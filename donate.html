@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Donate & Support | ISOT Community APS Turin</title>
+  <meta name="description" content="Support ISOT APS non-profit organization in Turin. Your tax-deductible donations fund welcome kits, cultural events, and emergency student support." />
+  <link rel="icon" href="assets/LOGOS/scritta isot.png" type="image/png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    :root {
+      --bg-dark: #0F172A;
+      --bg-card: #1E293B;
+      --bg-darker: #0B1120;
+      --pink: #EE0979;
+      --pink-glow: rgba(238, 9, 121, 0.35);
+      --navy: #243673;
+      --orange: #FF6A00;
+      --gold: #D4AF50;
+      --text-main: #F8FAFC;
+      --text-muted: #CBD5E1;
+      --text-dim: #94A3B8;
+      --border-light: rgba(255, 255, 255, 0.12);
+      --font-display: 'Amatic SC', cursive, sans-serif;
+      --font-body: 'Outfit', sans-serif;
+      --radius-sm: 12px;
+      --radius-md: 20px;
+      --radius-lg: 32px;
+      --radius-full: 9999px;
+      --transition: all 0.15s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-body); line-height: 1.6; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #243673; border-radius: 9999px; }
+
+    a { color: inherit; text-decoration: none; transition: var(--transition); }
+    img { max-width: 100%; height: auto; display: block; }
+
+    .container { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+    .section-padding { padding: 90px 0; position: relative; }
+
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    .text-pink { color: var(--pink); }
+    .text-gradient {
+      background: linear-gradient(135deg, var(--pink), var(--orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px 28px; border-radius: var(--radius-full); font-weight: 600;
+      font-size: 1rem; cursor: pointer; border: none; transition: var(--transition);
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .btn-pink { background: linear-gradient(135deg, #EE0979, #FF6A00); color: #FFF; box-shadow: 0 10px 25px var(--pink-glow); }
+
+    .pill-tag {
+      display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px;
+      border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px; background: rgba(238, 9, 121, 0.15);
+      border: 1px solid rgba(238, 9, 121, 0.3); color: var(--pink); margin-bottom: 20px;
+    }
+
+    .header {
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+      background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .nav-box { display: flex; align-items: center; justify-content: space-between; height: 80px; }
+    .nav-logo img { height: 48px; width: auto; }
+    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+    .nav-links a { font-size: 0.95rem; font-weight: 500; color: var(--text-muted); }
+    .nav-links a:hover, .nav-links a.active { color: #FFF; border-bottom: 2px solid var(--pink); padding-bottom: 4px; }
+    .mobile-toggle { display: none; background: none; border: none; color: #FFF; font-size: 1.5rem; cursor: pointer; }
+
+    .mobile-menu {
+      display: none; position: fixed; top: 80px; left: 0; width: 100%;
+      background: var(--bg-darker); border-bottom: 1px solid var(--border-light);
+      padding: 24px; flex-direction: column; gap: 16px; z-index: 999;
+    }
+    .mobile-menu.active { display: flex; }
+    .mobile-menu a { font-size: 1.1rem; font-weight: 600; color: var(--text-muted); }
+
+    .page-hero {
+      padding-top: 150px; padding-bottom: 70px; text-align: center; position: relative;
+      background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(238,9,121,0.12), transparent 70%);
+    }
+    .page-title { font-family: var(--font-display); font-size: 5rem; line-height: 0.9; margin-bottom: 16px; }
+
+    .bank-card {
+      background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--gold);
+      padding: 40px; margin: 40px auto 0; max-width: 750px; text-align: left;
+      box-shadow: 0 20px 50px rgba(212,175,80,0.15);
+    }
+    .bank-item { margin-bottom: 14px; font-size: 1.05rem; }
+
+    .footer { background: #070B14; border-top: 1px solid var(--border-light); padding: 70px 0 40px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 30px; margin-bottom: 40px; }
+
+    @media (max-width: 1024px) {
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .nav-links, .nav-btn-desktop { display: none; }
+      .mobile-toggle { display: block; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Header -->
+  <header class="header">
+    <div class="container nav-box">
+      <a href="index.html" class="nav-logo">
+        <img src="assets/LOGOS/scritta isot.png" alt="ISOT Community Logo" />
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="who-we-are.html">Who We Are</a></li>
+        <li><a href="what-we-do.html">What We Do</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="blog.html">Turin Guide & Blog</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li><a href="donate.html" class="active">Donate</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+
+      <div class="nav-btn-desktop">
+        <a href="join.html" class="btn btn-pink" style="padding: 10px 22px; font-size: 0.85rem;">Join Free <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="who-we-are.html">Who We Are</a>
+      <a href="what-we-do.html">What We Do</a>
+      <a href="events.html">Events</a>
+      <a href="blog.html">Turin Guide & Blog</a>
+      <a href="partners.html">Partners</a>
+      <a href="donate.html" class="active">Donate</a>
+      <a href="contact.html">Contact & FAQ</a>
+      <a href="join.html" class="btn btn-pink">Join Free →</a>
+    </div>
+  </header>
+
+  <!-- Page Hero -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="pill-tag"><i class="fa-solid fa-hand-holding-heart"></i> Non-Profit Support Portal</div>
+      <h1 class="page-title">Fuel International <span class="text-gradient">Student Futures</span></h1>
+      <p style="color: var(--text-muted); max-width: 680px; margin: 0 auto; font-size: 1.15rem;">
+        Your donations directly fund orientation kits, cultural workshops, and emergency support for students arriving in Turin.
+      </p>
+    </div>
+  </section>
+
+  <!-- Impact Breakdown -->
+  <section class="section-padding reveal">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 40px;">
+        <div class="pill-tag">Transparency</div>
+        <h2 style="font-family: var(--font-display); font-size: 3.8rem; line-height: 1;">How Your Contribution <span class="text-gradient">Helps</span></h2>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
+        <div style="background: var(--bg-card); padding: 36px; border-radius: var(--radius-lg); border: 1px solid var(--border-light);">
+          <div style="font-size: 2.2rem; color: var(--pink); margin-bottom: 14px;"><i class="fa-solid fa-box-open"></i></div>
+          <h3 style="font-size: 1.4rem; font-weight: 700; color: #FFF; margin-bottom: 10px;">Student Welcome Kits</h3>
+          <p style="color: var(--text-dim); font-size: 0.95rem;">Covers printing SIM card guides, transit maps, and essential housing checklists for newly arrived students in Turin.</p>
+        </div>
+
+        <div style="background: var(--bg-card); padding: 36px; border-radius: var(--radius-lg); border: 1px solid var(--border-light);">
+          <div style="font-size: 2.2rem; color: var(--orange); margin-bottom: 14px;"><i class="fa-solid fa-earth-asia"></i></div>
+          <h3 style="font-size: 1.4rem; font-weight: 700; color: #FFF; margin-bottom: 10px;">Cultural Festivals</h3>
+          <p style="color: var(--text-dim); font-size: 0.95rem;">Funds traditional food ingredients, music venues, and art supplies for Nowruz, Turkish Night, and multicultural meetups.</p>
+        </div>
+
+        <div style="background: var(--bg-card); padding: 36px; border-radius: var(--radius-lg); border: 1px solid var(--border-light);">
+          <div style="font-size: 2.2rem; color: var(--gold); margin-bottom: 14px;"><i class="fa-solid fa-shield-heart"></i></div>
+          <h3 style="font-size: 1.4rem; font-weight: 700; color: #FFF; margin-bottom: 10px;">Emergency Relief</h3>
+          <p style="color: var(--text-dim); font-size: 0.95rem;">Provides small micro-grants for arriving students facing temporary accommodation crises or urgent healthcare registration fees.</p>
+        </div>
+      </div>
+
+      <!-- Bank Card -->
+      <div class="bank-card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+          <h3 style="font-size: 1.8rem; font-weight: 700; color: #FFF;"><i class="fa-solid fa-building-columns" style="color: var(--gold); margin-right: 10px;"></i> Direct Bank Transfer (IBAN)</h3>
+          <span class="pill-tag" style="margin-bottom:0;">Official APS Account</span>
+        </div>
+
+        <div class="bank-item"><strong>Beneficiary Organization:</strong> <span style="color:#FFF;">ISOT APS (Associazione di Promozione Sociale)</span></div>
+        <div class="bank-item"><strong>Bank Name:</strong> <span style="color:#FFF;">Intesa Sanpaolo</span></div>
+        <div class="bank-item"><strong>IBAN Code:</strong> <span style="color: var(--gold); font-family: monospace; font-size: 1.2rem; font-weight: 700;">IT96I0306909606100000413476</span></div>
+        <div class="bank-item"><strong>SWIFT / BIC:</strong> <span style="color:#FFF;">BCITITMM</span></div>
+        <div class="bank-item"><strong>Causale (Reference):</strong> <span style="color: var(--pink);">Donazione ISOT APS – [Your Name]</span></div>
+
+        <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px;">
+          * As a registered Italian APS entity, all donations to ISOT are strictly tracked and dedicated to student non-profit activities.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" class="nav-logo"><img src="assets/LOGOS/scritta isot.png" alt="ISOT Logo" /></a>
+          <p style="color: var(--text-dim); font-size: 0.9rem; margin-top: 14px;">Live globally, connect locally. The international student community of Turin (APS).</p>
+        </div>
+        <div>
+          <h4 style="color: #FFF; margin-bottom: 16px;">Pages</h4>
+          <ul style="list-style: none; font-size: 0.9rem; color: var(--text-dim);">
+            <li style="margin-bottom: 8px;"><a href="who-we-are.html">Who We Are</a></li>
+            <li style="margin-bottom: 8px;"><a href="what-we-do.html">What We Do</a></li>
+            <li style="margin-bottom: 8px;"><a href="events.html">Events Calendar</a></li>
+            <li style="margin-bottom: 8px;"><a href="blog.html">Turin Student Guide</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="color: #FFF; margin-bottom: 16px;">Community</h4>
+          <ul style="list-style: none; font-size: 0.9rem; color: var(--text-dim);">
+            <li style="margin-bottom: 8px;"><a href="join.html">Free Access</a></li>
+            <li style="margin-bottom: 8px;"><a href="join.html">Official APS Member (€10)</a></li>
+            <li style="margin-bottom: 8px;"><a href="partners.html">Venue Partners</a></li>
+            <li style="margin-bottom: 8px;"><a href="donate.html">Donate & Support</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="color: #FFF; margin-bottom: 16px;">Support</h4>
+          <ul style="list-style: none; font-size: 0.9rem; color: var(--text-dim);">
+            <li style="margin-bottom: 8px;"><a href="contact.html">Contact Us</a></li>
+            <li style="margin-bottom: 8px;"><a href="contact.html">Student FAQs</a></li>
+            <li style="margin-bottom: 8px;"><a href="privacy.html">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="color: #FFF; margin-bottom: 16px;">Social</h4>
+          <p style="color: var(--text-dim); font-size: 0.85rem;">Follow us on Instagram @isot.community & join Telegram!</p>
+        </div>
+      </div>
+      <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 24px; text-align: center; color: var(--text-dark); font-size: 0.85rem;">
+        © 2026 ISOT Community (Associazione di Promozione Sociale) • Turin, Italy
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.toggle('active');
+    });
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } }),
+      { threshold: 0.12 }
+    );
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

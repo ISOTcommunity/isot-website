@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520">
+  <rect width="900" height="520" fill="#000000"/>
+
+  <!-- i: dot + body -->
+  <rect x="30" y="30"  width="52" height="40"  fill="#ffffff"/>
+  <rect x="30" y="100" width="52" height="390" fill="#ffffff"/>
+
+  <!-- S: two opposing arcs forming geometric S -->
+  <!-- top arc (opens right) -->
+  <path d="M170,30 L310,30 Q390,30 390,110 Q390,190 310,190 L230,190 Q150,190 150,270 Q150,350 230,350 L320,350 Q390,350 390,310"
+        stroke="#ffffff" stroke-width="52" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+
+  <!-- O: large filled donut, extends to bottom -->
+  <!-- Center-x ~570, center-y ~310, outer-r 200, inner-r 130 -->
+  <circle cx="570" cy="310" r="200" fill="#ffffff"/>
+  <circle cx="570" cy="310" r="130" fill="#000000"/>
+
+  <!-- T: wide horizontal bar + vertical stem -->
+  <rect x="680" y="30"  width="190" height="52" fill="#ffffff"/>
+  <rect x="741" y="82"  width="68"  height="370" fill="#ffffff"/>
+</svg>

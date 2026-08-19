@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Join ISOT | Free Access & Official APS Membership</title>
+  <meta name="description" content="Join ISOT Community in Turin. Choose between Free Community Access or Official €10/year APS Association Membership with Intesa Sanpaolo bank transfer." />
+  <link rel="icon" href="assets/LOGOS/scritta isot.png" type="image/png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    :root {
+      --bg-dark: #0F172A;
+      --bg-card: #1E293B;
+      --bg-darker: #0B1120;
+      --pink: #EE0979;
+      --pink-glow: rgba(238, 9, 121, 0.35);
+      --navy: #243673;
+      --orange: #FF6A00;
+      --gold: #D4AF50;
+      --text-main: #F8FAFC;
+      --text-muted: #CBD5E1;
+      --text-dim: #94A3B8;
+      --text-dark: #64748B;
+      --border-light: rgba(255, 255, 255, 0.12);
+      --font-display: 'Amatic SC', cursive, sans-serif;
+      --font-body: 'Outfit', sans-serif;
+      --radius-sm: 12px;
+      --radius-md: 20px;
+      --radius-lg: 32px;
+      --radius-full: 9999px;
+      --transition: all 0.15s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-body); line-height: 1.6; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #243673; border-radius: 9999px; }
+
+    a { color: inherit; text-decoration: none; transition: var(--transition); }
+    img { max-width: 100%; height: auto; display: block; }
+
+    .container { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+    .section-padding { padding: 90px 0; position: relative; }
+
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    .text-pink { color: var(--pink); }
+    .text-gradient {
+      background: linear-gradient(135deg, var(--pink), var(--orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px 28px; border-radius: var(--radius-full); font-weight: 600;
+      font-size: 1rem; cursor: pointer; border: none; transition: var(--transition);
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .btn-pink { background: linear-gradient(135deg, #EE0979, #FF6A00); color: #FFF; box-shadow: 0 10px 25px var(--pink-glow); }
+    .btn-pink:hover { transform: translateY(-3px); }
+    .btn-outline { background: rgba(255,255,255,0.05); color: #FFF; border: 1px solid rgba(255,255,255,0.2); }
+
+    .pill-tag {
+      display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px;
+      border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px; background: rgba(238, 9, 121, 0.15);
+      border: 1px solid rgba(238, 9, 121, 0.3); color: var(--pink); margin-bottom: 20px;
+    }
+
+    .header {
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+      background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .nav-box { display: flex; align-items: center; justify-content: space-between; height: 80px; }
+    .nav-logo img { height: 48px; width: auto; }
+    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+    .nav-links a { font-size: 0.95rem; font-weight: 500; color: var(--text-muted); }
+    .nav-links a:hover, .nav-links a.active { color: #FFF; border-bottom: 2px solid var(--pink); padding-bottom: 4px; }
+    .mobile-toggle { display: none; background: none; border: none; color: #FFF; font-size: 1.5rem; cursor: pointer; }
+
+    .mobile-menu {
+      display: none; position: fixed; top: 80px; left: 0; width: 100%;
+      background: var(--bg-darker); border-bottom: 1px solid var(--border-light);
+      padding: 24px; flex-direction: column; gap: 16px; z-index: 999;
+    }
+    .mobile-menu.active { display: flex; }
+    .mobile-menu a { font-size: 1.1rem; font-weight: 600; color: var(--text-muted); }
+
+    .page-hero {
+      padding-top: 150px; padding-bottom: 70px; text-align: center; position: relative;
+      background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(238,9,121,0.12), transparent 70%);
+    }
+    .page-title { font-family: var(--font-display); font-size: 5rem; line-height: 0.9; margin-bottom: 16px; }
+
+    .join-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: stretch; }
+    .join-card {
+      background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-light);
+      padding: 44px; position: relative; display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .join-card.featured {
+      border-color: var(--pink); box-shadow: 0 20px 50px var(--pink-glow);
+      background: linear-gradient(180deg, #1E293B 0%, #172033 100%);
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; text-align: left; margin-bottom: 16px; }
+    .form-group label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+    .form-input {
+      background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+      padding: 12px 16px; color: #FFF; font-size: 0.95rem; outline: none;
+    }
+    .form-input:focus { border-color: var(--pink); box-shadow: 0 0 0 3px var(--pink-glow); }
+    .hidden-field { display: none !important; }
+
+    .bank-box {
+      background: rgba(0, 0, 0, 0.4); border-radius: var(--radius-sm); padding: 18px;
+      text-align: left; font-size: 0.85rem; color: var(--text-muted); margin-top: 16px;
+      border: 1px dashed var(--gold);
+    }
+
+    .footer { background: #070B14; border-top: 1px solid var(--border-light); padding: 70px 0 40px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 30px; margin-bottom: 40px; }
+
+    @media (max-width: 1024px) {
+      .join-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .nav-links, .nav-btn-desktop { display: none; }
+      .mobile-toggle { display: block; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Header -->
+  <header class="header">
+    <div class="container nav-box">
+      <a href="index.html" class="nav-logo">
+        <img src="assets/LOGOS/scritta isot.png" alt="ISOT Community Logo" />
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="who-we-are.html">Who We Are</a></li>
+        <li><a href="what-we-do.html">What We Do</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="blog.html">Turin Guide & Blog</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li><a href="donate.html">Donate</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+
+      <div class="nav-btn-desktop">
+        <a href="join.html" class="btn btn-pink" style="padding: 10px 22px; font-size: 0.85rem;">Join Free <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="who-we-are.html">Who We Are</a>
+      <a href="what-we-do.html">What We Do</a>
+      <a href="events.html">Events</a>
+      <a href="blog.html">Turin Guide & Blog</a>
+      <a href="partners.html">Partners</a>
+      <a href="donate.html">Donate</a>
+      <a href="contact.html">Contact & FAQ</a>
+      <a href="join.html" class="btn btn-pink">Join Free →</a>
+    </div>
+  </header>
+
+  <!-- Page Hero -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="pill-tag"><i class="fa-solid fa-user-plus"></i> Membership Options</div>
+      <h1 class="page-title">Choose How to <span class="text-gradient">Connect</span></h1>
+      <p style="color: var(--text-muted); max-width: 680px; margin: 0 auto; font-size: 1.15rem;">
+        Whether you want free community access or full official APS non-profit member rights, welcome to ISOT!
+      </p>
+    </div>
+  </section>
+
+  <!-- Join Options Grid -->
+  <section class="section-padding reveal">
+    <div class="container">
+      <div class="join-grid">
+        
+        <!-- Track 1: Free Community -->
+        <div class="join-card">
+          <div>
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">TRACK 01</div>
+            <h3 style="font-size: 2rem; font-weight: 700; color: #FFF; margin-top: 4px;">Free Community Access</h3>
+            <p style="color: var(--text-dim); font-size: 0.9rem;">Open to all international students and youth in Turin.</p>
+            <div style="font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: #FFF; margin: 16px 0 24px;">€0 <span style="font-size: 1rem; color: var(--text-dark); font-family: var(--font-body);">/ forever</span></div>
+
+            <ul style="list-style: none; margin-bottom: 30px; font-size: 0.95rem; color: var(--text-muted);">
+              <li style="margin-bottom: 10px;"><i class="fa-solid fa-check text-pink" style="margin-right: 8px;"></i> Access to all weekly social events (Karaoke, Social Hub)</li>
+              <li style="margin-bottom: 10px;"><i class="fa-solid fa-check text-pink" style="margin-right: 8px;"></i> Official ISOT WhatsApp & Telegram group invites</li>
+              <li style="margin-bottom: 10px;"><i class="fa-solid fa-check text-pink" style="margin-right: 8px;"></i> Weekly event notifications & student guide updates</li>
+            </ul>
+          </div>
+
+          <form id="commForm" onsubmit="submitForm(event, 'community')">
+            <input type="text" name="website_url" class="hidden-field" tabindex="-1" autocomplete="off" />
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="commName" required placeholder="Alex Rossi" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" id="commEmail" required placeholder="alex@example.com" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label>University / School</label>
+              <input type="text" id="commUni" required placeholder="UniTo / PoliTO / SAA" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label>Verification Question: What city is ISOT based in?</label>
+              <input type="text" id="commCity" required placeholder="Type city name" class="form-input" />
+            </div>
+            <button type="submit" class="btn btn-outline" style="width: 100%;">Get Community Access →</button>
+          </form>
+
+          <div id="commSuccess" style="display:none; text-align:center; padding:20px; background: rgba(15,23,42,0.9); border-radius: var(--radius-md); border:1px solid var(--pink); margin-top:20px;">
+            <h4 style="color:#FFF; font-size:1.3rem;">Welcome to ISOT! 🎉</h4>
+            <p style="color:var(--text-muted); font-size:0.9rem; margin:10px 0 16px;">Click below to join our Telegram Community Chat:</p>
+            <a href="https://t.me/isotcommunity" target="_blank" class="btn btn-pink" style="width:100%; background:#229CCE; color:#FFF;"><i class="fa-brands fa-telegram"></i> Telegram Chat</a>
+          </div>
+        </div>
+
+        <!-- Track 2: Official APS Member (€10/yr) -->
+        <div class="join-card featured">
+          <div style="position: absolute; top:-16px; right:30px; background: linear-gradient(135deg, var(--pink), var(--orange)); padding: 6px 18px; border-radius: var(--radius-full); font-size:0.75rem; font-weight:800; color:#FFF; text-transform:uppercase;">RECOMMENDED</div>
+          <div>
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--pink); text-transform: uppercase;">TRACK 02</div>
+            <h3 style="font-size: 2rem; font-weight: 700; color: #FFF; margin-top: 4px;">Official APS Member</h3>
+            <p style="color: var(--text-dim); font-size: 0.9rem;">Full non-profit rights, Career Lab clinics & partner perks.</p>
+            <div style="font-family: var(--font-display); font-size: 4rem; font-weight: 700; margin: 16px 0 24px;" class="text-gradient">€10 <span style="font-size: 1rem; color: var(--text-dark); font-family: var(--font-body);">/ per year</span></div>
+
+            <ul style="list-style: none; margin-bottom: 30px; font-size: 0.95rem; color: var(--text-muted);">
+              <li style="margin-bottom: 10px;"><i class="fa-solid fa-star text-gold" style="margin-right: 8px;"></i> Everything in Free Access</li>
+              <li style="margin-bottom: 10px;"><i class="fa-solid fa-star text-gold" style="margin-right: 8px;"></i> Full Voting Rights at General Assembly (APS Member)</li>
+              <li style="margin-bottom: 10px;"><i class="fa-solid fa-star text-gold" style="margin-right: 8px;"></i> Weekly Career Lab & CV workshop access</li>
+              <li style="margin-bottom: 10px;"><i class="fa-solid fa-star text-gold" style="margin-right: 8px;"></i> Official non-profit tax receipt issued</li>
+            </ul>
+          </div>
+
+          <form id="memberForm" onsubmit="submitForm(event, 'member')">
+            <input type="text" name="website_url" class="hidden-field" tabindex="-1" autocomplete="off" />
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="memberName" required placeholder="Maria Silva" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" id="memberEmail" required placeholder="maria@example.com" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label>University / School</label>
+              <input type="text" id="memberUni" required placeholder="Politecnico di Torino" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label>Nationality</label>
+              <input type="text" id="memberNation" required placeholder="Spanish / Brazilian / Iranian" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label>Verification Question: What city is ISOT based in?</label>
+              <input type="text" id="memberCity" required placeholder="Type city name" class="form-input" />
+            </div>
+            <button type="submit" class="btn btn-pink" style="width: 100%;">Become Official APS Member →</button>
+          </form>
+
+          <div id="memberSuccess" style="display:none; text-align:left; padding:24px; background: rgba(15,23,42,0.95); border-radius: var(--radius-md); border:1px solid var(--pink); margin-top:20px;">
+            <h4 style="color:#FFF; font-size:1.3rem; margin-bottom:8px;">Thank You for Registering! 🌟</h4>
+            <p style="color:var(--text-muted); font-size:0.85rem;">Please transfer your annual €10.00 membership fee via bank transfer:</p>
+            <div class="bank-box">
+              <div><strong>Beneficiary:</strong> ISOT APS</div>
+              <div><strong>Amount:</strong> €10.00</div>
+              <div><strong>IBAN:</strong> <span style="color:var(--gold); font-family:monospace;">IT96I0306909606100000413476</span></div>
+              <div><strong>Bank:</strong> Intesa Sanpaolo</div>
+              <div><strong>Reference (Causale):</strong> Quota associativa – <span id="refName">Member</span></div>
+            </div>
+            <p style="color:var(--text-dim); font-size:0.8rem; margin-top:12px;">Your membership receipt will be generated and emailed within 48h. Welcome to ISOT APS!</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" class="nav-logo"><img src="assets/LOGOS/scritta isot.png" alt="ISOT Logo" /></a>
+          <p style="color: var(--text-dim); font-size: 0.9rem; margin-top: 14px;">Live globally, connect locally. The international student community of Turin (APS).</p>
+        </div>
+        <div>
+          <h4 style="color: #FFF; margin-bottom: 16px;">Pages</h4>
+          <ul style="list-style: none; font-size: 0.9rem; color: var(--text-dim);">
+            <li style="margin-bottom: 8px;"><a href="who-we-are.html">Who We Are</a></li>
+            <li style="margin-bottom: 8px;"><a href="what-we-do.html">What We Do</a></li>
+            <li style="margin-bottom: 8px;"><a href="events.html">Events Calendar</a></li>
+            <li style="margin-bottom: 8px;"><a href="blog.html">Turin Student Guide</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="color: #FFF; margin-bottom: 16px;">Community</h4>
+          <ul style="list-style: none; font-size: 0.9rem; color: var(--text-dim);">
+            <li style="margin-bottom: 8px;"><a href="join.html">Free Access</a></li>
+            <li style="margin-bottom: 8px;"><a href="join.html">Official APS Member (€10)</a></li>
+            <li style="margin-bottom: 8px;"><a href="partners.html">Venue Partners</a></li>
+            <li style="margin-bottom: 8px;"><a href="donate.html">Donate & Support</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="color: #FFF; margin-bottom: 16px;">Support</h4>
+          <ul style="list-style: none; font-size: 0.9rem; color: var(--text-dim);">
+            <li style="margin-bottom: 8px;"><a href="contact.html">Contact Us</a></li>
+            <li style="margin-bottom: 8px;"><a href="contact.html">Student FAQs</a></li>
+            <li style="margin-bottom: 8px;"><a href="privacy.html">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="color: #FFF; margin-bottom: 16px;">Social</h4>
+          <p style="color: var(--text-dim); font-size: 0.85rem;">Follow us on Instagram @isot.community & join Telegram!</p>
+        </div>
+      </div>
+      <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 24px; text-align: center; color: var(--text-dark); font-size: 0.85rem;">
+        © 2026 ISOT Community (Associazione di Promozione Sociale) • Turin, Italy
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.toggle('active');
+    });
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } }),
+      { threshold: 0.12 }
+    );
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    function submitForm(event, type) {
+      event.preventDefault();
+      const form = event.target;
+      const honeypot = form.querySelector('input[name="website_url"]').value;
+      if (honeypot) return;
+
+      const cityVal = (type === 'community' ? document.getElementById('commCity') : document.getElementById('memberCity')).value.trim().toLowerCase();
+      if (cityVal !== 'turin' && cityVal !== 'torino') {
+        alert('Please enter the city where ISOT is based (Turin or Torino).');
+        return;
+      }
+
+      if (type === 'community') {
+        document.getElementById('commForm').style.display = 'none';
+        document.getElementById('commSuccess').style.display = 'block';
+      } else {
+        const name = document.getElementById('memberName').value.trim();
+        document.getElementById('refName').innerText = name || 'Member';
+        document.getElementById('memberForm').style.display = 'none';
+        document.getElementById('memberSuccess').style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>

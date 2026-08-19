@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Internal tooling
+ANTIGRAVITY_PROMPT.md
+
+# Raw asset archives (not used by site, too large for git)
+assets/Photos/
+assets/Instagram Posts/
