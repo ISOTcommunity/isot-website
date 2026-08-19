@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Who We Are | ISOT Community APS Turin</title>
-  <meta name="description" content="Learn about ISOT (International Students of Turin), an officially registered non-profit APS association dedicated to connecting international students in Turin." />
+  <meta name="description" content="We are ISOT — an international student community based in Turin. Connected by heart, openness, and a shared belief that diversity makes us stronger." />
   
   <!-- Favicon using exact Scritta ISOT Logo -->
   <link rel="icon" href="assets/LOGOS/scritta isot.png" type="image/png" />
@@ -24,7 +24,6 @@
       --pink-glow: rgba(238, 9, 121, 0.35);
       --navy: #243673;
       --orange: #FF6A00;
-      --amber: #EBC17F;
       --gold: #D4AF50;
       --text-main: #F8FAFC;
       --text-muted: #CBD5E1;
@@ -42,7 +41,7 @@
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; font-size: 16px; }
-    body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-body); line-height: 1.6; }
+    body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-body); line-height: 1.7; }
 
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -75,7 +74,6 @@
     }
     .btn-pink { background: linear-gradient(135deg, #EE0979, #FF6A00); color: #FFF; box-shadow: 0 10px 25px var(--pink-glow); }
     .btn-pink:hover { transform: translateY(-3px); }
-    .btn-outline { background: rgba(255,255,255,0.05); color: #FFF; border: 1px solid rgba(255,255,255,0.2); }
 
     .pill-tag {
       display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px;
@@ -110,22 +108,22 @@
     }
     .page-title { font-family: var(--font-display); font-size: 5rem; line-height: 0.9; margin-bottom: 16px; }
 
-    .about-card {
+    .numbered-card {
       background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-light);
-      padding: 40px; margin-bottom: 40px;
+      padding: 40px; text-align: left; position: relative; overflow: hidden;
+      transition: var(--transition);
     }
+    .numbered-card:hover { border-color: var(--pink); transform: translateY(-6px); }
 
-    .governance-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 30px; }
-    .gov-card {
-      background: rgba(15, 23, 42, 0.8); border-radius: var(--radius-md); border: 1px solid var(--border-light);
-      padding: 30px; text-align: center;
+    .num-watermark {
+      font-family: var(--font-display); font-size: 5rem; font-weight: 700; color: var(--pink);
+      line-height: 0.8; margin-bottom: 12px;
     }
 
     .footer { background: #070B14; border-top: 1px solid var(--border-light); padding: 70px 0 40px; }
     .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 30px; margin-bottom: 40px; }
 
     @media (max-width: 1024px) {
-      .governance-grid { grid-template-columns: 1fr; }
       .footer-grid { grid-template-columns: 1fr 1fr; }
       .nav-links, .nav-btn-desktop { display: none; }
       .mobile-toggle { display: block; }
@@ -148,7 +146,7 @@
         <li><a href="blog.html">Turin Guide & Blog</a></li>
         <li><a href="partners.html">Partners</a></li>
         <li><a href="donate.html">Donate</a></li>
-        <li><a href="contact.html">Contact</a></li>
+        <li><a href="profile.html"><i class="fa-solid fa-user"></i> My Profile</a></li>
       </ul>
 
       <div class="nav-btn-desktop">
@@ -166,8 +164,7 @@
       <a href="events.html">Events</a>
       <a href="blog.html">Turin Guide & Blog</a>
       <a href="partners.html">Partners</a>
-      <a href="donate.html">Donate</a>
-      <a href="contact.html">Contact & FAQ</a>
+      <a href="profile.html"><i class="fa-solid fa-user"></i> My Profile</a>
       <a href="join.html" class="btn btn-pink">Join Free →</a>
     </div>
   </header>
@@ -175,10 +172,10 @@
   <!-- Page Hero -->
   <section class="page-hero">
     <div class="container">
-      <div class="pill-tag"><i class="fa-solid fa-building-columns"></i> Legal Non-Profit Association (APS)</div>
-      <h1 class="page-title">Not Just a Group. <br /><span class="text-gradient">A Movement.</span></h1>
-      <p style="color: var(--text-muted); max-width: 680px; margin: 0 auto; font-size: 1.15rem;">
-        ISOT (International Students of Turin) is the bridge between arriving in Italy and finding your true family in Turin.
+      <div class="pill-tag"><i class="fa-solid fa-earth-americas"></i> A Global Family in Turin</div>
+      <h1 class="page-title">Who We <span class="text-gradient">Are</span></h1>
+      <p style="color: var(--text-muted); max-width: 720px; margin: 0 auto; font-size: 1.2rem; font-weight: 500;">
+        We are here to connect cultures, build friendships, and make every student feel at home.
       </p>
     </div>
   </section>
@@ -188,52 +185,68 @@
     <div class="container">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center;">
         <div>
-          <h2 style="font-family: var(--font-display); font-size: 3.5rem; line-height: 1; margin-bottom: 20px;">
-            Our Story & <span class="text-gradient">Mission</span>
+          <div class="pill-tag">About ISOT</div>
+          <h2 style="font-family: var(--font-display); font-size: 3.8rem; line-height: 1; margin-bottom: 20px;">
+            Here, You're Part of a <span class="text-gradient">Family</span>
           </h2>
-          <p style="color: var(--text-muted); margin-bottom: 16px; font-size: 1.05rem;">
-            Moving to a new country to study at Politecnico di Torino, Università degli Studi di Torino, or SAA School of Management is thrilling—but navigating bureaucracy, housing, and social isolation can be daunting.
+          <p style="color: var(--text-muted); margin-bottom: 18px; font-size: 1.08rem;">
+            We are ISOT — an international student community based in the vibrant city of Turin. Founded by students who once felt the same excitement and uncertainty of arriving in a new country, ISOT was built to make that journey easier for others. Our community is a space where people from all cultures, languages, and backgrounds come together to feel seen, supported, and empowered. Whether you’re looking for friendship, cultural experiences, or professional growth, ISOT is here to walk beside you every step of the way.
           </p>
-          <p style="color: var(--text-muted); margin-bottom: 16px; font-size: 1.05rem;">
-            Founded by international students for international students, <strong>ISOT APS</strong> was built on a single core belief: <em>No student should have to navigate their journey alone.</em>
-          </p>
-          <p style="color: var(--text-muted); font-size: 1.05rem;">
-            Today, ISOT is an officially registered Italian Social Promotion Association (APS), uniting young minds from over 40 countries through weekly cultural events, integration workshops, and professional career mentorship.
+          <p style="color: var(--text-muted); font-size: 1.08rem;">
+            We believe in the power of connection — not just socially, but emotionally and intellectually. That’s why we organize everything from casual meetups and language exchange nights to career workshops, city tours, and multicultural celebrations. What makes ISOT special isn’t just what we do — it’s how we do it: with heart, openness, and a shared belief that diversity makes us stronger. Here, you’re not just a student. You’re part of a family.
           </p>
         </div>
         <div style="border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border-light); box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
-          <img src="assets/optimized/social_group_2.jpg" alt="ISOT Community Students in Turin" />
+          <img src="assets/optimized/social_group_2.jpg" alt="ISOT International Students Family in Turin" />
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Values Grid -->
+  <!-- Our Approach -->
   <section class="section-padding reveal" style="background: var(--bg-darker);">
     <div class="container">
       <div style="text-align: center; margin-bottom: 50px;">
-        <div class="pill-tag">Core Principles</div>
-        <h2 style="font-family: var(--font-display); font-size: 3.8rem; line-height: 1;">What Drives <span class="text-gradient">ISOT</span></h2>
+        <div class="pill-tag">Our Approach</div>
+        <h2 style="font-family: var(--font-display); font-size: 4rem; line-height: 1;">How We Make It <span class="text-gradient">Happen</span></h2>
+        <p style="color: var(--text-muted); max-width: 740px; margin: 16px auto 0; font-size: 1.1rem;">
+          At ISOT, we believe that meaningful change starts with human connection. Our approach is built on inclusion, empathy, and action. We listen to the needs of international students and respond with real, practical solutions — from organizing cultural events and support sessions, to creating spaces where people feel safe, seen, and inspired.
+        </p>
+        <p style="color: var(--text-muted); max-width: 740px; margin: 12px auto 0; font-size: 1.1rem;">
+          We don’t just host activities — we build bridges between cultures, communities, and individuals. Every program we design is rooted in collaboration and shaped by student voices. Our goal isn’t just to help students adapt — it’s to help them thrive.
+        </p>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
-        <div class="about-card">
-          <div style="font-size: 2.2rem; color: var(--pink); margin-bottom: 14px;"><i class="fa-solid fa-heart-circle-check"></i></div>
-          <h3 style="font-size: 1.5rem; font-weight: 700; color: #FFF; margin-bottom: 10px;">Inclusion & Belonging</h3>
-          <p style="color: var(--text-dim);">We foster a safe, warm environment where everyone—regardless of nationality, culture, or background—is welcomed as family.</p>
+      <!-- 3 Columns: 01 Mission, 02 Vision, 03 Story -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 50px;">
+        
+        <!-- 01 Mission -->
+        <div class="numbered-card">
+          <div class="num-watermark">01.</div>
+          <h3 style="font-size: 1.6rem; font-weight: 700; color: #FFF; margin-bottom: 12px;">— Our Mission</h3>
+          <p style="color: var(--text-muted); font-size: 1.05rem;">
+            We create a welcoming space where international students in Turin can connect, grow, and feel at home — culturally, socially, and professionally.
+          </p>
         </div>
 
-        <div class="about-card">
-          <div style="font-size: 2.2rem; color: var(--orange); margin-bottom: 14px;"><i class="fa-solid fa-bridge"></i></div>
-          <h3 style="font-size: 1.5rem; font-weight: 700; color: #FFF; margin-bottom: 10px;">Local Integration</h3>
-          <p style="color: var(--text-dim);">We connect international youth directly with Turin's rich culture, university systems, local venues, and community initiatives.</p>
+        <!-- 02 Vision -->
+        <div class="numbered-card">
+          <div class="num-watermark" style="color: var(--orange);">02.</div>
+          <h3 style="font-size: 1.6rem; font-weight: 700; color: #FFF; margin-bottom: 12px;">— Our Vision</h3>
+          <p style="color: var(--text-muted); font-size: 1.05rem;">
+            To become the heart of international student life in Turin — a vibrant, inclusive, and empowering global community.
+          </p>
         </div>
 
-        <div class="about-card">
-          <div style="font-size: 2.2rem; color: var(--gold); margin-bottom: 14px;"><i class="fa-solid fa-seedling"></i></div>
-          <h3 style="font-size: 1.5rem; font-weight: 700; color: #FFF; margin-bottom: 10px;">Empowerment</h3>
-          <p style="color: var(--text-dim);">Through our Career Lab clinics and leadership opportunities, we empower students to build valuable skills for their future careers.</p>
+        <!-- 03 Story -->
+        <div class="numbered-card">
+          <div class="num-watermark" style="color: var(--gold);">03.</div>
+          <h3 style="font-size: 1.6rem; font-weight: 700; color: #FFF; margin-bottom: 12px;">— Our Story</h3>
+          <p style="color: var(--text-muted); font-size: 1.05rem;">
+            ISOT started with one small event and a big dream: to turn strangers into friends and make every student’s journey in Turin meaningful.
+          </p>
         </div>
+
       </div>
     </div>
   </section>
@@ -241,44 +254,15 @@
   <!-- Legal Governance & APS Identity -->
   <section class="section-padding reveal">
     <div class="container">
-      <div class="about-card" style="border-color: var(--pink);">
-        <div class="pill-tag">APS Association Legal Notice</div>
-        <h2 style="font-family: var(--font-display); font-size: 3.2rem; line-height: 1; margin-bottom: 16px;">
+      <div style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--pink); padding: 40px;">
+        <div class="pill-tag">Legal APS Status</div>
+        <h2 style="font-family: var(--font-display); font-size: 3.5rem; line-height: 1; margin-bottom: 16px;">
           Associazione di Promozione Sociale (APS)
         </h2>
-        <p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 20px;">
-          ISOT is formally registered under Italian non-profit law (RUNTS compliant APS). As an official APS entity, our leadership is democratically elected, our financial statements are open to members, and all revenues are directly reinvested into student support services.
+        <p style="color: var(--text-muted); font-size: 1.05rem;">
+          ISOT is formally registered under Italian non-profit law (RUNTS compliant APS). Led by President <strong>Amirhossein Shokouhipour</strong> and student board members, all membership fees (€10/yr) and donations directly fund student welfare, emergency welcome kits, and cultural programs.
         </p>
-
-        <div class="governance-grid">
-          <div class="gov-card">
-            <div style="font-size: 1.8rem; color: var(--gold); margin-bottom: 8px;"><i class="fa-solid fa-user-tie"></i></div>
-            <h4 style="font-size: 1.2rem; color: #FFF;">President & Executive Board</h4>
-            <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 6px;">Led by <strong>Amirhossein Shokouhipour</strong> and student board members overseeing operations, legal compliance, and community outreach.</p>
-          </div>
-
-          <div class="gov-card">
-            <div style="font-size: 1.8rem; color: var(--pink); margin-bottom: 8px;"><i class="fa-solid fa-check-double"></i></div>
-            <h4 style="font-size: 1.2rem; color: #FFF;">General Assembly Rights</h4>
-            <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 6px;">Official €10/yr APS members have full voting rights at our annual assembly and can run for board leadership positions.</p>
-          </div>
-
-          <div class="gov-card">
-            <div style="font-size: 1.8rem; color: var(--orange); margin-bottom: 8px;"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-            <h4 style="font-size: 1.2rem; color: #FFF;">Transparent Financials</h4>
-            <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 6px;">All membership fees and donations are processed via our official Intesa Sanpaolo bank account with formal tax receipts issued.</p>
-          </div>
-        </div>
       </div>
-    </div>
-  </section>
-
-  <!-- CTA -->
-  <section class="section-padding reveal" style="text-align: center; background: var(--bg-darker);">
-    <div class="container">
-      <h2 style="font-family: var(--font-display); font-size: 4rem; margin-bottom: 16px;">Ready to Join the <span class="text-gradient">ISOT Family?</span></h2>
-      <p style="color: var(--text-muted); max-width: 540px; margin: 0 auto 30px;">Whether you want free community access or full official APS membership, we welcome you with open arms.</p>
-      <a href="join.html" class="btn btn-pink">Become a Member Today →</a>
     </div>
   </section>
 
@@ -312,7 +296,7 @@
           <h4 style="color: #FFF; margin-bottom: 16px;">Support</h4>
           <ul style="list-style: none; font-size: 0.9rem; color: var(--text-dim);">
             <li style="margin-bottom: 8px;"><a href="contact.html">Contact Us</a></li>
-            <li style="margin-bottom: 8px;"><a href="contact.html">Student FAQs</a></li>
+            <li style="margin-bottom: 8px;"><a href="profile.html">My Profile</a></li>
             <li style="margin-bottom: 8px;"><a href="privacy.html">Privacy Policy</a></li>
           </ul>
         </div>
