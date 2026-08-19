@@ -504,6 +504,19 @@
       z-index: 0;
     }
 
+    .portal-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+
+    @media (max-width: 1024px) {
+      .portal-cards-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -896,7 +909,7 @@
         <p class="section-subtitle">Dedicated hubs created to guide your international student life.</p>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
+      <div class="portal-cards-grid">
         <a href="who-we-are.html" class="cat-box" style="padding: 30px; text-align: left; background: var(--bg-card);">
           <div style="font-size: 2rem; color: var(--pink); margin-bottom: 12px;"><i class="fa-solid fa-users"></i></div>
           <h3 style="font-size: 1.4rem; font-weight: 700; color: #FFF; margin-bottom: 8px;">Who We Are</h3>
