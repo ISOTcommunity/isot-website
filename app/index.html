@@ -31,16 +31,19 @@
 
   <script>
     async function routeEntry() {
-      if (!db) {
-        location.replace('login.html');
-        return;
+      let target = 'login.html';
+      if (db) {
+        const { data: { session } } = await db.auth.getSession();
+        if (session) {
+          target = 'home.html';
+        }
       }
-      const { data: { session } } = await db.auth.getSession();
-      if (session) {
-        location.replace('home.html');
-      } else {
-        location.replace('login.html');
-      }
+
+      // Handle relative path resolution for /app vs /app/ vs file://
+      const isFolderWithoutSlash = location.pathname.endsWith('/app');
+      const prefix = isFolderWithoutSlash ? 'app/' : '';
+
+      location.replace(prefix + target);
     }
     document.addEventListener('DOMContentLoaded', routeEntry);
   </script>
