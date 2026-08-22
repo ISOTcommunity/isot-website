@@ -135,10 +135,53 @@
         const post = posts.find(p => p.slug === slug) || posts[0];
 
         if (post) {
-          document.getElementById('articleTitle').innerText = post.title.rendered || 'Guide Title';
-          document.title = (post.title.rendered || 'Guide') + ' | ISOT Turin';
+          const cleanTitle = (post.title.rendered || 'Guide').replace(/[—–]/g, '-');
+          document.getElementById('articleTitle').innerText = cleanTitle;
+          document.title = cleanTitle + ' | ISOT Turin';
           document.getElementById('articleDate').innerHTML = '<i class="fa-regular fa-calendar"></i> ' + new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
           document.getElementById('articleBody').innerHTML = post.content.rendered || '<p>Content preview available.</p>';
+
+          // Dynamic Canonical & JSON-LD Article Schema (ISO 8601 date)
+          const isoDate = post.date ? new Date(post.date).toISOString().split('T')[0] : '2026-08-22';
+          const cleanDesc = (post.excerpt ? post.excerpt.rendered.replace(/<[^>]*>/g, '').replace(/[—–]/g, '-').trim() : cleanTitle);
+
+          let canonical = document.querySelector("link[rel='canonical']");
+          if (!canonical) {
+            canonical = document.createElement('link');
+            canonical.rel = 'canonical';
+            document.head.appendChild(canonical);
+          }
+          canonical.href = "https://isotcommunity.com/" + slug;
+
+          const jsonLd = {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": cleanTitle,
+            "description": cleanDesc,
+            "datePublished": isoDate,
+            "dateModified": isoDate,
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": "https://isotcommunity.com/" + slug
+            },
+            "author": {
+              "@type": "Organization",
+              "name": "ISOT Editorial Team",
+              "url": "https://isotcommunity.com"
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "ISOT Community",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://isotcommunity.com/assets/LOGOS/scritta%20isot.png"
+              }
+            }
+          };
+          const ldScript = document.createElement('script');
+          ldScript.type = 'application/ld+json';
+          ldScript.text = JSON.stringify(jsonLd);
+          document.head.appendChild(ldScript);
         }
       } catch (err) {
         console.log('Fetching local json, rendering fallback title for slug:', slug);
