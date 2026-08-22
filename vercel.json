@@ -95,6 +95,54 @@
   ],
   "rewrites": [
     {
+      "source": "/app",
+      "destination": "/app/index.html"
+    },
+    {
+      "source": "/app/",
+      "destination": "/app/index.html"
+    },
+    {
+      "source": "/app/login",
+      "destination": "/app/login.html"
+    },
+    {
+      "source": "/app/signup",
+      "destination": "/app/signup.html"
+    },
+    {
+      "source": "/app/home",
+      "destination": "/app/home.html"
+    },
+    {
+      "source": "/app/profile",
+      "destination": "/app/profile.html"
+    },
+    {
+      "source": "/app/scan",
+      "destination": "/app/scan.html"
+    },
+    {
+      "source": "/app/karaoke",
+      "destination": "/app/karaoke.html"
+    },
+    {
+      "source": "/app/karaoke-kj",
+      "destination": "/app/karaoke-kj.html"
+    },
+    {
+      "source": "/app/partner",
+      "destination": "/app/partner.html"
+    },
+    {
+      "source": "/app/dashboard",
+      "destination": "/app/dashboard.html"
+    },
+    {
+      "source": "/app/assembly",
+      "destination": "/app/assembly.html"
+    },
+    {
       "source": "/checkin",
       "destination": "/app/checkin.html"
     }
