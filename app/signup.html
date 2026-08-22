@@ -54,6 +54,18 @@
         <input type="text" id="city" name="city" placeholder="Answer to prove you're human" required />
       </div>
 
+      <!-- GDPR Consents (Separate, unticked checkboxes — never bundled into account creation) -->
+      <div style="margin: 20px 0; font-size: 0.85rem; display: flex; flex-direction: column; gap: 10px;">
+        <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; color: var(--text-muted);">
+          <input type="checkbox" id="consent_photos" name="consent_photos" style="width: auto; min-height: 18px; margin-top: 2px;" />
+          <span>I consent to ISOT taking photos at events for community highlights (GDPR v1.0).</span>
+        </label>
+        <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; color: var(--text-muted);">
+          <input type="checkbox" id="consent_newsletter" name="consent_newsletter" style="width: auto; min-height: 18px; margin-top: 2px;" />
+          <span>I would like to receive the weekly ISOT Turin newsletter & event updates.</span>
+        </label>
+      </div>
+
       <button type="submit" class="btn btn-pink" id="submit">Create account</button>
     </form>
 

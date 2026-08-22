@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>ISOT Board Dashboard</title>
+
+  <link rel="icon" href="../assets/LOGOS/scritta isot.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display: flex; align-items: center; gap: 8px;">
+      <i class="fa-solid fa-chart-line text-pink"></i>
+      <span>Board Dashboard</span>
+    </a>
+    <span class="badge badge-staff">BOARD ONLY</span>
+  </header>
+
+  <main class="shell shell-wide">
+
+    <div style="margin-bottom: 24px;">
+      <div class="eyebrow"><i class="fa-solid fa-building-columns"></i> Executive Analytics</div>
+      <h1 style="font-size: 2rem; margin-top: 4px;">Venue Attendance & Member Metrics</h1>
+    </div>
+
+    <!-- Monthly Venue Attendance & Scan Split -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px;">
+      <div class="card card-glow">
+        <div class="dim">Rough Bar Scans (This Month)</div>
+        <div style="font-size: 2.2rem; font-weight: 800; color: #FFF; margin-top: 4px;">412</div>
+        <div style="font-size: 0.78rem; color: var(--green); margin-top: 4px;">Justification for €200/mo partner contribution</div>
+      </div>
+
+      <div class="card card-glow">
+        <div class="dim">Capodoglio Scans (This Month)</div>
+        <div style="font-size: 2.2rem; font-weight: 800; color: #FFF; margin-top: 4px;">385</div>
+        <div style="font-size: 0.78rem; color: var(--green); margin-top: 4px;">Justification for €200/mo partner contribution</div>
+      </div>
+
+      <div class="card card-glass">
+        <div class="dim">Scan Split</div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: #FFF; margin-top: 8px;">
+          <span style="color: var(--pink);">74%</span> Door Volunteer Scan <br />
+          <span style="color: var(--gold);">26%</span> Poster Self-Scan
+        </div>
+      </div>
+    </div>
+
+    <!-- Official Receipt Generator & Member Register -->
+    <div class="card card-glass">
+      <h2 style="font-size: 1.2rem; margin-bottom: 16px;"><i class="fa-solid fa-receipt text-pink" style="margin-right: 6px;"></i> Official Member Receipt Issue & Register</h2>
+      <p class="muted" style="font-size: 0.88rem; margin-bottom: 16px;">
+        Issue official sequential non-profit membership receipts for confirmed €10 bank transfers.
+      </p>
+
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+        <thead>
+          <tr style="border-bottom: 1px solid var(--border-light); text-align: left; color: var(--text-dim);">
+            <th style="padding: 10px;">Member</th>
+            <th style="padding: 10px;">Code</th>
+            <th style="padding: 10px;">Tier</th>
+            <th style="padding: 10px;">Receipt #</th>
+            <th style="padding: 10px;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border-light);">
+            <td style="padding: 12px 10px; font-weight: 600;">Alex Rossi</td>
+            <td style="padding: 12px 10px; font-family: monospace;">ISOT-2026-8942</td>
+            <td style="padding: 12px 10px;"><span class="badge badge-socio">MEMBER</span></td>
+            <td style="padding: 12px 10px; font-family: monospace;">2026/0142</td>
+            <td style="padding: 12px 10px;"><button onclick="alert('Official receipt emailed to member.')" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem;">Issue Receipt</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await requireAuth({ board: true });
+    });
+  </script>
+</body>
+</html>

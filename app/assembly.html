@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>ISOT General Assembly & Voting</title>
+
+  <link rel="icon" href="../assets/LOGOS/scritta isot.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display: flex; align-items: center; gap: 8px;">
+      <i class="fa-solid fa-check-to-slot text-pink"></i>
+      <span>General Assembly</span>
+    </a>
+    <span class="badge badge-socio">MEMBER VOTING</span>
+  </header>
+
+  <main class="shell">
+
+    <div style="margin-bottom: 24px;">
+      <div class="eyebrow"><i class="fa-solid fa-landmark"></i> Official Voting Rights</div>
+      <h1 style="font-size: 1.8rem; margin-top: 4px;">General Assembly Motions</h1>
+    </div>
+
+    <!-- Active Motion Voting Card -->
+    <div class="card card-glow" style="margin-bottom: 20px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+        <span class="badge badge-live">ACTIVE MOTION #04</span>
+        <span class="dim">Voting closes 23:59</span>
+      </div>
+      <h2 style="font-size: 1.3rem; margin-bottom: 8px;">Approval of 2026 Student Integration Budget</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
+        Motion to allocate €1,200 towards student emergency welcome kits and EDISU housing guide translation.
+      </p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <button onclick="vote('favor')" class="btn btn-pink" style="background: var(--green);"><i class="fa-solid fa-thumbs-up"></i> In Favor</button>
+        <button onclick="vote('against')" class="btn btn-outline" style="color: var(--red); border-color: rgba(239,68,68,0.4);"><i class="fa-solid fa-thumbs-down"></i> Against</button>
+      </div>
+    </div>
+
+    <div id="voteAlert"></div>
+
+  </main>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await requireAuth({ socio: true });
+    });
+
+    function vote(type) {
+      setAlert(document.getElementById('voteAlert'), `Your vote (${type.toUpperCase()}) has been securely recorded in the assembly log.`, 'success');
+    }
+  </script>
+</body>
+</html>

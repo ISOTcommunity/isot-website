@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>ISOT Partner Venues & Map</title>
+
+  <link rel="icon" href="../assets/LOGOS/scritta isot.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="vendor/leaflet.css" />
+  <link rel="stylesheet" href="css/app.css" />
+
+  <style>
+    #mapContainer {
+      height: 280px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display: flex; align-items: center; gap: 8px;">
+      <i class="fa-solid fa-store text-pink"></i>
+      <span>Partner Network</span>
+    </a>
+    <div id="headerAvatar"></div>
+  </header>
+
+  <main class="shell">
+
+    <div style="margin-bottom: 16px;">
+      <div class="eyebrow"><i class="fa-solid fa-map-location-dot"></i> Turin Venues Map</div>
+      <h1 style="font-size: 1.8rem; margin-top: 4px;">Explore Partner Spots</h1>
+    </div>
+
+    <!-- Leaflet Dark Map -->
+    <div id="mapContainer"></div>
+
+    <!-- Partner Venue Cards -->
+    <div class="card card-glass" style="margin-bottom: 16px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+        <h2 style="font-size: 1.2rem; color: #FFF;">Rough Bar</h2>
+        <span class="badge badge-socio">20% OFF DRINKS</span>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">
+        <i class="fa-solid fa-location-dot text-pink"></i> Via San Salvario 12, Torino
+      </p>
+      <div style="font-size: 0.8rem; color: var(--text-dim);">
+        Host venue for Monday Karaoke & Saturday Pre-Party.
+      </div>
+    </div>
+
+    <div class="card card-glass">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+        <h2 style="font-size: 1.2rem; color: #FFF;">Capodoglio</h2>
+        <span class="badge badge-socio">20% OFF DRINKS</span>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">
+        <i class="fa-solid fa-location-dot text-pink"></i> Murazzi del Po 37, Torino
+      </p>
+      <div style="font-size: 0.8rem; color: var(--text-dim);">
+        Host venue for Thursday International Social Hub.
+      </div>
+    </div>
+
+  </main>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="vendor/leaflet.js"></script>
+  <script src="js/isot.js"></script>
+
+  <script>
+    async function initPartnerMap() {
+      const me = await requireAuth();
+      document.getElementById('headerAvatar').innerHTML = renderGeoAvatar(me.member_code, 36);
+
+      // Initialize Leaflet Map over Turin (45.0703, 7.6869)
+      const map = L.map('mapContainer').setView([45.0560, 7.6820], 14);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap &copy; CARTO'
+      }).addTo(map);
+
+      // Rough Bar marker
+      L.marker([45.0545, 7.6832]).addTo(map)
+        .bindPopup('<b>Rough Bar</b><br>20% Member Discount');
+
+      // Capodoglio marker
+      L.marker([45.0578, 7.6915]).addTo(map)
+        .bindPopup('<b>Capodoglio</b><br>20% Member Discount');
+    }
+
+    document.addEventListener('DOMContentLoaded', initPartnerMap);
+  </script>
+</body>
+</html>

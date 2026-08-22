@@ -1,16 +1,9 @@
-/* ISOT app service worker.
- *
- * Two jobs:
- *   1. Android/Chrome only offers "Install app" if a service worker is registered.
- *   2. Offline shell — a member can open their card and show today's QR in a basement
- *      bar with no signal. This is why the QR is a daily code rather than a 90-second
- *      one: a short-lived token is useless exactly where it is needed.
- *
- * Supabase calls are never cached — stale membership status must not be shown to a
- * bartender as valid.
+/* ISOT App Service Worker
+ * Offline Shell v3 — Supports all member, volunteer, board & partner screens.
+ * Supabase calls are NEVER cached to ensure real-time RLS security.
  */
 
-const CACHE = 'isot-shell-v1';
+const CACHE = 'isot-shell-v3';
 
 const SHELL = [
   './',
@@ -19,10 +12,20 @@ const SHELL = [
   'login.html',
   'signup.html',
   'profile.html',
+  'scan.html',
+  'karaoke.html',
+  'karaoke-kj.html',
+  'checkin.html',
+  'dashboard.html',
+  'assembly.html',
+  'partner.html',
   'css/app.css',
   'js/isot.js',
   'vendor/supabase.js',
   'vendor/qrcode.min.js',
+  'vendor/html5-qrcode.min.js',
+  'vendor/leaflet.js',
+  'vendor/leaflet.css',
   'logo.png',
   'icon-192.png',
   'icon-512.png',
@@ -31,8 +34,6 @@ const SHELL = [
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    // addAll is all-or-nothing; a single 404 during development would break install,
-    // so cache each entry independently and tolerate misses.
     caches.open(CACHE).then((c) => Promise.allSettled(SHELL.map((u) => c.add(u))))
       .then(() => self.skipWaiting())
   );
@@ -49,24 +50,34 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
 
-  // Never cache the API. A cached "you are a member" could be served to a bar after
-  // the membership lapsed.
+  // Never cache Supabase database API calls
   if (url.hostname.endsWith('.supabase.co')) return;
 
   if (e.request.method !== 'GET') return;
+  if (url.origin !== location.origin) return;
 
-  // Cache-first for our own shell, with a background refresh so updates land next visit.
-  if (url.origin === location.origin) {
+  const isPage = e.request.mode === 'navigate' || url.pathname.endsWith('.html');
+
+  if (isPage) {
     e.respondWith(
-      caches.match(e.request).then((hit) => {
-        const live = fetch(e.request)
-          .then((res) => {
-            if (res.ok) caches.open(CACHE).then((c) => c.put(e.request, res.clone()));
-            return res;
-          })
-          .catch(() => hit);
-        return hit || live;
-      })
+      fetch(e.request)
+        .then((res) => {
+          if (res.ok) caches.open(CACHE).then((c) => c.put(e.request, res.clone()));
+          return res;
+        })
+        .catch(() => caches.match(e.request).then((hit) => hit || caches.match('index.html')))
     );
+    return;
   }
+
+  // Static assets: cache-first with network fallback
+  e.respondWith(
+    caches.match(e.request).then((hit) => {
+      if (hit) return hit;
+      return fetch(e.request).then((res) => {
+        if (res.ok) caches.open(CACHE).then((c) => c.put(e.request, res.clone()));
+        return res;
+      });
+    })
+  );
 });

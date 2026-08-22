@@ -1,15 +1,10 @@
-/* ISOT app — Supabase client, auth guard, shared helpers.
- *
- * The anon key is public by design: RLS is what protects the data, which is why
- * the policies in supabase/001_schema.sql are not optional. The service_role key
- * bypasses RLS entirely and must never appear in this repo — Edge Function env only.
+/* ISOT App — Client Core, Auth Guard, Geometry Generator & Helper API
+ * Stack: Standalone Vanilla JS + Supabase Client
  */
 
 /* eslint-disable no-unused-vars */
 
 const ISOT_CONFIG = {
-  // Supabase project "isot" — eu-central-1 (Frankfurt).
-  // This anon key is public on purpose; RLS is the protection.
   SUPABASE_URL: 'https://ywmdaekblhabyajzusfm.supabase.co',
   SUPABASE_ANON_KEY:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3bWRhZWtibGhhYnlhanp1c2ZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNDM2NDYsImV4cCI6MjEwMjcxOTY0Nn0.PyMpTzffZ12j1HoheuRQMYH8d0WvfYkLXGfd1wJXTWw',
@@ -19,26 +14,107 @@ const isConfigured = () =>
   !ISOT_CONFIG.SUPABASE_URL.startsWith('REPLACE_') &&
   !ISOT_CONFIG.SUPABASE_ANON_KEY.startsWith('REPLACE_');
 
-const db = isConfigured()
+const db = isConfigured() && window.supabase
   ? window.supabase.createClient(ISOT_CONFIG.SUPABASE_URL, ISOT_CONFIG.SUPABASE_ANON_KEY)
   : null;
 
 /* ---------------------------------------------------------------
- * Auth guard
- *
- * Every authenticated page calls this first. It resolves with the
- * signed-in profile, or redirects and never resolves.
- *
- *   const me = await requireAuth();                  // any signed-in user
- *   const me = await requireAuth({ staff: true });   // volunteer or board
- *   const me = await requireAuth({ board: true });   // board only
- *   const me = await requireAuth({ socio: true });   // soci only
+ * Identity Palette for Deterministic Geometry Avatars
+ * ------------------------------------------------------------- */
+const IDENTITY_PALETTE = [
+  '#7397B1', // Steel blue
+  '#3E6B7E', // Teal
+  '#EBC17F', // Warm amber
+  '#DE8E28', // Deep orange
+  '#B64226', // Terracotta
+  '#A0689A', // Mauve
+  '#BBC1F9', // Lavender
+  '#3F35A0', // Deep indigo
+];
+
+/**
+ * Generates an Apple-grade deterministic dual-color split circle SVG avatar
+ * based on the member's unique `member_code`.
+ */
+function renderGeoAvatar(memberCode, size = 44) {
+  const codeStr = String(memberCode || 'ISOT-2026-0000');
+  let hash = 0;
+  for (let i = 0; i < codeStr.length; i++) {
+    hash = (hash << 5) - hash + codeStr.charCodeAt(i);
+    hash |= 0;
+  }
+
+  const index1 = Math.abs(hash) % IDENTITY_PALETTE.length;
+  const index2 = Math.abs(hash >> 3) % IDENTITY_PALETTE.length;
+  const color1 = IDENTITY_PALETTE[index1];
+  const color2 = index1 === index2 ? IDENTITY_PALETTE[(index2 + 1) % IDENTITY_PALETTE.length] : IDENTITY_PALETTE[index2];
+
+  return `
+    <svg class="geo-avatar" width="${size}" height="${size}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <clipPath id="leftHalf-${codeStr}">
+          <rect x="0" y="0" width="50" height="100"/>
+        </clipPath>
+        <clipPath id="rightHalf-${codeStr}">
+          <rect x="50" y="0" width="100" height="100"/>
+        </clipPath>
+      </defs>
+      <circle cx="50" cy="50" r="50" fill="${color1}" clip-path="url(#leftHalf-${codeStr})"/>
+      <circle cx="50" cy="50" r="50" fill="${color2}" clip-path="url(#rightHalf-${codeStr})"/>
+      <circle cx="50" cy="50" r="14" fill="#000000" opacity="0.15"/>
+    </svg>
+  `;
+}
+
+/* ---------------------------------------------------------------
+ * Category Characters System
+ * ------------------------------------------------------------- */
+const CATEGORY_ASSETS = {
+  drinks: '../assets/LOGOS/Drink.jpeg',
+  social: '../assets/LOGOS/Tog.jpeg',
+  party: '../assets/LOGOS/Party.jpeg',
+  career: '../assets/LOGOS/Busines.jpeg',
+  sports: '../assets/LOGOS/Sport.jpeg',
+};
+
+/**
+ * Renders Category Character Badge HTML or Karaoke character SVG
+ */
+function getCategoryBadgeHtml(catKey) {
+  const key = String(catKey || 'social').toLowerCase();
+  if (key === 'karaoke') {
+    // Custom Karaoke Category Character SVG (Asterisk with sunglasses & microphone)
+    return `
+      <div class="cat-badge">
+        <svg viewBox="0 0 100 100" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="42" fill="#EBC17F"/>
+          <rect x="25" y="44" width="50" height="12" rx="6" fill="#3F35A0"/>
+          <circle cx="36" cy="50" r="9" fill="#000"/>
+          <circle cx="64" cy="50" r="9" fill="#000"/>
+          <path d="M 40 68 Q 50 78 60 68" stroke="#3F35A0" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <rect x="70" y="25" width="4" height="24" rx="2" fill="#B64226"/>
+          <ellipse cx="72" cy="22" rx="6" ry="8" fill="#3F35A0"/>
+        </svg>
+      </div>
+    `;
+  }
+
+  const assetSrc = CATEGORY_ASSETS[key] || CATEGORY_ASSETS.social;
+  return `
+    <div class="cat-badge">
+      <img src="${assetSrc}" alt="${key} category" />
+    </div>
+  `;
+}
+
+/* ---------------------------------------------------------------
+ * Auth Guard
  * ------------------------------------------------------------- */
 async function requireAuth(opts = {}) {
   if (!db) {
     showGateError(
       'Not configured yet',
-      'Supabase credentials are missing from js/isot.js. Add the project URL and anon key, then redeploy.'
+      'Supabase credentials missing from js/isot.js.'
     );
     return new Promise(() => {});
   }
@@ -56,7 +132,7 @@ async function requireAuth(opts = {}) {
     .single();
 
   if (error || !profile) {
-    showGateError('Profile missing', 'Your account exists but has no profile row. Tell Amir — the signup trigger may not have run.');
+    showGateError('Profile missing', 'Your account exists but has no profile row.');
     return new Promise(() => {});
   }
 
@@ -66,7 +142,7 @@ async function requireAuth(opts = {}) {
   if (opts.board && !isBoard)                  return denyAccess('This page is for board members.');
   if (opts.staff && !isStaff)                  return denyAccess('This page is for volunteers and board members.');
   if (opts.socio && profile.tier !== 'socio' && !isBoard)
-    return denyAccess('This page is for ISOT members. Membership is €10/year and includes voting rights.');
+    return denyAccess('This page is for ISOT members. Membership is €10/year.');
   if (opts.partner && profile.staff_role !== 'partner' && !isBoard)
     return denyAccess('This page is for venue partners.');
 
@@ -96,15 +172,13 @@ async function signOut() {
 }
 
 /* ---------------------------------------------------------------
- * Helpers
+ * Navigation Helpers
  * ------------------------------------------------------------- */
-
-/** Where a user lands after signing in, based on what they are. */
 function homeFor(profile) {
-  if (profile.staff_role === 'board')   return 'dashboard.html';
-  if (profile.staff_role === 'partner') return 'partner.html';
-  if (profile.staff_role === 'volunteer') return 'scan.html';
-  return 'profile.html';
+  if (profile.staff_role === 'board')     return 'dashboard.html';
+  if (profile.staff_role === 'partner')   return 'partner.html';
+  if (profile.staff_role === 'volunteer') return 'home.html';
+  return 'home.html';
 }
 
 function escapeHtml(s) {
@@ -113,7 +187,6 @@ function escapeHtml(s) {
   ));
 }
 
-/** Inline feedback. `type` is 'error' | 'success' | 'info'. */
 function setAlert(el, message, type = 'error') {
   if (!el) return;
   if (!message) { el.hidden = true; return; }
@@ -122,7 +195,6 @@ function setAlert(el, message, type = 'error') {
   el.hidden = false;
 }
 
-/** Swaps a button into a loading state and returns a restore function. */
 function busy(btn, label = 'Working…') {
   const original = btn.innerHTML;
   btn.disabled = true;
@@ -130,11 +202,6 @@ function busy(btn, label = 'Working…') {
   return () => { btn.disabled = false; btn.innerHTML = original; };
 }
 
-/**
- * Bot filter, matching the public site: a hidden honeypot plus a question only
- * someone who knows ISOT answers. Pure client-side — it stops drive-by bots,
- * not a determined human, which is the right level here.
- */
 function passesBotCheck(form) {
   if (form.querySelector('.hp')?.value) return false;
   const city = form.querySelector('[name="city"]')?.value.trim().toLowerCase();

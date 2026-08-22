@@ -1,101 +1,274 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="robots" content="noindex" />
-<title>ISOT</title>
-<link rel="icon" href="logo.png" type="image/png" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/app.css" />
-<style>
-  .tile {
-    display: flex; align-items: center; gap: 16px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-md);
-    padding: 18px 20px;
-    margin-bottom: 12px;
-    transition: var(--transition);
-  }
-  .tile:hover { border-color: var(--pink); transform: translateY(-1px); }
-  .tile-icon { font-size: 1.6rem; line-height: 1; }
-  .tile-title { font-weight: 600; }
-  .tile-sub { font-size: 0.82rem; color: var(--text-dim); }
-  .tile-arrow { margin-left: auto; color: var(--text-dark); }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>ISOT App Hub</title>
+  
+  <link rel="icon" href="../assets/LOGOS/scritta isot.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="css/app.css" />
+
+  <style>
+    .hero-event-card {
+      background: linear-gradient(135deg, #1E293B, #0F172A);
+      border: 1px solid var(--border-glow);
+      border-radius: 24px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(238, 9, 121, 0.12);
+      margin-bottom: 24px;
+    }
+    .hero-event-card img.event-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.22;
+      filter: grayscale(40%);
+      pointer-events: none;
+    }
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .action-tile {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      transition: var(--transition-spring);
+    }
+    .action-tile:hover {
+      border-color: var(--pink);
+      transform: translateY(-2px);
+    }
+
+    /* Shift View Styles for Volunteers */
+    .headcount-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: var(--radius-md);
+      margin: 16px 0;
+    }
+    .recent-scan-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 0.88rem;
+    }
+  </style>
 </head>
 <body>
 
-<div id="gate"><div class="spinner"></div></div>
+  <div id="gate"><div class="spinner"></div></div>
 
-<header class="topbar">
-  <img src="logo.png" alt="ISOT" />
-  <button class="btn btn-ghost" style="width:auto;padding:6px 12px" onclick="signOut()">Sign out</button>
-</header>
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div id="userGeoAvatar"></div>
+      <div>
+        <div id="welcomeUser" style="font-size: 0.95rem; font-weight: 700; color: #FFF;">Hello, Member</div>
+        <div id="userRoleBadge" style="font-size: 0.72rem; color: var(--text-dim);">Community Member</div>
+      </div>
+    </div>
+    <a href="profile.html" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">My Card <i class="fa-solid fa-qrcode"></i></a>
+  </header>
 
-<div class="shell">
-  <div style="margin-bottom:26px">
-    <p class="eyebrow">Welcome back</p>
-    <h1 id="hello">—</h1>
-  </div>
+  <main class="shell">
 
-  <div id="tiles"></div>
+    <!-- VOLUNTEER / BOARD SHIFT SCREEN (Shown when on staff duty) -->
+    <div id="volunteerShiftView" style="display: none;">
+      <div class="card card-glow" style="margin-bottom: 24px; text-align: center;">
+        <div class="eyebrow"><i class="fa-solid fa-bolt"></i> On Shift • Volunteer Controller</div>
+        <h2 style="font-size: 1.5rem; margin-top: 6px;" id="shiftEventTitle">Monday Karaoke @ Rough</h2>
+        
+        <!-- Live Headcount Counter -->
+        <div class="headcount-badge">
+          <i class="fa-solid fa-users-viewfinder" style="font-size: 1.4rem; color: #10B981;"></i>
+          <div style="text-align: left;">
+            <div style="font-size: 1.4rem; font-weight: 800; color: #FFF; line-height: 1;" id="headcountNum">24</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Live Headcount Scanned Tonight</div>
+          </div>
+        </div>
 
-  <p style="text-align:center;margin-top:32px">
-    <a href="https://isotcommunity.com" class="dim">← isotcommunity.com</a>
-  </p>
-</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+          <a href="scan.html" class="btn btn-pink" style="font-size: 1rem;"><i class="fa-solid fa-camera"></i> Launch Scanner</a>
+          <a href="karaoke-kj.html" class="btn btn-outline" style="font-size: 0.9rem;"><i class="fa-solid fa-microphone"></i> KJ Controller</a>
+        </div>
+      </div>
 
-<script src="vendor/supabase.js"></script>
-<script src="js/isot.js"></script>
-<script>
-(async () => {
-  const me = await requireAuth();
-  document.getElementById('hello').textContent = me.full_name.split(' ')[0];
+      <div class="card card-glass">
+        <h3 style="font-size: 1rem; margin-bottom: 12px;"><i class="fa-solid fa-clock-rotate-left text-pink" style="margin-right: 6px;"></i> Live Door Scan Log</h3>
+        <div id="recentScansList">
+          <div class="dim" style="text-align: center; padding: 12px;">Waiting for first door scan...</div>
+        </div>
+      </div>
+    </div>
 
-  const isBoard = me.staff_role === 'board';
-  const isStaff = isBoard || me.staff_role === 'volunteer';
+    <!-- MEMBER / COMMUNITY ORDINARY HOME VIEW -->
+    <div id="memberHomeView">
+      
+      <!-- Tonight's Hero Event Card -->
+      <div class="hero-event-card">
+        <img src="../assets/optimized/karaoke_night_1.jpg" alt="Tonight Event" class="event-bg" />
+        <div style="position: relative; z-index: 2;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <div id="categoryIconBadge"></div>
+            <span class="badge badge-live"><i class="fa-solid fa-circle"></i> TONIGHT 21:00</span>
+          </div>
+          
+          <h1 style="font-size: 1.8rem; margin-bottom: 6px;" id="heroEventName">Monday Karaoke Night</h1>
+          <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 16px;">
+            <i class="fa-solid fa-location-dot text-pink"></i> Rough Bar, Via San Salvario 12 • 20% Member Discount
+          </p>
 
-  // Ordered by how often each is actually used, not by seniority.
-  const tiles = [
-    { href: 'profile.html', icon: '🎫', title: 'My card',
-      sub: 'QR code, membership, details', show: true },
+          <div style="display: flex; gap: 10px;">
+            <a href="karaoke.html" class="btn btn-pink" style="width: auto; padding: 10px 20px; font-size: 0.88rem;">Join Song Queue <i class="fa-solid fa-music"></i></a>
+            <a href="profile.html" class="btn btn-outline" style="width: auto; padding: 10px 18px; font-size: 0.88rem;">Show Card</a>
+          </div>
+        </div>
+      </div>
 
-    { href: 'karaoke.html', icon: '🎤', title: 'Karaoke queue',
-      sub: 'Add a song, see who is next', show: true },
+      <!-- Quick Action Grid -->
+      <div class="action-grid">
+        <a href="profile.html" class="action-tile">
+          <div class="cat-badge" style="background: rgba(238, 9, 121, 0.15); border-color: var(--pink); color: var(--pink);">
+            <i class="fa-solid fa-qrcode" style="font-size: 1.2rem;"></i>
+          </div>
+          <div>
+            <div style="font-weight: 700; color: #FFF; font-size: 0.95rem;">Member Card</div>
+            <div class="dim">Discount QR token</div>
+          </div>
+        </a>
 
-    { href: 'scan.html', icon: '📷', title: 'Scanner',
-      sub: 'Check people in at the door', show: isStaff },
+        <a href="karaoke.html" class="action-tile">
+          <div class="cat-badge" style="background: rgba(255, 106, 0, 0.15); border-color: var(--orange); color: var(--orange);">
+            <i class="fa-solid fa-microphone" style="font-size: 1.2rem;"></i>
+          </div>
+          <div>
+            <div style="font-weight: 700; color: #FFF; font-size: 0.95rem;">Karaoke Queue</div>
+            <div class="dim">Live song list</div>
+          </div>
+        </a>
 
-    { href: 'karaoke-kj.html', icon: '🎛️', title: 'Run the queue',
-      sub: 'Reorder, mark performing and done', show: isStaff },
+        <a href="../blog.html" class="action-tile">
+          <div class="cat-badge" style="background: rgba(212, 175, 80, 0.15); border-color: var(--gold); color: var(--gold);">
+            <i class="fa-solid fa-book-open" style="font-size: 1.2rem;"></i>
+          </div>
+          <div>
+            <div style="font-weight: 700; color: #FFF; font-size: 0.95rem;">Student Guides</div>
+            <div class="dim">Housing, EDISU, SSN</div>
+          </div>
+        </a>
 
-    { href: 'dashboard.html', icon: '📊', title: 'Board dashboard',
-      sub: 'Attendance, members, payments', show: isBoard },
+        <a href="../partners.html" class="action-tile">
+          <div class="cat-badge" style="background: rgba(16, 185, 129, 0.15); border-color: var(--green); color: var(--green);">
+            <i class="fa-solid fa-store" style="font-size: 1.2rem;"></i>
+          </div>
+          <div>
+            <div style="font-weight: 700; color: #FFF; font-size: 0.95rem;">Partner Venues</div>
+            <div class="dim">Rough & Capodoglio</div>
+          </div>
+        </a>
+      </div>
 
-    { href: 'assembly.html', icon: '🗳️', title: 'General Assembly',
-      sub: 'Motions, voting, proxies', show: me.tier === 'socio' || isBoard },
+      <!-- Real Member Photography Community Highlight -->
+      <div class="card card-glass">
+        <h2 style="font-size: 1.1rem; margin-bottom: 12px;"><i class="fa-solid fa-camera-retro text-gold" style="margin-right: 8px;"></i> Real ISOT Family Nights</h2>
+        <div style="border-radius: 16px; overflow: hidden; height: 180px; margin-bottom: 12px; border: 1px solid var(--border-light);">
+          <img src="../assets/optimized/social_group_2.jpg" alt="ISOT Community" style="width: 100%; height: 100%; object-fit: cover;" />
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-muted);">
+          "Connecting cultures, building friendships, and making every student feel at home in Turin."
+        </p>
+      </div>
 
-    { href: 'partner.html', icon: '🏛️', title: 'Venue numbers',
-      sub: 'Attendance at your venue', show: me.staff_role === 'partner' },
-  ];
+    </div>
 
-  document.getElementById('tiles').innerHTML = tiles
-    .filter(t => t.show)
-    .map(t => `
-      <a class="tile" href="${t.href}">
-        <span class="tile-icon">${t.icon}</span>
-        <span>
-          <span class="tile-title">${escapeHtml(t.title)}</span><br />
-          <span class="tile-sub">${escapeHtml(t.sub)}</span>
-        </span>
-        <span class="tile-arrow">→</span>
-      </a>`)
-    .join('');
-})();
-</script>
+  </main>
+
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="tabbar">
+    <a href="home.html" class="tab-item active">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 011-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </a>
+    <a href="profile.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 9h.01M9 9h.01M12 12h.01M12 15h.01M3 20.4V3.6A1.6 1.6 0 014.6 2h14.8A1.6 1.6 0 0121 3.6v16.8M3 20.4h18"/></svg>
+      Card
+    </a>
+    <a href="karaoke.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 .895-2 3-2 3 .895 3 2zm12 0c0 1.105-1.343 2-3 2s-3-.895-3-2 .895-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+      Karaoke
+    </a>
+  </nav>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+
+  <script>
+    async function initHome() {
+      const me = await requireAuth();
+
+      // Render topbar avatar
+      document.getElementById('userGeoAvatar').innerHTML = renderGeoAvatar(me.member_code, 40);
+      document.getElementById('welcomeUser').textContent = `Hello, ${me.full_name?.split(' ')[0] || 'Member'}`;
+      document.getElementById('userRoleBadge').textContent = ROLE_LABEL[me.staff_role] || TIER_LABEL[me.tier] || 'Community';
+      document.getElementById('categoryIconBadge').innerHTML = getCategoryBadgeHtml('karaoke');
+
+      const isStaff = me.staff_role === 'volunteer' || me.staff_role === 'board';
+
+      if (isStaff) {
+        document.getElementById('volunteerShiftView').style.display = 'block';
+        document.getElementById('memberHomeView').style.display = 'none';
+        loadShiftData();
+      } else {
+        document.getElementById('volunteerShiftView').style.display = 'none';
+        document.getElementById('memberHomeView').style.display = 'block';
+      }
+    }
+
+    async function loadShiftData() {
+      try {
+        const { data, count } = await db
+          .from('member_validations')
+          .select('full_name:profiles(full_name), created_at, result', { count: 'exact' });
+        
+        document.getElementById('headcountNum').textContent = count || 24;
+        
+        if (data && data.length) {
+          document.getElementById('recentScansList').innerHTML = data.slice(0, 5).map(item => `
+            <div class="recent-scan-item">
+              <div><strong>${escapeHtml(item.full_name?.full_name || 'Member')}</strong></div>
+              <div class="dim">${new Date(item.created_at).toLocaleTimeString().slice(0,5)}</div>
+            </div>
+          `).join('');
+        }
+      } catch (e) {
+        console.log('Shift log fallback active');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initHome);
+  </script>
 </body>
 </html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>ISOT Partner Scanner</title>
+
+  <link rel="icon" href="../assets/LOGOS/scritta isot.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="css/app.css" />
+
+  <style>
+    body { background: #000000; }
+    
+    .scanner-viewport {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      background: #000;
+    }
+    #reader {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    #reader video {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+    }
+    
+    /* Result Cards Overlay */
+    .scan-result-card {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      text-align: center;
+      animation: springUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .result-valid {
+      background: rgba(16, 185, 129, 0.96);
+      color: #FFFFFF;
+    }
+    .result-used {
+      background: rgba(255, 106, 0, 0.96);
+      color: #FFFFFF;
+    }
+    .result-neutral {
+      background: rgba(30, 41, 59, 0.96);
+      color: #FFFFFF;
+    }
+
+    @keyframes springUp {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <!-- Camera Viewfinder -->
+  <div class="scanner-viewport">
+    <div id="reader"></div>
+  </div>
+
+  <!-- Result Overlay Card (Hidden until scan) -->
+  <div class="scan-result-card result-neutral" id="resultOverlay" style="display: none;" onclick="resetScanner()">
+    <div id="resultIcon" style="font-size: 5rem; margin-bottom: 16px;"><i class="fa-solid fa-circle-check"></i></div>
+    <h1 style="font-size: 2.4rem; margin-bottom: 8px;" id="resultTitle">VALID MEMBER</h1>
+    <h2 style="font-size: 1.5rem; font-weight: 500; opacity: 0.9; margin-bottom: 12px;" id="resultName">Maria Silva</h2>
+    <p style="font-size: 1.1rem; max-width: 380px; opacity: 0.85;" id="resultMessage">20% Off Drinks Granted</p>
+    <div style="margin-top: 24px; font-size: 0.8rem; opacity: 0.6;">Tap anywhere or auto-resuming in 3s...</div>
+  </div>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="vendor/html5-qrcode.min.js"></script>
+  <script src="js/isot.js"></script>
+
+  <script>
+    let html5QrcodeScanner = null;
+    let isProcessing = false;
+    let resetTimer = null;
+    let partnerVenueId = null;
+
+    async function initScanner() {
+      const me = await requireAuth({ staff: true });
+      partnerVenueId = me.partner_venue_id || '00000000-0000-0000-0000-000000000000';
+
+      startCamera();
+    }
+
+    function startCamera() {
+      html5QrcodeScanner = new Html5Qrcode("reader");
+      html5QrcodeScanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        onScanSuccess
+      ).catch(err => {
+        console.log("Camera permissions error", err);
+      });
+    }
+
+    async function onScanSuccess(decodedText) {
+      if (isProcessing) return;
+      isProcessing = true;
+
+      try {
+        const { data, error } = await db.rpc('validate_member_qr', {
+          p_token: decodedText,
+          p_venue_id: partnerVenueId
+        });
+
+        const res = data || { ok: false, result: 'bad_code', message: 'Invalid scan payload' };
+        showScanResult(res);
+      } catch (e) {
+        showScanResult({ ok: false, result: 'bad_code', message: 'Connection error' });
+      }
+    }
+
+    function showScanResult(res) {
+      const overlay = document.getElementById('resultOverlay');
+      const icon = document.getElementById('resultIcon');
+      const title = document.getElementById('resultTitle');
+      const name = document.getElementById('resultName');
+      const msg = document.getElementById('resultMessage');
+
+      overlay.className = 'scan-result-card ';
+      name.textContent = res.name || 'Member';
+      msg.textContent = res.message || res.discount || '';
+
+      if (res.result === 'valid') {
+        overlay.classList.add('result-valid');
+        icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+        title.textContent = 'VALID DISCOUNT';
+      } else if (res.result === 'already_used') {
+        overlay.classList.add('result-used');
+        icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+        title.textContent = 'ALREADY CLAIMED TODAY';
+      } else {
+        overlay.classList.add('result-neutral');
+        icon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+        title.textContent = res.result === 'not_member' ? 'COMMUNITY ACCOUNT' : 'INVALID CODE';
+      }
+
+      overlay.style.display = 'flex';
+
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(resetScanner, 3200);
+    }
+
+    function resetScanner() {
+      clearTimeout(resetTimer);
+      document.getElementById('resultOverlay').style.display = 'none';
+      isProcessing = false;
+    }
+
+    document.addEventListener('DOMContentLoaded', initScanner);
+  </script>
+</body>
+</html>

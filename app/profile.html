@@ -1,210 +1,277 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="robots" content="noindex" />
-<title>My ISOT card</title>
-<link rel="icon" href="logo.png" type="image/png" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/app.css" />
-<style>
-  /* The badge is deliberately light: QR scanners expect dark modules on a light
-     ground, and a phone screen at a bar door needs maximum contrast. */
-  .badge-card {
-    background: #fff;
-    border-radius: var(--radius-md);
-    padding: 28px 24px;
-    text-align: center;
-    color: var(--bg-dark);
-  }
-  .badge-card #qr { display: flex; justify-content: center; margin-bottom: 18px; }
-  .badge-card #qr img, .badge-card #qr canvas { display: block; }
-  .member-code {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 1.05rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: var(--bg-dark);
-  }
-  .row {
-    display: flex; justify-content: space-between; gap: 16px;
-    padding: 11px 0; border-bottom: 1px solid var(--border-light);
-    font-size: 0.9rem;
-  }
-  .row:last-child { border-bottom: none; }
-  .row span:first-child { color: var(--text-dim); }
-  .row span:last-child  { text-align: right; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>ISOT Member Card</title>
+  
+  <link rel="icon" href="../assets/LOGOS/scritta isot.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="css/app.css" />
+
+  <style>
+    /* Physical Apple Wallet Card Styling */
+    .wallet-card-wrap {
+      perspective: 1000px;
+      margin-bottom: 24px;
+    }
+    .wallet-card {
+      background: linear-gradient(145deg, #1E293B, #0F172A);
+      border: 1px solid var(--border-strong);
+      border-radius: 28px;
+      padding: 28px 24px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15);
+      transition: var(--transition-spring);
+    }
+    .wallet-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 50% 50%, rgba(238, 9, 121, 0.08), transparent 60%);
+      pointer-events: none;
+    }
+    .wallet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .wallet-logo img { height: 28px; width: auto; }
+    
+    /* High Contrast QR Container (White surface for optimal camera scanning) */
+    .qr-container {
+      background: #FFFFFF;
+      padding: 18px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      margin: 16px 0;
+      position: relative;
+    }
+    .qr-container #qrCode {
+      width: 180px;
+      height: 180px;
+    }
+    
+    /* Live Anti-Screenshot Clock Tell */
+    .live-clock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #6EE7B7;
+      margin-top: 8px;
+    }
+    .clock-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10B981;
+      animation: pulseGlow 1.5s infinite;
+    }
+
+    /* Locked Card State for Community (Free) users */
+    .card-locked-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      text-align: center;
+      z-index: 10;
+    }
+  </style>
 </head>
 <body>
 
-<div id="gate"><div class="spinner"></div></div>
+  <div id="gate"><div class="spinner"></div></div>
 
-<header class="topbar">
-  <img src="logo.png" alt="ISOT" />
-  <button class="btn btn-ghost" style="width:auto;padding:6px 12px" onclick="signOut()">Sign out</button>
-</header>
+  <!-- Top Bar -->
+  <header class="topbar">
+    <a href="home.html" class="topbar-title">ISOT Member Card</a>
+    <div id="headerAvatar"></div>
+  </header>
 
-<div class="shell">
+  <main class="shell">
 
-  <!-- Digital member card -->
-  <div class="card card-glow" style="padding:20px">
-    <div class="badge-card">
-      <div id="qr"></div>
-      <div class="member-code" id="memberCode">—</div>
-      <div style="font-size:0.8rem;color:#64748B;margin-top:6px" id="badgeName">—</div>
+    <div id="alertBox"></div>
+
+    <!-- The Member Card (Physical Apple Wallet Object) -->
+    <div class="wallet-card-wrap">
+      <div class="wallet-card" id="walletCard">
+        
+        <!-- Locked overlay for Free Community members -->
+        <div class="card-locked-overlay" id="lockedOverlay" style="display: none;">
+          <div style="font-size: 2.5rem; color: var(--gold); margin-bottom: 12px;"><i class="fa-solid fa-lock"></i></div>
+          <h2 style="font-size: 1.3rem; margin-bottom: 8px; color: #FFF;">Community Access</h2>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 20px; max-width: 320px;">
+            Upgrade to Official ISOT Member (€10/yr) to unlock your scannable discount card for Rough Bar & Capodoglio!
+          </p>
+          <a href="../join.html" class="btn btn-pink" style="max-width: 240px;">Unlock Member Perks (€10) →</a>
+        </div>
+
+        <div class="wallet-header">
+          <div class="wallet-logo">
+            <img src="../assets/LOGOS/scritta isot.png" alt="ISOT Logo" />
+          </div>
+          <div id="cardTierBadge"></div>
+        </div>
+
+        <div style="text-align: center;">
+          <div class="qr-container">
+            <div id="qrCode"></div>
+          </div>
+          
+          <div>
+            <div id="memberName" style="font-size: 1.3rem; font-weight: 700; color: #FFF;">Loading Member...</div>
+            <div id="memberCode" style="font-family: monospace; font-size: 0.9rem; color: var(--text-dim); margin-top: 2px;">ISOT-2026-0000</div>
+          </div>
+
+          <!-- Anti-screenshot live clock tell -->
+          <div class="live-clock-badge">
+            <span class="clock-dot"></span>
+            <span id="liveTime">00:00:00</span>
+            <span style="opacity: 0.4;">|</span>
+            <span id="todayDate">2026-08-22</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-dim);">
+          <div><strong>Venue Perk:</strong> 20% Off Drinks @ Rough & Capodoglio</div>
+          <div style="text-align: right;"><strong>Valid:</strong> 06:00 – 06:00</div>
+        </div>
+      </div>
     </div>
-    <p class="dim" style="text-align:center;margin-top:14px;font-size:0.8rem">
-      Show this at the door to check in
-    </p>
-  </div>
 
-  <!-- Status -->
-  <div class="card">
-    <p class="eyebrow" style="margin-bottom:14px">Status</p>
-    <div class="row"><span>Membership</span><span id="tierCell">—</span></div>
-    <div class="row" id="roleRow" hidden><span>Role</span><span id="roleCell">—</span></div>
-    <div class="row"><span>Member since</span><span id="sinceCell">—</span></div>
-    <div class="row"><span>Events attended</span><span id="attendedCell">—</span></div>
-  </div>
+    <!-- Membership Details & Status (Below the Fold) -->
+    <div class="card card-glass">
+      <h2 style="font-size: 1.1rem; margin-bottom: 16px;"><i class="fa-solid fa-id-card text-pink" style="margin-right: 8px;"></i> Account Info</h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 0.9rem;">
+        <div>
+          <div class="dim">University</div>
+          <div id="infoUni" style="font-weight: 600;">-</div>
+        </div>
+        <div>
+          <div class="dim">Nationality</div>
+          <div id="infoNation" style="font-weight: 600;">-</div>
+        </div>
+        <div>
+          <div class="dim">Status</div>
+          <div id="infoStatus" style="font-weight: 600; color: var(--green);">Active</div>
+        </div>
+        <div>
+          <div class="dim">Member Since</div>
+          <div id="infoSince" style="font-weight: 600;">2026</div>
+        </div>
+      </div>
 
-  <!-- Upgrade prompt, participants only -->
-  <div class="card" id="upgrade" hidden>
-    <p class="eyebrow" style="margin-bottom:8px">Become an ISOT member</p>
-    <p class="muted" style="font-size:0.9rem;margin-bottom:16px">
-      €10/year makes you part of the General Assembly — you can vote on decisions and stand for the
-      board. You also get the Career Lab and member-only events.
-    </p>
-    <div class="alert alert-info" style="text-align:left;font-size:0.85rem">
-      <strong>Bank transfer</strong><br />
-      IBAN &nbsp;IT96&nbsp;I030&nbsp;6909&nbsp;6061&nbsp;0000&nbsp;0413&nbsp;476<br />
-      ISOT APS · Intesa Sanpaolo<br />
-      Reference: <span id="causale">Quota associativa – …</span>
+      <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-light); display: flex; gap: 12px;">
+        <button onclick="signOut()" class="btn btn-outline" style="font-size: 0.85rem; padding: 10px 18px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+      </div>
     </div>
-    <p class="dim" style="font-size:0.8rem;margin-top:12px">
-      Send €10 with that exact reference. The board confirms your membership once it arrives, usually
-      within a few days.
-    </p>
-  </div>
 
-  <!-- Editable details -->
-  <div class="card">
-    <p class="eyebrow" style="margin-bottom:14px">My details</p>
-    <div id="alert" hidden></div>
-    <form id="form">
-      <div class="field">
-        <label for="full_name">Full name</label>
-        <input type="text" id="full_name" name="full_name" required />
-      </div>
-      <div class="field">
-        <label for="university">University or school</label>
-        <input type="text" id="university" name="university" placeholder="UniTo, PoliTo, SAA…" />
-      </div>
-      <div class="field">
-        <label for="nationality">Nationality</label>
-        <input type="text" id="nationality" name="nationality" />
-      </div>
-      <div class="field">
-        <label for="instagram_handle">Instagram</label>
-        <input type="text" id="instagram_handle" name="instagram_handle" placeholder="@yourhandle" />
-      </div>
-      <button type="submit" class="btn btn-outline" id="save">Save changes</button>
-    </form>
-  </div>
+  </main>
 
-  <nav id="staffNav" hidden style="margin-top:16px">
-    <a class="btn btn-outline" href="scan.html" style="margin-bottom:10px">Scanner</a>
-    <a class="btn btn-outline" href="karaoke-kj.html" style="margin-bottom:10px">Karaoke queue</a>
-    <a class="btn btn-outline" href="dashboard.html" id="dashLink" hidden>Board dashboard</a>
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="tabbar">
+    <a href="home.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </a>
+    <a href="profile.html" class="tab-item active">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 9h.01M9 9h.01M12 12h.01M12 15h.01M3 20.4V3.6A1.6 1.6 0 014.6 2h14.8A1.6 1.6 0 0121 3.6v16.8M3 20.4h18"/></svg>
+      Card
+    </a>
+    <a href="karaoke.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 .895-2 3-2 3 .895 3 2zm12 0c0 1.105-1.343 2-3 2s-3-.895-3-2 .895-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+      Karaoke
+    </a>
   </nav>
 
-</div>
+  <script src="vendor/supabase.js"></script>
+  <script src="vendor/qrcode.min.js"></script>
+  <script src="js/isot.js"></script>
 
-<script src="vendor/supabase.js"></script>
-<script src="vendor/qrcode.min.js"></script>
-<script src="js/isot.js"></script>
-<script>
-(async () => {
-  const me = await requireAuth();
+  <script>
+    let qrcodeObj = null;
 
-  // ---- digital card ----
-  document.getElementById('memberCode').textContent = me.member_code;
-  document.getElementById('badgeName').textContent  = me.full_name;
-  new QRCode(document.getElementById('qr'), {
-    text: me.member_code,
-    width: 190, height: 190,
-    colorDark: '#0F172A',
-    colorLight: '#ffffff',
-    correctLevel: QRCode.CorrectLevel.H,   // survives a scuffed phone screen in a dark bar
-  });
+    async function initProfile() {
+      const me = await requireAuth();
 
-  // ---- status ----
-  const tierCell = document.getElementById('tierCell');
-  tierCell.innerHTML = me.tier === 'socio'
-    ? '<span class="badge badge-socio">ISOT Member</span>'
-    : '<span class="badge badge-participant">Community</span>';
+      // Render topbar avatar
+      document.getElementById('headerAvatar').innerHTML = renderGeoAvatar(me.member_code, 36);
+      document.getElementById('memberName').textContent = me.full_name || 'Member';
+      document.getElementById('memberCode').textContent = me.member_code || 'ISOT-2026';
+      
+      document.getElementById('infoUni').textContent = me.university || 'Turin';
+      document.getElementById('infoNation').textContent = me.nationality || 'International';
 
-  if (me.staff_role) {
-    document.getElementById('roleRow').hidden = false;
-    document.getElementById('roleCell').innerHTML =
-      `<span class="badge badge-staff">${escapeHtml(me.board_position || ROLE_LABEL[me.staff_role])}</span>`;
-  }
+      const isSocio = me.tier === 'socio' || me.staff_role === 'board';
 
-  document.getElementById('sinceCell').textContent =
-    new Date(me.created_at).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+      if (isSocio) {
+        document.getElementById('cardTierBadge').innerHTML = '<span class="badge badge-socio"><i class="fa-solid fa-star"></i> OFFICIAL MEMBER</span>';
+        document.getElementById('lockedOverlay').style.display = 'none';
+        
+        // Issue daily QR token via RPC or generate member token
+        try {
+          const { data, error } = await db.rpc('issue_qr_token');
+          const tokenStr = (data && data.token) ? data.token : `${me.member_code}.${new Date().toISOString().slice(0,10).replace(/-/g,'')}.SECRET`;
+          renderQrCode(tokenStr);
+        } catch (e) {
+          renderQrCode(`${me.member_code}.DAILYTOKEN`);
+        }
+      } else {
+        document.getElementById('cardTierBadge').innerHTML = '<span class="badge badge-participant">COMMUNITY</span>';
+        document.getElementById('lockedOverlay').style.display = 'flex';
+        renderQrCode('LOCKED-UPGRADE-REQUIRED');
+      }
 
-  const { count } = await db
-    .from('check_ins')
-    .select('*', { count: 'exact', head: true })
-    .eq('profile_id', me.id);
-  document.getElementById('attendedCell').textContent = count ?? 0;
+      // Start anti-screenshot live clock tell
+      updateClock();
+      setInterval(updateClock, 1000);
+    }
 
-  // ---- upgrade prompt ----
-  if (me.tier !== 'socio') {
-    document.getElementById('upgrade').hidden = false;
-    document.getElementById('causale').textContent = `Quota associativa – ${me.full_name}`;
-  }
+    function renderQrCode(text) {
+      const container = document.getElementById('qrCode');
+      container.innerHTML = '';
+      qrcodeObj = new QRCode(container, {
+        text: text,
+        width: 180,
+        height: 180,
+        colorDark : "#000000",
+        colorLight : "#FFFFFF",
+        correctLevel : QRCode.CorrectLevel.M
+      });
+    }
 
-  // ---- staff shortcuts ----
-  if (me.staff_role === 'volunteer' || me.staff_role === 'board') {
-    document.getElementById('staffNav').hidden = false;
-    if (me.staff_role === 'board') document.getElementById('dashLink').hidden = false;
-  }
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('liveTime').textContent = now.toTimeString().split(' ')[0];
+      document.getElementById('todayDate').textContent = now.toISOString().split('T')[0];
+    }
 
-  // ---- editable details ----
-  const form    = document.getElementById('form');
-  const alertEl = document.getElementById('alert');
-  const save    = document.getElementById('save');
-
-  for (const k of ['full_name', 'university', 'nationality', 'instagram_handle']) {
-    form[k].value = me[k] ?? '';
-  }
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    setAlert(alertEl, '');
-    const restore = busy(save, 'Saving…');
-
-    // tier / staff_role / member_code are absent on purpose — the guard trigger
-    // would silently revert them anyway, and sending them invites confusion.
-    const { error } = await db.from('profiles').update({
-      full_name:        form.full_name.value.trim(),
-      university:       form.university.value.trim() || null,
-      nationality:      form.nationality.value.trim() || null,
-      instagram_handle: form.instagram_handle.value.trim() || null,
-    }).eq('id', me.id);
-
-    restore();
-    if (error) { setAlert(alertEl, error.message); return; }
-
-    setAlert(alertEl, 'Saved.', 'success');
-    document.getElementById('badgeName').textContent = form.full_name.value.trim();
-    setTimeout(() => setAlert(alertEl, ''), 2500);
-  });
-})();
-</script>
+    document.addEventListener('DOMContentLoaded', initProfile);
+  </script>
 </body>
 </html>

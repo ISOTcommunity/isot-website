@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>ISOT KJ Controller</title>
+
+  <link rel="icon" href="../assets/LOGOS/scritta isot.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="css/app.css" />
+
+  <style>
+    .kj-song-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .kj-song-card.now-playing {
+      border-color: var(--pink);
+      background: rgba(238, 9, 121, 0.12);
+      box-shadow: 0 0 24px rgba(238, 9, 121, 0.15);
+    }
+    .big-tap-btn {
+      min-height: 52px;
+      min-width: 52px;
+      padding: 12px 18px;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display: flex; align-items: center; gap: 8px;">
+      <i class="fa-solid fa-microphone-lines text-pink"></i>
+      <span>KJ Host Controller</span>
+    </a>
+    <span class="badge badge-staff">VOLUNTEER MIC</span>
+  </header>
+
+  <main class="shell">
+
+    <div class="card card-glow" style="text-align: center; margin-bottom: 24px;">
+      <div class="eyebrow"><i class="fa-solid fa-circle-play"></i> NOW ON MIC</div>
+      <h1 style="font-size: 2.2rem; margin-top: 4px;" id="nowPlayingTitle">Dancing Queen — ABBA</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 4px;" id="nowPlayingSinger">Singer: Maria Silva (Table 4)</p>
+
+      <button onclick="markDone()" class="btn btn-pink big-tap-btn" style="margin-top: 16px;">
+        <i class="fa-solid fa-circle-check"></i> Mark Sung & Next Singer →
+      </button>
+    </div>
+
+    <div class="card card-glass">
+      <h2 style="font-size: 1.1rem; margin-bottom: 16px;"><i class="fa-solid fa-list-ol text-gold" style="margin-right: 6px;"></i> Up Next Lineup</h2>
+
+      <div id="kjQueue">
+        <div class="kj-song-card">
+          <div>
+            <div style="font-weight: 700; color: #FFF; font-size: 1.05rem;">Wonderwall</div>
+            <div class="dim">Alex • Oasis</div>
+          </div>
+          <button onclick="removeSong(this)" class="btn btn-outline big-tap-btn" style="width: auto; color: var(--red); border-color: rgba(239,68,68,0.4);">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
+
+        <div class="kj-song-card">
+          <div>
+            <div style="font-weight: 700; color: #FFF; font-size: 1.05rem;">Volare</div>
+            <div class="dim">Marco • Domenico Modugno</div>
+          </div>
+          <button onclick="removeSong(this)" class="btn btn-outline big-tap-btn" style="width: auto; color: var(--red); border-color: rgba(239,68,68,0.4);">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+
+  <script>
+    async function initKj() {
+      await requireAuth({ staff: true });
+    }
+
+    function markDone() {
+      document.getElementById('nowPlayingTitle').textContent = 'Wonderwall — Oasis';
+      document.getElementById('nowPlayingSinger').textContent = 'Singer: Alex';
+      
+      const first = document.querySelector('#kjQueue .kj-song-card');
+      if (first) first.remove();
+    }
+
+    function removeSong(btn) {
+      btn.closest('.kj-song-card')?.remove();
+    }
+
+    document.addEventListener('DOMContentLoaded', initKj);
+  </script>
+</body>
+</html>
