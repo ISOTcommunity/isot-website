@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="robots" content="noindex" />
+  <title>Reset your password · ISOT App</title>
+
+  <link rel="icon" href="logo.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+
+  <main class="shell" style="max-width: 420px; padding-top: 48px;">
+
+    <div style="text-align: center; margin-bottom: 28px;">
+      <img src="logo.png" alt="ISOT" style="height: 44px; width: auto; margin-bottom: 16px;" />
+      <h1 style="font-size: 1.8rem; margin-bottom: 4px;">Forgot your password?</h1>
+      <p class="muted" style="font-size: 0.92rem;">We'll email you a link to set a new one.</p>
+    </div>
+
+    <div class="card">
+      <div id="alert" hidden></div>
+
+      <form id="form" novalidate>
+        <div class="field">
+          <label for="email">Email address</label>
+          <input type="email" id="email" name="email" autocomplete="email" required placeholder="name@example.com" />
+        </div>
+        <button type="submit" class="btn btn-pink" id="submit">Send reset link</button>
+      </form>
+
+      <div style="text-align:center;margin-top:20px;font-size:0.88rem" class="dim">
+        Remembered it? <a href="login.html" style="color:var(--pink);font-weight:700">Sign in</a>
+      </div>
+    </div>
+
+    <!-- Success state. Deliberately identical whether or not the address exists. -->
+    <div class="card card-glow" id="sent" hidden style="text-align:center">
+      <h2 style="margin-bottom:10px">Check your email</h2>
+      <p class="muted" style="font-size:0.9rem;margin-bottom:6px">
+        If there's an ISOT account for <strong id="sentTo"></strong>, a reset link is on its way.
+      </p>
+      <p class="dim" style="font-size:0.8rem;margin-bottom:20px">
+        The link expires in an hour. Check spam if it doesn't arrive in a couple of minutes.
+      </p>
+      <a class="btn btn-outline" href="login.html">Back to sign in</a>
+    </div>
+
+    <div style="text-align:center;margin-top:24px">
+      <a href="https://isotcommunity.com" class="dim" style="font-size:0.85rem">← isotcommunity.com</a>
+    </div>
+
+  </main>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+  <script>
+    (async () => {
+      const form    = document.getElementById('form');
+      const alertEl = document.getElementById('alert');
+      const submit  = document.getElementById('submit');
+      const sent    = document.getElementById('sent');
+
+      if (!db) {
+        setAlert(alertEl, 'Supabase credentials missing from js/isot.js.', 'info');
+        submit.disabled = true;
+        return;
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        setAlert(alertEl, '');
+        if (!form.checkValidity()) { form.reportValidity(); return; }
+
+        const email = form.email.value.trim();
+        const restore = busy(submit, 'Sending…');
+        const res = await sendPasswordReset(email);
+        restore();
+
+        // Show the same confirmation either way — telling a stranger whether an
+        // address has an account here would leak who is a member.
+        if (!res.ok && !/rate|limit/i.test(res.error)) {
+          console.warn('reset error:', res.error);
+        }
+        if (!res.ok && /rate|limit/i.test(res.error)) {
+          setAlert(alertEl, 'Too many attempts — wait a minute and try again.');
+          return;
+        }
+
+        document.getElementById('sentTo').textContent = email;
+        form.parentElement.hidden = true;
+        sent.hidden = false;
+      });
+    })();
+  </script>
+</body>
+</html>

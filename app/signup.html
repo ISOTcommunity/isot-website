@@ -69,6 +69,9 @@
       <button type="submit" class="btn btn-pink" id="submit">Create account</button>
     </form>
 
+      <div id="googleSlot"></div>
+
+
     <p style="text-align:center;margin-top:18px;font-size:0.875rem" class="dim">
       Already have an account? <a href="login.html" style="color:var(--pink);font-weight:600">Sign in</a>
     </p>
@@ -108,6 +111,13 @@
 
   const { data: { session } } = await db.auth.getSession();
   if (session) { location.replace('home.html'); return; }
+
+      document.getElementById('googleSlot').innerHTML = googleButtonHtml('Sign up with Google');
+      document.getElementById('googleBtn').addEventListener('click', async (ev) => {
+        setAlert(alertEl, '');
+        try { await signInWithGoogle(ev.currentTarget); }
+        catch (err) { setAlert(alertEl, err.message || 'Could not open Google sign-in.'); }
+      });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();

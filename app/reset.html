@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="robots" content="noindex" />
+  <title>Set a new password · ISOT App</title>
+
+  <link rel="icon" href="logo.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+
+  <main class="shell" style="max-width: 420px; padding-top: 48px;">
+
+    <div style="text-align: center; margin-bottom: 28px;">
+      <img src="logo.png" alt="ISOT" style="height: 44px; width: auto; margin-bottom: 16px;" />
+      <h1 style="font-size: 1.8rem; margin-bottom: 4px;">Set a new password</h1>
+      <p class="muted" style="font-size: 0.92rem;" id="forWho">Choose something you'll remember.</p>
+    </div>
+
+    <!-- Waiting for Supabase to turn the link's token into a recovery session -->
+    <div class="card" id="checking" style="text-align:center">
+      <div class="spinner" style="margin:0 auto"></div>
+    </div>
+
+    <div class="card" id="formCard" hidden>
+      <div id="alert" hidden></div>
+      <form id="form" novalidate>
+        <div class="field">
+          <label for="password">New password <span class="dim" style="font-weight:400">— at least 8 characters</span></label>
+          <input type="password" id="password" autocomplete="new-password" minlength="8" required />
+        </div>
+        <div class="field">
+          <label for="confirm">Repeat it</label>
+          <input type="password" id="confirm" autocomplete="new-password" minlength="8" required />
+        </div>
+        <button type="submit" class="btn btn-pink" id="submit">Save new password</button>
+      </form>
+    </div>
+
+    <!-- Link expired, already used, or opened directly -->
+    <div class="card" id="invalid" hidden style="text-align:center">
+      <h2 style="margin-bottom:10px">This link has expired</h2>
+      <p class="muted" style="font-size:0.9rem;margin-bottom:20px">
+        Reset links last an hour and work once. Ask for a fresh one.
+      </p>
+      <a class="btn btn-pink" href="forgot.html">Send a new link</a>
+    </div>
+
+    <div class="card card-glow" id="done" hidden style="text-align:center">
+      <h2 style="margin-bottom:10px">Password changed</h2>
+      <p class="muted" style="font-size:0.9rem;margin-bottom:20px">You're signed in.</p>
+      <a class="btn btn-pink" href="home.html">Continue</a>
+    </div>
+
+    <div style="text-align:center;margin-top:24px">
+      <a href="https://isotcommunity.com" class="dim" style="font-size:0.85rem">← isotcommunity.com</a>
+    </div>
+
+  </main>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+  <script>
+    (async () => {
+      const checking = document.getElementById('checking');
+      const formCard = document.getElementById('formCard');
+      const invalid  = document.getElementById('invalid');
+      const done     = document.getElementById('done');
+      const form     = document.getElementById('form');
+      const alertEl  = document.getElementById('alert');
+      const submit   = document.getElementById('submit');
+
+      if (!db) {
+        checking.hidden = true;
+        invalid.hidden = false;
+        return;
+      }
+
+      // Supabase parses the recovery token out of the URL fragment and fires
+      // PASSWORD_RECOVERY. That can land before or after this listener attaches,
+      // so check for an existing session too rather than relying on the event alone.
+      let ready = false;
+
+      function unlock(session) {
+        if (ready || !session) return;
+        ready = true;
+        checking.hidden = true;
+        formCard.hidden = false;
+        if (session.user?.email) {
+          document.getElementById('forWho').textContent = 'for ' + session.user.email;
+        }
+      }
+
+      db.auth.onAuthStateChange((event, session) => {
+        if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') unlock(session);
+      });
+
+      const { data: { session } } = await db.auth.getSession();
+      unlock(session);
+
+      // Nothing arrived — the link is stale, already used, or someone opened this
+      // page directly.
+      setTimeout(() => {
+        if (!ready) { checking.hidden = true; invalid.hidden = false; }
+      }, 2500);
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        setAlert(alertEl, '');
+
+        const pw = document.getElementById('password').value;
+        const c2 = document.getElementById('confirm').value;
+
+        if (pw.length < 8)  { setAlert(alertEl, 'At least 8 characters, please.'); return; }
+        if (pw !== c2)      { setAlert(alertEl, "Those don't match."); return; }
+
+        const restore = busy(submit, 'Saving…');
+        const { error } = await db.auth.updateUser({ password: pw });
+
+        if (error) { restore(); setAlert(alertEl, error.message); return; }
+
+        formCard.hidden = true;
+        done.hidden = false;
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="robots" content="noindex" />
+  <title>Finish your profile · ISOT App</title>
+
+  <link rel="icon" href="logo.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .avatar { width:64px; height:64px; border-radius:50%; margin:0 auto 14px; display:block; object-fit:cover; }
+    .consent { display:flex; gap:11px; align-items:flex-start; padding:12px 0; }
+    .consent input { width:19px; height:19px; margin-top:2px; flex-shrink:0; accent-color:var(--pink); }
+    .consent label { font-size:0.85rem; color:var(--text-muted); line-height:1.5; font-weight:400; text-transform:none; letter-spacing:0; }
+    .sub { border-top:1px solid var(--border-light); margin-top:22px; padding-top:20px; }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <main class="shell" style="max-width:420px;padding-top:44px">
+
+    <div style="text-align:center;margin-bottom:26px">
+      <img id="avatar" class="avatar" alt="" hidden />
+      <h1 style="font-size:1.7rem;margin-bottom:4px">Almost there</h1>
+      <p class="muted" style="font-size:0.92rem" id="greeting">Just a couple of things.</p>
+    </div>
+
+    <div class="card">
+      <div id="alert" hidden></div>
+
+      <form id="form" novalidate>
+        <div class="field">
+          <label for="full_name">Your name</label>
+          <input type="text" id="full_name" autocomplete="name" required />
+        </div>
+        <div class="field">
+          <label for="university">University or school <span class="dim" style="font-weight:400">— optional</span></label>
+          <input type="text" id="university" placeholder="UniTo, PoliTo, SAA…" />
+        </div>
+        <div class="field">
+          <label for="nationality">Nationality <span class="dim" style="font-weight:400">— optional</span></label>
+          <input type="text" id="nationality" />
+        </div>
+
+        <!-- Set a password so Google is not the only way in. Optional by design:
+             forcing one on an OAuth user is friction for no security gain. -->
+        <div class="sub" id="pwSection">
+          <p class="eyebrow" style="margin-bottom:6px">Add a password <span class="dim" style="font-weight:400;text-transform:none;letter-spacing:0">— optional</span></p>
+          <p class="dim" style="font-size:0.8rem;margin-bottom:14px">
+            So you can sign in with your email too, not only through Google.
+          </p>
+          <div class="field">
+            <label for="password">Password <span class="dim" style="font-weight:400">— at least 8 characters</span></label>
+            <input type="password" id="password" autocomplete="new-password" minlength="8" />
+          </div>
+          <div class="field">
+            <label for="confirm">Repeat it</label>
+            <input type="password" id="confirm" autocomplete="new-password" minlength="8" />
+          </div>
+          <p id="pwMatch" class="dim" style="font-size:0.8rem;margin-top:-6px" hidden></p>
+        </div>
+
+        <!-- GDPR: separate, unticked, never bundled into the account itself.
+             The account runs on contract; these two run on consent. -->
+        <div class="sub">
+          <p class="eyebrow" style="margin-bottom:10px">Optional</p>
+          <div class="consent">
+            <input type="checkbox" id="cPhotos" />
+            <label for="cPhotos">I'm happy for ISOT to publish photos from events I appear in, on the site and on Instagram. You can withdraw this any time.</label>
+          </div>
+          <div class="consent">
+            <input type="checkbox" id="cNews" />
+            <label for="cNews">Email me about upcoming events.</label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-pink" id="submit" style="margin-top:18px">Finish</button>
+      </form>
+
+      <button type="button" class="btn btn-ghost" id="skip" style="margin-top:10px">Skip for now</button>
+    </div>
+
+  </main>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+  <script>
+  (async () => {
+    const me = await requireAuth();
+
+    // Already done — do not make them see this twice.
+    if (me.profile_completed_at) { location.replace('home.html'); return; }
+
+    const form    = document.getElementById('form');
+    const alertEl = document.getElementById('alert');
+    const submit  = document.getElementById('submit');
+    const pwEl    = document.getElementById('password');
+    const cfEl    = document.getElementById('confirm');
+    const matchEl = document.getElementById('pwMatch');
+
+    document.getElementById('greeting').textContent =
+      'Welcome, ' + me.full_name.split(' ')[0] + '. Just a couple of things.';
+
+    if (me.avatar_url) {
+      const img = document.getElementById('avatar');
+      img.src = me.avatar_url;
+      img.hidden = false;
+    }
+
+    form.full_name.value   = me.full_name ?? '';
+    document.getElementById('university').value  = me.university ?? '';
+    document.getElementById('nationality').value = me.nationality ?? '';
+
+    // Someone who signed up with email already has a password — do not offer another.
+    const { data: { user } } = await db.auth.getUser();
+    const viaOAuth = (user?.app_metadata?.providers ?? []).some(p => p !== 'email');
+    if (!viaOAuth) document.getElementById('pwSection').hidden = true;
+
+    // Live match feedback, so they find out before they hit the button.
+    function checkMatch() {
+      if (!pwEl.value && !cfEl.value) { matchEl.hidden = true; return true; }
+      if (pwEl.value.length < 8) {
+        matchEl.textContent = 'At least 8 characters.';
+        matchEl.style.color = 'var(--text-dim)';
+        matchEl.hidden = false;
+        return false;
+      }
+      const ok = pwEl.value === cfEl.value;
+      matchEl.textContent = ok ? 'Passwords match.' : "Passwords don't match.";
+      matchEl.style.color = ok ? 'var(--green)' : '#FCA5A5';
+      matchEl.hidden = !cfEl.value;
+      return ok;
+    }
+    pwEl.addEventListener('input', checkMatch);
+    cfEl.addEventListener('input', checkMatch);
+
+    async function saveConsents() {
+      const rows = [
+        { purpose: 'photos',     granted: document.getElementById('cPhotos').checked },
+        { purpose: 'newsletter', granted: document.getElementById('cNews').checked },
+      ].map(r => ({ ...r, profile_id: me.id, policy_version: '2026-08' }));
+      const { error } = await db.from('consents').insert(rows);
+      if (error) console.warn('consent save failed:', error.message);
+    }
+
+    async function finish(withDetails) {
+      const restore = busy(submit, 'Saving…');
+
+      if (withDetails) {
+        const wantsPassword = pwEl.value || cfEl.value;
+        if (wantsPassword && !checkMatch()) {
+          restore();
+          setAlert(alertEl, pwEl.value.length < 8
+            ? 'Password needs at least 8 characters.'
+            : "Those two passwords don't match.");
+          return;
+        }
+
+        if (wantsPassword) {
+          const { error } = await db.auth.updateUser({ password: pwEl.value });
+          if (error) { restore(); setAlert(alertEl, error.message); return; }
+        }
+      }
+
+      const patch = { profile_completed_at: new Date().toISOString() };
+      if (withDetails) {
+        patch.full_name   = form.full_name.value.trim() || me.full_name;
+        patch.university  = document.getElementById('university').value.trim() || null;
+        patch.nationality = document.getElementById('nationality').value.trim() || null;
+      }
+
+      const { error } = await db.from('profiles').update(patch).eq('id', me.id);
+      if (error) { restore(); setAlert(alertEl, error.message); return; }
+
+      if (withDetails) await saveConsents();
+      location.replace('home.html');
+    }
+
+    form.addEventListener('submit', (e) => { e.preventDefault(); finish(true); });
+    document.getElementById('skip').addEventListener('click', () => finish(false));
+  })();
+  </script>
+</body>
+</html>
