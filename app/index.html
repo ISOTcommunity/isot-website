@@ -1,51 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-  <title>ISOT App</title>
-  
-  <link rel="icon" href="logo.png" type="image/png" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
+<title>The ISOT App | Member card, karaoke queue, events</title>
+<meta name="description" content="Your ISOT member card with a daily code for partner discounts, the live karaoke queue at Rough, and what's on this week in Turin." />
 
-  <style>
-    body {
-      background: var(--bg-dark);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  </style>
+<meta property="og:title" content="The ISOT App" />
+<meta property="og:description" content="Member card, partner discounts, karaoke queue." />
+<meta property="og:image" content="https://isotcommunity.com/assets/optimized/social_group_1.jpg" />
+
+<link rel="icon" href="icon-192.png" type="image/png" />
+<link rel="apple-touch-icon" href="icon-180.png" />
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#0F172A" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css" />
+<style>
+  /* ISOT identity palette. Used only as geometry — never as UI chrome. */
+  :root {
+    --steel:#7397B1; --teal:#3E6B7E; --amber:#EBC17F; --orange:#DE8E28;
+    --terracotta:#B64226; --mauve:#A0689A; --lavender:#BBC1F9; --indigo:#3F35A0;
+  }
+
+  body { display:block; }
+  .wrap { max-width:460px; margin:0 auto; padding:0 22px; }
+
+  .hero { position:relative; isolation:isolate; padding:64px 0 40px; }
+  .hero::before {
+    content:""; position:absolute; inset:-40px 0 0; z-index:-1; pointer-events:none;
+    background:radial-gradient(ellipse 70% 50% at 50% 0%, rgba(238,9,121,0.09), transparent 72%);
+  }
+
+  /* The wordmark's own construction — domes and split circles — used as a page rule.
+     Straight from assets/Graphics/Brand identity. */
+  .domes { display:flex; gap:6px; margin-bottom:34px; }
+  .domes i { width:22px; height:11px; border-radius:11px 11px 0 0; display:block; }
+
+  h1 { font-size:2.05rem; font-weight:600; letter-spacing:-0.03em; line-height:1.14; margin-bottom:14px; }
+  .lede { color:var(--text-dim); font-size:1rem; line-height:1.6; max-width:32ch; margin-bottom:30px; }
+  .actions { display:flex; flex-direction:column; gap:11px; max-width:300px; }
+
+  .features { margin:52px 0; }
+  .row { display:flex; gap:15px; padding:19px 0; border-top:1px solid var(--border-light); }
+  .row:last-child { border-bottom:1px solid var(--border-light); }
+  .row h2 { font-size:0.95rem; font-weight:600; margin-bottom:4px; letter-spacing:-0.01em; }
+  .row p  { font-size:0.875rem; color:var(--text-dim); line-height:1.55; }
+  /* Each feature marked by a split circle — the same construction as the O in the wordmark */
+  .glyph { flex-shrink:0; width:26px; height:26px; border-radius:50%; overflow:hidden; display:flex; margin-top:2px; }
+  .glyph span { flex:1; }
+
+  .cats { margin:52px 0; }
+  .cat-strip { display:flex; gap:10px; overflow-x:auto; margin:0 -22px; padding:0 22px 6px; scrollbar-width:none; }
+  .cat-strip::-webkit-scrollbar { display:none; }
+  .cat { flex-shrink:0; width:104px; }
+  .cat img { width:104px; height:104px; border-radius:18px; display:block; object-fit:cover; }
+  .cat span { display:block; font-size:0.74rem; color:var(--text-dim); margin-top:8px; line-height:1.3; }
+
+  .note { border-left:2px solid var(--pink); padding:2px 0 2px 16px; margin:44px 0; }
+  .note p { font-size:0.9rem; color:var(--text-muted); line-height:1.6; }
+  .note strong { color:var(--text-main); font-weight:600; }
+
+  footer { padding:40px 0 130px; }
+  footer a { font-size:0.85rem; color:var(--text-dark); }
+
+  .install {
+    position:fixed; left:0; right:0; bottom:0; z-index:50;
+    background:rgba(30,41,59,0.86); backdrop-filter:blur(20px);
+    border-top:1px solid var(--border-light);
+    padding:15px 22px calc(15px + env(safe-area-inset-bottom));
+    display:flex; align-items:center; gap:13px;
+  }
+  .install svg { width:19px; height:19px; stroke:var(--pink); flex-shrink:0; }
+  .install p { font-size:0.83rem; color:var(--text-muted); flex:1; line-height:1.45; }
+  .install button {
+    background:none; border:none; cursor:pointer; padding:4px; white-space:nowrap;
+    font-family:var(--font-body); font-size:0.83rem; font-weight:600;
+  }
+  #installGo { color:var(--pink); }
+  #installNo { color:var(--text-dark); }
+
+  .reveal { opacity:0; transform:translateY(12px); transition:opacity .45s ease, transform .45s ease; }
+  .reveal.visible { opacity:1; transform:none; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity:1; transform:none; transition:none; } }
+</style>
 </head>
 <body>
 
-  <div id="gate"><div class="spinner"></div></div>
+<div class="wrap">
 
-  <script src="vendor/supabase.js"></script>
-  <script src="js/isot.js"></script>
+  <section class="hero">
+    <div class="domes" aria-hidden="true">
+      <i style="background:var(--steel)"></i>
+      <i style="background:var(--teal)"></i>
+      <i style="background:var(--terracotta)"></i>
+      <i style="background:var(--orange)"></i>
+      <i style="background:var(--mauve)"></i>
+    </div>
+    <h1>Everything ISOT,<br />on your phone.</h1>
+    <p class="lede">Your member card, the karaoke queue, and what's on this week in Turin.</p>
+    <div class="actions">
+      <a class="btn btn-pink" href="signup.html">Create a free account</a>
+      <a class="btn btn-outline" href="login.html">Sign in</a>
+    </div>
+  </section>
 
-  <script>
-    async function routeEntry() {
-      let target = 'login.html';
-      if (db) {
+  <section class="features reveal">
+    <div class="row">
+      <span class="glyph" aria-hidden="true"><span style="background:var(--terracotta)"></span><span style="background:var(--amber)"></span></span>
+      <div>
+        <h2>Member card</h2>
+        <p>A code that changes daily. Show it at Rough or Capodoglio and the bar scans it for your member discount.</p>
+      </div>
+    </div>
+    <div class="row">
+      <span class="glyph" aria-hidden="true"><span style="background:var(--steel)"></span><span style="background:var(--teal)"></span></span>
+      <div>
+        <h2>Karaoke queue</h2>
+        <p>Monday at Rough. Add your song, see how many are ahead of you, and check whether it's already been sung tonight.</p>
+      </div>
+    </div>
+    <div class="row">
+      <span class="glyph" aria-hidden="true"><span style="background:var(--mauve)"></span><span style="background:var(--lavender)"></span></span>
+      <div>
+        <h2>Where we are</h2>
+        <p>Every partner venue on a map, with what's on and what your membership gets you there.</p>
+      </div>
+    </div>
+    <div class="row">
+      <span class="glyph" aria-hidden="true"><span style="background:var(--indigo)"></span><span style="background:var(--steel)"></span></span>
+      <div>
+        <h2>A say in it</h2>
+        <p>Members vote at the General Assembly and can stand for the board. It's your association.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cats reveal">
+    <p class="eyebrow" style="margin-bottom:14px">What we run</p>
+    <div class="cat-strip">
+      <div class="cat"><img src="../assets/LOGOS/Tog.jpeg"     alt="" loading="lazy" /><span>Together<br />&amp; Social</span></div>
+      <div class="cat"><img src="../assets/LOGOS/Drink.jpeg"   alt="" loading="lazy" /><span>Drinks<br />&amp; Aperitivo</span></div>
+      <div class="cat"><img src="../assets/LOGOS/Party.jpeg"   alt="" loading="lazy" /><span>Party<br />&amp; Nightlife</span></div>
+      <div class="cat"><img src="../assets/LOGOS/Busines.jpeg" alt="" loading="lazy" /><span>Career<br />&amp; Workshops</span></div>
+      <div class="cat"><img src="../assets/LOGOS/Sport.jpeg"   alt="" loading="lazy" /><span>Sports<br />&amp; Trips</span></div>
+    </div>
+  </section>
+
+  <section class="note reveal">
+    <p>
+      A free account gets you the app, the events and the karaoke queue.
+      <strong>€10 a year</strong> makes you a member: partner discounts, a vote at the General
+      Assembly, and the right to stand for the board.
+    </p>
+  </section>
+
+  <footer>
+    <a href="https://isotcommunity.com">← isotcommunity.com</a>
+  </footer>
+</div>
+
+<div class="install" id="install" hidden>
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 3v12" /><path d="m7 10 5 5 5-5" /><path d="M5 21h14" />
+  </svg>
+  <p id="installText">Install ISOT for faster access</p>
+  <button id="installGo" hidden>Install</button>
+  <button id="installNo">Not now</button>
+</div>
+
+<script src="vendor/supabase.js"></script>
+<script src="js/isot.js"></script>
+<script>
+(() => {
+  const DISMISSED = 'isot-install-dismissed';
+  const banner = document.getElementById('install');
+  const text   = document.getElementById('installText');
+  const goBtn  = document.getElementById('installGo');
+  const noBtn  = document.getElementById('installNo');
+
+  const standalone = window.matchMedia('(display-mode: standalone)').matches
+                  || window.navigator.standalone === true;
+
+  // Opened from the home screen — they are past the pitch.
+  if (standalone) { location.replace('home.html'); return; }
+
+  // Already signed in in the browser? Skip the pitch too. Anonymous visitors stay —
+  // this page is how they find out what the app is.
+  (async () => {
+    try {
+      if (typeof db !== 'undefined' && db) {
         const { data: { session } } = await db.auth.getSession();
-        if (session) {
-          target = 'home.html';
-        }
+        if (session) location.replace('home.html');
       }
+    } catch (e) { /* stay on the landing */ }
+  })();
 
-      // Handle relative path resolution for /app vs /app/ vs file://
-      const isFolderWithoutSlash = location.pathname.endsWith('/app');
-      const prefix = isFolderWithoutSlash ? 'app/' : '';
+  const ua  = navigator.userAgent;
+  const ios = /iPhone|iPad|iPod/i.test(ua) && !/CriOS|FxiOS/i.test(ua);
 
-      location.replace(prefix + target);
+  let dismissed = false;
+  try { dismissed = !!localStorage.getItem(DISMISSED); } catch (e) {}
+
+  if (!dismissed) {
+    if (ios) {
+      // Safari has no beforeinstallprompt — the only option is telling them where to tap.
+      text.innerHTML = 'Tap <strong>Share</strong>, then <strong>Add to Home Screen</strong>';
+      banner.hidden = false;
+    } else {
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        goBtn.onclick = async () => { e.prompt(); await e.userChoice; banner.hidden = true; };
+        goBtn.hidden = false;
+        banner.hidden = false;
+      });
     }
-    document.addEventListener('DOMContentLoaded', routeEntry);
-  </script>
+  }
+
+  noBtn.onclick = () => {
+    banner.hidden = true;
+    try { localStorage.setItem(DISMISSED, '1'); } catch (e) {}
+  };
+
+  // ⚠️ DO NOT REMOVE. Nothing else registers the service worker. Without this line
+  // Chrome will not offer "Install app" and the member card has no offline shell.
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch((e) => console.warn('SW failed:', e));
+  }
+
+  const io = new IntersectionObserver(
+    (es) => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } }),
+    { threshold: 0.1 }
+  );
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+})();
+</script>
 </body>
 </html>
