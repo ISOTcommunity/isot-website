@@ -12,7 +12,17 @@
       "permanent": true
     },
     {
+      "source": "/universities-and-colleges-in-turin-for-international-students/",
+      "destination": "/blog-post?slug=universities-and-colleges-in-turin-for-international-students",
+      "permanent": true
+    },
+    {
       "source": "/a-complete-guide-to-living-in-turin-for-international-students",
+      "destination": "/blog-post?slug=a-complete-guide-to-living-in-turin-for-international-students",
+      "permanent": true
+    },
+    {
+      "source": "/a-complete-guide-to-living-in-turin-for-international-students/",
       "destination": "/blog-post?slug=a-complete-guide-to-living-in-turin-for-international-students",
       "permanent": true
     },
@@ -22,7 +32,17 @@
       "permanent": true
     },
     {
+      "source": "/isot-brazilian-karaoke-night-at-rough-bar-san-salvario/",
+      "destination": "/blog-post?slug=isot-brazilian-karaoke-night-at-rough-bar-san-salvario",
+      "permanent": true
+    },
+    {
       "source": "/happy-nowruz-iranian-new-year-isot-community",
+      "destination": "/blog-post?slug=happy-nowruz-iranian-new-year-isot-community",
+      "permanent": true
+    },
+    {
+      "source": "/happy-nowruz-iranian-new-year-isot-community/",
       "destination": "/blog-post?slug=happy-nowruz-iranian-new-year-isot-community",
       "permanent": true
     },
@@ -32,7 +52,17 @@
       "permanent": true
     },
     {
+      "source": "/saahorizon2025/",
+      "destination": "/blog-post?slug=saahorizon2025",
+      "permanent": true
+    },
+    {
       "source": "/studenthousinginturin",
+      "destination": "/blog-post?slug=studenthousinginturin",
+      "permanent": true
+    },
+    {
+      "source": "/studenthousinginturin/",
       "destination": "/blog-post?slug=studenthousinginturin",
       "permanent": true
     },
@@ -42,7 +72,17 @@
       "permanent": true
     },
     {
+      "source": "/italianacademicexamsystem/",
+      "destination": "/blog-post?slug=italianacademicexamsystem",
+      "permanent": true
+    },
+    {
       "source": "/turin-student-canteens",
+      "destination": "/blog-post?slug=turin-student-canteens",
+      "permanent": true
+    },
+    {
+      "source": "/turin-student-canteens/",
       "destination": "/blog-post?slug=turin-student-canteens",
       "permanent": true
     },
@@ -52,7 +92,17 @@
       "permanent": true
     },
     {
+      "source": "/celebrating-migration-a-journey-of-resilience-and-opportunity/",
+      "destination": "/blog-post?slug=celebrating-migration-a-journey-of-resilience-and-opportunity",
+      "permanent": true
+    },
+    {
       "source": "/edisuscholarship2024",
+      "destination": "/blog-post?slug=edisuscholarship2024",
+      "permanent": true
+    },
+    {
+      "source": "/edisuscholarship2024/",
       "destination": "/blog-post?slug=edisuscholarship2024",
       "permanent": true
     },
@@ -62,7 +112,17 @@
       "permanent": true
     },
     {
+      "source": "/sexual-behaviour-in-italy/",
+      "destination": "/blog-post?slug=sexual-behaviour-in-italy",
+      "permanent": true
+    },
+    {
       "source": "/post_medical1",
+      "destination": "/blog-post?slug=post_medical1",
+      "permanent": true
+    },
+    {
+      "source": "/post_medical1/",
       "destination": "/blog-post?slug=post_medical1",
       "permanent": true
     },
@@ -72,7 +132,17 @@
       "permanent": true
     },
     {
+      "source": "/welcome/",
+      "destination": "/blog-post?slug=welcome",
+      "permanent": true
+    },
+    {
       "source": "/register-login",
+      "destination": "/join",
+      "permanent": true
+    },
+    {
+      "source": "/register-login/",
       "destination": "/join",
       "permanent": true
     },
@@ -82,7 +152,17 @@
       "permanent": true
     },
     {
+      "source": "/cookie-policy/",
+      "destination": "/privacy",
+      "permanent": true
+    },
+    {
       "source": "/privacy-policy",
+      "destination": "/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/privacy-policy/",
       "destination": "/privacy",
       "permanent": true
     },
@@ -92,7 +172,17 @@
       "permanent": true
     },
     {
+      "source": "/contact-us/",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
       "source": "/our-partners",
+      "destination": "/partners",
+      "permanent": true
+    },
+    {
+      "source": "/our-partners/",
       "destination": "/partners",
       "permanent": true
     }
