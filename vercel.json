@@ -1,7 +1,11 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false,
   "redirects": [
+    {
+      "source": "/app",
+      "destination": "/app/",
+      "permanent": false
+    },
     {
       "source": "/universities-and-colleges-in-turin-for-international-students",
       "destination": "/blog-post?slug=universities-and-colleges-in-turin-for-international-students",
@@ -94,14 +98,6 @@
     }
   ],
   "rewrites": [
-    {
-      "source": "/app",
-      "destination": "/app/index.html"
-    },
-    {
-      "source": "/app/",
-      "destination": "/app/index.html"
-    },
     {
       "source": "/app/login",
       "destination": "/app/login.html"
