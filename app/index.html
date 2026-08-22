@@ -3,145 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-  <title>ISOT App — Your Digital Member Card in Turin</title>
-
-  <link rel="icon" href="../assets/LOGOS/scritta isot.png" type="image/png" />
+  <title>ISOT App</title>
+  
+  <link rel="icon" href="logo.png" type="image/png" />
   <link rel="manifest" href="manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-
   <link rel="stylesheet" href="css/app.css" />
 
   <style>
-    .hero-product-viewport {
-      min-height: 85vh;
+    body {
+      background: var(--bg-dark);
+      min-height: 100vh;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      text-align: center;
-      padding: 40px 20px;
-      position: relative;
-    }
-    .hero-product-viewport img.app-mockup-frame {
-      max-width: 320px;
-      border-radius: 36px;
-      border: 1px solid var(--border-strong);
-      box-shadow: 0 30px 80px rgba(238, 9, 121, 0.25);
-      margin: 30px 0;
-    }
-    .install-bar-fixed {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--nav-glass);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border-top: 1px solid var(--border-light);
-      padding: 16px 20px calc(16px + env(safe-area-inset-bottom));
-      z-index: 200;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Bar -->
-  <header class="topbar">
-    <a href="index.html" class="topbar-title" style="display: flex; align-items: center; gap: 8px;">
-      <img src="../assets/LOGOS/scritta isot.png" alt="ISOT Logo" />
-      <span>App</span>
-    </a>
-    <a href="login.html" class="btn btn-outline" style="width: auto; padding: 6px 16px; font-size: 0.82rem;">Sign In</a>
-  </header>
+  <div id="gate"><div class="spinner"></div></div>
 
-  <!-- Hero Product Viewport (Concept 1: The App) -->
-  <section class="hero-product-viewport">
-    <div class="eyebrow"><i class="fa-solid fa-sparkles"></i> Apple-Grade Member Experience</div>
-    <h1 style="font-size: 2.8rem; margin-top: 8px; max-width: 480px;">
-      Your ISOT Card. <br /><span style="color: var(--pink);">In Your Pocket.</span>
-    </h1>
-    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 420px; margin-top: 14px;">
-      Standing in a loud bar in San Salvario. Show your live daily QR card to the bartender and claim your 20% member discount.
-    </p>
-
-    <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: center; width: 100%; max-width: 380px;">
-      <a href="login.html" class="btn btn-pink">Open App Now →</a>
-      <a href="signup.html" class="btn btn-outline">Join Free</a>
-    </div>
-
-    <img src="../assets/optimized/social_group_2.jpg" alt="ISOT Night Out" class="app-mockup-frame" />
-  </section>
-
-  <!-- Product Features Section (Concept 2: Built for San Salvario Nights) -->
-  <section class="shell shell-wide" style="padding-bottom: 120px;">
-    <div style="text-align: center; margin-bottom: 40px;">
-      <div class="eyebrow">Nightlife & Community</div>
-      <h2 style="font-size: 2rem;">Everything You Need at 22:40</h2>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
-      <div class="card card-glass">
-        <div style="font-size: 2rem; color: var(--pink); margin-bottom: 12px;"><i class="fa-solid fa-qrcode"></i></div>
-        <h3>Daily Member QR Card</h3>
-        <p class="muted" style="font-size: 0.9rem; margin-top: 6px;">
-          Scannable daily token with anti-screenshot live clock tell. Claim your discount @ Rough Bar & Capodoglio.
-        </p>
-      </div>
-
-      <div class="card card-glass">
-        <div style="font-size: 2rem; color: var(--orange); margin-bottom: 12px;"><i class="fa-solid fa-microphone"></i></div>
-        <h3>Monday Karaoke Queue</h3>
-        <p class="muted" style="font-size: 0.9rem; margin-top: 6px;">
-          Add songs to the live Monday queue at Rough. Know your position ("3 songs away") without crowding the mic.
-        </p>
-      </div>
-
-      <div class="card card-glass">
-        <div style="font-size: 2rem; color: var(--gold); margin-bottom: 12px;"><i class="fa-solid fa-mobile-screen-button"></i></div>
-        <h3>Zero App Store Delay</h3>
-        <p class="muted" style="font-size: 0.9rem; margin-top: 6px;">
-          Install directly to your home screen as a standalone PWA. Works offline, updates automatically.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- PWA Persistent Install Bar -->
-  <div class="install-bar-fixed" id="installBar" style="display: none;">
-    <div>
-      <div style="font-size: 0.9rem; font-weight: 700; color: #FFF;" id="installTitle">Install ISOT App</div>
-      <div style="font-size: 0.78rem; color: var(--text-dim);" id="installDesc">Add to Home Screen for fast bar access</div>
-    </div>
-    <button class="btn btn-pink" id="installBtn" style="width: auto; padding: 8px 18px; font-size: 0.85rem;">Install</button>
-  </div>
-
+  <script src="vendor/supabase.js"></script>
   <script src="js/isot.js"></script>
+
   <script>
-    let deferredPrompt = null;
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      document.getElementById('installBar').style.display = 'flex';
-    });
-
-    document.getElementById('installBtn')?.addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        deferredPrompt = null;
-        document.getElementById('installBar').style.display = 'none';
-      } else {
-        alert('To install on iOS: Tap Share then "Add to Home Screen".');
+    async function routeEntry() {
+      if (!db) {
+        location.replace('login.html');
+        return;
       }
-    });
+      const { data: { session } } = await db.auth.getSession();
+      if (session) {
+        location.replace('home.html');
+      } else {
+        location.replace('login.html');
+      }
+    }
+    document.addEventListener('DOMContentLoaded', routeEntry);
   </script>
 </body>
 </html>

@@ -1,95 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="robots" content="noindex" />
-<title>Sign in · ISOT</title>
-<link rel="icon" href="logo.png" type="image/png" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/app.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Sign In · ISOT App</title>
+
+  <link rel="icon" href="logo.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="css/app.css" />
 </head>
 <body>
 
-<div class="shell" style="max-width:400px;padding-top:56px">
+  <main class="shell" style="max-width: 420px; padding-top: 48px;">
 
-  <div style="text-align:center;margin-bottom:32px">
-    <img src="logo.png" alt="ISOT" style="height:38px;margin-bottom:20px" />
-    <h1>Welcome back</h1>
-    <p class="dim">Sign in to your ISOT account</p>
-  </div>
+    <div style="text-align: center; margin-bottom: 28px;">
+      <img src="logo.png" alt="ISOT Logo" style="height: 44px; width: auto; margin-bottom: 16px;" />
+      <h1 style="font-size: 1.8rem; margin-bottom: 4px;">Welcome Back</h1>
+      <p class="muted" style="font-size: 0.92rem;">Sign in to your ISOT Member account</p>
+    </div>
 
-  <div class="card">
-    <div id="alert" hidden></div>
+    <div class="card card-glass card-glow">
+      <div id="alert" hidden></div>
 
-    <form id="form" novalidate>
-      <div class="field">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" autocomplete="email" required />
+      <form id="form" novalidate>
+        <div class="field">
+          <label for="email">Email address</label>
+          <input type="email" id="email" name="email" autocomplete="email" required placeholder="name@example.com" />
+        </div>
+        
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" autocomplete="current-password" required placeholder="••••••••" />
+        </div>
+
+        <button type="submit" class="btn btn-pink" id="submit" style="margin-top: 8px;">Sign In →</button>
+      </form>
+
+      <div style="text-align: center; margin-top: 20px; font-size: 0.88rem;" class="dim">
+        Don't have an account? <a href="signup.html" style="color: var(--pink); font-weight: 700;">Join ISOT Free</a>
       </div>
-      <div class="field">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" autocomplete="current-password" required />
-      </div>
-      <button type="submit" class="btn btn-pink" id="submit">Sign in</button>
-    </form>
+    </div>
 
-    <p style="text-align:center;margin-top:18px;font-size:0.875rem" class="dim">
-      No account yet? <a href="signup.html" style="color:var(--pink);font-weight:600">Join ISOT</a>
-    </p>
-  </div>
+    <div style="text-align: center; margin-top: 24px;">
+      <a href="../index.html" class="dim" style="font-size: 0.85rem;"><i class="fa-solid fa-arrow-left"></i> Back to isotcommunity.com</a>
+    </div>
 
-  <p style="text-align:center;margin-top:24px">
-    <a href="https://isotcommunity.com" class="dim">← isotcommunity.com</a>
-  </p>
-</div>
+  </main>
 
-<script src="vendor/supabase.js"></script>
-<script src="js/isot.js"></script>
-<script>
-(async () => {
-  const form   = document.getElementById('form');
-  const alertEl= document.getElementById('alert');
-  const submit = document.getElementById('submit');
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+  <script>
+    (async () => {
+      const form    = document.getElementById('form');
+      const alertEl = document.getElementById('alert');
+      const submit  = document.getElementById('submit');
 
-  if (!db) {
-    setAlert(alertEl, 'Supabase is not configured yet — add the project URL and anon key to js/isot.js.', 'info');
-    submit.disabled = true;
-    return;
-  }
+      if (!db) {
+        setAlert(alertEl, 'Supabase credentials missing from js/isot.js.', 'info');
+        submit.disabled = true;
+        return;
+      }
 
-  // Already signed in? Skip straight through.
-  const { data: { session } } = await db.auth.getSession();
-  if (session) { location.replace('home.html'); return; }
+      const { data: { session } } = await db.auth.getSession();
+      if (session) { location.replace('home.html'); return; }
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    setAlert(alertEl, '');
-    const restore = busy(submit, 'Signing in…');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        setAlert(alertEl, '');
+        const restore = busy(submit, 'Signing in…');
 
-    const { error } = await db.auth.signInWithPassword({
-      email: form.email.value.trim(),
-      password: form.password.value,
-    });
+        const { error } = await db.auth.signInWithPassword({
+          email: form.email.value.trim(),
+          password: form.password.value,
+        });
 
-    if (error) {
-      restore();
-      // Supabase returns the same message for wrong password and unknown email,
-      // which is correct — don't leak which accounts exist.
-      setAlert(alertEl, error.message === 'Invalid login credentials'
-        ? 'That email and password combination did not work.'
-        : error.message);
-      return;
-    }
+        if (error) {
+          restore();
+          setAlert(alertEl, error.message === 'Invalid login credentials'
+            ? 'Invalid email or password.'
+            : error.message);
+          return;
+        }
 
-    // Honour ?next= if it points somewhere inside this app.
-    const next = new URLSearchParams(location.search).get('next');
-    const safe = next && /^[a-z0-9-]+\.html$/i.test(next) ? next : 'home.html';
-    location.replace(safe);
-  });
-})();
-</script>
+        const next = new URLSearchParams(location.search).get('next');
+        const safe = next && /^[a-z0-9-]+\.html$/i.test(next) ? next : 'home.html';
+        location.replace(safe);
+      });
+    })();
+  </script>
 </body>
 </html>
