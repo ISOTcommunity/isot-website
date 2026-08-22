@@ -2,6 +2,26 @@
   "cleanUrls": true,
   "redirects": [
     {
+      "source": "/turin-public-transport-gtt-student-pass",
+      "destination": "/blog-post?slug=turin-public-transport-gtt-student-pass",
+      "permanent": true
+    },
+    {
+      "source": "/healthcare-tessera-sanitaria-turin",
+      "destination": "/blog-post?slug=healthcare-tessera-sanitaria-turin",
+      "permanent": true
+    },
+    {
+      "source": "/permesso-di-soggiorno-turin-guide",
+      "destination": "/blog-post?slug=permesso-di-soggiorno-turin-guide",
+      "permanent": true
+    },
+    {
+      "source": "/codice-fiscale-turin-guide",
+      "destination": "/blog-post?slug=codice-fiscale-turin-guide",
+      "permanent": true
+    },
+    {
       "source": "/app",
       "destination": "/app/",
       "permanent": false
