@@ -250,30 +250,35 @@
         <!-- Right: Form -->
         <div style="background: var(--bg-card); padding: 36px; border-radius: var(--radius-lg); border: 1px solid var(--border-light);">
           <h3 style="font-size: 1.8rem; font-weight: 700; color: #FFF; margin-bottom: 20px;">Send a Message</h3>
-          <form onsubmit="event.preventDefault(); document.getElementById('contactSent').style.display='block'; this.style.display='none';">
+          <form id="contactForm">
             <input type="text" name="website_url" class="hidden-field" tabindex="-1" autocomplete="off" />
             <div class="form-group">
               <label>Your Name</label>
-              <input type="text" required placeholder="Alex Rossi" class="form-input" />
+              <input type="text" id="cName" required placeholder="Alex Rossi" class="form-input" />
             </div>
             <div class="form-group">
               <label>Email Address</label>
-              <input type="email" required placeholder="alex@example.com" class="form-input" />
+              <input type="email" id="cEmail" required placeholder="alex@example.com" class="form-input" />
             </div>
             <div class="form-group">
               <label>Subject</label>
-              <input type="text" required placeholder="Question about housing / events / membership" class="form-input" />
+              <input type="text" id="cSubject" required placeholder="Question about housing / events / membership" class="form-input" />
             </div>
             <div class="form-group">
               <label>Message</label>
-              <textarea rows="4" required placeholder="Write your question..." class="form-input" style="resize: vertical;"></textarea>
+              <textarea rows="4" id="cMessage" required placeholder="Write your question..." class="form-input" style="resize: vertical;"></textarea>
             </div>
-            <button type="submit" class="btn btn-pink" style="width: 100%;">Send Message →</button>
+            <div id="cError" style="display:none; color:#FCA5A5; font-size:0.85rem; margin-bottom:12px;"></div>
+            <button type="submit" class="btn btn-pink" style="width: 100%;" id="cBtn">Send Message →</button>
+            <p style="color:var(--text-dark); font-size:0.75rem; margin-top:12px; text-align:center;">
+              Or email us directly at
+              <a href="mailto:isot.infocenter@gmail.com" style="color:var(--pink);">isot.infocenter@gmail.com</a>
+            </p>
           </form>
 
           <div id="contactSent" style="display:none; text-align:center; padding:30px; background: rgba(15,23,42,0.9); border-radius: var(--radius-md); border:1px solid var(--pink);">
             <h4 style="color:#FFF; font-size:1.3rem;">Message Received! 📨</h4>
-            <p style="color:var(--text-muted); font-size:0.9rem; margin-top:8px;">Thank you for reaching out. An ISOT team member will reply via email shortly.</p>
+            <p style="color:var(--text-muted); font-size:0.9rem; margin-top:8px;">Thanks for reaching out — we'll reply by email. If it's urgent, write to <a href="mailto:isot.infocenter@gmail.com" style="color:var(--pink);">isot.infocenter@gmail.com</a>.</p>
           </div>
         </div>
 
@@ -416,6 +421,40 @@
     function toggleFaq(el) {
       el.classList.toggle('active');
     }
+  </script>
+
+  <!-- Enquiries write to Supabase contact_messages (anon INSERT policy) -->
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot-public.js"></script>
+  <script>
+    document.getElementById('contactForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      if (form.querySelector('[name="website_url"]').value) return;   // honeypot
+
+      const btn = document.getElementById('cBtn');
+      const err = document.getElementById('cError');
+      err.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+
+      const res = await sendEnquiry('contact', {
+        name:  document.getElementById('cName').value.trim(),
+        email: document.getElementById('cEmail').value.trim(),
+        message: document.getElementById('cSubject').value.trim() + '\n\n' +
+                 document.getElementById('cMessage').value.trim(),
+      });
+
+      if (!res.ok) {
+        btn.disabled = false;
+        btn.textContent = 'Send Message →';
+        err.textContent = "Could not send — please email isot.infocenter@gmail.com instead.";
+        err.style.display = 'block';
+        return;
+      }
+      form.style.display = 'none';
+      document.getElementById('contactSent').style.display = 'block';
+    });
   </script>
 </body>
 </html>

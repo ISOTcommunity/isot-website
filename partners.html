@@ -290,21 +290,31 @@
         <p style="color: var(--text-muted); font-size: 0.95rem;">Are you a venue owner, student organization, or business in Turin wanting to connect with 1,000+ international students?</p>
       </div>
 
-      <form style="background: var(--bg-card); padding: 36px; border-radius: var(--radius-lg); border: 1px solid var(--border-light);" onsubmit="event.preventDefault(); alert('Thank you! Our partnership team will contact you shortly.');">
+      <form id="partnerForm" style="background: var(--bg-card); padding: 36px; border-radius: var(--radius-lg); border: 1px solid var(--border-light);">
+        <input type="text" name="website_url" style="display:none !important" tabindex="-1" autocomplete="off" />
         <div class="form-group">
           <label>Company / Organization Name</label>
-          <input type="text" required placeholder="e.g. Rough Bar / Uni Club" class="form-input" />
+          <input type="text" id="pName" required placeholder="e.g. Rough Bar / Uni Club" class="form-input" />
         </div>
         <div class="form-group">
           <label>Contact Email</label>
-          <input type="email" required placeholder="partner@example.com" class="form-input" />
+          <input type="email" id="pEmail" required placeholder="partner@example.com" class="form-input" />
         </div>
         <div class="form-group">
           <label>Proposal / Collaboration Message</label>
-          <textarea rows="4" required placeholder="Tell us how you would like to collaborate with ISOT..." class="form-input" style="resize: vertical;"></textarea>
+          <textarea rows="4" id="pMessage" required placeholder="Tell us how you would like to collaborate with ISOT..." class="form-input" style="resize: vertical;"></textarea>
         </div>
-        <button type="submit" class="btn btn-pink" style="width: 100%;">Send Partnership Request →</button>
+        <div id="pError" style="display:none; color:#FCA5A5; font-size:0.85rem; margin-bottom:12px;"></div>
+        <button type="submit" class="btn btn-pink" style="width: 100%;" id="pBtn">Send Partnership Request →</button>
+        <p style="color: var(--text-dim); font-size: 0.75rem; margin-top: 12px; text-align:center;">
+          Or email <a href="mailto:isot.infocenter@gmail.com" style="color:var(--pink);">isot.infocenter@gmail.com</a>
+        </p>
       </form>
+
+      <div id="partnerSent" style="display:none; background: var(--bg-card); padding: 36px; border-radius: var(--radius-lg); border: 1px solid var(--pink); text-align:center;">
+        <h4 style="color:#FFF; font-size:1.3rem;">Request received 🤝</h4>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-top:8px;">Thanks — we'll be in touch by email.</p>
+      </div>
     </div>
   </section>
 
@@ -362,6 +372,38 @@
       { threshold: 0.12 }
     );
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot-public.js"></script>
+  <script>
+    document.getElementById('partnerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      if (form.querySelector('[name="website_url"]').value) return;   // honeypot
+
+      const btn = document.getElementById('pBtn');
+      const err = document.getElementById('pError');
+      err.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+
+      const res = await sendEnquiry('partner', {
+        name:    document.getElementById('pName').value.trim(),
+        email:   document.getElementById('pEmail').value.trim(),
+        message: document.getElementById('pMessage').value.trim(),
+      });
+
+      if (!res.ok) {
+        btn.disabled = false;
+        btn.textContent = 'Send Partnership Request →';
+        err.textContent = "Could not send — please email isot.infocenter@gmail.com instead.";
+        err.style.display = 'block';
+        return;
+      }
+      form.style.display = 'none';
+      document.getElementById('partnerSent').style.display = 'block';
+    });
   </script>
 </body>
 </html>
