@@ -1,0 +1,209 @@
+/* ISOT app — shared styles
+   Brand tokens are copied verbatim from website/index.html :root.
+   Keep the two in sync by hand; there is no shared package by design. */
+
+:root {
+  --bg-dark:      #0F172A;
+  --bg-card:      #1E293B;
+  --bg-darker:    #0B1120;
+  --pink:         #EE0979;
+  --pink-glow:    rgba(238, 9, 121, 0.35);
+  --navy:         #243673;
+  --orange:       #FF6A00;
+  --gold:         #D4AF50;
+  --text-main:    #F8FAFC;
+  --text-muted:   #CBD5E1;
+  --text-dim:     #94A3B8;
+  --text-dark:    #64748B;
+  --border-light: rgba(255, 255, 255, 0.12);
+  --border-glow:  rgba(238, 9, 121, 0.4);
+  --green:        #10B981;
+  --red:          #EF4444;
+  --font-display: 'Amatic SC', cursive, sans-serif;
+  --font-body:    'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --radius-sm:    12px;
+  --radius-md:    20px;
+  --radius-lg:    32px;
+  --radius-full:  9999px;
+  --transition:   all 0.15s ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--navy); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--pink); }
+
+a { color: inherit; text-decoration: none; }
+
+/* ---------- layout ---------- */
+.shell {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+}
+.shell-wide { max-width: 960px; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-light);
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(20px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.topbar img { height: 26px; width: auto; }
+
+/* ---------- type ---------- */
+h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; }
+h2 { font-size: 1.25rem; font-weight: 600; }
+.display { font-family: var(--font-display); font-size: 3rem; line-height: 0.95; }
+.muted { color: var(--text-muted); }
+.dim   { color: var(--text-dim); font-size: 0.875rem; }
+.eyebrow {
+  color: var(--pink);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ---------- card ---------- */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 24px;
+}
+.card + .card { margin-top: 16px; }
+.card-glow { border-color: var(--border-glow); box-shadow: 0 0 30px rgba(238, 9, 121, 0.08); }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 22px;
+  border: none;
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-pink { background: var(--pink); color: #fff; }
+.btn-pink:hover:not(:disabled) {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--pink) 40%, transparent);
+  transform: translateY(-1px);
+}
+.btn-outline {
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--border-light);
+}
+.btn-outline:hover:not(:disabled) { border-color: var(--pink); color: var(--pink); }
+.btn-ghost { background: transparent; color: var(--text-dim); font-weight: 500; }
+.btn-ghost:hover:not(:disabled) { color: var(--text-main); }
+
+/* ---------- forms ---------- */
+.field { margin-bottom: 16px; }
+.field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.field input, .field select, .field textarea {
+  width: 100%;
+  padding: 13px 16px;
+  background: var(--bg-darker);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  transition: var(--transition);
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none;
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px rgba(238, 9, 121, 0.12);
+}
+
+/* Honeypot — bots fill it, humans never see it */
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+/* ---------- feedback ---------- */
+.alert {
+  padding: 13px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+.alert-error   { background: rgba(239, 68, 68, 0.12);  border: 1px solid rgba(239, 68, 68, 0.35);  color: #FCA5A5; }
+.alert-success { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #6EE7B7; }
+.alert-info    { background: rgba(238, 9, 121, 0.10);  border: 1px solid var(--border-glow);       color: var(--text-muted); }
+[hidden] { display: none !important; }
+
+/* ---------- badges ---------- */
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.badge-socio       { background: var(--pink);  color: #fff; }
+.badge-participant { background: var(--navy);  color: var(--text-muted); }
+.badge-staff       { background: var(--gold);  color: var(--bg-dark); }
+
+/* ---------- spinner ---------- */
+.spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Full-page gate shown until the auth guard resolves — prevents a flash of
+   content to someone who turns out not to be signed in. */
+#gate {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-dark);
+  z-index: 999;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

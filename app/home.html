@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex" />
+<title>ISOT</title>
+<link rel="icon" href="logo.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css" />
+<style>
+  .tile {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    transition: var(--transition);
+  }
+  .tile:hover { border-color: var(--pink); transform: translateY(-1px); }
+  .tile-icon { font-size: 1.6rem; line-height: 1; }
+  .tile-title { font-weight: 600; }
+  .tile-sub { font-size: 0.82rem; color: var(--text-dim); }
+  .tile-arrow { margin-left: auto; color: var(--text-dark); }
+</style>
+</head>
+<body>
+
+<div id="gate"><div class="spinner"></div></div>
+
+<header class="topbar">
+  <img src="logo.png" alt="ISOT" />
+  <button class="btn btn-ghost" style="width:auto;padding:6px 12px" onclick="signOut()">Sign out</button>
+</header>
+
+<div class="shell">
+  <div style="margin-bottom:26px">
+    <p class="eyebrow">Welcome back</p>
+    <h1 id="hello">—</h1>
+  </div>
+
+  <div id="tiles"></div>
+
+  <p style="text-align:center;margin-top:32px">
+    <a href="https://isotcommunity.com" class="dim">← isotcommunity.com</a>
+  </p>
+</div>
+
+<script src="vendor/supabase.js"></script>
+<script src="js/isot.js"></script>
+<script>
+(async () => {
+  const me = await requireAuth();
+  document.getElementById('hello').textContent = me.full_name.split(' ')[0];
+
+  const isBoard = me.staff_role === 'board';
+  const isStaff = isBoard || me.staff_role === 'volunteer';
+
+  // Ordered by how often each is actually used, not by seniority.
+  const tiles = [
+    { href: 'profile.html', icon: '🎫', title: 'My card',
+      sub: 'QR code, membership, details', show: true },
+
+    { href: 'karaoke.html', icon: '🎤', title: 'Karaoke queue',
+      sub: 'Add a song, see who is next', show: true },
+
+    { href: 'scan.html', icon: '📷', title: 'Scanner',
+      sub: 'Check people in at the door', show: isStaff },
+
+    { href: 'karaoke-kj.html', icon: '🎛️', title: 'Run the queue',
+      sub: 'Reorder, mark performing and done', show: isStaff },
+
+    { href: 'dashboard.html', icon: '📊', title: 'Board dashboard',
+      sub: 'Attendance, members, payments', show: isBoard },
+
+    { href: 'assembly.html', icon: '🗳️', title: 'General Assembly',
+      sub: 'Motions, voting, proxies', show: me.tier === 'socio' || isBoard },
+
+    { href: 'partner.html', icon: '🏛️', title: 'Venue numbers',
+      sub: 'Attendance at your venue', show: me.staff_role === 'partner' },
+  ];
+
+  document.getElementById('tiles').innerHTML = tiles
+    .filter(t => t.show)
+    .map(t => `
+      <a class="tile" href="${t.href}">
+        <span class="tile-icon">${t.icon}</span>
+        <span>
+          <span class="tile-title">${escapeHtml(t.title)}</span><br />
+          <span class="tile-sub">${escapeHtml(t.sub)}</span>
+        </span>
+        <span class="tile-arrow">→</span>
+      </a>`)
+    .join('');
+})();
+</script>
+</body>
+</html>

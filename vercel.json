@@ -96,7 +96,7 @@
   "rewrites": [
     {
       "source": "/checkin",
-      "destination": "https://app.isotcommunity.com/checkin.html"
+      "destination": "/app/checkin.html"
     }
   ]
 }

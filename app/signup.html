@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex" />
+<title>Join ISOT</title>
+<link rel="icon" href="logo.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+
+<div class="shell" style="max-width:440px;padding-top:48px">
+
+  <div style="text-align:center;margin-bottom:28px">
+    <img src="logo.png" alt="ISOT" style="height:38px;margin-bottom:20px" />
+    <h1>Join the community</h1>
+    <p class="dim">Free. Takes a minute.</p>
+  </div>
+
+  <div class="card">
+    <div id="alert" hidden></div>
+
+    <form id="form" novalidate>
+      <div class="field">
+        <label for="full_name">Full name</label>
+        <input type="text" id="full_name" name="full_name" autocomplete="name" required />
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" autocomplete="email" required />
+      </div>
+      <div class="field">
+        <label for="password">Password <span class="dim" style="font-weight:400">— at least 8 characters</span></label>
+        <input type="password" id="password" name="password" autocomplete="new-password" minlength="8" required />
+      </div>
+      <div class="field">
+        <label for="university">University or school <span class="dim" style="font-weight:400">— optional</span></label>
+        <input type="text" id="university" name="university" placeholder="UniTo, PoliTo, SAA…" />
+      </div>
+      <div class="field">
+        <label for="nationality">Nationality <span class="dim" style="font-weight:400">— optional</span></label>
+        <input type="text" id="nationality" name="nationality" />
+      </div>
+
+      <!-- Bots fill this; humans never see it -->
+      <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+      <div class="field">
+        <label for="city">Which city is ISOT based in?</label>
+        <input type="text" id="city" name="city" placeholder="Answer to prove you're human" required />
+      </div>
+
+      <button type="submit" class="btn btn-pink" id="submit">Create account</button>
+    </form>
+
+    <p style="text-align:center;margin-top:18px;font-size:0.875rem" class="dim">
+      Already have an account? <a href="login.html" style="color:var(--pink);font-weight:600">Sign in</a>
+    </p>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <p class="eyebrow" style="margin-bottom:8px">Want to become an ISOT member?</p>
+    <p class="dim" style="font-size:0.85rem">
+      Membership is €10/year and makes you part of the General Assembly — you can vote and stand for
+      the board. Create your free account first, then apply from your profile.
+    </p>
+  </div>
+
+  <!-- Success state -->
+  <div class="card card-glow" id="done" hidden style="text-align:center">
+    <h2 style="margin-bottom:10px">You're in 🎉</h2>
+    <p class="muted" id="doneMsg" style="font-size:0.9rem;margin-bottom:20px"></p>
+    <a class="btn btn-pink" href="profile.html">Go to my profile</a>
+  </div>
+
+</div>
+
+<script src="vendor/supabase.js"></script>
+<script src="js/isot.js"></script>
+<script>
+(async () => {
+  const form    = document.getElementById('form');
+  const alertEl = document.getElementById('alert');
+  const submit  = document.getElementById('submit');
+  const done    = document.getElementById('done');
+
+  if (!db) {
+    setAlert(alertEl, 'Supabase is not configured yet — add the project URL and anon key to js/isot.js.', 'info');
+    submit.disabled = true;
+    return;
+  }
+
+  const { data: { session } } = await db.auth.getSession();
+  if (session) { location.replace('home.html'); return; }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    setAlert(alertEl, '');
+
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+
+    if (!passesBotCheck(form)) {
+      setAlert(alertEl, 'Check the city answer — ISOT is based in Turin.');
+      return;
+    }
+
+    const restore = busy(submit, 'Creating…');
+
+    const { data, error } = await db.auth.signUp({
+      email: form.email.value.trim(),
+      password: form.password.value,
+      options: {
+        // handle_new_user() reads full_name out of this to build the profile row
+        data: {
+          full_name:   form.full_name.value.trim(),
+          university:  form.university.value.trim() || null,
+          nationality: form.nationality.value.trim() || null,
+        },
+      },
+    });
+
+    if (error) { restore(); setAlert(alertEl, error.message); return; }
+
+    // With email confirmation on, there is no session yet — say so rather than
+    // bouncing them to a profile page that will just redirect back to login.
+    const needsConfirm = !data.session;
+    form.parentElement.hidden = true;
+    done.hidden = false;
+    document.getElementById('doneMsg').textContent = needsConfirm
+      ? 'Check your email to confirm your address, then sign in.'
+      : 'Your account is ready.';
+    if (needsConfirm) {
+      done.querySelector('a').textContent = 'Go to sign in';
+      done.querySelector('a').href = 'login.html';
+    }
+  });
+})();
+</script>
+</body>
+</html>
