@@ -126,6 +126,11 @@
         </div>
 
         <div class="field">
+          <label for="languages">Languages Spoken <span class="dim" style="font-weight:400">— e.g. English, Italian, Persian, Spanish</span></label>
+          <input type="text" id="languages" placeholder="English, Italian, Persian, Spanish…" />
+        </div>
+
+        <div class="field">
           <label for="member_code">Unique Member Code <span class="dim" style="font-weight:400">— System generated</span></label>
           <input type="text" id="member_code" readonly style="opacity: 0.6; cursor: not-allowed;" />
         </div>
@@ -234,6 +239,7 @@
       document.getElementById('full_name').value = currentProfile.full_name || '';
       document.getElementById('university').value = currentProfile.university || '';
       document.getElementById('nationality').value = currentProfile.nationality || '';
+      document.getElementById('languages').value = currentProfile.languages || '';
       document.getElementById('member_code').value = currentProfile.member_code || '';
 
       // Load consents
@@ -271,6 +277,7 @@
         full_name: document.getElementById('full_name').value.trim() || currentProfile.full_name,
         university: document.getElementById('university').value.trim() || null,
         nationality: document.getElementById('nationality').value.trim() || null,
+        languages: document.getElementById('languages').value.trim() || null,
       };
 
       const { error } = await db.from('profiles').update(patch).eq('id', currentProfile.id);

@@ -213,6 +213,7 @@
       align-items: center;
       gap: 8px;
       min-width: 0;
+      cursor: pointer;
     }
     .avatar-stack {
       display: flex;
@@ -262,6 +263,68 @@
       border-color: #10B981;
       color: #10B981;
       box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+    }
+
+    /* Modal Sheet for Attendees Profile Cards */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 15, 25, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 1000;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-sheet {
+      width: 100%;
+      max-width: 480px;
+      background: var(--bg-darker);
+      border: 1px solid var(--border-glow);
+      border-bottom: none;
+      border-radius: 28px 28px 0 0;
+      padding: 24px;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal-backdrop.active .modal-sheet {
+      transform: translateY(0);
+    }
+
+    .attendee-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+    }
+    .attendee-info { flex: 1; min-width: 0; }
+    .attendee-name { font-size: 0.95rem; font-weight: 700; color: #FFF; margin-bottom: 4px; }
+    .attendee-meta-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .meta-pill {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-light);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
   </style>
 </head>
@@ -324,6 +387,23 @@
     </a>
   </nav>
 
+  <!-- Attendees Profile List Modal Drawer -->
+  <div class="modal-backdrop" id="attendeesModal" onclick="closeAttendeesModal()">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div class="eyebrow"><i class="fa-solid fa-users text-pink"></i> Attending Members</div>
+          <h2 style="font-size:1.3rem;color:#FFF;margin-top:2px" id="modalEventTitle">Event Name</h2>
+        </div>
+        <button type="button" onclick="closeAttendeesModal()" style="background:transparent;border:none;color:var(--text-muted);font-size:1.4rem;cursor:pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div id="attendeesListContainer"></div>
+    </div>
+  </div>
+
   <script src="vendor/supabase.js"></script>
   <script src="js/isot.js"></script>
 
@@ -385,14 +465,6 @@
 
     const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-    const SAMPLE_MEMBERS = [
-      { name: 'Maria Silva', code: 'ISOT-2026-0001' },
-      { name: 'Marco Rossi', code: 'ISOT-2026-0002' },
-      { name: 'Alex Vance', code: 'ISOT-2026-0003' },
-      { name: 'Sofia Rossi', code: 'ISOT-2026-0004' },
-      { name: 'Luca Bianchi', code: 'ISOT-2026-0005' }
-    ];
-
     let meProfile = null;
     let userRsvps = JSON.parse(localStorage.getItem('isot_rsvps') || '{}');
     let currentView = 'list';
@@ -417,6 +489,45 @@
       localStorage.setItem('isot_rsvps', JSON.stringify(userRsvps));
       
       renderMainView();
+    }
+
+    function openAttendeesModal(eventTitle, eventId) {
+      const isGoing = !!userRsvps[eventId];
+      let html = '';
+
+      if (isGoing && meProfile) {
+        const nation = meProfile.nationality || 'Not specified';
+        const uni = meProfile.university || 'Turin Student';
+        const langs = meProfile.languages || 'English, Italian';
+
+        html += `
+          <div class="attendee-card">
+            <div style="width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0">
+              ${renderGeoAvatar(meProfile.member_code, 44)}
+            </div>
+            <div class="attendee-info">
+              <div class="attendee-name">${escapeHtml(meProfile.full_name || 'Member')} <span class="badge badge-socio" style="font-size:0.65rem;margin-left:4px">YOU</span></div>
+              <div class="attendee-meta-pills">
+                <span class="meta-pill"><i class="fa-solid fa-earth-americas text-pink"></i> ${escapeHtml(nation)}</span>
+                <span class="meta-pill"><i class="fa-solid fa-graduation-cap text-gold"></i> ${escapeHtml(uni)}</span>
+                <span class="meta-pill"><i class="fa-solid fa-comments text-green"></i> ${escapeHtml(langs)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (!isGoing) {
+        html = `<div class="dim" style="text-align:center;padding:30px">No members have marked going yet. Click "I'm Going" to join the list!</div>`;
+      }
+
+      document.getElementById('modalEventTitle').textContent = eventTitle;
+      document.getElementById('attendeesListContainer').innerHTML = html;
+      document.getElementById('attendeesModal').classList.add('active');
+    }
+
+    function closeAttendeesModal() {
+      document.getElementById('attendeesModal').classList.remove('active');
     }
 
     function setViewMode(mode) {
@@ -634,8 +745,8 @@
           </div>
 
           <div class="rsvp-row">
-            <div class="avatar-stack-wrapper">
-              ${isGoing ? `<div class="avatar-stack">${stackHtml}</div><span class="avatar-stack-count"><strong>1 Going</strong> • You</span>` : `<span class="avatar-stack-count">Be the first to RSVP</span>`}
+            <div class="avatar-stack-wrapper" onclick="openAttendeesModal('${escapeHtml(item.title)}', ${item.id})">
+              ${isGoing ? `<div class="avatar-stack">${stackHtml}</div><span class="avatar-stack-count"><strong>1 Going</strong> • You <i class="fa-solid fa-chevron-right text-pink" style="font-size:0.7rem;margin-left:4px"></i></span>` : `<span class="avatar-stack-count">Be the first to RSVP <i class="fa-solid fa-chevron-right text-pink" style="font-size:0.7rem;margin-left:4px"></i></span>`}
             </div>
 
             <button type="button" onclick="event.stopPropagation(); toggleRsvp(${item.id})" class="btn-rsvp ${isGoing ? 'going' : ''}">
