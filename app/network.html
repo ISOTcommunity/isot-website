@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ISOT Student Network & Friends</title>
+
+  <link rel="icon" href="../assets/LOGOS/scritta isot.png" type="image/png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/LOGOS/scritta isot.png" />
+  <link rel="apple-touch-icon" href="../assets/LOGOS/scritta isot.png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-title" content="ISOT" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0B0F19" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="css/app.css" />
+
+  <style>
+    .search-box-wrapper {
+      position: relative;
+      margin-bottom: 14px;
+    }
+    .search-box-wrapper input {
+      width: 100%;
+      padding: 12px 14px 12px 42px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      color: #FFF;
+      font-size: 0.9rem;
+      outline: none;
+      transition: var(--transition-fast);
+    }
+    .search-box-wrapper input:focus {
+      border-color: var(--pink);
+      box-shadow: 0 0 14px rgba(238, 9, 121, 0.25);
+    }
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    .network-filter-bar {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      scrollbar-width: none;
+    }
+    .network-filter-bar::-webkit-scrollbar { display: none; }
+    .filter-pill {
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-light);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: var(--transition-fast);
+    }
+    .filter-pill.active {
+      background: var(--pink);
+      border-color: var(--pink);
+      color: #FFF;
+      box-shadow: 0 4px 12px rgba(238, 9, 121, 0.3);
+    }
+
+    .student-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: var(--transition-spring);
+    }
+    .student-card:hover {
+      border-color: var(--pink);
+    }
+    .student-card-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .student-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1.5px solid var(--pink);
+      background: #1E293B;
+    }
+    .student-meta-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .student-meta-pill {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-light);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .student-card-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .btn-connect {
+      padding: 6px 14px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--pink);
+      background: var(--pink);
+      color: #FFF;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition-fast);
+    }
+    .btn-connect:hover {
+      box-shadow: 0 0 14px rgba(238, 9, 121, 0.4);
+    }
+    .btn-connect.requested {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--border-light);
+      color: var(--text-muted);
+    }
+    .btn-connect.connected {
+      background: rgba(16, 185, 129, 0.16);
+      border-color: #10B981;
+      color: #10B981;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display: flex; align-items: center; gap: 8px;">
+      <i class="fa-solid fa-users-viewfinder text-pink"></i>
+      <span>ISOT Network</span>
+    </a>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div id="headerAvatar" style="cursor: pointer;" data-open-drawer></div>
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: #FFF; font-size: 1.3rem; cursor: pointer; padding: 6px;">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="shell">
+
+    <div style="margin-bottom: 16px;">
+      <div class="eyebrow"><i class="fa-solid fa-earth-americas"></i> Turin Student Community</div>
+      <h1 style="font-size: 1.8rem; margin-top: 4px;">Connect &amp; Make Friends</h1>
+    </div>
+
+    <!-- Search Input -->
+    <div class="search-box-wrapper">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input type="text" id="searchInput" placeholder="Search by name, country, uni, or language…" oninput="filterStudents()" />
+    </div>
+
+    <!-- Filter Pills -->
+    <div class="network-filter-bar">
+      <button type="button" class="filter-pill active" id="fAll" onclick="setFilter('all')">All Students</button>
+      <button type="button" class="filter-pill" id="fFriends" onclick="setFilter('friends')">My Friends (<span id="friendsCount">0</span>)</button>
+      <button type="button" class="filter-pill" id="fUniTo" onclick="setFilter('unitto')">UniTo</button>
+      <button type="button" class="filter-pill" id="fPoliTo" onclick="setFilter('polito')">PoliTo</button>
+    </div>
+
+    <!-- Student Cards Container -->
+    <div id="studentContainer"></div>
+
+  </main>
+
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="tabbar">
+    <a href="home.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 011-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </a>
+    <a href="events.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Calendar
+    </a>
+    <a href="partner.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V9a2 2 0 012-2h2a2 2 0 012 2v12"/></svg>
+      Partners
+    </a>
+    <a href="network.html" class="tab-item active">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+      Network
+    </a>
+  </nav>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+
+  <script>
+    // Vibrant ISOT International Student Community Directory
+    const NETWORK_STUDENTS = [
+      { id: 's1', name: 'Sofia Rossi', code: 'ISOT-2026-0001', country: 'Italy 🇮🇹', uni: 'UniTo', langs: 'Italian, English, French', tier: 'socio' },
+      { id: 's2', name: 'Alex Vance', code: 'ISOT-2026-0002', country: 'United Kingdom 🇬🇧', uni: 'PoliTo', langs: 'English, Italian, German', tier: 'socio' },
+      { id: 's3', name: 'Maria Silva', code: 'ISOT-2026-0003', country: 'Brazil 🇧🇷', uni: 'SAA Management', langs: 'Portuguese, English, Italian', tier: 'socio' },
+      { id: 's4', name: 'Amir Hossein', code: 'ISOT-2026-0004', country: 'Iran 🇮🇷', uni: 'UniTo Computer Science', langs: 'Persian, English, Italian', tier: 'socio' },
+      { id: 's5', name: 'Mateo Garcia', code: 'ISOT-2026-0005', country: 'Spain 🇪🇸', uni: 'ESCP Business School', langs: 'Spanish, English, Italian', tier: 'participant' },
+      { id: 's6', name: 'Emma Müller', code: 'ISOT-2026-0006', country: 'Germany 🇩🇪', uni: 'PoliTo Engineering', langs: 'German, English, Italian', tier: 'socio' }
+    ];
+
+    let meProfile = null;
+    let friendState = JSON.parse(localStorage.getItem('isot_friends') || '{}');
+    let currentFilter = 'all';
+
+    async function initNetworkPage() {
+      meProfile = await requireAuth();
+      document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(meProfile, 36);
+
+      // Load friends state from Supabase if available
+      try {
+        const { data } = await db.from('friendships').select('*').eq('user_id', meProfile.id);
+        if (data && data.length) {
+          data.forEach(f => { friendState[f.friend_id] = f.status; });
+          localStorage.setItem('isot_friends', JSON.stringify(friendState));
+        }
+      } catch (e) {
+        console.warn('Friendship sync note:', e);
+      }
+
+      renderStudents();
+    }
+
+    function toggleFriendship(studentId) {
+      const current = friendState[studentId];
+      if (current === 'connected') {
+        delete friendState[studentId];
+      } else if (current === 'requested') {
+        friendState[studentId] = 'connected';
+      } else {
+        friendState[studentId] = 'requested';
+      }
+
+      localStorage.setItem('isot_friends', JSON.stringify(friendState));
+      renderStudents();
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
+      if (filter === 'all') document.getElementById('fAll').classList.add('active');
+      if (filter === 'friends') document.getElementById('fFriends').classList.add('active');
+      if (filter === 'unitto') document.getElementById('fUniTo').classList.add('active');
+      if (filter === 'polito') document.getElementById('fPoliTo').classList.add('active');
+      renderStudents();
+    }
+
+    function filterStudents() {
+      renderStudents();
+    }
+
+    function renderStudents() {
+      const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      const connectedCount = Object.values(friendState).filter(s => s === 'connected').length;
+      document.getElementById('friendsCount').textContent = connectedCount;
+
+      let list = NETWORK_STUDENTS.filter(s => {
+        if (q) {
+          const matchName = s.name.toLowerCase().includes(q);
+          const matchCountry = s.country.toLowerCase().includes(q);
+          const matchUni = s.uni.toLowerCase().includes(q);
+          const matchLangs = s.langs.toLowerCase().includes(q);
+          if (!matchName && !matchCountry && !matchUni && !matchLangs) return false;
+        }
+
+        if (currentFilter === 'friends' && friendState[s.id] !== 'connected') return false;
+        if (currentFilter === 'unitto' && !s.uni.toLowerCase().includes('unito')) return false;
+        if (currentFilter === 'polito' && !s.uni.toLowerCase().includes('polito')) return false;
+
+        return true;
+      });
+
+      const container = document.getElementById('studentContainer');
+      if (!list.length) {
+        container.innerHTML = `
+          <div class="card card-glass" style="text-align:center;padding:34px">
+            <i class="fa-solid fa-user-slash text-pink" style="font-size:2rem;margin-bottom:10px"></i>
+            <h3 style="font-size:1.1rem;color:#FFF;margin-bottom:4px">No Students Found</h3>
+            <p class="dim" style="font-size:0.85rem">Try adjusting your search query or filter pill.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(s => {
+        const status = friendState[s.id];
+        let btnHtml = '';
+        if (status === 'connected') {
+          btnHtml = `<button type="button" class="btn-connect connected" onclick="toggleFriendship('${s.id}')"><i class="fa-solid fa-user-check"></i> Friends 🤝</button>`;
+        } else if (status === 'requested') {
+          btnHtml = `<button type="button" class="btn-connect requested" onclick="toggleFriendship('${s.id}')"><i class="fa-solid fa-clock"></i> Sent ⏳</button>`;
+        } else {
+          btnHtml = `<button type="button" class="btn-connect" onclick="toggleFriendship('${s.id}')"><i class="fa-solid fa-user-plus"></i> + Add Friend</button>`;
+        }
+
+        return `
+          <div class="student-card">
+            <div class="student-card-top">
+              <div class="student-avatar">
+                ${renderGeoAvatar(s.code, 52)}
+              </div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+                  <h3 style="font-size:1.05rem;color:#FFF;margin:0">${escapeHtml(s.name)}</h3>
+                  <span class="badge ${s.tier === 'socio' ? 'badge-socio' : 'badge-participant'}">${s.tier === 'socio' ? '20% OFF' : 'Member'}</span>
+                </div>
+                <div class="student-meta-pills">
+                  <span class="student-meta-pill"><i class="fa-solid fa-earth-americas text-pink"></i> ${escapeHtml(s.country)}</span>
+                  <span class="student-meta-pill"><i class="fa-solid fa-graduation-cap text-gold"></i> ${escapeHtml(s.uni)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="student-card-bottom">
+              <div class="dim" style="font-size:0.75rem"><i class="fa-solid fa-comments text-green"></i> ${escapeHtml(s.langs)}</div>
+              ${btnHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', initNetworkPage);
+  </script>
+</body>
+</html>
