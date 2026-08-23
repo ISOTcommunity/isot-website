@@ -231,16 +231,7 @@
   <script src="js/isot.js"></script>
 
   <script>
-    // Vibrant ISOT International Student Community Directory
-    const NETWORK_STUDENTS = [
-      { id: 's1', name: 'Sofia Rossi', code: 'ISOT-2026-0001', country: 'Italy 🇮🇹', uni: 'UniTo', langs: 'Italian, English, French', tier: 'socio' },
-      { id: 's2', name: 'Alex Vance', code: 'ISOT-2026-0002', country: 'United Kingdom 🇬🇧', uni: 'PoliTo', langs: 'English, Italian, German', tier: 'socio' },
-      { id: 's3', name: 'Maria Silva', code: 'ISOT-2026-0003', country: 'Brazil 🇧🇷', uni: 'SAA Management', langs: 'Portuguese, English, Italian', tier: 'socio' },
-      { id: 's4', name: 'Amir Hossein', code: 'ISOT-2026-0004', country: 'Iran 🇮🇷', uni: 'UniTo Computer Science', langs: 'Persian, English, Italian', tier: 'socio' },
-      { id: 's5', name: 'Mateo Garcia', code: 'ISOT-2026-0005', country: 'Spain 🇪🇸', uni: 'ESCP Business School', langs: 'Spanish, English, Italian', tier: 'participant' },
-      { id: 's6', name: 'Emma Müller', code: 'ISOT-2026-0006', country: 'Germany 🇩🇪', uni: 'PoliTo Engineering', langs: 'German, English, Italian', tier: 'socio' }
-    ];
-
+    let allProfiles = [];
     let meProfile = null;
     let friendState = JSON.parse(localStorage.getItem('isot_friends') || '{}');
     let currentFilter = 'all';
@@ -249,7 +240,17 @@
       meProfile = await requireAuth();
       document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(meProfile, 36);
 
-      // Load friends state from Supabase if available
+      // Fetch real registered student profiles from Supabase profiles table
+      try {
+        const { data, error } = await db.from('profiles').select('*').neq('id', meProfile.id).order('created_at', { ascending: false });
+        if (data) {
+          allProfiles = data;
+        }
+      } catch (e) {
+        console.warn('Profiles load note:', e);
+      }
+
+      // Sync friendships from Supabase
       try {
         const { data } = await db.from('friendships').select('*').eq('user_id', meProfile.id);
         if (data && data.length) {
@@ -263,18 +264,34 @@
       renderStudents();
     }
 
-    function toggleFriendship(studentId) {
+    async function toggleFriendship(studentId) {
       const current = friendState[studentId];
+      let newStatus = 'requested';
+
       if (current === 'connected') {
         delete friendState[studentId];
+        newStatus = 'deleted';
       } else if (current === 'requested') {
         friendState[studentId] = 'connected';
+        newStatus = 'connected';
       } else {
         friendState[studentId] = 'requested';
+        newStatus = 'requested';
       }
 
       localStorage.setItem('isot_friends', JSON.stringify(friendState));
       renderStudents();
+
+      // Upsert to Supabase friendships table
+      try {
+        if (newStatus === 'deleted') {
+          await db.from('friendships').delete().eq('user_id', meProfile.id).eq('friend_id', studentId);
+        } else {
+          await db.from('friendships').upsert({ user_id: meProfile.id, friend_id: studentId, status: newStatus });
+        }
+      } catch (e) {
+        console.warn('Friendship DB upsert:', e);
+      }
     }
 
     function setFilter(filter) {
@@ -296,18 +313,19 @@
       const connectedCount = Object.values(friendState).filter(s => s === 'connected').length;
       document.getElementById('friendsCount').textContent = connectedCount;
 
-      let list = NETWORK_STUDENTS.filter(s => {
+      let list = allProfiles.filter(s => {
+        const nameStr = (s.full_name || '').toLowerCase();
+        const countryStr = (s.nationality || '').toLowerCase();
+        const uniStr = (s.university || '').toLowerCase();
+        const langStr = (s.languages || '').toLowerCase();
+
         if (q) {
-          const matchName = s.name.toLowerCase().includes(q);
-          const matchCountry = s.country.toLowerCase().includes(q);
-          const matchUni = s.uni.toLowerCase().includes(q);
-          const matchLangs = s.langs.toLowerCase().includes(q);
-          if (!matchName && !matchCountry && !matchUni && !matchLangs) return false;
+          if (!nameStr.includes(q) && !countryStr.includes(q) && !uniStr.includes(q) && !langStr.includes(q)) return false;
         }
 
         if (currentFilter === 'friends' && friendState[s.id] !== 'connected') return false;
-        if (currentFilter === 'unitto' && !s.uni.toLowerCase().includes('unito')) return false;
-        if (currentFilter === 'polito' && !s.uni.toLowerCase().includes('polito')) return false;
+        if (currentFilter === 'unitto' && !uniStr.includes('unito')) return false;
+        if (currentFilter === 'polito' && !uniStr.includes('polito')) return false;
 
         return true;
       });
@@ -316,9 +334,12 @@
       if (!list.length) {
         container.innerHTML = `
           <div class="card card-glass" style="text-align:center;padding:34px">
-            <i class="fa-solid fa-user-slash text-pink" style="font-size:2rem;margin-bottom:10px"></i>
-            <h3 style="font-size:1.1rem;color:#FFF;margin-bottom:4px">No Students Found</h3>
-            <p class="dim" style="font-size:0.85rem">Try adjusting your search query or filter pill.</p>
+            <i class="fa-solid fa-users text-pink" style="font-size:2rem;margin-bottom:10px"></i>
+            <h3 style="font-size:1.1rem;color:#FFF;margin-bottom:4px">No Registered Members Found</h3>
+            <p class="dim" style="font-size:0.85rem;margin-bottom:14px">Share your referral link with fellow students to build your Turin network!</p>
+            <button type="button" class="btn btn-pink" style="width:auto;display:inline-flex;padding:6px 16px;font-size:0.82rem;" onclick="navigator.clipboard.writeText('https://isotcommunity.com'); alert('Community web app link copied!')">
+              <i class="fa-solid fa-share-nodes"></i> Share Web App Link
+            </button>
           </div>
         `;
         return;
@@ -335,26 +356,30 @@
           btnHtml = `<button type="button" class="btn-connect" onclick="toggleFriendship('${s.id}')"><i class="fa-solid fa-user-plus"></i> + Add Friend</button>`;
         }
 
+        const nation = s.nationality || 'Turin Student';
+        const uni = s.university || 'Turin Campus';
+        const langs = s.languages || 'English, Italian';
+
         return `
           <div class="student-card">
             <div class="student-card-top">
-              <div class="student-avatar">
-                ${renderGeoAvatar(s.code, 52)}
+              <div class="student-avatar" style="width:52px;height:52px;border-radius:50%;overflow:hidden;flex-shrink:0;">
+                ${renderUserAvatarHtml(s, 52)}
               </div>
               <div style="flex:1;min-width:0">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
-                  <h3 style="font-size:1.05rem;color:#FFF;margin:0">${escapeHtml(s.name)}</h3>
+                  <h3 style="font-size:1.05rem;color:#FFF;margin:0">${escapeHtml(s.full_name || 'Member')}</h3>
                   <span class="badge ${s.tier === 'socio' ? 'badge-socio' : 'badge-participant'}">${s.tier === 'socio' ? '20% OFF' : 'Member'}</span>
                 </div>
                 <div class="student-meta-pills">
-                  <span class="student-meta-pill"><i class="fa-solid fa-earth-americas text-pink"></i> ${escapeHtml(s.country)}</span>
-                  <span class="student-meta-pill"><i class="fa-solid fa-graduation-cap text-gold"></i> ${escapeHtml(s.uni)}</span>
+                  <span class="student-meta-pill"><i class="fa-solid fa-earth-americas text-pink"></i> ${escapeHtml(nation)}</span>
+                  <span class="student-meta-pill"><i class="fa-solid fa-graduation-cap text-gold"></i> ${escapeHtml(uni)}</span>
                 </div>
               </div>
             </div>
 
             <div class="student-card-bottom">
-              <div class="dim" style="font-size:0.75rem"><i class="fa-solid fa-comments text-green"></i> ${escapeHtml(s.langs)}</div>
+              <div class="dim" style="font-size:0.75rem"><i class="fa-solid fa-comments text-green"></i> ${escapeHtml(langs)}</div>
               ${btnHtml}
             </div>
           </div>
