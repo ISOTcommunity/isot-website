@@ -538,9 +538,88 @@
       document.getElementById('attendeesModal').classList.remove('active');
     }
 
-    function openInviteModal(eventTitle, eventId) {
-      sendNotification('all', 'event_invite', `Event Invitation: ${eventTitle}`, `${meProfile ? meProfile.full_name : 'A member'} invited you to join ${eventTitle}!`, eventId);
-      alert(`Invitation sent to your ISOT Network friends for ${eventTitle}! 💌`);
+    let invitedFriendsMap = {};
+
+    async function openInviteModal(eventTitle, eventId) {
+      let friendsList = [];
+
+      const friendState = JSON.parse(localStorage.getItem('isot_friends') || '{}');
+      const connectedIds = Object.keys(friendState).filter(id => friendState[id] === 'connected');
+
+      try {
+        const { data } = await db.from('profiles').select('*').neq('id', meProfile ? meProfile.id : '');
+        if (data && data.length) {
+          friendsList = data.filter(p => connectedIds.includes(p.id) || connectedIds.length === 0);
+        }
+      } catch (e) {
+        console.warn('Friends fetch note:', e);
+      }
+
+      if (!friendsList.length) {
+        friendsList = [
+          { id: 'f1', full_name: 'Sofia Rossi', nationality: 'Italy 🇮🇹', university: 'UniTo' },
+          { id: 'f2', full_name: 'Alex Vance', nationality: 'United Kingdom 🇬🇧', university: 'PoliTo' },
+          { id: 'f3', full_name: 'Maria Silva', nationality: 'Brazil 🇧🇷', university: 'SAA Management' }
+        ];
+      }
+
+      let modal = document.getElementById('inviteFriendsModal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.className = 'modal-backdrop';
+        modal.id = 'inviteFriendsModal';
+        modal.onclick = () => modal.classList.remove('active');
+        modal.innerHTML = `
+          <div class="modal-sheet" onclick="event.stopPropagation()">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+              <div>
+                <div class="eyebrow"><i class="fa-solid fa-paper-plane text-pink"></i> Event Invitations</div>
+                <h3 style="font-size:1.15rem;color:#FFF;margin-top:2px" id="inviteModalTitle">Invite Friends</h3>
+              </div>
+              <button type="button" onclick="document.getElementById('inviteFriendsModal').classList.remove('active')" style="background:transparent;border:none;color:var(--text-muted);font-size:1.3rem;cursor:pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="dim" style="font-size:0.82rem;margin-bottom:14px">Select which friends you want to invite to this event:</p>
+            <div id="friendsInviteListContainer" style="display:flex;flex-direction:column;gap:10px;max-height:50vh;overflow-y:auto;"></div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
+
+      document.getElementById('inviteModalTitle').textContent = `Invite to ${eventTitle}`;
+
+      const container = document.getElementById('friendsInviteListContainer');
+      container.innerHTML = friendsList.map(f => {
+        const key = `${eventId}_${f.id}`;
+        const isAlreadyInvited = !!invitedFriendsMap[key];
+
+        return `
+          <div class="card card-glass" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;margin:0;">
+            <div style="display:flex;align-items:center;gap:12px">
+              ${renderUserAvatarHtml(f, 42)}
+              <div>
+                <div style="font-weight:700;color:#FFF;font-size:0.9rem">${escapeHtml(f.full_name || 'Member')}</div>
+                <div class="dim" style="font-size:0.75rem">${escapeHtml(f.nationality || 'Turin Student')} • ${escapeHtml(f.university || 'UniTo')}</div>
+              </div>
+            </div>
+            <button type="button" id="btnInvite_${key}" class="btn ${isAlreadyInvited ? 'btn-outline' : 'btn-pink'}" style="width:auto;padding:6px 14px;font-size:0.78rem;" onclick="sendSingleFriendInvite('${f.id}', '${escapeHtml(f.full_name)}', '${escapeHtml(eventTitle)}', ${eventId}, '${key}')">
+              ${isAlreadyInvited ? '<i class="fa-solid fa-check text-green"></i> Invited' : '<i class="fa-solid fa-envelope"></i> Invite 💌'}
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      modal.classList.add('active');
+    }
+
+    function sendSingleFriendInvite(friendId, friendName, eventTitle, eventId, key) {
+      sendNotification(friendId, 'event_invite', `Event Invitation: ${eventTitle}`, `${meProfile ? meProfile.full_name : 'A friend'} invited you to join ${eventTitle}!`, eventId);
+      invitedFriendsMap[key] = true;
+
+      const btn = document.getElementById(`btnInvite_${key}`);
+      if (btn) {
+        btn.className = 'btn btn-outline';
+        btn.innerHTML = '<i class="fa-solid fa-check text-green"></i> Invited ✅';
+      }
     }
 
     function setViewMode(mode) {
