@@ -272,6 +272,7 @@
     }
 
     let cropImg = null;
+    let baseFitScale = 1.0;
     let cropScale = 1.0;
     let cropRotation = 0;
     let cropOffsetX = 0;
@@ -285,6 +286,7 @@
         cropImg = new Image();
         cropImg.crossOrigin = "anonymous";
         cropImg.onload = function() {
+          baseFitScale = 260 / Math.min(cropImg.width, cropImg.height);
           cropScale = 1.0;
           cropRotation = 0;
           cropOffsetX = 0;
@@ -305,6 +307,7 @@
       reader.onload = function(ev) {
         cropImg = new Image();
         cropImg.onload = function() {
+          baseFitScale = 260 / Math.min(cropImg.width, cropImg.height);
           cropScale = 1.0;
           cropRotation = 0;
           cropOffsetX = 0;
@@ -336,13 +339,14 @@
       const h = canvas.height;
 
       cropScale = parseFloat(document.getElementById('zoomSlider').value || 1.0);
+      const totalScale = baseFitScale * cropScale;
 
       ctx.clearRect(0, 0, w, h);
       ctx.save();
 
       ctx.translate(w / 2 + cropOffsetX, h / 2 + cropOffsetY);
       ctx.rotate((cropRotation * Math.PI) / 180);
-      ctx.scale(cropScale, cropScale);
+      ctx.scale(totalScale, totalScale);
 
       ctx.drawImage(cropImg, -cropImg.width / 2, -cropImg.height / 2);
       ctx.restore();
@@ -392,12 +396,12 @@
       exportCanvas.height = 300;
       const ctx = exportCanvas.getContext('2d');
 
-      const scaleFactor = 300 / 260;
+      const exportScaleFactor = (300 / 260) * baseFitScale;
 
       ctx.save();
-      ctx.translate(150 + cropOffsetX * scaleFactor, 150 + cropOffsetY * scaleFactor);
+      ctx.translate(150 + cropOffsetX * (300 / 260), 150 + cropOffsetY * (300 / 260));
       ctx.rotate((cropRotation * Math.PI) / 180);
-      ctx.scale(cropScale * scaleFactor, cropScale * scaleFactor);
+      ctx.scale(cropScale * exportScaleFactor, cropScale * exportScaleFactor);
       ctx.drawImage(cropImg, -cropImg.width / 2, -cropImg.height / 2);
       ctx.restore();
 
