@@ -85,22 +85,50 @@
     <!-- Live Queue Status Hero Banner -->
     <div class="position-hero-badge" id="heroBadge">
       <div class="eyebrow"><i class="fa-solid fa-music"></i> Live Stage Status</div>
-      <h1 style="font-size: 2.1rem; color: #FFF; margin-top: 4px;" id="posText">Queue Open</h1>
-      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;" id="mySongSub">Put your song in the queue below!</p>
+      <h1 style="font-size: 2.1rem; color: #FFF; margin-top: 4px;" id="posText">Monday Karaoke @ Rough</h1>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;" id="mySongSub">Queue opens every Monday at 21:00 (9 PM CET)!</p>
+      <div id="scheduleOverrideNotice" style="margin-top: 10px; display: none;">
+        <button type="button" class="btn btn-outline" style="width: auto; padding: 4px 12px; font-size: 0.75rem; border-color: var(--gold); color: var(--gold);" onclick="toggleStaffOverride()">
+          <i class="fa-solid fa-key"></i> Unlock Queue (Staff Testing Mode)
+        </button>
+      </div>
     </div>
 
     <div id="alertBox"></div>
 
+    <!-- Closed Schedule Notice Card -->
+    <div class="card card-glass" id="closedScheduleCard" style="display: none; text-align: center; padding: 28px; margin-bottom: 24px; border-color: var(--gold);">
+      <i class="fa-solid fa-clock text-gold" style="font-size: 2.2rem; margin-bottom: 10px;"></i>
+      <h3 style="font-size: 1.1rem; color: #FFF; margin-bottom: 6px;">Karaoke Queue Opens Every Monday at 21:00</h3>
+      <p class="dim" style="font-size: 0.85rem; margin-bottom: 14px;">
+        Join us live at Rough Bar (San Salvario) every Monday night from 21:00 (9 PM CET) to request your song on stage!
+      </p>
+      <a href="partner.html" class="btn btn-outline" style="width: auto; display: inline-flex; padding: 6px 16px; font-size: 0.82rem;">
+        <i class="fa-solid fa-location-dot text-pink"></i> View Venue &amp; Offer
+      </a>
+    </div>
+
     <!-- Song Request Form -->
     <div class="card card-glass" style="margin-bottom: 24px;" id="requestCard">
-      <h3 style="margin-bottom: 14px;"><i class="fa-solid fa-plus text-pink" style="margin-right: 6px;"></i> Request a Song</h3>
-      
+      <h3 style="margin-bottom: 14px;"><i class="fa-solid fa-microphone-lines text-pink" style="margin-right: 6px;"></i> Request a Song</h3>
+
       <form id="songForm" onsubmit="submitSong(event)">
         <div class="field">
-          <label for="songTitle">Song Title &amp; Artist</label>
-          <input type="text" id="songTitle" required placeholder="e.g. Bohemian Rhapsody — Queen" />
+          <label for="songTitle">Song Title <span class="text-pink">*</span></label>
+          <input type="text" id="songTitle" required placeholder="e.g. Despacito, Bohemian Rhapsody, Volare" />
         </div>
-        <button type="submit" class="btn btn-pink" id="addBtn"><i class="fa-solid fa-paper-plane"></i> Add to Karaoke Queue</button>
+
+        <div class="field">
+          <label for="artistName">Original Singer / Artist <span class="text-pink">*</span></label>
+          <input type="text" id="artistName" required placeholder="e.g. Luis Fonsi, Queen, Domenico Modugno" />
+        </div>
+
+        <div class="field">
+          <label for="performerName">Your Name (Performer / Student) <span class="text-pink">*</span></label>
+          <input type="text" id="performerName" required placeholder="Your Name" />
+        </div>
+
+        <button type="submit" class="btn btn-pink" id="addBtn"><i class="fa-solid fa-paper-plane"></i> Submit Song to Karaoke Queue 🎤</button>
       </form>
     </div>
 
@@ -112,8 +140,9 @@
           <i class="fa-solid fa-trash"></i> Cancel Song
         </button>
       </div>
-      <h2 style="font-size: 1.2rem; color: #FFF; margin-bottom: 4px;" id="myActiveTitle">Bohemian Rhapsody</h2>
-      <p class="dim" style="font-size: 0.85rem;" id="myActiveSinger">Singer: Member</p>
+      <h2 style="font-size: 1.25rem; color: #FFF; margin-bottom: 2px;" id="myActiveTitle">Bohemian Rhapsody</h2>
+      <p class="dim" style="font-size: 0.88rem;" id="myActiveArtist"><i class="fa-solid fa-record-vinyl text-pink"></i> Original Artist: Queen</p>
+      <p class="dim" style="font-size: 0.85rem;" id="myActiveSinger"><i class="fa-solid fa-user text-gold"></i> Performer: Member</p>
     </div>
 
     <!-- Live Queue Lineup -->
@@ -132,6 +161,10 @@
 
   <!-- Mobile Bottom Tab Bar -->
   <nav class="tabbar">
+    <a href="home.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 011-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </a>
     <a href="events.html" class="tab-item">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
       Calendar
@@ -140,18 +173,10 @@
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V9a2 2 0 012-2h2a2 2 0 012 2v12"/></svg>
       Partners
     </a>
-    <a href="home.html" class="tab-item">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 011-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-      Home
-    </a>
-    <a href="../blog.html" class="tab-item">
+    <a href="network.html" class="tab-item">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
       Network
     </a>
-    <button type="button" class="tab-item" style="background:transparent;border:none;cursor:pointer;font-family:inherit;" data-open-drawer>
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-      Menu
-    </button>
   </nav>
 
   <script src="vendor/supabase.js"></script>
@@ -162,19 +187,55 @@
     let myActiveSlot = null;
     let pollInterval = null;
 
-    // Fallback in-memory queue if DB RLS or table has no active event
     let localQueue = [
-      { id: '101', song_title: 'Dancing Queen', singer_name: 'Maria', status: 'playing', profile_id: 'sample-1' },
-      { id: '102', song_title: 'Wonderwall', singer_name: 'Alex', status: 'pending', profile_id: 'sample-2' },
-      { id: '103', song_title: 'Volare', singer_name: 'Marco', status: 'pending', profile_id: 'sample-3' }
+      { id: '101', song_title: 'Dancing Queen', artist_name: 'ABBA', singer_name: 'Maria Silva', status: 'playing', profile_id: 'sample-1' },
+      { id: '102', song_title: 'Wonderwall', artist_name: 'Oasis', singer_name: 'Alex Vance', status: 'pending', profile_id: 'sample-2' },
+      { id: '103', song_title: 'Volare', artist_name: 'Domenico Modugno', singer_name: 'Marco Rossi', status: 'pending', profile_id: 'sample-3' }
     ];
 
     async function initKaraoke() {
       me = await requireAuth();
-      document.getElementById('headerAvatar').innerHTML = renderGeoAvatar(me.member_code, 36);
+      document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(me, 36);
 
+      if (document.getElementById('performerName')) {
+        document.getElementById('performerName').value = me.full_name || 'Member';
+      }
+
+      checkKaraokeSchedule();
       loadQueue();
       pollInterval = setInterval(loadQueue, 3000);
+    }
+
+    function checkKaraokeSchedule() {
+      const now = new Date();
+      const day = now.getDay(); // 1 = Monday
+      const hour = now.getHours(); // 21 = 9 PM
+
+      const isMondayNight = (day === 1 && hour >= 21) || (day === 2 && hour < 3);
+      const isOverride = localStorage.getItem('isot_karaoke_override') === 'true';
+
+      const isOpen = isMondayNight || isOverride;
+
+      const closedCard = document.getElementById('closedScheduleCard');
+      const requestCard = document.getElementById('requestCard');
+      const overrideNotice = document.getElementById('scheduleOverrideNotice');
+
+      if (!isOpen) {
+        if (closedCard) closedCard.style.display = 'block';
+        if (requestCard) requestCard.style.display = 'none';
+        if (overrideNotice) overrideNotice.style.display = 'block';
+      } else {
+        if (closedCard) closedCard.style.display = 'none';
+        if (requestCard) requestCard.style.display = 'block';
+        if (overrideNotice) overrideNotice.style.display = isOverride ? 'block' : 'none';
+      }
+    }
+
+    function toggleStaffOverride() {
+      const curr = localStorage.getItem('isot_karaoke_override') === 'true';
+      localStorage.setItem('isot_karaoke_override', (!curr).toString());
+      checkKaraokeSchedule();
+      setAlert(document.getElementById('alertBox'), !curr ? 'Staff Override Activated: Karaoke Queue Unlocked 🔑' : 'Staff Override Deactivated', 'info');
     }
 
     async function loadQueue() {
@@ -201,11 +262,9 @@
     function renderQueueUI(slots) {
       const playingSlot = slots.find(s => s.status === 'playing');
       const pendingSlots = slots.filter(s => s.status === 'pending');
-      
-      // Find current user's slot
+
       myActiveSlot = slots.find(s => s.profile_id === me.id);
 
-      // Render Hero Status
       const heroBadge = document.getElementById('heroBadge');
       const posText = document.getElementById('posText');
       const mySongSub = document.getElementById('mySongSub');
@@ -213,34 +272,33 @@
       if (playingSlot && playingSlot.profile_id === me.id) {
         heroBadge.className = 'position-hero-badge on-mic';
         posText.textContent = "YOU ARE ON MIC! 🎤";
-        mySongSub.textContent = `Singing: "${playingSlot.song_title}"`;
+        mySongSub.textContent = `Singing: "${playingSlot.song_title}" by ${playingSlot.artist_name || 'Artist'}`;
       } else if (myActiveSlot && myActiveSlot.status === 'pending') {
         heroBadge.className = 'position-hero-badge';
         const index = pendingSlots.findIndex(s => s.id === myActiveSlot.id);
         const position = index >= 0 ? index + 1 : 1;
         posText.textContent = position === 1 ? "YOU ARE UP NEXT! 🌟" : `${position} songs away`;
-        mySongSub.textContent = `Your queued song: "${myActiveSlot.song_title}"`;
+        mySongSub.textContent = `Your song: "${myActiveSlot.song_title}" by ${myActiveSlot.artist_name || 'Artist'}`;
       } else if (playingSlot) {
         heroBadge.className = 'position-hero-badge';
         posText.textContent = `Now Playing: ${playingSlot.song_title}`;
-        mySongSub.textContent = `On Mic: ${playingSlot.singer_name || 'Member'}`;
+        mySongSub.textContent = `Artist: ${playingSlot.artist_name || 'Original Artist'} • Performed by ${playingSlot.singer_name || 'Member'}`;
       } else {
         heroBadge.className = 'position-hero-badge';
-        posText.textContent = "Queue Open";
-        mySongSub.textContent = "Put your song in the queue below!";
+        posText.textContent = "Monday Karaoke @ Rough";
+        mySongSub.textContent = "Request your song below!";
       }
 
-      // My Active Song Card
       const myActiveCard = document.getElementById('myActiveCard');
       if (myActiveSlot) {
         myActiveCard.style.display = 'block';
         document.getElementById('myActiveTitle').textContent = myActiveSlot.song_title;
-        document.getElementById('myActiveSinger').textContent = `Singer: ${myActiveSlot.singer_name || me.full_name}`;
+        document.getElementById('myActiveArtist').innerHTML = `<i class="fa-solid fa-record-vinyl text-pink"></i> Original Artist: ${escapeHtml(myActiveSlot.artist_name || 'Artist')}`;
+        document.getElementById('myActiveSinger').innerHTML = `<i class="fa-solid fa-user text-gold"></i> Performer: ${escapeHtml(myActiveSlot.singer_name || me.full_name)}`;
       } else {
         myActiveCard.style.display = 'none';
       }
 
-      // Render Lineup
       document.getElementById('queueCount').textContent = `${slots.length} in queue`;
       const queueList = document.getElementById('queueList');
 
@@ -259,14 +317,21 @@
         } else if (isMine) {
           badgeHtml = `<span class="badge badge-socio">YOUR TURN (#${idx})</span>`;
         } else {
-          badgeHtml = `<span class="dim">#${idx}</span>`;
+          badgeHtml = `<span class="dim" style="font-weight:700;">#${idx}</span>`;
         }
+
+        const performerProfile = { full_name: s.singer_name || 'Member', member_code: s.profile_id || 'ISOT-2026' };
 
         return `
           <div class="queue-row ${isPlaying ? 'playing' : ''} ${isMine ? 'my-row' : ''}">
-            <div>
-              <div style="font-weight:700;color:#FFF;">${escapeHtml(s.song_title)}</div>
-              <div class="dim">${escapeHtml(s.singer_name || 'Member')} ${isMine ? '• You' : ''}</div>
+            <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">
+              ${renderUserAvatarHtml(performerProfile, 40)}
+              <div style="flex:1;min-width:0;">
+                <div style="font-weight:700;color:#FFF;font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(s.song_title)}</div>
+                <div class="dim" style="font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                  <i class="fa-solid fa-music text-pink"></i> ${escapeHtml(s.artist_name || 'Artist')} • <i class="fa-solid fa-user text-gold"></i> ${escapeHtml(s.singer_name || 'Member')} ${isMine ? '(You)' : ''}
+                </div>
+              </div>
             </div>
             ${badgeHtml}
           </div>
@@ -285,7 +350,13 @@
       }
 
       const songVal = document.getElementById('songTitle').value.trim();
-      if (!songVal) return;
+      const artistVal = document.getElementById('artistName').value.trim();
+      const performerVal = document.getElementById('performerName').value.trim() || me.full_name || 'Member';
+
+      if (!songVal || !artistVal) {
+        setAlert(alertEl, 'Please enter both the Song Title and the Original Singer/Artist name!', 'error');
+        return;
+      }
 
       const btn = document.getElementById('addBtn');
       const restore = busy(btn, 'Submitting…');
@@ -293,7 +364,8 @@
       const newSlot = {
         id: 'slot-' + Date.now(),
         profile_id: me.id,
-        singer_name: me.full_name || 'Member',
+        singer_name: performerVal,
+        artist_name: artistVal,
         song_title: songVal,
         status: 'pending',
         created_at: new Date().toISOString()
@@ -303,7 +375,8 @@
         const { data, error } = await db.from('karaoke_slots').insert([
           {
             profile_id: me.id,
-            singer_name: me.full_name || 'Member',
+            singer_name: performerVal,
+            artist_name: artistVal,
             song_title: songVal,
             status: 'pending'
           }
@@ -320,13 +393,14 @@
 
       restore();
       document.getElementById('songTitle').value = '';
+      document.getElementById('artistName').value = '';
       setAlert(alertEl, 'Song added to line-up! Watch your turn on stage.', 'success');
       loadQueue();
     }
 
     async function cancelMySong() {
       if (!myActiveSlot) return;
-      
+
       try {
         await db.from('karaoke_slots').update({ status: 'skipped' }).eq('id', myActiveSlot.id);
       } catch (e) {}

@@ -147,10 +147,10 @@
       // Hero
       if (playingSlot) {
         document.getElementById('nowPlayingTitle').textContent = playingSlot.song_title;
-        document.getElementById('nowPlayingSinger').textContent = `Singer: ${playingSlot.singer_name || 'Member'}`;
+        document.getElementById('nowPlayingSinger').textContent = `Artist: ${playingSlot.artist_name || 'Original Artist'} • Singer: ${playingSlot.singer_name || 'Member'}`;
       } else if (pendingSlots.length) {
         document.getElementById('nowPlayingTitle').textContent = 'Ready to start';
-        document.getElementById('nowPlayingSinger').textContent = `Next up: ${pendingSlots[0].singer_name} ("${pendingSlots[0].song_title}")`;
+        document.getElementById('nowPlayingSinger').textContent = `Next up: ${pendingSlots[0].singer_name} ("${pendingSlots[0].song_title}" by ${pendingSlots[0].artist_name || 'Artist'})`;
       } else {
         document.getElementById('nowPlayingTitle').textContent = 'No song playing';
         document.getElementById('nowPlayingSinger').textContent = 'Stage Empty • Waiting for singers';
@@ -169,7 +169,7 @@
           <div style="flex:1;min-width:0">
             <div style="font-size:0.75rem;color:var(--pink);font-weight:700">#${idx + 1} UP NEXT</div>
             <div style="font-weight:700;color:#FFF;font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(item.song_title)}</div>
-            <div class="dim" style="font-size:0.85rem">${escapeHtml(item.singer_name || 'Member')}</div>
+            <div class="dim" style="font-size:0.85rem">Artist: ${escapeHtml(item.artist_name || 'Original Artist')} • Performed by ${escapeHtml(item.singer_name || 'Member')}</div>
           </div>
           <div style="display:flex;gap:6px">
             <button type="button" onclick="playNow('${item.id}')" class="btn btn-outline" style="width:auto;padding:8px 12px;font-size:0.8rem;color:var(--green);border-color:rgba(16,185,129,0.4)">
