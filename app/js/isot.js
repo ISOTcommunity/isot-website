@@ -120,11 +120,28 @@ async function requireAuth(opts = {}) {
   }
 
   let { data: { session } } = await db.auth.getSession();
-  if (!session && (location.hash.includes('access_token=') || location.search.includes('code='))) {
-    // OAuth redirect callback: wait for Supabase JS client to parse access_token hash/code
-    await new Promise((r) => setTimeout(r, 600));
-    const res = await db.auth.getSession();
-    session = res.data?.session;
+
+  // If returning from OAuth redirect with ?code= or #access_token=, wait for auth state event
+  const hasOAuthParams = location.hash.includes('access_token=') || location.search.includes('code=');
+  if (!session && hasOAuthParams) {
+    session = await new Promise((resolve) => {
+      let done = false;
+      const { data: { subscription } } = db.auth.onAuthStateChange((event, sess) => {
+        if (sess && !done) {
+          done = true;
+          subscription.unsubscribe();
+          resolve(sess);
+        }
+      });
+      setTimeout(async () => {
+        if (!done) {
+          done = true;
+          subscription.unsubscribe();
+          const res = await db.auth.getSession();
+          resolve(res.data?.session || null);
+        }
+      }, 3500);
+    });
   }
 
   if (!session) {
@@ -132,15 +149,37 @@ async function requireAuth(opts = {}) {
     return new Promise(() => {});
   }
 
-  const { data: profile, error } = await db
+  let { data: profile, error } = await db
     .from('profiles')
     .select('*')
     .eq('id', session.user.id)
-    .single();
+    .maybeSingle();
 
-  if (error || !profile) {
-    showGateError('Profile missing', 'Your account exists but has no profile row.');
-    return new Promise(() => {});
+  // Self-heal profile row for OAuth user if DB trigger was missing/delayed
+  if (!profile) {
+    const meta = session.user.user_metadata || {};
+    const fallbackName = meta.full_name || meta.name || session.user.email?.split('@')[0] || 'Member';
+    const fallbackAvatar = meta.avatar_url || meta.picture || null;
+    const fallbackCode = 'ISOT-2026-' + Math.floor(1000 + Math.random() * 9000);
+
+    const { data: created, error: upsertErr } = await db
+      .from('profiles')
+      .upsert({
+        id: session.user.id,
+        email: session.user.email,
+        full_name: fallbackName,
+        avatar_url: fallbackAvatar,
+        member_code: fallbackCode
+      })
+      .select('*')
+      .single();
+
+    if (!upsertErr && created) {
+      profile = created;
+    } else {
+      showGateError('Profile missing', 'Your account exists but has no profile row.');
+      return new Promise(() => {});
+    }
   }
 
   const isBoard = profile.staff_role === 'board';
