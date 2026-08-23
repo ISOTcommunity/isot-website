@@ -19,6 +19,23 @@ const db = isConfigured() && window.supabase
   : null;
 
 /* ---------------------------------------------------------------
+ * Double-Tap Zoom Prevention (Mobile Webview & Safari)
+ * ------------------------------------------------------------- */
+(function preventDoubleTapZoom() {
+  let lastTouch = 0;
+  document.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if (now - lastTouch <= 300) {
+      const tag = e.target ? e.target.tagName : '';
+      if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
+        e.preventDefault();
+      }
+    }
+    lastTouch = now;
+  }, { passive: false });
+})();
+
+/* ---------------------------------------------------------------
  * Identity Palette for Deterministic Geometry Avatars
  * ------------------------------------------------------------- */
 const IDENTITY_PALETTE = [
