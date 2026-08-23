@@ -176,11 +176,12 @@ async function requireAuth(opts = {}) {
     return new Promise(() => {});
   }
 
+  // getSession() reads local storage first, so it is fast. Racing it against a 1.2s
+  // timer meant a slow phone on bar wifi was treated as signed out.
   let session = null;
   try {
-    const sessionPromise = db.auth.getSession().then(res => res.data?.session || null);
-    const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 1200));
-    session = await Promise.race([sessionPromise, timeoutPromise]);
+    const { data } = await db.auth.getSession();
+    session = data?.session || null;
   } catch (e) {
     session = null;
   }
@@ -209,24 +210,14 @@ async function requireAuth(opts = {}) {
   }
 
   if (!session) {
-    // Guest fallback profile so the app ALWAYS loads cleanly on any mobile phone or browser
-    const guestProfile = {
-      id: 'guest_user',
-      email: 'member@isotcommunity.com',
-      full_name: 'ISOT Member',
-      member_code: 'ISOT-2026-GUEST',
-      tier: 'participant',
-      staff_role: 'member',
-      university: 'UniTo / PoliTo',
-      nationality: 'International Student',
-      languages: 'English, Italian'
-    };
-
-    const gateEl = document.getElementById('gate');
-    if (gateEl) gateEl.remove();
-
-    initBurgerMenu(guestProfile);
-    return guestProfile;
+    // No session means not signed in. This previously returned a fabricated "guest"
+    // profile so the app would always render — which meant requireAuth did not
+    // require auth, and anyone opening /app/home was let in as "ISOT Member".
+    // It also made sign-out look broken: you were bounced to login, but any guarded
+    // page still rendered.
+    const here = location.pathname.split('/').pop() || 'home.html';
+    location.replace('login.html?next=' + encodeURIComponent(here));
+    return new Promise(() => {});
   }
 
   let profile = null;
@@ -242,16 +233,30 @@ async function requireAuth(opts = {}) {
     console.warn('Profile fetch note:', e);
   }
 
-  // Fallback profile if row hasn't synced yet
+  // The row can legitimately be missing for a moment right after signup, while the
+  // handle_new_user trigger commits. Retry briefly.
+  //
+  // What we must NOT do is invent one. This previously fell back to a profile with
+  // member_code hardcoded to 'ISOT-2026-0001' — so a failed fetch rendered someone
+  // else's member code on the card, and a bartender scanning it would have validated
+  // the wrong person.
   if (!profile) {
-    profile = {
-      id: session.user.id,
-      email: session.user.email,
-      full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Member',
-      member_code: 'ISOT-2026-0001',
-      tier: 'participant',
-      staff_role: 'member'
-    };
+    for (let attempt = 0; attempt < 3 && !profile; attempt++) {
+      await new Promise(r => setTimeout(r, 600));
+      try {
+        const { data } = await db.from('profiles').select('*').eq('id', session.user.id).single();
+        if (data) profile = data;
+      } catch (e) { /* keep trying */ }
+    }
+  }
+
+  if (!profile) {
+    showGateError(
+      'Your profile is missing',
+      'Your account exists but has no profile record, so we cannot show your member card. ' +
+      'Tell Amir — the signup trigger may not have run.'
+    );
+    return new Promise(() => {});
   }
 
   const isBoard = profile.staff_role === 'board';
@@ -426,8 +431,38 @@ function showGateError(title, message, showHome = false) {
 }
 
 async function signOut() {
-  await db?.auth.signOut();
-  location.replace('login.html');
+  // Sign-out has to actually leave. Previously this fired signOut() and redirected
+  // without checking it worked — so if the call failed, the session survived in
+  // localStorage and the next guarded page signed you straight back into the old
+  // account. That is exactly what happens in a home-screen PWA, where the app stays
+  // resident and nothing forces a clean reload.
+  try {
+    await db?.auth.signOut();                    // revoke server-side
+  } catch (e) {
+    console.warn('signOut (global) failed:', e);
+  }
+
+  try {
+    await db?.auth.signOut({ scope: 'local' });  // clear locally even if the network failed
+  } catch (e) { /* already gone */ }
+
+  // Belt and braces: purge any Supabase token still sitting in storage.
+  try {
+    for (const store of [localStorage, sessionStorage]) {
+      Object.keys(store)
+        .filter(k => k.startsWith('sb-') || k.includes('supabase.auth'))
+        .forEach(k => store.removeItem(k));
+    }
+  } catch (e) { /* private mode */ }
+
+  // Verify before leaving, so we never redirect while still signed in.
+  try {
+    const { data } = await db.auth.getSession();
+    if (data?.session) console.warn('session survived sign-out; storage cleared anyway');
+  } catch (e) { /* ignore */ }
+
+  // Cache-bust so a resident PWA cannot serve a page rendered for the old user.
+  location.replace('login.html?signedout=' + Date.now());
 }
 
 /* ---------------------------------------------------------------
