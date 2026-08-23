@@ -480,27 +480,40 @@
     ];
 
     async function initHome() {
-      const me = await requireAuth();
+      try {
+        meProfile = await requireAuth();
 
-      // Render topbar avatar
-      document.getElementById('userGeoAvatar').innerHTML = renderUserAvatarHtml(me, 40);
-      document.getElementById('welcomeUser').textContent = `Hello, ${me.full_name?.split(' ')[0] || 'Member'}`;
-      document.getElementById('userRoleBadge').textContent = ROLE_LABEL[me.staff_role] || TIER_LABEL[me.tier] || 'Community';
-      document.getElementById('actionKaraokeIcon').innerHTML = getCategoryBadgeHtml('karaoke', 38);
+        if (document.getElementById('userGeoAvatar')) {
+          document.getElementById('userGeoAvatar').innerHTML = renderUserAvatarHtml(meProfile, 40);
+        }
+        if (document.getElementById('welcomeUser')) {
+          document.getElementById('welcomeUser').textContent = `Hello, ${meProfile.full_name?.split(' ')[0] || 'Member'}`;
+        }
+        if (document.getElementById('userRoleBadge')) {
+          document.getElementById('userRoleBadge').textContent = ROLE_LABEL[meProfile.staff_role] || TIER_LABEL[meProfile.tier] || 'Community';
+        }
+        if (document.getElementById('actionKaraokeIcon')) {
+          document.getElementById('actionKaraokeIcon').innerHTML = getCategoryBadgeHtml('karaoke', 38);
+        }
 
-      // Dynamically resolve next upcoming event based on today's real date
-      const nextEvent = getNextUpcomingEvent();
-      updateHeroEvent(nextEvent);
+        const nextEvent = getNextUpcomingEvent();
+        updateHeroEvent(nextEvent);
 
-      const isStaff = me.staff_role === 'volunteer' || me.staff_role === 'board';
+        const isStaff = meProfile && (meProfile.staff_role === 'volunteer' || meProfile.staff_role === 'board');
 
-      if (isStaff) {
-        document.getElementById('volunteerShiftView').style.display = 'block';
-        document.getElementById('memberHomeView').style.display = 'none';
-        loadShiftData();
-      } else {
-        document.getElementById('volunteerShiftView').style.display = 'none';
-        document.getElementById('memberHomeView').style.display = 'block';
+        if (isStaff) {
+          if (document.getElementById('volunteerShiftView')) document.getElementById('volunteerShiftView').style.display = 'block';
+          if (document.getElementById('memberHomeView')) document.getElementById('memberHomeView').style.display = 'none';
+          loadShiftData();
+        } else {
+          if (document.getElementById('volunteerShiftView')) document.getElementById('volunteerShiftView').style.display = 'none';
+          if (document.getElementById('memberHomeView')) document.getElementById('memberHomeView').style.display = 'block';
+        }
+      } catch (err) {
+        console.error('Home init catch:', err);
+      } finally {
+        const gate = document.getElementById('gate');
+        if (gate) gate.remove();
       }
     }
 
