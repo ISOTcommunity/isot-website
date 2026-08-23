@@ -67,6 +67,11 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
+input, select, textarea, button {
+  font-size: 16px !important;
+  touch-action: manipulation;
+}
+
 body {
   background-color: var(--bg-dark);
   color: var(--text-main);
