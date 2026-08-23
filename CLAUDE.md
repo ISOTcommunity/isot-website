@@ -15,15 +15,16 @@ ISOT/
 │   │   ├── events.html       ← 7-Column Month Matrix, Week Stepper, 100% Real RSVPs & Who's Going Modal
 │   │   ├── partner.html      ← Retina HD Dark Map (@2x), Real GPS Pinpoints, 1-Tap Google/Apple Maps
 │   │   ├── network.html      ← Student Directory, Real Supabase Profiles, Search, Friendships & Requests
-│   │   ├── account.html      ← Profile Settings, Canvas 300x300 Photo Compressor, Languages Spoken
+│   │   ├── notifications.html← Dedicated Activity Center & Real-time Notifications Page
+│   │   ├── account.html      ← Profile Settings, Interactive Crop/Rotate Modal, Tap-to-Crop Photo
 │   │   ├── profile.html      ← Live QR Member Card (Socio 20% OFF)
 │   │   ├── karaoke.html      ← Live Karaoke Queue (1 active song per student, stage status)
 │   │   ├── karaoke-kj.html   ← Volunteer Host Booth ("Mark Sung & Next Singer →")
 │   │   ├── css/app.css       ← Apple-Grade Design System, Translucent Glass & Motion Physics
-│   │   ├── js/isot.js        ← Core API, Auth Guard, GeoAvatar Generator & Notification Center
+│   │   ├── js/isot.js        ← Core API, Fast Auth Guard, Centered Initials Avatars & Notification Manager
 │   │   └── manifest.json     ← PWA Add to Home Screen Manifest (ISOT Logo)
 │   ├── assets/               ← Official Logos, Photos, Graphic Identity
-│   └── vercel.json           ← 18 Permanent WordPress SEO Redirects & Clean URLs
+│   └── vercel.json           ← Clean URLs, Explicit App Rewrites & WordPress SEO Redirects
 ├── supabase/                 ← Database SQL Migrations, RLS Policies & Triggers
 └── BACKEND_PLAN.md           ← Architecture Spec & RUNTS Compliance Plan
 ```
@@ -32,82 +33,39 @@ ISOT/
 
 ## 🧠 Summary of Recent Architecture & Engineering Work (23 August 2026)
 
-### 1. 🛡️ 100% Real RSVPs & Attendee Profile Sheet ("Who's Going")
-* **User Directive**: `"please dont put any fake going"`
-* **Why**: The user strictly forbade pre-seeded mock attendees or fake numbers (`baseCount + (isGoing ? 1 : 0)`).
-* **Implementation**: Modified `events.html` and `home.html`. If 0 users have RSVP'd, displays **"Be the first to RSVP"**. When users tap **`[ I'm Going ]`**, only real user profiles and genuine counts are computed.
-* **Profile Preview Modal**: Tapping the attendee avatar stack slides up an Apple Glass modal showing attendee full names, tier badges (`YOU`), country of origin (🇮🇹 🇪🇸 🇮🇷 🇧🇷), university (UniTo, PoliTo), and spoken languages.
+### 1. 🔔 Dedicated Activity Center & Real-time Notifications Page (`notifications.html`)
+* **User Directive**: `"when i push on the ring it should go on new page not open below netwrok"`
+* **Implementation**: Created `app/notifications.html` linked directly from the topbar bell icon `🔔` across all pages.
+* **Features**: Displays real-time friend requests, event invitations, and accepted requests with direct 1-tap action buttons.
 
-### 2. 📷 HTML5 Canvas Client-Side Profile Photo Compressor
-* **Why**: Uncompressed phone camera photos (5–10MB) slow down mobile apps.
-* **Implementation**: Built `compressAvatarFile(file, maxSide=300, quality=0.82)` in `js/isot.js`. Crops photos to a square, resizes to **300×300 JPEG**, and compresses to ~30KB before saving `avatar_url` to Supabase `profiles`.
-* **Universal Avatar Fallback**: `renderUserAvatarHtml(profile, size)` renders uploaded photos or falls back to deterministic split-circle `renderGeoAvatar(member_code, size)`.
+### 2. 💌 Selective Friend Selection Modal for Event Invitations
+* **User Directive**: `"when inviting friend user should be able to chose what friend not all of them"` & `"it bring all the possible members should be able only to send accepted friemds"`
+* **Implementation**: Replaced blast invitation with an interactive **Friend Selection Sheet Modal** in `events.html`.
+* **Strict Accepted Friends Filter**: Displays **strictly connected/accepted friends only** (`status: 'connected'`). Displays a clear empty state card linking to `network.html` if the user has no connected friends yet.
 
-### 3. 🌐 ISOT Student Network & Friendship System (`network.html`)
-* **Why**: Students wanted to connect, view each other's profiles, and send friend requests.
-* **Implementation**: Created `app/network.html` querying Supabase `profiles` table.
-* **Filters & Search**: Real-time search by name, country, university, or language, with filter pills (`All Students`, `My Friends`, `Pending Requests`, `UniTo`, `PoliTo`).
-* **Friendship Statuses**: `+ Add Friend` → `Sent ⏳` → `Friends 🤝` (saved to Supabase `friendships` table).
+### 3. 📸 Tap-to-Crop & Rotate Profile Photo at Top of Account Page
+* **User Directive**: `"can we add the edit profile crop and rotate on tap avatar to change the photo not at the end of account"`
+* **Implementation**: Added a camera overlay badge 📷 to the avatar at the top of `account.html`. Tapping the photo or the `[ 📷 Tap Photo to Crop & Rotate ]` button immediately opens the canvas crop, zoom, and 90° rotation editor.
 
-### 4. 🔔 Activity & Notification Center (`🔔` Bell Icon)
-* **Why**: Provide instant feedback for incoming friend requests and event invites.
-* **Implementation**: Added a notification bell icon with an unread badge counter (`🔔 1`) to top bars across all app screens. Tapping opens an **Activity Center Modal** for notification history.
-* **1-Tap Event Invitations**: Added an **`[ Invite Friends 💌 ]`** button on event cards in `events.html` allowing students to invite connected friends to events.
+### 4. 🎨 Apple-Grade Centered Member Initials & Fallback Avatar System
+* **User Directive**: `"the people who doesnt have the picture have a really bad icon not in center"`
+* **Implementation**: Redesigned `renderUserAvatarHtml` and `renderGeoAvatar` in `js/isot.js` and `app.css`. Replaced offset SVG clipping paths with GPU-accelerated flex-centered circular initial badges (e.g., **A** for Amir, **S** for Sofia) on deterministic dual-color gradient backgrounds.
 
-### 5. 🗺️ Retina HD Dark Vector Map & Real Venue GPS Locations (`partner.html`)
-* **Why**: Venues needed crisp, high-DPI maps and accurate navigation.
-* **Implementation**: Upgraded Leaflet map to CartoDB Retina HD Dark tiles (`dark_all@2x`).
-* **Authentic Locations**:
-  - 🍸 **Rough San Salvario**: `Via Principe Tommaso 3` (Lat `45.0601`, Lng `7.6835`)
-  - 🪩 **Zenit Club**: `Piazza Vittorio Veneto 13/E` (Lat `45.0648`, Lng `7.6955`)
-  - 🍹 **Capodoglio**: `Murazzi del Po 37` (Lat `45.0610`, Lng `7.6920`)
-* **1-Tap Navigation**: Added direct **`[ Google Maps ]`** and **`[ Apple Maps ]`** buttons to venue cards.
+### 5. 📱 Mobile Viewport Lock & Auto-Zoom Prevention
+* **User Directive**: `"in my account also cancel zoom feature user touches something wrong and it does a strange zoom"`
+* **Implementation**: Set `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">` and enforced `font-size: 16px !important; touch-action: manipulation;` on input fields so iOS Safari never triggers unexpected viewport auto-zooming.
 
-### 6. 📱 Clean 4-Tab Bottom Navigation Bar
-* **Sequence**: `Home (1)` · `Calendar (2)` · `Partners (3)` · `Network (4)`.
-* **Rationale**: Menu was removed from the bottom bar because the **Burger Drawer Menu** (`#burgerBtn`) is located at the top right header next to the user's account photo.
+### 6. 📐 Upgraded Mobile Bottom Tab Bar Proportions
+* **User Directive**: `"the menue at bottom became strangly small chose a normal pleasable size"`
+* **Implementation**: Upgraded bottom tab bar in `app.css` to generous Apple native proportions: `25px × 25px` SVG icons, `0.82rem` (`font-weight: 600`) readable labels, and `64px` tabbar height.
 
-### 7. ✨ Apple-Grade Fluid Motion System
-* **Why**: The user requested high-end Apple motion while strictly avoiding cheap confetti or celebration animations.
-* **Implementation**:
-  - **Tactile Tap Physics**: `active: scale(0.95)` on buttons, cards, and tabs with elastic spring physics (`cubic-bezier(0.34, 1.56, 0.64, 1)`).
-  - **Staggered Page Entrance**: `.shell > *` elements slide up with staggered delays (`appleFadeInUp`).
-  - **Breathing Ambient Neon Glow**: `ambientPulse` keyframes for live badges and active RSVPs.
-
----
-
-## 🗄️ Supabase Database Schema Quick Reference
-
-### Table: `public.profiles`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `UUID` | Primary Key, references `auth.users(id)` |
-| `email` | `TEXT` | User email address |
-| `full_name` | `TEXT` | User full name |
-| `member_code` | `TEXT` | Unique code (e.g. `ISOT-2026-0001`) |
-| `tier` | `TEXT` | `'participant'` (free) vs `'socio'` (€10/yr) |
-| `staff_role` | `TEXT` | `'member'`, `'volunteer'`, `'board'`, `'partner'` |
-| `university` | `TEXT` | e.g. `UniTo`, `PoliTo`, `SAA` |
-| `nationality` | `TEXT` | e.g. `Italy 🇮🇹`, `Spain 🇪🇸`, `Iran 🇮🇷` |
-| `languages` | `TEXT` | e.g. `English, Italian, Spanish, Persian` |
-| `avatar_url` | `TEXT` | Compressed base64 or storage URL |
-
-### Required RLS SQL Migration for Member Discovery:
-```sql
--- Allow registered members to discover each other in Network & Attendee lists
-DROP POLICY IF EXISTS profiles_read ON public.profiles;
-
-CREATE POLICY profiles_read ON public.profiles
-  FOR SELECT TO authenticated
-  USING (TRUE);
-```
+### 7. ⚡ Fast Auth Session Guard & Vercel Clean URL Rewrites
+* **User Directive**: `"maybe is not for the speed something related to vercel"`
+* **Implementation**: Added 1.2s `Promise.race` fast-timeout to `db.auth.getSession()` in `js/isot.js` and updated `vercel.json` with explicit rewrite rules for all clean PWA app URLs (`/app/home`, `/app/events`, `/app/network`, `/app/partner`, `/app/account`, `/app/notifications`).
 
 ---
 
 ## 🚀 How to Commit & Push Code
-
-**Repo Remote:** `git@github-isot:ISOTcommunity/isot-website.git`  
-**SSH Host Alias:** `github-isot` (Key: `~/.ssh/isot_github`)
 
 ```bash
 cd website
