@@ -166,10 +166,10 @@ a { color: inherit; text-decoration: none; }
 .drawer-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  z-index: 200;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 3000;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s;
@@ -185,21 +185,19 @@ a { color: inherit; text-decoration: none; }
   right: 0;
   bottom: 0;
   width: min(340px, 85vw);
-  /* dvh tracks the visible viewport as iOS shows/hides its chrome; without it the
-     drawer's bottom can sit below the screen. Falls back to the top/bottom:0 above. */
+  height: 100vh;
   height: 100dvh;
-  background: rgba(18, 24, 38, 0.95);
+  background: rgba(18, 24, 38, 0.98);
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
   border-left: 1px solid var(--border-light);
-  z-index: 201;
+  z-index: 3001;
   display: flex;
   flex-direction: column;
   transform: translateX(100%);
   transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6);
   padding-top: max(16px, env(safe-area-inset-top));
-  padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
 .drawer.open {
   transform: translateX(0);
@@ -211,6 +209,7 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-shrink: 0;
 }
 
 .drawer-user-card {
@@ -220,13 +219,11 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .drawer-nav {
   flex: 1;
-  /* Without min-height:0 a flex child will not shrink below its content height, so a
-     long nav list pushes the footer (and the Sign Out button) off the bottom of the
-     screen instead of scrolling inside the drawer. */
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -264,13 +261,10 @@ a { color: inherit; text-decoration: none; }
 }
 
 .drawer-footer {
-  /* flex-shrink:0 keeps the footer at full height when the nav is long.
-     The safe-area padding keeps Sign Out clear of the iPhone home indicator,
-     which matters most in the installed PWA where there is no browser chrome. */
   flex-shrink: 0;
-  padding: 16px 20px calc(16px + env(safe-area-inset-bottom));
+  padding: 16px 20px max(24px, calc(16px + env(safe-area-inset-bottom)));
   border-top: 1px solid var(--border-light);
-  background: inherit;
+  background: rgba(18, 24, 38, 0.98);
 }
 
 /* ---------- Typography ---------- */
