@@ -209,23 +209,23 @@
         </div>
       </div>
 
-      <!-- Tonight's Hero Event Card -->
+      <!-- Dynamic Upcoming Hero Event Card -->
       <div class="hero-event-card">
-        <img src="../assets/optimized/karaoke_night_1.jpg" alt="Tonight Event" class="event-bg" />
+        <img src="../assets/optimized/karaoke_night_1.jpg" alt="Upcoming Event" class="event-bg" />
         <div style="position: relative; z-index: 2;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
             <div id="categoryIconBadge"></div>
-            <span class="badge badge-live"><i class="fa-solid fa-circle"></i> TONIGHT 21:00</span>
+            <span id="heroEventBadge" class="badge badge-socio"><i class="fa-solid fa-calendar"></i> SAT 29 AUG • 22:30</span>
           </div>
           
-          <h1 style="font-size: 1.8rem; margin-bottom: 6px;" id="heroEventName">Monday Karaoke Night</h1>
-          <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 16px;">
-            <i class="fa-solid fa-location-dot text-pink"></i> Rough Bar, Via San Salvario 12 • 20% Member Discount
+          <h1 style="font-size: 1.8rem; margin-bottom: 6px;" id="heroEventName">ISOT Pre-Party</h1>
+          <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 16px;" id="heroEventSub">
+            <i class="fa-solid fa-location-dot text-pink"></i> Rough Bar &amp; Partner Clubs • 20% Member Discount
           </p>
 
-          <div style="display: flex; gap: 10px;">
-            <a href="karaoke.html" class="btn btn-pink" style="width: auto; padding: 10px 20px; font-size: 0.88rem;">Join Song Queue <i class="fa-solid fa-music"></i></a>
-            <a href="profile.html" class="btn btn-outline" style="width: auto; padding: 10px 18px; font-size: 0.88rem;">Show Card</a>
+          <div style="display: flex; gap: 10px;" id="heroEventActions">
+            <a href="profile.html" class="btn btn-pink" style="width: auto; padding: 10px 20px; font-size: 0.88rem;">Show Member Card <i class="fa-solid fa-qrcode"></i></a>
+            <a href="events.html" class="btn btn-outline" style="width: auto; padding: 10px 18px; font-size: 0.88rem;">View Calendar</a>
           </div>
         </div>
       </div>
@@ -293,7 +293,7 @@
   <!-- Mobile Bottom Tab Bar -->
   <nav class="tabbar">
     <a href="home.html" class="tab-item active">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 011-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
       Home
     </a>
     <a href="profile.html" class="tab-item">
@@ -310,6 +310,14 @@
   <script src="js/isot.js"></script>
 
   <script>
+    const EVENTS_DATA = [
+      { date: '2026-08-29', dayName: 'SAT', dayNum: '29', monthName: 'AUG', title: 'ISOT Pre-Party', venue: 'Rough Bar & Partner Clubs', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { date: '2026-08-31', dayName: 'MON', dayNum: '31', monthName: 'AUG', title: 'ISOT Karaoke Night', venue: 'Rough Bar, Via San Salvario 12', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { date: '2026-09-05', dayName: 'SAT', dayNum: '05', monthName: 'SEP', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { date: '2026-09-07', dayName: 'MON', dayNum: '07', monthName: 'SEP', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { date: '2026-09-11', dayName: 'FRI', dayNum: '11', monthName: 'SEP', title: 'ISOT Pre-Uni Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Semester Opener' }
+    ];
+
     async function initHome() {
       const me = await requireAuth();
 
@@ -317,9 +325,11 @@
       document.getElementById('userGeoAvatar').innerHTML = renderGeoAvatar(me.member_code, 40);
       document.getElementById('welcomeUser').textContent = `Hello, ${me.full_name?.split(' ')[0] || 'Member'}`;
       document.getElementById('userRoleBadge').textContent = ROLE_LABEL[me.staff_role] || TIER_LABEL[me.tier] || 'Community';
-      
-      document.getElementById('categoryIconBadge').innerHTML = getCategoryBadgeHtml('karaoke', 44);
       document.getElementById('actionKaraokeIcon').innerHTML = getCategoryBadgeHtml('karaoke', 38);
+
+      // Dynamically resolve next upcoming event based on today's real date
+      const nextEvent = getNextUpcomingEvent();
+      updateHeroEvent(nextEvent);
 
       const isStaff = me.staff_role === 'volunteer' || me.staff_role === 'board';
 
@@ -333,10 +343,53 @@
       }
     }
 
+    function getNextUpcomingEvent() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      return EVENTS_DATA.find(e => e.date >= todayStr) || EVENTS_DATA[0];
+    }
+
+    function updateHeroEvent(eventObj) {
+      if (!eventObj) return;
+
+      const todayStr = new Date().toISOString().split('T')[0];
+      const isToday = eventObj.date === todayStr;
+
+      document.getElementById('categoryIconBadge').innerHTML = getCategoryBadgeHtml(eventObj.cat, 44);
+      document.getElementById('heroEventName').textContent = eventObj.title;
+      document.getElementById('heroEventSub').innerHTML = `<i class="fa-solid fa-location-dot text-pink"></i> ${escapeHtml(eventObj.venue)} • 20% Member Discount`;
+
+      const badgeEl = document.getElementById('heroEventBadge');
+      if (isToday) {
+        badgeEl.className = 'badge badge-live';
+        badgeEl.innerHTML = `<i class="fa-solid fa-circle"></i> TONIGHT ${eventObj.time}`;
+      } else {
+        badgeEl.className = 'badge badge-socio';
+        badgeEl.innerHTML = `<i class="fa-solid fa-calendar"></i> ${eventObj.dayName} ${eventObj.dayNum} ${eventObj.monthName} • ${eventObj.time}`;
+      }
+
+      const actionsEl = document.getElementById('heroEventActions');
+      if (eventObj.cat === 'karaoke' || eventObj.link) {
+        actionsEl.innerHTML = `
+          <a href="karaoke.html" class="btn btn-pink" style="width: auto; padding: 10px 20px; font-size: 0.88rem;">Join Song Queue <i class="fa-solid fa-music"></i></a>
+          <a href="profile.html" class="btn btn-outline" style="width: auto; padding: 10px 18px; font-size: 0.88rem;">Show Card</a>
+        `;
+      } else {
+        actionsEl.innerHTML = `
+          <a href="profile.html" class="btn btn-pink" style="width: auto; padding: 10px 20px; font-size: 0.88rem;">Show Member Card <i class="fa-solid fa-qrcode"></i></a>
+          <a href="events.html" class="btn btn-outline" style="width: auto; padding: 10px 18px; font-size: 0.88rem;">View Calendar</a>
+        `;
+      }
+    }
+
     function filterCategory(catKey) {
-      const label = CATEGORY_LABELS[catKey] || 'Featured Event';
-      document.getElementById('heroEventName').textContent = label;
-      document.getElementById('categoryIconBadge').innerHTML = getCategoryBadgeHtml(catKey, 44);
+      const matched = EVENTS_DATA.find(e => e.cat === catKey || (catKey === 'drinks' && e.venue.includes('Rough')) || (catKey === 'social' && e.venue.includes('Capodoglio')));
+      if (matched) {
+        updateHeroEvent(matched);
+      } else {
+        const label = CATEGORY_LABELS[catKey] || 'Featured Event';
+        document.getElementById('heroEventName').textContent = label;
+        document.getElementById('categoryIconBadge').innerHTML = getCategoryBadgeHtml(catKey, 44);
+      }
     }
 
     async function loadShiftData() {
