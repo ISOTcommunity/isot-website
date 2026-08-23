@@ -175,7 +175,136 @@ async function requireAuth(opts = {}) {
     return denyAccess('This page is for venue partners.');
 
   document.getElementById('gate')?.remove();
+  initBurgerMenu(profile);
   return profile;
+}
+
+/* ---------------------------------------------------------------
+ * Account Burger Drawer Component (Apple Glass Slide-In)
+ * ------------------------------------------------------------- */
+function initBurgerMenu(profile) {
+  if (!profile || document.getElementById('burgerDrawer')) return;
+
+  const isStaff = profile.staff_role === 'volunteer' || profile.staff_role === 'board';
+  const isBoard = profile.staff_role === 'board';
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'drawer-backdrop';
+  backdrop.id = 'burgerBackdrop';
+
+  const drawer = document.createElement('div');
+  drawer.className = 'drawer';
+  drawer.id = 'burgerDrawer';
+
+  drawer.innerHTML = `
+    <div class="drawer-header">
+      <div style="display:flex;align-items:center;gap:8px">
+        <img src="../assets/LOGOS/scritta isot.png" alt="ISOT" style="height:20px;" />
+        <span style="font-weight:700;font-size:0.95rem;color:#FFF">Account</span>
+      </div>
+      <button type="button" id="closeDrawerBtn" style="background:transparent;border:none;color:var(--text-muted);font-size:1.2rem;cursor:pointer;padding:6px;">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="drawer-user-card">
+      ${renderGeoAvatar(profile.member_code, 44)}
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;color:#FFF;font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+          ${escapeHtml(profile.full_name || 'Member')}
+        </div>
+        <div class="dim" style="font-size:0.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+          ${escapeHtml(profile.email || '')}
+        </div>
+        <span class="badge ${profile.tier === 'socio' ? 'badge-socio' : 'badge-participant'}" style="margin-top:4px;display:inline-block">
+          ${TIER_LABEL[profile.tier] || 'Community'}
+        </span>
+      </div>
+    </div>
+
+    <div class="drawer-nav">
+      <div class="drawer-section-title">My Account Settings</div>
+      <a href="profile.html" class="drawer-item">
+        <i class="fa-solid fa-qrcode text-pink"></i>
+        <span>My Member Card &amp; QR</span>
+      </a>
+      <a href="complete-profile.html" class="drawer-item">
+        <i class="fa-solid fa-user-gear text-pink"></i>
+        <span>Account &amp; Profile Settings</span>
+      </a>
+
+      <div class="drawer-section-title">App Navigation</div>
+      <a href="home.html" class="drawer-item">
+        <i class="fa-solid fa-house"></i>
+        <span>App Hub</span>
+      </a>
+      <a href="karaoke.html" class="drawer-item">
+        <i class="fa-solid fa-microphone"></i>
+        <span>Karaoke Queue</span>
+      </a>
+      <a href="partner.html" class="drawer-item">
+        <i class="fa-solid fa-store"></i>
+        <span>Partner Venues &amp; Map</span>
+      </a>
+      <a href="../blog.html" class="drawer-item">
+        <i class="fa-solid fa-book-open"></i>
+        <span>Turin Student Guides</span>
+      </a>
+      <a href="assembly.html" class="drawer-item">
+        <i class="fa-solid fa-check-to-slot"></i>
+        <span>General Assembly &amp; Voting</span>
+      </a>
+
+      ${isStaff ? `
+        <div class="drawer-section-title">Volunteer &amp; Board Staff</div>
+        <a href="scan.html" class="drawer-item">
+          <i class="fa-solid fa-camera text-gold"></i>
+          <span>Door Scanner</span>
+        </a>
+        <a href="karaoke-kj.html" class="drawer-item">
+          <i class="fa-solid fa-sliders text-gold"></i>
+          <span>KJ Controller</span>
+        </a>
+      ` : ''}
+
+      ${isBoard ? `
+        <a href="dashboard.html" class="drawer-item">
+          <i class="fa-solid fa-chart-line text-gold"></i>
+          <span>Board Analytics Dashboard</span>
+        </a>
+      ` : ''}
+    </div>
+
+    <div class="drawer-footer">
+      <button type="button" class="btn btn-outline" id="drawerSignOutBtn" style="width:100%;color:#FCA5A5;border-color:rgba(239,68,68,0.3)">
+        <i class="fa-solid fa-right-from-bracket" style="margin-right:8px"></i> Sign Out
+      </button>
+    </div>
+  `;
+
+  document.body.appendChild(backdrop);
+  document.body.appendChild(drawer);
+
+  function toggle(open) {
+    backdrop.classList.toggle('open', open);
+    drawer.classList.toggle('open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+
+  backdrop.addEventListener('click', () => toggle(false));
+  document.getElementById('closeDrawerBtn')?.addEventListener('click', () => toggle(false));
+  document.getElementById('drawerSignOutBtn')?.addEventListener('click', () => signOut());
+
+  document.querySelectorAll('#burgerBtn, [data-open-drawer]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggle(true);
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && drawer.classList.contains('open')) toggle(false);
+  });
 }
 
 function denyAccess(message) {

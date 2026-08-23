@@ -125,13 +125,18 @@
   <!-- Top Bar -->
   <header class="topbar">
     <div style="display: flex; align-items: center; gap: 10px;">
-      <div id="userGeoAvatar"></div>
+      <div id="userGeoAvatar" style="cursor: pointer;" data-open-drawer></div>
       <div>
         <div id="welcomeUser" style="font-size: 0.95rem; font-weight: 700; color: #FFF;">Hello, Member</div>
         <div id="userRoleBadge" style="font-size: 0.72rem; color: var(--text-dim);">Community Member</div>
       </div>
     </div>
-    <a href="profile.html" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">My Card <i class="fa-solid fa-qrcode"></i></a>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <a href="profile.html" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">My Card <i class="fa-solid fa-qrcode"></i></a>
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: #FFF; font-size: 1.3rem; cursor: pointer; padding: 6px 8px; display: flex; align-items: center;">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
   </header>
 
   <main class="shell">
