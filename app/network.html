@@ -247,7 +247,10 @@
 
       // Fetch real registered student profiles from Supabase profiles table
       try {
-        const { data, error } = await db.from('profiles').select('*').neq('id', meProfile.id).order('created_at', { ascending: false });
+        // member_directory is a view exposing only directory-safe columns. Reading
+        // profiles directly here returned every member's email, date_of_birth and
+        // qr_secret — the HMAC key that signs their member QR — to any signed-in user.
+        const { data, error } = await db.from('member_directory').select('*').neq('id', meProfile.id).order('created_at', { ascending: false });
         if (data) {
           allProfiles = data;
         }
