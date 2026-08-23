@@ -70,6 +70,14 @@
         return;
       }
 
+      // Detect OAuth errors or notices from redirect params
+      const searchParams = new URLSearchParams(location.search);
+      const hashParams = new URLSearchParams(location.hash.replace(/^#/, ''));
+      const oauthError = searchParams.get('error_description') || searchParams.get('error') || hashParams.get('error_description') || hashParams.get('error');
+      if (oauthError) {
+        setAlert(alertEl, 'Google Sign-In: ' + oauthError, 'error');
+      }
+
       const { data: { session } } = await db.auth.getSession();
       if (session) { location.replace('home.html'); return; }
 

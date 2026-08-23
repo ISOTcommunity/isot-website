@@ -89,6 +89,15 @@
   <script src="js/isot.js"></script>
   <script>
   (async () => {
+    // Forward OAuth error parameters to login page if present
+    const searchParams = new URLSearchParams(location.search);
+    const hashParams = new URLSearchParams(location.hash.replace(/^#/, ''));
+    const oauthError = searchParams.get('error_description') || searchParams.get('error') || hashParams.get('error_description') || hashParams.get('error');
+    if (oauthError) {
+      location.replace('login.html?error_description=' + encodeURIComponent(oauthError));
+      return;
+    }
+
     const me = await requireAuth();
 
     // Already done — do not make them see this twice.
