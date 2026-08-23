@@ -84,6 +84,7 @@ const CATEGORY_ASSETS = {
   sports: '../assets/LOGOS/Sport.jpeg',
   sport: '../assets/LOGOS/Sport.jpeg',
   trips: '../assets/LOGOS/Sport.jpeg',
+  karaoke: '../assets/LOGOS/Karaoke.png',
 };
 
 const CATEGORY_LABELS = {
@@ -96,26 +97,10 @@ const CATEGORY_LABELS = {
 };
 
 /**
- * Renders Category Character Badge HTML or Karaoke character SVG
+ * Renders Category Character Badge HTML
  */
 function getCategoryBadgeHtml(catKey, size = 40) {
   const key = String(catKey || 'social').toLowerCase().trim();
-  if (key === 'karaoke') {
-    return `
-      <div class="cat-badge" style="width:${size}px;height:${size}px">
-        <svg viewBox="0 0 100 100" width="${size * 0.8}" height="${size * 0.8}" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="50" cy="50" r="42" fill="#EBC17F"/>
-          <rect x="25" y="44" width="50" height="12" rx="6" fill="#3F35A0"/>
-          <circle cx="36" cy="50" r="9" fill="#000"/>
-          <circle cx="64" cy="50" r="9" fill="#000"/>
-          <path d="M 40 68 Q 50 78 60 68" stroke="#3F35A0" stroke-width="4" fill="none" stroke-linecap="round"/>
-          <rect x="70" y="25" width="4" height="24" rx="2" fill="#B64226"/>
-          <ellipse cx="72" cy="22" rx="6" ry="8" fill="#3F35A0"/>
-        </svg>
-      </div>
-    `;
-  }
-
   const assetSrc = CATEGORY_ASSETS[key] || CATEGORY_ASSETS.social;
   return `
     <div class="cat-badge" style="width:${size}px;height:${size}px">
