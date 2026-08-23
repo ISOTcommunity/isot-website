@@ -119,7 +119,14 @@ async function requireAuth(opts = {}) {
     return new Promise(() => {});
   }
 
-  const { data: { session } } = await db.auth.getSession();
+  let { data: { session } } = await db.auth.getSession();
+  if (!session && (location.hash.includes('access_token=') || location.search.includes('code='))) {
+    // OAuth redirect callback: wait for Supabase JS client to parse access_token hash/code
+    await new Promise((r) => setTimeout(r, 600));
+    const res = await db.auth.getSession();
+    session = res.data?.session;
+  }
+
   if (!session) {
     location.replace('login.html?next=' + encodeURIComponent(location.pathname.replace(/^\//, '')));
     return new Promise(() => {});
