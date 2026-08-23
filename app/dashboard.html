@@ -73,12 +73,16 @@
           </tr>
         </thead>
         <tbody>
-          <tr style="border-bottom: 1px solid var(--border-light);">
-            <td style="padding: 12px 10px; font-weight: 600;">Alex Rossi</td>
-            <td style="padding: 12px 10px; font-family: monospace;">ISOT-2026-8942</td>
-            <td style="padding: 12px 10px;"><span class="badge badge-socio">MEMBER</span></td>
-            <td style="padding: 12px 10px; font-family: monospace;">2026/0142</td>
-            <td style="padding: 12px 10px;"><button onclick="alert('Official receipt emailed to member.')" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem;">Issue Receipt</button></td>
+          <!-- Was a hardcoded member (Alex Rossi / ISOT-2026-8942 / receipt 2026/0142) with an
+               "Issue Receipt" button that only ran alert('Official receipt emailed to member.').
+               Nothing was issued and nothing was emailed, but the board was told otherwise — and
+               an APS receipt is a numbered legal document. Removed until it reads memberships
+               and actually issues one. -->
+          <tr>
+            <td colspan="5" style="padding: 28px 10px; text-align: center;" class="dim">
+              No paid memberships yet.<br />
+              <span style="font-size:0.8rem">Receipts appear here once the board records a €10 payment.</span>
+            </td>
           </tr>
         </tbody>
       </table>

@@ -562,13 +562,6 @@
     let userRsvps = JSON.parse(localStorage.getItem('isot_rsvps') || '{}');
     let meProfile = null;
 
-    const SAMPLE_MEMBERS = [
-      { name: 'Maria Silva', code: 'ISOT-2026-0001' },
-      { name: 'Marco Rossi', code: 'ISOT-2026-0002' },
-      { name: 'Alex Vance', code: 'ISOT-2026-0003' },
-      { name: 'Sofia Rossi', code: 'ISOT-2026-0004' }
-    ];
-
     function toggleHeroRsvp() {
       if (userRsvps[currentHeroEventId]) {
         delete userRsvps[currentHeroEventId];
