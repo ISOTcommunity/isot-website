@@ -83,6 +83,53 @@ function renderGeoAvatar(memberCode, size = 44) {
   `;
 }
 
+/**
+ * Renders user photo avatar if profile.avatar_url exists, otherwise renders GeoAvatar
+ */
+function renderUserAvatarHtml(profile, size = 44) {
+  if (!profile) return renderGeoAvatar('ISOT-2026-0000', size);
+
+  if (profile.avatar_url) {
+    return `<img src="${escapeHtml(profile.avatar_url)}" alt="Avatar" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;border:1.5px solid var(--pink);" />`;
+  }
+  return renderGeoAvatar(profile.member_code, size);
+}
+
+/**
+ * Compresses an uploaded image file down to maxSide x maxSide pixels (default 300x300)
+ * returns a lightweight JPEG data URL (~30-40KB)
+ */
+function compressAvatarFile(file, maxSide = 300, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const w = img.width;
+        const h = img.height;
+
+        const minSide = Math.min(w, h);
+        const sx = (w - minSide) / 2;
+        const sy = (h - minSide) / 2;
+
+        canvas.width = maxSide;
+        canvas.height = maxSide;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, maxSide, maxSide);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(dataUrl);
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 /* ---------------------------------------------------------------
  * Category Characters System
  * ------------------------------------------------------------- */
@@ -226,7 +273,7 @@ function initBurgerMenu(profile) {
     </div>
 
     <div class="drawer-user-card">
-      ${renderGeoAvatar(profile.member_code, 44)}
+      ${renderUserAvatarHtml(profile, 44)}
       <div style="flex:1;min-width:0">
         <div style="font-weight:700;color:#FFF;font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
           ${escapeHtml(profile.full_name || 'Member')}

@@ -479,7 +479,7 @@
 
     async function initEventsCalendar() {
       meProfile = await requireAuth();
-      document.getElementById('headerAvatar').innerHTML = renderGeoAvatar(meProfile.member_code, 36);
+      document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(meProfile, 36);
 
       renderMainView();
     }
@@ -507,7 +507,7 @@
         html += `
           <div class="attendee-card">
             <div style="width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0">
-              ${renderGeoAvatar(meProfile.member_code, 44)}
+              ${renderUserAvatarHtml(meProfile, 44)}
             </div>
             <div class="attendee-info">
               <div class="attendee-name">${escapeHtml(meProfile.full_name || 'Member')} <span class="badge badge-socio" style="font-size:0.65rem;margin-left:4px">YOU</span></div>
@@ -721,7 +721,7 @@
 
       let stackHtml = '';
       if (isGoing && meProfile) {
-        stackHtml += `<div class="avatar-stack-item-box" title="You (${meProfile.full_name})">${renderGeoAvatar(meProfile.member_code, 26)}</div>`;
+        stackHtml += `<div class="avatar-stack-item-box" title="You (${meProfile.full_name})">${renderUserAvatarHtml(meProfile, 26)}</div>`;
       }
 
       return `

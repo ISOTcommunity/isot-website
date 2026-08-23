@@ -97,8 +97,10 @@
 
     <!-- User Header Preview -->
     <div class="avatar-preview-box">
-      <div id="avatarContainer"></div>
-      <h2 style="font-size: 1.4rem; color: #FFF; margin-bottom: 2px;" id="dispName">Member</h2>
+      <div id="avatarContainer" style="position: relative; cursor: pointer;" onclick="document.getElementById('avatarFileInput').click()" title="Click to upload profile photo"></div>
+      <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="handleAvatarFileSelect(event)" />
+      <div class="dim" style="font-size: 0.72rem; margin-top: 4px;"><i class="fa-solid fa-camera text-pink"></i> Tap avatar to change photo</div>
+      <h2 style="font-size: 1.4rem; color: #FFF; margin-top: 6px; margin-bottom: 2px;" id="dispName">Member</h2>
       <div class="dim" style="font-size: 0.85rem;" id="dispEmail">email@example.com</div>
       <div style="margin-top: 8px;">
         <span class="badge badge-socio" id="dispTier">ISOT Member</span>
@@ -229,7 +231,7 @@
       currentProfile = await requireAuth();
 
       // Top bar avatar
-      document.getElementById('headerAvatar').innerHTML = renderGeoAvatar(currentProfile.member_code, 36);
+      document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(currentProfile, 36);
 
       // Header preview
       document.getElementById('dispName').textContent = currentProfile.full_name || 'Member';
@@ -237,11 +239,7 @@
       document.getElementById('dispTier').textContent = TIER_LABEL[currentProfile.tier] || 'Community';
       document.getElementById('dispTier').className = currentProfile.tier === 'socio' ? 'badge badge-socio' : 'badge badge-participant';
 
-      if (currentProfile.avatar_url) {
-        document.getElementById('avatarContainer').innerHTML = `<img src="${currentProfile.avatar_url}" alt="Avatar" class="user-avatar-lg" />`;
-      } else {
-        document.getElementById('avatarContainer').innerHTML = renderGeoAvatar(currentProfile.member_code, 76);
-      }
+      renderAccountAvatarPreview();
 
       // Populate form
       document.getElementById('full_name').value = currentProfile.full_name || '';
@@ -257,6 +255,41 @@
       document.getElementById('profileForm').addEventListener('submit', handleProfileSave);
       document.getElementById('passwordForm').addEventListener('submit', handlePasswordSave);
       document.getElementById('saveConsentsBtn').addEventListener('click', handleConsentsSave);
+    }
+
+    function renderAccountAvatarPreview() {
+      if (currentProfile.avatar_url) {
+        document.getElementById('avatarContainer').innerHTML = `<img src="${currentProfile.avatar_url}" alt="Avatar" style="width:84px;height:84px;border-radius:50%;object-fit:cover;border:2px solid var(--pink);" />`;
+      } else {
+        document.getElementById('avatarContainer').innerHTML = renderGeoAvatar(currentProfile.member_code, 84);
+      }
+    }
+
+    async function handleAvatarFileSelect(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const alertEl = document.getElementById('alert');
+      setAlert(alertEl, '');
+
+      try {
+        const compressedDataUrl = await compressAvatarFile(file, 300, 0.82);
+
+        document.getElementById('avatarContainer').innerHTML = `<img src="${compressedDataUrl}" alt="Avatar" style="width:84px;height:84px;border-radius:50%;object-fit:cover;border:2px solid var(--pink);" />`;
+
+        const { error } = await db.from('profiles').update({ avatar_url: compressedDataUrl }).eq('id', currentProfile.id);
+        if (error) {
+          console.error(error);
+          setAlert(alertEl, 'Failed to update photo in database', 'error');
+        } else {
+          currentProfile.avatar_url = compressedDataUrl;
+          document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(currentProfile, 36);
+          setAlert(alertEl, 'Profile photo uploaded & compressed successfully!', 'success');
+        }
+      } catch (err) {
+        console.error(err);
+        setAlert(alertEl, 'Error compressing photo file', 'error');
+      }
     }
 
     async function loadConsents() {

@@ -479,7 +479,7 @@
       const me = await requireAuth();
 
       // Render topbar avatar
-      document.getElementById('userGeoAvatar').innerHTML = renderGeoAvatar(me.member_code, 40);
+      document.getElementById('userGeoAvatar').innerHTML = renderUserAvatarHtml(me, 40);
       document.getElementById('welcomeUser').textContent = `Hello, ${me.full_name?.split(' ')[0] || 'Member'}`;
       document.getElementById('userRoleBadge').textContent = ROLE_LABEL[me.staff_role] || TIER_LABEL[me.tier] || 'Community';
       document.getElementById('actionKaraokeIcon').innerHTML = getCategoryBadgeHtml('karaoke', 38);
