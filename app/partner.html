@@ -204,40 +204,57 @@
       const me = await requireAuth();
       document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(me, 36);
 
-      // High-DPI Retina HD Dark Vector Map centered on Turin city center
-      const map = L.map('mapContainer', { zoomControl: false }).setView([45.0620, 7.6890], 14);
+      const map = L.map('mapContainer', { zoomControl: false });
 
       L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png', {
         maxZoom: 19,
         attribution: '&copy; OpenStreetMap &copy; CARTO'
       }).addTo(map);
 
-      // Custom Glowing ISOT Markers
-      const pinkIcon = L.divIcon({
+      const icon = (glyph, cls = '') => L.divIcon({
         className: 'isot-pin-wrapper',
-        html: `<div class="isot-pin"><i class="fa-solid fa-martini-glass"></i></div>`,
+        html: `<div class="isot-pin ${cls}"><i class="fa-solid ${glyph}"></i></div>`,
         iconSize: [32, 32],
-        iconAnchor: [16, 16]
+        iconAnchor: [16, 16],
       });
 
-      const partyIcon = L.divIcon({
-        className: 'isot-pin-wrapper',
-        html: `<div class="isot-pin party"><i class="fa-solid fa-compact-disc"></i></div>`,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16]
+      // Pins come from the venues table. They used to be three hardcoded literals —
+      // Capodoglio sat 160m west of its real address, in the middle of a street rather
+      // than on Murazzi del Po, and adding a venue meant editing this file.
+      const { data: venues, error } = await db
+        .from('venues')
+        .select('name, address, neighbourhood, lat, lng, member_discount, active')
+        .eq('active', true);
+
+      if (error) {
+        console.error('Could not load venues:', error.message);
+        map.setView([45.0620, 7.6890], 14);
+        return;
+      }
+
+      // Only plot venues that actually have coordinates. An approximate pin on a
+      // partner's venue sends students to the wrong door.
+      const located = (venues || []).filter(v => v.lat != null && v.lng != null);
+
+      if (!located.length) {
+        map.setView([45.0620, 7.6890], 13);   // Turin centre, nothing to show yet
+        return;
+      }
+
+      located.forEach(v => {
+        const isClub = /club|zenit/i.test(v.name);
+        L.marker([v.lat, v.lng], { icon: icon(isClub ? 'fa-compact-disc' : 'fa-martini-glass', isClub ? 'party' : '') })
+          .addTo(map)
+          .bindPopup(
+            `<b>${escapeHtml(v.name)}</b><br>` +
+            `${escapeHtml(v.address || v.neighbourhood || '')}` +
+            (v.member_discount ? `<br>${escapeHtml(v.member_discount)}` : '')
+          );
       });
 
-      // 1. Rough San Salvario (Via Principe Tommaso 3)
-      L.marker([45.0601, 7.6835], { icon: pinkIcon }).addTo(map)
-        .bindPopup('<b>Rough San Salvario</b><br>Via Principe Tommaso 3 • 20% OFF');
-
-      // 2. Zenit Club (Piazza Vittorio Veneto 13/E)
-      L.marker([45.0648, 7.6955], { icon: partyIcon }).addTo(map)
-        .bindPopup('<b>Zenit Club</b><br>Piazza Vittorio Veneto 13/E • 20% OFF');
-
-      // 3. Capodoglio (Murazzi del Po 37)
-      L.marker([45.0610, 7.6920], { icon: pinkIcon }).addTo(map)
-        .bindPopup('<b>Capodoglio</b><br>Murazzi del Po 37 • 20% OFF');
+      // Fit every pin rather than centring on a guessed midpoint — with one venue
+      // off-screen it looked like the map was wrong.
+      map.fitBounds(located.map(v => [v.lat, v.lng]), { padding: [40, 40], maxZoom: 16 });
     }
 
     document.addEventListener('DOMContentLoaded', initPartnerMap);
