@@ -7,6 +7,17 @@
   <meta name="description" content="ISOT is a student-led non-profit organization (APS) in Turin connecting international students through cultural events, workshops, and social gatherings. Live globally, connect locally." />
   <meta name="keywords" content="ISOT, Turin international students, student life Turin, Politecnico di Torino, Università di Torino, international community Italy" />
   <meta name="google-site-verification" content="2_7C1MnimMiikTUk22cAbBMEJRV7Ft1-OlqayN7tduY" />
+
+  <script>
+    // Immediate auto-forward if Supabase email confirmation or OAuth lands on root domain
+    (function checkAuthRedirect() {
+      const h = window.location.hash || '';
+      const s = window.location.search || '';
+      if (h.includes('access_token') || h.includes('error') || s.includes('code') || s.includes('type=')) {
+        window.location.replace('/app/complete-profile.html' + s + h);
+      }
+    })();
+  </script>
   
   <link rel="canonical" href="https://isotcommunity.com/" />
   
