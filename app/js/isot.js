@@ -474,3 +474,122 @@ function googleButtonHtml(label = 'Continue with Google') {
       ${escapeHtml(label)}
     </button>`;
 }
+
+/* ---------------------------------------------------------------
+ * Global Notification & Event Invitation System
+ * ------------------------------------------------------------- */
+let localNotifications = JSON.parse(localStorage.getItem('isot_notifications') || '[]');
+
+function getUnreadNotificationsCount() {
+  return localNotifications.filter(n => !n.read).length;
+}
+
+function sendNotification(recipientId, type, title, message, eventId = null) {
+  const notif = {
+    id: 'n_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+    recipientId,
+    type, // 'friend_request', 'event_invite', 'friend_accept'
+    title,
+    message,
+    eventId,
+    read: false,
+    created_at: new Date().toISOString()
+  };
+
+  localNotifications.unshift(notif);
+  localStorage.setItem('isot_notifications', JSON.stringify(localNotifications));
+
+  if (db) {
+    db.from('notifications').insert({
+      user_id: recipientId,
+      type,
+      title,
+      message,
+      event_id: eventId,
+      read: false
+    }).then(() => {}).catch(e => console.warn('Notif DB sync:', e));
+  }
+  updateNotificationBellUI();
+}
+
+function updateNotificationBellUI() {
+  const bellBadge = document.getElementById('notifBellBadge');
+  if (bellBadge) {
+    const unread = getUnreadNotificationsCount();
+    if (unread > 0) {
+      bellBadge.style.display = 'inline-flex';
+      bellBadge.textContent = unread;
+    } else {
+      bellBadge.style.display = 'none';
+    }
+  }
+}
+
+function openNotificationCenterModal() {
+  let modal = document.getElementById('notifCenterModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.className = 'modal-backdrop';
+    modal.id = 'notifCenterModal';
+    modal.onclick = closeNotificationCenterModal;
+    modal.innerHTML = `
+      <div class="modal-sheet" onclick="event.stopPropagation()">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div>
+            <div class="eyebrow"><i class="fa-solid fa-bell text-pink"></i> Activity Center</div>
+            <h2 style="font-size:1.3rem;color:#FFF;margin-top:2px">Notifications &amp; Invites</h2>
+          </div>
+          <button type="button" onclick="closeNotificationCenterModal()" style="background:transparent;border:none;color:var(--text-muted);font-size:1.4rem;cursor:pointer">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div id="notifListContainer"></div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  renderNotificationsList();
+  modal.classList.add('active');
+
+  // Mark as read
+  localNotifications.forEach(n => { n.read = true; });
+  localStorage.setItem('isot_notifications', JSON.stringify(localNotifications));
+  updateNotificationBellUI();
+}
+
+function closeNotificationCenterModal() {
+  const modal = document.getElementById('notifCenterModal');
+  if (modal) modal.classList.remove('active');
+}
+
+function renderNotificationsList() {
+  const container = document.getElementById('notifListContainer');
+  if (!container) return;
+
+  if (!localNotifications.length) {
+    container.innerHTML = `
+      <div class="card card-glass" style="text-align:center;padding:30px">
+        <i class="fa-solid fa-bell-slash text-pink" style="font-size:1.8rem;margin-bottom:10px"></i>
+        <h3 style="font-size:1rem;color:#FFF;margin-bottom:4px">No Notifications Yet</h3>
+        <p class="dim" style="font-size:0.82rem">You'll see friend requests and event invites here!</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = localNotifications.map(n => `
+    <div class="card card-glass" style="margin-bottom:10px;padding:12px 14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div style="font-weight:700;color:#FFF;font-size:0.9rem;display:flex;align-items:center;gap:6px">
+          <i class="${n.type === 'event_invite' ? 'fa-solid fa-envelope-open-text text-pink' : 'fa-solid fa-user-plus text-green'}"></i>
+          ${escapeHtml(n.title)}
+        </div>
+        <span class="dim" style="font-size:0.7rem">${new Date(n.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+      </div>
+      <p class="dim" style="font-size:0.82rem;margin-bottom:8px">${escapeHtml(n.message)}</p>
+      ${n.eventId ? `<a href="events.html" class="btn btn-pink" style="width:auto;padding:4px 12px;font-size:0.75rem;display:inline-flex">View Event Schedule 📅</a>` : ''}
+    </div>
+  `).join('');
+}
+}

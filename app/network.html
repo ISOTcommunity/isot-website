@@ -173,7 +173,11 @@
       <i class="fa-solid fa-users-viewfinder text-pink"></i>
       <span>ISOT Network</span>
     </a>
-    <div style="display: flex; align-items: center; gap: 10px;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div id="notifBellBtn" onclick="openNotificationCenterModal()" style="position: relative; cursor: pointer; color: #FFF; font-size: 1.2rem; padding: 4px;" title="Notifications & Invites">
+        <i class="fa-solid fa-bell"></i>
+        <span id="notifBellBadge" style="display: none; position: absolute; top: -2px; right: -2px; background: var(--pink); color: #FFF; font-size: 0.65rem; font-weight: 700; border-radius: 10px; min-width: 16px; height: 16px; align-items: center; justify-content: center; padding: 0 4px; border: 1.5px solid var(--bg-dark);">0</span>
+      </div>
       <div id="headerAvatar" style="cursor: pointer;" data-open-drawer></div>
       <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: #FFF; font-size: 1.3rem; cursor: pointer; padding: 6px;">
         <i class="fa-solid fa-bars"></i>
@@ -198,6 +202,7 @@
     <div class="network-filter-bar">
       <button type="button" class="filter-pill active" id="fAll" onclick="setFilter('all')">All Students</button>
       <button type="button" class="filter-pill" id="fFriends" onclick="setFilter('friends')">My Friends (<span id="friendsCount">0</span>)</button>
+      <button type="button" class="filter-pill" id="fRequests" onclick="setFilter('requests')">Pending Requests (<span id="requestsCount">0</span>)</button>
       <button type="button" class="filter-pill" id="fUniTo" onclick="setFilter('unitto')">UniTo</button>
       <button type="button" class="filter-pill" id="fPoliTo" onclick="setFilter('polito')">PoliTo</button>
     </div>
@@ -264,11 +269,19 @@
       renderStudents();
     }
 
-    async function toggleFriendship(studentId) {
+    async function toggleFriendship(studentId, action = null) {
+      const student = allProfiles.find(p => p.id === studentId);
       const current = friendState[studentId];
       let newStatus = 'requested';
 
-      if (current === 'connected') {
+      if (action === 'accept') {
+        friendState[studentId] = 'connected';
+        newStatus = 'connected';
+        sendNotification(studentId, 'friend_accept', 'Friend Request Accepted 🤝', `${meProfile.full_name || 'A member'} accepted your friend request!`);
+      } else if (action === 'decline') {
+        delete friendState[studentId];
+        newStatus = 'deleted';
+      } else if (current === 'connected') {
         delete friendState[studentId];
         newStatus = 'deleted';
       } else if (current === 'requested') {
@@ -277,6 +290,7 @@
       } else {
         friendState[studentId] = 'requested';
         newStatus = 'requested';
+        sendNotification(studentId, 'friend_request', 'New Friend Request 📩', `${meProfile.full_name || 'A member'} sent you a friend request in ISOT Network.`);
       }
 
       localStorage.setItem('isot_friends', JSON.stringify(friendState));
@@ -299,6 +313,7 @@
       document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
       if (filter === 'all') document.getElementById('fAll').classList.add('active');
       if (filter === 'friends') document.getElementById('fFriends').classList.add('active');
+      if (filter === 'requests') document.getElementById('fRequests').classList.add('active');
       if (filter === 'unitto') document.getElementById('fUniTo').classList.add('active');
       if (filter === 'polito') document.getElementById('fPoliTo').classList.add('active');
       renderStudents();
@@ -311,7 +326,10 @@
     function renderStudents() {
       const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
       const connectedCount = Object.values(friendState).filter(s => s === 'connected').length;
+      const requestsCount = Object.values(friendState).filter(s => s === 'requested' || s === 'pending').length;
+
       document.getElementById('friendsCount').textContent = connectedCount;
+      document.getElementById('requestsCount').textContent = requestsCount;
 
       let list = allProfiles.filter(s => {
         const nameStr = (s.full_name || '').toLowerCase();
@@ -324,6 +342,7 @@
         }
 
         if (currentFilter === 'friends' && friendState[s.id] !== 'connected') return false;
+        if (currentFilter === 'requests' && friendState[s.id] !== 'requested' && friendState[s.id] !== 'pending') return false;
         if (currentFilter === 'unitto' && !uniStr.includes('unito')) return false;
         if (currentFilter === 'polito' && !uniStr.includes('polito')) return false;
 
