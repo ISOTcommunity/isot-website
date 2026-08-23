@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>ISOT Events Calendar</title>
+
+  <link rel="icon" href="../assets/LOGOS/scritta isot.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .event-card-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      margin-bottom: 16px;
+      display: flex;
+      gap: 16px;
+      transition: var(--transition-spring);
+    }
+    .event-card-item:hover {
+      border-color: var(--pink);
+      transform: translateY(-2px);
+    }
+    .event-date-box {
+      width: 54px;
+      height: 60px;
+      background: rgba(238, 9, 121, 0.12);
+      border: 1px solid var(--border-glow);
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .event-date-box .day-num {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #FFF;
+      line-height: 1;
+    }
+    .event-date-box .month-name {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--pink);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display: flex; align-items: center; gap: 8px;">
+      <i class="fa-solid fa-calendar-days text-pink"></i>
+      <span>ISOT Calendar</span>
+    </a>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div id="headerAvatar" style="cursor: pointer;" data-open-drawer></div>
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: #FFF; font-size: 1.3rem; cursor: pointer; padding: 6px;">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="shell">
+
+    <div style="margin-bottom: 18px;">
+      <div class="eyebrow"><i class="fa-solid fa-sparkles"></i> Weekly Turin Schedule</div>
+      <h1 style="font-size: 1.8rem; margin-top: 4px;">Upcoming Events</h1>
+    </div>
+
+    <!-- Events List -->
+    <div id="eventsList">
+      
+      <!-- Event Item 1: Monday Karaoke -->
+      <div class="event-card-item">
+        <div class="event-date-box">
+          <span class="day-num">MON</span>
+          <span class="month-name">21:00</span>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <img src="../assets/LOGOS/Karaoke.png" alt="Karaoke" style="width: 24px; height: 24px; border-radius: 6px; object-fit: cover;" />
+              <span class="badge badge-socio">20% OFF</span>
+            </div>
+            <span class="dim" style="font-size: 0.75rem;"><i class="fa-solid fa-clock"></i> Every Monday</span>
+          </div>
+          <h2 style="font-size: 1.1rem; color: #FFF; margin-bottom: 4px;">Monday Karaoke Night</h2>
+          <p class="dim" style="margin-bottom: 10px;"><i class="fa-solid fa-location-dot text-pink"></i> Rough Bar, Via San Salvario 12</p>
+          <a href="karaoke.html" class="btn btn-pink" style="width: auto; padding: 6px 14px; font-size: 0.8rem; display: inline-flex;">Join Song Queue <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i></a>
+        </div>
+      </div>
+
+      <!-- Event Item 2: Thursday Social Hub -->
+      <div class="event-card-item">
+        <div class="event-date-box">
+          <span class="day-num">THU</span>
+          <span class="month-name">20:00</span>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <img src="../assets/LOGOS/Tog.jpeg" alt="Together & Social" style="width: 24px; height: 24px; border-radius: 6px; object-fit: cover;" />
+              <span class="badge badge-socio">20% OFF</span>
+            </div>
+            <span class="dim" style="font-size: 0.75rem;"><i class="fa-solid fa-clock"></i> Every Thursday</span>
+          </div>
+          <h2 style="font-size: 1.1rem; color: #FFF; margin-bottom: 4px;">International Social Hub</h2>
+          <p class="dim" style="margin-bottom: 10px;"><i class="fa-solid fa-location-dot text-pink"></i> Capodoglio, Murazzi del Po 37</p>
+          <a href="partner.html" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem; display: inline-flex;">Venue Details</a>
+        </div>
+      </div>
+
+      <!-- Event Item 3: Saturday Pre-Party -->
+      <div class="event-card-item">
+        <div class="event-date-box">
+          <span class="day-num">SAT</span>
+          <span class="month-name">22:30</span>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <img src="../assets/LOGOS/Party.jpeg" alt="Party" style="width: 24px; height: 24px; border-radius: 6px; object-fit: cover;" />
+              <span class="badge badge-socio">20% OFF</span>
+            </div>
+            <span class="dim" style="font-size: 0.75rem;"><i class="fa-solid fa-clock"></i> Every Saturday</span>
+          </div>
+          <h2 style="font-size: 1.1rem; color: #FFF; margin-bottom: 4px;">Saturday Pre-Party &amp; DJ Night</h2>
+          <p class="dim" style="margin-bottom: 10px;"><i class="fa-solid fa-location-dot text-pink"></i> Rough Bar &amp; Partner Clubs</p>
+          <a href="profile.html" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem; display: inline-flex;">Show Member Card</a>
+        </div>
+      </div>
+
+      <!-- Event Item 4: Career Workshop -->
+      <div class="event-card-item">
+        <div class="event-date-box">
+          <span class="day-num">FRI</span>
+          <span class="month-name">18:00</span>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <img src="../assets/LOGOS/Busines.jpeg" alt="Career" style="width: 24px; height: 24px; border-radius: 6px; object-fit: cover;" />
+              <span class="badge badge-participant">WORKSHOP</span>
+            </div>
+            <span class="dim" style="font-size: 0.75rem;">Monthly</span>
+          </div>
+          <h2 style="font-size: 1.1rem; color: #FFF; margin-bottom: 4px;">CV &amp; Italian Work Permit Workshop</h2>
+          <p class="dim" style="margin-bottom: 10px;"><i class="fa-solid fa-location-dot text-pink"></i> UniTo Campus Luigi Einaudi</p>
+          <a href="../blog.html" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem; display: inline-flex;">Read Guides</a>
+        </div>
+      </div>
+
+      <!-- Event Item 5: Sports Day Trip -->
+      <div class="event-card-item">
+        <div class="event-date-box">
+          <span class="day-num">SUN</span>
+          <span class="month-name">09:00</span>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <img src="../assets/LOGOS/Sport.jpeg" alt="Sports" style="width: 24px; height: 24px; border-radius: 6px; object-fit: cover;" />
+              <span class="badge badge-participant">DAY TRIP</span>
+            </div>
+            <span class="dim" style="font-size: 0.75rem;">Bi-Weekly</span>
+          </div>
+          <h2 style="font-size: 1.1rem; color: #FFF; margin-bottom: 4px;">Alps Hiking &amp; Gran Paradiso Trip</h2>
+          <p class="dim" style="margin-bottom: 10px;"><i class="fa-solid fa-location-dot text-pink"></i> Bus Departure from Porta Nuova</p>
+          <a href="home.html" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem; display: inline-flex;">Back to Hub</a>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="tabbar">
+    <a href="home.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 011-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </a>
+    <a href="profile.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 9h.01M9 9h.01M12 12h.01M12 15h.01M3 20.4V3.6A1.6 1.6 0 014.6 2h14.8A1.6 1.6 0 0121 3.6v16.8M3 20.4h18"/></svg>
+      Card
+    </a>
+    <a href="events.html" class="tab-item active">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Calendar
+    </a>
+  </nav>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+  <script>
+    async function initEvents() {
+      const me = await requireAuth();
+      document.getElementById('headerAvatar').innerHTML = renderGeoAvatar(me.member_code, 36);
+    }
+    document.addEventListener('DOMContentLoaded', initEvents);
+  </script>
+</body>
+</html>
