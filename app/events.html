@@ -512,25 +512,7 @@
       let html = '';
 
       if (isGoing && meProfile) {
-        const nation = meProfile.nationality || 'Not specified';
-        const uni = meProfile.university || 'Turin Student';
-        const langs = meProfile.languages || 'English, Italian';
-
-        html += `
-          <div class="attendee-card">
-            <div style="width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0">
-              ${renderUserAvatarHtml(meProfile, 44)}
-            </div>
-            <div class="attendee-info">
-              <div class="attendee-name">${escapeHtml(meProfile.full_name || 'Member')} <span class="badge badge-socio" style="font-size:0.65rem;margin-left:4px">YOU</span></div>
-              <div class="attendee-meta-pills">
-                <span class="meta-pill"><i class="fa-solid fa-earth-americas text-pink"></i> ${escapeHtml(nation)}</span>
-                <span class="meta-pill"><i class="fa-solid fa-graduation-cap text-gold"></i> ${escapeHtml(uni)}</span>
-                <span class="meta-pill"><i class="fa-solid fa-comments text-green"></i> ${escapeHtml(langs)}</span>
-              </div>
-            </div>
-          </div>
-        `;
+        html += renderMemberCardHtml(meProfile, true);
       }
 
       if (!isGoing) {

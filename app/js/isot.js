@@ -86,6 +86,47 @@ function renderGeoAvatar(memberCode, size = 44) {
 }
 
 /**
+ * Renders a unified Apple-Grade Member Card HTML component
+ * used consistently across Home, Events ("Who's Going"), Network, and Profile pages.
+ */
+function renderMemberCardHtml(profile, isCurrentUser = false) {
+  if (!profile) return '';
+
+  const name = escapeHtml(profile.full_name || 'Member');
+  const nation = escapeHtml(profile.nationality || 'International Student');
+  const uni = escapeHtml(profile.university || 'Turin Student');
+  const langs = escapeHtml(profile.languages || 'English, Italian');
+  const tier = profile.tier === 'socio' ? 'badge-socio' : 'badge-participant';
+  const tierText = TIER_LABEL[profile.tier] || 'Member';
+
+  return `
+    <div class="card card-glass student-card" style="display:flex;align-items:center;gap:14px;padding:14px;margin-bottom:10px;">
+      <div style="flex-shrink:0;">
+        ${renderUserAvatarHtml(profile, 48)}
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+          <span style="font-weight:700;color:#FFF;font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</span>
+          <span class="badge ${tier}" style="font-size:0.62rem;padding:2px 8px;">${tierText}</span>
+          ${isCurrentUser ? `<span class="badge badge-socio" style="font-size:0.62rem;padding:2px 6px;">YOU</span>` : ''}
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;">
+          <span class="meta-pill" style="font-size:0.73rem;padding:2px 8px;background:rgba(255,255,255,0.06);border-radius:12px;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;">
+            <i class="fa-solid fa-earth-americas text-pink"></i> ${nation}
+          </span>
+          <span class="meta-pill" style="font-size:0.73rem;padding:2px 8px;background:rgba(255,255,255,0.06);border-radius:12px;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;">
+            <i class="fa-solid fa-graduation-cap text-gold"></i> ${uni}
+          </span>
+          <span class="meta-pill" style="font-size:0.73rem;padding:2px 8px;background:rgba(255,255,255,0.06);border-radius:12px;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;">
+            <i class="fa-solid fa-comments text-green"></i> ${langs}
+          </span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/**
  * Compresses an uploaded image file down to maxSide x maxSide pixels (default 300x300)
  * returns a lightweight JPEG data URL (~30-40KB)
  */
