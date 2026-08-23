@@ -549,18 +549,11 @@
       try {
         const { data } = await db.from('profiles').select('*').neq('id', meProfile ? meProfile.id : '');
         if (data && data.length) {
-          friendsList = data.filter(p => connectedIds.includes(p.id) || connectedIds.length === 0);
+          // Strictly filter ONLY connected/accepted friends
+          friendsList = data.filter(p => connectedIds.includes(p.id));
         }
       } catch (e) {
         console.warn('Friends fetch note:', e);
-      }
-
-      if (!friendsList.length) {
-        friendsList = [
-          { id: 'f1', full_name: 'Sofia Rossi', nationality: 'Italy 🇮🇹', university: 'UniTo' },
-          { id: 'f2', full_name: 'Alex Vance', nationality: 'United Kingdom 🇬🇧', university: 'PoliTo' },
-          { id: 'f3', full_name: 'Maria Silva', nationality: 'Brazil 🇧🇷', university: 'SAA Management' }
-        ];
       }
 
       let modal = document.getElementById('inviteFriendsModal');
@@ -578,7 +571,7 @@
               </div>
               <button type="button" onclick="document.getElementById('inviteFriendsModal').classList.remove('active')" style="background:transparent;border:none;color:var(--text-muted);font-size:1.3rem;cursor:pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <p class="dim" style="font-size:0.82rem;margin-bottom:14px">Select which friends you want to invite to this event:</p>
+            <p class="dim" style="font-size:0.82rem;margin-bottom:14px">Select which connected friends you want to invite:</p>
             <div id="friendsInviteListContainer" style="display:flex;flex-direction:column;gap:10px;max-height:50vh;overflow-y:auto;"></div>
           </div>
         `;
@@ -588,25 +581,42 @@
       document.getElementById('inviteModalTitle').textContent = `Invite to ${eventTitle}`;
 
       const container = document.getElementById('friendsInviteListContainer');
-      container.innerHTML = friendsList.map(f => {
-        const key = `${eventId}_${f.id}`;
-        const isAlreadyInvited = !!invitedFriendsMap[key];
 
-        return `
-          <div class="card card-glass" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;margin:0;">
-            <div style="display:flex;align-items:center;gap:12px">
-              ${renderUserAvatarHtml(f, 42)}
-              <div>
-                <div style="font-weight:700;color:#FFF;font-size:0.9rem">${escapeHtml(f.full_name || 'Member')}</div>
-                <div class="dim" style="font-size:0.75rem">${escapeHtml(f.nationality || 'Turin Student')} • ${escapeHtml(f.university || 'UniTo')}</div>
-              </div>
-            </div>
-            <button type="button" id="btnInvite_${key}" class="btn ${isAlreadyInvited ? 'btn-outline' : 'btn-pink'}" style="width:auto;padding:6px 14px;font-size:0.78rem;" onclick="sendSingleFriendInvite('${f.id}', '${escapeHtml(f.full_name)}', '${escapeHtml(eventTitle)}', ${eventId}, '${key}')">
-              ${isAlreadyInvited ? '<i class="fa-solid fa-check text-green"></i> Invited' : '<i class="fa-solid fa-envelope"></i> Invite 💌'}
-            </button>
+      if (!friendsList.length) {
+        container.innerHTML = `
+          <div class="card card-glass" style="text-align:center;padding:26px">
+            <i class="fa-solid fa-user-group text-pink" style="font-size:1.8rem;margin-bottom:10px"></i>
+            <h4 style="font-size:1rem;color:#FFF;margin-bottom:4px">No Connected Friends Yet</h4>
+            <p class="dim" style="font-size:0.82rem;margin-bottom:14px">Connect with students in the ISOT Network first to invite them to events!</p>
+            <a href="network.html" class="btn btn-pink" style="width:auto;display:inline-flex;padding:6px 16px;font-size:0.82rem;">
+              <i class="fa-solid fa-users"></i> Go to ISOT Network 🌐
+            </a>
           </div>
         `;
-      }).join('');
+      } else {
+        container.innerHTML = friendsList.map(f => {
+          const key = `${eventId}_${f.id}`;
+          const isAlreadyInvited = !!invitedFriendsMap[key];
+
+          return `
+            <div class="card card-glass" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;margin:0;">
+              <div style="display:flex;align-items:center;gap:12px">
+                ${renderUserAvatarHtml(f, 42)}
+                <div>
+                  <div style="font-weight:700;color:#FFF;font-size:0.9rem">${escapeHtml(f.full_name || 'Member')}</div>
+                  <div class="dim" style="font-size:0.75rem">${escapeHtml(f.nationality || 'Turin Student')} • ${escapeHtml(f.university || 'UniTo')}</div>
+                </div>
+              </div>
+              <button type="button" id="btnInvite_${key}" class="btn ${isAlreadyInvited ? 'btn-outline' : 'btn-pink'}" style="width:auto;padding:6px 14px;font-size:0.78rem;" onclick="sendSingleFriendInvite('${f.id}', '${escapeHtml(f.full_name)}', '${escapeHtml(eventTitle)}', ${eventId}, '${key}')">
+                ${isAlreadyInvited ? '<i class="fa-solid fa-check text-green"></i> Invited' : '<i class="fa-solid fa-envelope"></i> Invite 💌'}
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      modal.classList.add('active');
+    }
 
       modal.classList.add('active');
     }
