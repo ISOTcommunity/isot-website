@@ -44,33 +44,108 @@
       box-shadow: 0 4px 12px rgba(238, 9, 121, 0.3);
     }
 
-    .month-filter-strip {
+    /* Month Navigation Controls */
+    .cal-nav-header {
       display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      margin: 0 -18px 20px;
-      padding: 0 18px 4px;
-      scrollbar-width: none;
-    }
-    .month-filter-strip::-webkit-scrollbar { display: none; }
-    .month-pill {
-      flex-shrink: 0;
-      padding: 6px 14px;
-      border-radius: var(--radius-full);
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
       background: var(--bg-card);
       border: 1px solid var(--border-light);
-      color: var(--text-muted);
-      font-size: 0.82rem;
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+    }
+    .cal-nav-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-light);
+      color: #FFF;
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       transition: var(--transition-fast);
     }
-    .month-pill.active {
-      background: rgba(238, 9, 121, 0.15);
+    .cal-nav-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
       border-color: var(--pink);
-      color: var(--pink);
+    }
+    .cal-month-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #FFF;
     }
 
+    /* 7-Column Month Calendar Matrix */
+    .cal-matrix {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    .cal-matrix-head {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--pink);
+      text-align: center;
+      padding: 6px 0;
+      text-transform: uppercase;
+    }
+    .cal-matrix-day {
+      min-height: 48px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 2px;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: var(--transition-fast);
+    }
+    .cal-matrix-day:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .cal-matrix-day.other-month {
+      opacity: 0.2;
+      pointer-events: none;
+    }
+    .cal-matrix-day.has-event {
+      border-color: rgba(238, 9, 121, 0.4);
+      background: rgba(238, 9, 121, 0.12);
+    }
+    .cal-matrix-day.selected {
+      border-color: var(--pink);
+      background: rgba(238, 9, 121, 0.28);
+      box-shadow: 0 0 14px rgba(238, 9, 121, 0.4);
+    }
+    .cal-day-num {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #FFF;
+    }
+    .cal-event-dots {
+      display: flex;
+      gap: 3px;
+    }
+    .cal-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--pink);
+    }
+    .cal-dot.party { background: #FF6A00; }
+    .cal-dot.karaoke { background: #EBC17F; }
+
+    /* List Event Cards */
     .event-card-item {
       background: var(--bg-card);
       border: 1px solid var(--border-light);
@@ -111,52 +186,6 @@
       text-transform: uppercase;
       margin-top: 3px;
     }
-
-    /* Monthly Grid View */
-    .monthly-grid {
-      display: grid;
-      grid-template-columns: repeat(1, 1fr);
-      gap: 16px;
-    }
-    .month-section-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-light);
-      border-radius: var(--radius-md);
-      padding: 18px;
-    }
-    .month-section-header {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--pink);
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border-light);
-      padding-bottom: 10px;
-    }
-
-    /* Weekly View Cards */
-    .week-day-group {
-      margin-bottom: 20px;
-    }
-    .week-day-header {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .week-day-header::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border-light);
-    }
   </style>
 </head>
 <body>
@@ -180,7 +209,7 @@
   <main class="shell">
 
     <div style="margin-bottom: 16px;">
-      <div class="eyebrow"><i class="fa-solid fa-sparkles"></i> Official Schedule (29 Aug – Dec 2026)</div>
+      <div class="eyebrow"><i class="fa-solid fa-sparkles"></i> Official Schedule Matrix</div>
       <h1 style="font-size: 1.8rem; margin-top: 4px;">ISOT Calendar</h1>
     </div>
 
@@ -197,18 +226,8 @@
       </button>
     </div>
 
-    <!-- Month Filter Pills -->
-    <div class="month-filter-strip" id="monthFilterStrip">
-      <button type="button" class="month-pill active" onclick="filterMonth('all')">All Months</button>
-      <button type="button" class="month-pill" onclick="filterMonth('aug')">August</button>
-      <button type="button" class="month-pill" onclick="filterMonth('sep')">September</button>
-      <button type="button" class="month-pill" onclick="filterMonth('oct')">October</button>
-      <button type="button" class="month-pill" onclick="filterMonth('nov')">November</button>
-      <button type="button" class="month-pill" onclick="filterMonth('dec')">December</button>
-    </div>
-
-    <!-- Events Container -->
-    <div id="eventsContainer"></div>
+    <!-- Calendar View Container -->
+    <div id="calendarViewContainer"></div>
 
   </main>
 
@@ -234,69 +253,72 @@
   <script>
     // Authentic ISOT Events Dataset (Starting August 29 – December 2026)
     const EVENTS_DATA = [
-      // AUGUST (Starting 29 Aug)
-      { id: 100, date: '2026-08-29', month: 'aug', dayName: 'SAT', dayNum: '29', title: 'ISOT Pre-Party', venue: 'Rough Bar & Partner Clubs', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Season Kickoff 🎉' },
-      { id: 101, date: '2026-08-31', month: 'aug', dayName: 'MON', dayNum: '31', title: 'ISOT Karaoke Night', venue: 'Rough Bar, Via San Salvario 12', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      // AUGUST 2026
+      { id: 100, date: '2026-08-29', year: 2026, monthIdx: 7, dayNum: 29, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar & Partner Clubs', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Season Kickoff 🎉' },
+      { id: 101, date: '2026-08-31', year: 2026, monthIdx: 7, dayNum: 31, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar, Via San Salvario 12', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
 
-      // SEPTEMBER
-      { id: 102, date: '2026-09-05', month: 'sep', dayName: 'SAT', dayNum: '05', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 103, date: '2026-09-07', month: 'sep', dayName: 'MON', dayNum: '07', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 1, date: '2026-09-11', month: 'sep', dayName: 'FRI', dayNum: '11', title: 'ISOT Pre-Uni Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Pre-Uni Semester Opener' },
-      { id: 104, date: '2026-09-12', month: 'sep', dayName: 'SAT', dayNum: '12', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 105, date: '2026-09-14', month: 'sep', dayName: 'MON', dayNum: '14', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 106, date: '2026-09-19', month: 'sep', dayName: 'SAT', dayNum: '19', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 107, date: '2026-09-21', month: 'sep', dayName: 'MON', dayNum: '21', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 2, date: '2026-09-25', month: 'sep', dayName: 'FRI', dayNum: '25', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 3, date: '2026-09-26', month: 'sep', dayName: 'SAT', dayNum: '26', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 4, date: '2026-09-28', month: 'sep', dayName: 'MON', dayNum: '28', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      // SEPTEMBER 2026
+      { id: 102, date: '2026-09-05', year: 2026, monthIdx: 8, dayNum: 5, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 103, date: '2026-09-07', year: 2026, monthIdx: 8, dayNum: 7, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 1, date: '2026-09-11', year: 2026, monthIdx: 8, dayNum: 11, dayName: 'FRI', title: 'ISOT Pre-Uni Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Pre-Uni Semester Opener' },
+      { id: 104, date: '2026-09-12', year: 2026, monthIdx: 8, dayNum: 12, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 105, date: '2026-09-14', year: 2026, monthIdx: 8, dayNum: 14, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 106, date: '2026-09-19', year: 2026, monthIdx: 8, dayNum: 19, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 107, date: '2026-09-21', year: 2026, monthIdx: 8, dayNum: 21, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 2, date: '2026-09-25', year: 2026, monthIdx: 8, dayNum: 25, dayName: 'FRI', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 3, date: '2026-09-26', year: 2026, monthIdx: 8, dayNum: 26, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 4, date: '2026-09-28', year: 2026, monthIdx: 8, dayNum: 28, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
 
-      // OCTOBER
-      { id: 5, date: '2026-10-03', month: 'oct', dayName: 'SAT', dayNum: '03', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 6, date: '2026-10-05', month: 'oct', dayName: 'MON', dayNum: '05', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 7, date: '2026-10-09', month: 'oct', dayName: 'FRI', dayNum: '09', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 8, date: '2026-10-10', month: 'oct', dayName: 'SAT', dayNum: '10', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 9, date: '2026-10-12', month: 'oct', dayName: 'MON', dayNum: '12', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 10, date: '2026-10-17', month: 'oct', dayName: 'SAT', dayNum: '17', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 11, date: '2026-10-19', month: 'oct', dayName: 'MON', dayNum: '19', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 12, date: '2026-10-24', month: 'oct', dayName: 'SAT', dayNum: '24', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 13, date: '2026-10-26', month: 'oct', dayName: 'MON', dayNum: '26', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 14, date: '2026-10-30', month: 'oct', dayName: 'FRI', dayNum: '30', title: 'ISOT Halloween Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Halloween Edition 🎃' },
-      { id: 15, date: '2026-10-31', month: 'oct', dayName: 'SAT', dayNum: '31', title: 'ISOT Pre-Party & Costume Night', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      // OCTOBER 2026
+      { id: 5, date: '2026-10-03', year: 2026, monthIdx: 9, dayNum: 3, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 6, date: '2026-10-05', year: 2026, monthIdx: 9, dayNum: 5, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 7, date: '2026-10-09', year: 2026, monthIdx: 9, dayNum: 9, dayName: 'FRI', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 8, date: '2026-10-10', year: 2026, monthIdx: 9, dayNum: 10, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 9, date: '2026-10-12', year: 2026, monthIdx: 9, dayNum: 12, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 10, date: '2026-10-17', year: 2026, monthIdx: 9, dayNum: 17, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 11, date: '2026-10-19', year: 2026, monthIdx: 9, dayNum: 19, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 12, date: '2026-10-24', year: 2026, monthIdx: 9, dayNum: 24, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 13, date: '2026-10-26', year: 2026, monthIdx: 9, dayNum: 26, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 14, date: '2026-10-30', year: 2026, monthIdx: 9, dayNum: 30, dayName: 'FRI', title: 'ISOT Halloween Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Halloween Edition 🎃' },
+      { id: 15, date: '2026-10-31', year: 2026, monthIdx: 9, dayNum: 31, dayName: 'SAT', title: 'ISOT Pre-Party & Costume Night', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
 
-      // NOVEMBER
-      { id: 16, date: '2026-11-02', month: 'nov', dayName: 'MON', dayNum: '02', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 17, date: '2026-11-06', month: 'nov', dayName: 'FRI', dayNum: '06', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 18, date: '2026-11-07', month: 'nov', dayName: 'SAT', dayNum: '07', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 19, date: '2026-11-09', month: 'nov', dayName: 'MON', dayNum: '09', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 20, date: '2026-11-14', month: 'nov', dayName: 'SAT', dayNum: '14', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 21, date: '2026-11-16', month: 'nov', dayName: 'MON', dayNum: '16', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 22, date: '2026-11-20', month: 'nov', dayName: 'FRI', dayNum: '20', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 23, date: '2026-11-21', month: 'nov', dayName: 'SAT', dayNum: '21', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 24, date: '2026-11-23', month: 'nov', dayName: 'MON', dayNum: '23', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 25, date: '2026-11-28', month: 'nov', dayName: 'SAT', dayNum: '28', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 26, date: '2026-11-30', month: 'nov', dayName: 'MON', dayNum: '30', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      // NOVEMBER 2026
+      { id: 16, date: '2026-11-02', year: 2026, monthIdx: 10, dayNum: 2, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 17, date: '2026-11-06', year: 2026, monthIdx: 10, dayNum: 6, dayName: 'FRI', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 18, date: '2026-11-07', year: 2026, monthIdx: 10, dayNum: 7, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 19, date: '2026-11-09', year: 2026, monthIdx: 10, dayNum: 9, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 20, date: '2026-11-14', year: 2026, monthIdx: 10, dayNum: 14, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 21, date: '2026-11-16', year: 2026, monthIdx: 10, dayNum: 16, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 22, date: '2026-11-20', year: 2026, monthIdx: 10, dayNum: 20, dayName: 'FRI', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 23, date: '2026-11-21', year: 2026, monthIdx: 10, dayNum: 21, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 24, date: '2026-11-23', year: 2026, monthIdx: 10, dayNum: 23, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 25, date: '2026-11-28', year: 2026, monthIdx: 10, dayNum: 28, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 26, date: '2026-11-30', year: 2026, monthIdx: 10, dayNum: 30, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
 
-      // DECEMBER
-      { id: 27, date: '2026-12-04', month: 'dec', dayName: 'FRI', dayNum: '04', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 28, date: '2026-12-05', month: 'dec', dayName: 'SAT', dayNum: '05', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 29, date: '2026-12-07', month: 'dec', dayName: 'MON', dayNum: '07', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 30, date: '2026-12-12', month: 'dec', dayName: 'SAT', dayNum: '12', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 31, date: '2026-12-14', month: 'dec', dayName: 'MON', dayNum: '14', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 32, date: '2026-12-18', month: 'dec', dayName: 'FRI', dayNum: '18', title: 'ISOT Winter Gala & Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Semester Finale ❄️' },
-      { id: 33, date: '2026-12-19', month: 'dec', dayName: 'SAT', dayNum: '19', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 34, date: '2026-12-21', month: 'dec', dayName: 'MON', dayNum: '21', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' }
+      // DECEMBER 2026
+      { id: 27, date: '2026-12-04', year: 2026, monthIdx: 11, dayNum: 4, dayName: 'FRI', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 28, date: '2026-12-05', year: 2026, monthIdx: 11, dayNum: 5, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 29, date: '2026-12-07', year: 2026, monthIdx: 11, dayNum: 7, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 30, date: '2026-12-12', year: 2026, monthIdx: 11, dayNum: 12, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 31, date: '2026-12-14', year: 2026, monthIdx: 11, dayNum: 14, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 32, date: '2026-12-18', year: 2026, monthIdx: 11, dayNum: 18, dayName: 'FRI', title: 'ISOT Winter Gala & Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Semester Finale ❄️' },
+      { id: 33, date: '2026-12-19', year: 2026, monthIdx: 11, dayNum: 19, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 34, date: '2026-12-21', year: 2026, monthIdx: 11, dayNum: 21, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' }
     ];
 
-    const MONTH_LABELS = { aug: 'August 2026', sep: 'September 2026', oct: 'October 2026', nov: 'November 2026', dec: 'December 2026' };
+    const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
     let currentView = 'list';
-    let currentMonth = 'all';
+    let currYear = 2026;
+    let currMonthIdx = 8; // September 2026
+    let currWeekStart = new Date(2026, 8, 21); // Week of Sep 21, 2026
+    let selectedDateStr = null;
 
     async function initEventsCalendar() {
       const me = await requireAuth();
       document.getElementById('headerAvatar').innerHTML = renderGeoAvatar(me.member_code, 36);
 
-      renderEvents();
+      renderMainView();
     }
 
     function setViewMode(mode) {
@@ -305,40 +327,186 @@
       if (mode === 'list') document.getElementById('btnListView').classList.add('active');
       if (mode === 'weekly') document.getElementById('btnWeeklyView').classList.add('active');
       if (mode === 'monthly') document.getElementById('btnMonthlyView').classList.add('active');
-      renderEvents();
+      renderMainView();
     }
 
-    function filterMonth(m) {
-      currentMonth = m;
-      document.querySelectorAll('.month-pill').forEach(pill => pill.classList.remove('active'));
-      event.target.classList.add('active');
-      renderEvents();
+    function changeMonth(delta) {
+      currMonthIdx += delta;
+      if (currMonthIdx < 7) currMonthIdx = 7; // Aug 2026
+      if (currMonthIdx > 11) currMonthIdx = 11; // Dec 2026
+      selectedDateStr = null;
+      renderMainView();
     }
 
-    function getFilteredEvents() {
-      if (currentMonth === 'all') return EVENTS_DATA;
-      return EVENTS_DATA.filter(item => item.month === currentMonth);
+    function changeWeek(deltaDays) {
+      currWeekStart.setDate(currWeekStart.getDate() + deltaDays);
+      renderMainView();
     }
 
-    function renderEvents() {
-      const container = document.getElementById('eventsContainer');
-      const items = getFilteredEvents();
-
-      if (!items.length) {
-        container.innerHTML = '<div class="card card-glass" style="text-align:center;padding:30px">No events for this selection.</div>';
-        return;
-      }
+    function renderMainView() {
+      const container = document.getElementById('calendarViewContainer');
 
       if (currentView === 'list') {
-        container.innerHTML = items.map(item => renderEventItemHtml(item)).join('');
+        container.innerHTML = renderListView();
       } else if (currentView === 'weekly') {
-        container.innerHTML = renderWeeklyView(items);
+        container.innerHTML = renderWeeklyMatrixView();
       } else if (currentView === 'monthly') {
-        container.innerHTML = renderMonthlyView(items);
+        container.innerHTML = renderMonthlyMatrixView();
       }
     }
 
-    function renderEventItemHtml(item) {
+    /* -------------------------------------------------------------
+     * 1. MONTHLY MATRIX VIEW (7 Columns: Mon-Sun)
+     * ------------------------------------------------------------- */
+    function renderMonthlyMatrixView() {
+      const firstDay = new Date(currYear, currMonthIdx, 1);
+      const totalDays = new Date(currYear, currMonthIdx + 1, 0).getDate();
+      
+      // Calculate Monday start offset (0 = Mon, 6 = Sun)
+      const firstDayOfWeek = (firstDay.getDay() + 6) % 7;
+
+      let html = `
+        <div class="cal-nav-header">
+          <button type="button" class="cal-nav-btn" onclick="changeMonth(-1)" ${currMonthIdx <= 7 ? 'disabled style="opacity:0.4"' : ''}>
+            <i class="fa-solid fa-chevron-left"></i> Prev Month
+          </button>
+          <div class="cal-month-title">${MONTH_NAMES[currMonthIdx]} ${currYear}</div>
+          <button type="button" class="cal-nav-btn" onclick="changeMonth(1)" ${currMonthIdx >= 11 ? 'disabled style="opacity:0.4"' : ''}>
+            Next Month <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <div class="cal-matrix">
+          <div class="cal-matrix-head">MON</div>
+          <div class="cal-matrix-head">TUE</div>
+          <div class="cal-matrix-head">WED</div>
+          <div class="cal-matrix-head">THU</div>
+          <div class="cal-matrix-head">FRI</div>
+          <div class="cal-matrix-head">SAT</div>
+          <div class="cal-matrix-head">SUN</div>
+      `;
+
+      // Previous month padding cells
+      for (let i = 0; i < firstDayOfWeek; i++) {
+        html += `<div class="cal-matrix-day other-month"><span class="cal-day-num"></span></div>`;
+      }
+
+      // Days of the month
+      for (let day = 1; day <= totalDays; day++) {
+        const mStr = String(currMonthIdx + 1).padStart(2, '0');
+        const dStr = String(day).padStart(2, '0');
+        const dateStr = `${currYear}-${mStr}-${dStr}`;
+
+        const dayEvents = EVENTS_DATA.filter(e => e.date === dateStr);
+        const hasEvents = dayEvents.length > 0;
+        const isSelected = selectedDateStr === dateStr;
+
+        let dotsHtml = '';
+        if (hasEvents) {
+          dotsHtml = '<div class="cal-event-dots">' + dayEvents.map(e => `<span class="cal-dot ${e.cat}"></span>`).join('') + '</div>';
+        }
+
+        html += `
+          <div class="cal-matrix-day ${hasEvents ? 'has-event' : ''} ${isSelected ? 'selected' : ''}" onclick="selectDate('${dateStr}')">
+            <span class="cal-day-num">${day}</span>
+            ${dotsHtml}
+          </div>
+        `;
+      }
+
+      html += `</div>`;
+
+      // Render selected day events below matrix
+      if (selectedDateStr) {
+        const selectedEvents = EVENTS_DATA.filter(e => e.date === selectedDateStr);
+        html += `
+          <div class="card card-glass" style="margin-top:16px">
+            <h3 style="margin-bottom:12px;font-size:1rem;color:var(--pink)">
+              <i class="fa-solid fa-calendar-day"></i> Events on ${selectedDateStr}
+            </h3>
+            ${selectedEvents.length ? selectedEvents.map(e => renderEventCardHtml(e)).join('') : '<div class="dim">No events scheduled for this day.</div>'}
+          </div>
+        `;
+      } else {
+        // Default show all events in this month
+        const monthEvents = EVENTS_DATA.filter(e => e.monthIdx === currMonthIdx);
+        html += `
+          <div style="margin-top:16px">
+            <div class="eyebrow" style="margin-bottom:10px">${MONTH_NAMES[currMonthIdx]} Schedule Feed</div>
+            ${monthEvents.map(e => renderEventCardHtml(e)).join('')}
+          </div>
+        `;
+      }
+
+      return html;
+    }
+
+    function selectDate(dateStr) {
+      selectedDateStr = selectedDateStr === dateStr ? null : dateStr;
+      renderMainView();
+    }
+
+    /* -------------------------------------------------------------
+     * 2. WEEKLY MATRIX VIEW (Step Week by Week)
+     * ------------------------------------------------------------- */
+    function renderWeeklyMatrixView() {
+      const weekStart = new Date(currWeekStart);
+      const weekEnd = new Date(currWeekStart);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+
+      const startStr = `${weekStart.getDate()} ${MONTH_NAMES[weekStart.getMonth()].slice(0,3)}`;
+      const endStr = `${weekEnd.getDate()} ${MONTH_NAMES[weekEnd.getMonth()].slice(0,3)} ${weekEnd.getFullYear()}`;
+
+      let html = `
+        <div class="cal-nav-header">
+          <button type="button" class="cal-nav-btn" onclick="changeWeek(-7)">
+            <i class="fa-solid fa-chevron-left"></i> Prev Week
+          </button>
+          <div class="cal-month-title">${startStr} – ${endStr}</div>
+          <button type="button" class="cal-nav-btn" onclick="changeWeek(7)">
+            Next Week <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      `;
+
+      // Collect 7 days of this week
+      let weekEventsFound = 0;
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(weekStart);
+        d.setDate(d.getDate() + i);
+
+        const yStr = d.getFullYear();
+        const mStr = String(d.getMonth() + 1).padStart(2, '0');
+        const dNum = String(d.getDate()).padStart(2, '0');
+        const dateStr = `${yStr}-${mStr}-${dNum}`;
+
+        const dayEvents = EVENTS_DATA.filter(e => e.date === dateStr);
+        if (dayEvents.length) {
+          weekEventsFound += dayEvents.length;
+          html += `
+            <div class="week-day-group">
+              <div class="week-day-header"><i class="fa-solid fa-calendar-day text-pink"></i> ${d.toDateString().slice(0,10)}</div>
+              ${dayEvents.map(e => renderEventCardHtml(e)).join('')}
+            </div>
+          `;
+        }
+      }
+
+      if (!weekEventsFound) {
+        html += `<div class="card card-glass" style="text-align:center;padding:30px">No ISOT events scheduled for this week.</div>`;
+      }
+
+      return html;
+    }
+
+    /* -------------------------------------------------------------
+     * 3. LIST FEED VIEW
+     * ------------------------------------------------------------- */
+    function renderListView() {
+      return EVENTS_DATA.map(item => renderEventCardHtml(item)).join('');
+    }
+
+    function renderEventCardHtml(item) {
       return `
         <div class="event-card-item">
           <div class="event-date-box">
@@ -362,49 +530,6 @@
           </div>
         </div>
       `;
-    }
-
-    function renderWeeklyView(items) {
-      const days = ['MON', 'FRI', 'SAT'];
-      let html = '';
-
-      days.forEach(day => {
-        const dayEvents = items.filter(e => e.dayName === day);
-        if (dayEvents.length) {
-          const dayLabel = day === 'MON' ? 'Mondays • Karaoke @ Rough' : (day === 'FRI' ? 'Fridays • ISOT Zenit Parties' : 'Saturdays • ISOT Pre-Parties');
-          html += `
-            <div class="week-day-group">
-              <div class="week-day-header"><i class="fa-solid fa-calendar-day text-pink"></i> ${dayLabel}</div>
-              ${dayEvents.map(item => renderEventItemHtml(item)).join('')}
-            </div>
-          `;
-        }
-      });
-
-      return html || '<div class="card card-glass" style="text-align:center;padding:30px">No events for this week selection.</div>';
-    }
-
-    function renderMonthlyView(items) {
-      const months = ['aug', 'sep', 'oct', 'nov', 'dec'];
-      let html = '<div class="monthly-grid">';
-
-      months.forEach(mKey => {
-        const mEvents = items.filter(e => e.month === mKey);
-        if (mEvents.length) {
-          html += `
-            <div class="month-section-card">
-              <div class="month-section-header">
-                <span>${MONTH_LABELS[mKey]}</span>
-                <span class="badge badge-participant" style="font-size:0.75rem">${mEvents.length} Events</span>
-              </div>
-              ${mEvents.map(item => renderEventItemHtml(item)).join('')}
-            </div>
-          `;
-        }
-      });
-
-      html += '</div>';
-      return html;
     }
 
     document.addEventListener('DOMContentLoaded', initEventsCalendar);
