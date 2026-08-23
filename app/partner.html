@@ -2,10 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>ISOT Partner Venues & Map</title>
 
   <link rel="icon" href="../assets/LOGOS/scritta isot.png" type="image/png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/LOGOS/scritta isot.png" />
+  <link rel="apple-touch-icon" href="../assets/LOGOS/scritta isot.png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-title" content="ISOT" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0B0F19" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -16,11 +23,37 @@
 
   <style>
     #mapContainer {
-      height: 280px;
-      border-radius: var(--radius-md);
+      height: 320px;
+      border-radius: 20px;
       overflow: hidden;
-      border: 1px solid var(--border-light);
+      border: 1px solid var(--border-glow);
       margin-bottom: 24px;
+      box-shadow: 0 8px 24px rgba(238, 9, 121, 0.15);
+    }
+    
+    /* Custom Glowing Map Pin Markers */
+    .isot-pin {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--pink);
+      border: 2px solid #FFF;
+      box-shadow: 0 0 16px rgba(238, 9, 121, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFF;
+      font-size: 0.9rem;
+    }
+    .isot-pin.party { background: #FF6A00; box-shadow: 0 0 16px rgba(255, 106, 0, 0.7); }
+    .isot-pin.edu { background: #3B82F6; box-shadow: 0 0 16px rgba(59, 130, 246, 0.7); }
+
+    .venue-card-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-light);
     }
   </style>
 </head>
@@ -45,14 +78,14 @@
   <main class="shell">
 
     <div style="margin-bottom: 16px;">
-      <div class="eyebrow"><i class="fa-solid fa-map-location-dot"></i> Turin Venues Map</div>
+      <div class="eyebrow"><i class="fa-solid fa-map-location-dot"></i> Retina HD Turin Map</div>
       <h1 style="font-size: 1.8rem; margin-top: 4px;">Explore Partner Spots</h1>
     </div>
 
-    <!-- Leaflet Dark Map -->
+    <!-- Retina HD Dark Map -->
     <div id="mapContainer"></div>
 
-    <!-- Partner Venue Cards with Category Logos -->
+    <!-- 1. Rough Bar -->
     <div class="card card-glass" style="margin-bottom: 16px;">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -65,13 +98,23 @@
         <span class="badge badge-socio">20% OFF</span>
       </div>
 
-      <div style="display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-light);">
-        <span class="badge badge-participant"><i class="fa-solid fa-microphone"></i> Monday Karaoke</span>
-        <span class="badge badge-participant"><i class="fa-solid fa-glass-cheers"></i> Saturday Pre-Party</span>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+        <span class="badge badge-participant"><i class="fa-solid fa-microphone"></i> Monday Karaoke (21:00)</span>
+        <span class="badge badge-participant"><i class="fa-solid fa-glass-cheers"></i> Saturday Pre-Party (22:30)</span>
+      </div>
+
+      <div class="venue-card-actions">
+        <a href="https://maps.google.com/?q=Via+San+Salvario+12+Torino" target="_blank" rel="noopener" class="btn btn-pink" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">
+          <i class="fa-solid fa-diamond-turn-right"></i> Google Maps
+        </a>
+        <a href="https://maps.apple.com/?q=Via+San+Salvario+12+Torino" target="_blank" rel="noopener" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">
+          <i class="fa-solid fa-location-arrow"></i> Apple Maps
+        </a>
       </div>
     </div>
 
-    <div class="card card-glass">
+    <!-- 2. Capodoglio -->
+    <div class="card card-glass" style="margin-bottom: 16px;">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
         <div style="display: flex; align-items: center; gap: 12px;">
           <img src="../assets/LOGOS/Tog.jpeg" alt="Together & Social" style="width: 44px; height: 44px; border-radius: 12px; object-fit: cover;" />
@@ -83,9 +126,46 @@
         <span class="badge badge-socio">20% OFF</span>
       </div>
 
-      <div style="display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-light);">
-        <span class="badge badge-participant"><i class="fa-solid fa-users"></i> Thursday Social Hub</span>
-        <span class="badge badge-participant"><i class="fa-solid fa-music"></i> DJ Nights</span>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+        <span class="badge badge-participant"><i class="fa-solid fa-users"></i> Thursday Social Hub (20:00)</span>
+        <span class="badge badge-participant"><i class="fa-solid fa-wine-glass"></i> Aperitivo &amp; River View</span>
+      </div>
+
+      <div class="venue-card-actions">
+        <a href="https://maps.google.com/?q=Murazzi+del+Po+37+Torino" target="_blank" rel="noopener" class="btn btn-pink" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">
+          <i class="fa-solid fa-diamond-turn-right"></i> Google Maps
+        </a>
+        <a href="https://maps.apple.com/?q=Murazzi+del+Po+37+Torino" target="_blank" rel="noopener" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">
+          <i class="fa-solid fa-location-arrow"></i> Apple Maps
+        </a>
+      </div>
+    </div>
+
+    <!-- 3. Zenit Club -->
+    <div class="card card-glass">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <img src="../assets/LOGOS/Party.jpeg" alt="Party" style="width: 44px; height: 44px; border-radius: 12px; object-fit: cover;" />
+          <div>
+            <h2 style="font-size: 1.2rem; color: #FFF; margin: 0;">Zenit Club</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Corso Massimo d'Azeglio 3</p>
+          </div>
+        </div>
+        <span class="badge badge-socio">20% OFF</span>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+        <span class="badge badge-participant"><i class="fa-solid fa-compact-disc"></i> Friday Zenit Club Nights (23:00)</span>
+        <span class="badge badge-live"><i class="fa-solid fa-ghost"></i> Halloween Party 🎃</span>
+      </div>
+
+      <div class="venue-card-actions">
+        <a href="https://maps.google.com/?q=Corso+Massimo+d'Azeglio+3+Torino" target="_blank" rel="noopener" class="btn btn-pink" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">
+          <i class="fa-solid fa-diamond-turn-right"></i> Google Maps
+        </a>
+        <a href="https://maps.apple.com/?q=Corso+Massimo+d'Azeglio+3+Torino" target="_blank" rel="noopener" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">
+          <i class="fa-solid fa-location-arrow"></i> Apple Maps
+        </a>
       </div>
     </div>
 
@@ -124,18 +204,37 @@
       const me = await requireAuth();
       document.getElementById('headerAvatar').innerHTML = renderGeoAvatar(me.member_code, 36);
 
-      const map = L.map('mapContainer').setView([45.0560, 7.6820], 14);
+      // High-DPI Retina HD Dark Vector Map
+      const map = L.map('mapContainer', { zoomControl: false }).setView([45.0565, 7.6850], 14);
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png', {
         maxZoom: 19,
         attribution: '&copy; OpenStreetMap &copy; CARTO'
       }).addTo(map);
 
-      L.marker([45.0545, 7.6832]).addTo(map)
-        .bindPopup('<b>Rough Bar</b><br>20% Member Discount');
+      // Custom Glowing ISOT Markers
+      const pinkIcon = L.divIcon({
+        className: 'isot-pin-wrapper',
+        html: `<div class="isot-pin"><i class="fa-solid fa-martini-glass"></i></div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      });
 
-      L.marker([45.0578, 7.6915]).addTo(map)
-        .bindPopup('<b>Capodoglio</b><br>20% Member Discount');
+      const partyIcon = L.divIcon({
+        className: 'isot-pin-wrapper',
+        html: `<div class="isot-pin party"><i class="fa-solid fa-compact-disc"></i></div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      });
+
+      L.marker([45.0545, 7.6832], { icon: pinkIcon }).addTo(map)
+        .bindPopup('<b>Rough Bar</b><br>San Salvario • 20% OFF');
+
+      L.marker([45.0578, 7.6915], { icon: pinkIcon }).addTo(map)
+        .bindPopup('<b>Capodoglio</b><br>Murazzi del Po • 20% OFF');
+
+      L.marker([45.0520, 7.6810], { icon: partyIcon }).addTo(map)
+        .bindPopup('<b>Zenit Club</b><br>Corso Massimo d\'Azeglio 3 • 20% OFF');
     }
 
     document.addEventListener('DOMContentLoaded', initPartnerMap);
