@@ -67,10 +67,46 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
-input, select, textarea, button {
+input[type="text"], input[type="password"], input[type="email"], select, textarea {
   font-size: 16px !important;
   touch-action: manipulation;
 }
+
+/* ---------- Mobile Bottom Tab Bar (Apple Material) ---------- */
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: var(--nav-glass);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border-top: 1px solid var(--border-light);
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  padding-top: 10px;
+}
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 0.82rem !important;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: var(--transition-fast);
+  padding: 6px 14px;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+.tab-item.active { color: var(--pink); font-weight: 700; }
+.tab-item svg { width: 25px; height: 25px; stroke-width: 2.2; }
 
 body {
   background-color: var(--bg-dark);
@@ -380,36 +416,7 @@ h3 {
   50% { opacity: 0.6; }
 }
 
-/* ---------- Mobile Bottom Tab Bar (Apple Style) ---------- */
-.tabbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  background: var(--nav-glass);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-top: 1px solid var(--border-light);
-  padding-bottom: max(10px, env(safe-area-inset-bottom));
-  padding-top: 8px;
-}
-.tab-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--text-dark);
-  transition: var(--transition-fast);
-  padding: 4px 12px;
-}
-.tab-item.active { color: var(--pink); }
-.tab-item svg { width: 22px; height: 22px; stroke-width: 2.2; }
+
 
 /* ---------- Deterministic Geometry & Initials Avatars ---------- */
 .geo-avatar {
