@@ -153,12 +153,17 @@
       padding: 16px;
       margin-bottom: 14px;
       display: flex;
-      gap: 14px;
+      flex-direction: column;
+      gap: 12px;
       transition: var(--transition-spring);
     }
     .event-card-item:hover {
       border-color: var(--pink);
       transform: translateY(-2px);
+    }
+    .event-card-top {
+      display: flex;
+      gap: 14px;
     }
     .event-date-box {
       width: 58px;
@@ -185,6 +190,71 @@
       color: var(--pink);
       text-transform: uppercase;
       margin-top: 3px;
+    }
+
+    /* RSVP & Who's Going Avatar Stack Bar */
+    .rsvp-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-light);
+    }
+    .avatar-stack-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .avatar-stack {
+      display: flex;
+      align-items: center;
+    }
+    .avatar-stack-item-box {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1.5px solid var(--bg-card);
+      margin-left: -8px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #1E293B;
+    }
+    .avatar-stack-item-box:first-child {
+      margin-left: 0;
+    }
+    .avatar-stack-count {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .btn-rsvp {
+      padding: 5px 14px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-light);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      transition: var(--transition-fast);
+    }
+    .btn-rsvp:hover {
+      border-color: var(--pink);
+      color: #FFF;
+    }
+    .btn-rsvp.going {
+      background: rgba(16, 185, 129, 0.16);
+      border-color: #10B981;
+      color: #10B981;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
     }
   </style>
 </head>
@@ -260,7 +330,7 @@
       // SEPTEMBER 2026
       { id: 102, date: '2026-09-05', year: 2026, monthIdx: 8, dayNum: 5, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
       { id: 103, date: '2026-09-07', year: 2026, monthIdx: 8, dayNum: 7, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 1, date: '2026-09-11', year: 2026, monthIdx: 8, dayNum: 11, dayName: 'FRI', title: 'ISOT Pre-Uni Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Pre-Uni Semester Opener' },
+      { id: 1, date: '2026-09-11', year: 2026, monthIdx: 8, dayNum: 11, dayName: 'FRI', title: 'ISOT Pre-Uni Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Semester Opener' },
       { id: 104, date: '2026-09-12', year: 2026, monthIdx: 8, dayNum: 12, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
       { id: 105, date: '2026-09-14', year: 2026, monthIdx: 8, dayNum: 14, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
       { id: 106, date: '2026-09-19', year: 2026, monthIdx: 8, dayNum: 19, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
@@ -308,6 +378,16 @@
 
     const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
+    const SAMPLE_MEMBERS = [
+      { name: 'Maria Silva', code: 'ISOT-2026-0001' },
+      { name: 'Marco Rossi', code: 'ISOT-2026-0002' },
+      { name: 'Alex Vance', code: 'ISOT-2026-0003' },
+      { name: 'Sofia Rossi', code: 'ISOT-2026-0004' },
+      { name: 'Luca Bianchi', code: 'ISOT-2026-0005' }
+    ];
+
+    let meProfile = null;
+    let userRsvps = JSON.parse(localStorage.getItem('isot_rsvps') || '{}');
     let currentView = 'list';
     let currYear = 2026;
     let currMonthIdx = 8; // September 2026
@@ -315,9 +395,20 @@
     let selectedDateStr = null;
 
     async function initEventsCalendar() {
-      const me = await requireAuth();
-      document.getElementById('headerAvatar').innerHTML = renderGeoAvatar(me.member_code, 36);
+      meProfile = await requireAuth();
+      document.getElementById('headerAvatar').innerHTML = renderGeoAvatar(meProfile.member_code, 36);
 
+      renderMainView();
+    }
+
+    function toggleRsvp(eventId) {
+      if (userRsvps[eventId]) {
+        delete userRsvps[eventId];
+      } else {
+        userRsvps[eventId] = true;
+      }
+      localStorage.setItem('isot_rsvps', JSON.stringify(userRsvps));
+      
       renderMainView();
     }
 
@@ -362,7 +453,6 @@
       const firstDay = new Date(currYear, currMonthIdx, 1);
       const totalDays = new Date(currYear, currMonthIdx + 1, 0).getDate();
       
-      // Calculate Monday start offset (0 = Mon, 6 = Sun)
       const firstDayOfWeek = (firstDay.getDay() + 6) % 7;
 
       let html = `
@@ -386,12 +476,10 @@
           <div class="cal-matrix-head">SUN</div>
       `;
 
-      // Previous month padding cells
       for (let i = 0; i < firstDayOfWeek; i++) {
         html += `<div class="cal-matrix-day other-month"><span class="cal-day-num"></span></div>`;
       }
 
-      // Days of the month
       for (let day = 1; day <= totalDays; day++) {
         const mStr = String(currMonthIdx + 1).padStart(2, '0');
         const dStr = String(day).padStart(2, '0');
@@ -416,7 +504,6 @@
 
       html += `</div>`;
 
-      // Render selected day events below matrix
       if (selectedDateStr) {
         const selectedEvents = EVENTS_DATA.filter(e => e.date === selectedDateStr);
         html += `
@@ -428,7 +515,6 @@
           </div>
         `;
       } else {
-        // Default show all events in this month
         const monthEvents = EVENTS_DATA.filter(e => e.monthIdx === currMonthIdx);
         html += `
           <div style="margin-top:16px">
@@ -447,7 +533,7 @@
     }
 
     /* -------------------------------------------------------------
-     * 2. WEEKLY MATRIX VIEW (Step Week by Week)
+     * 2. WEEKLY MATRIX VIEW
      * ------------------------------------------------------------- */
     function renderWeeklyMatrixView() {
       const weekStart = new Date(currWeekStart);
@@ -469,7 +555,6 @@
         </div>
       `;
 
-      // Collect 7 days of this week
       let weekEventsFound = 0;
       for (let i = 0; i < 7; i++) {
         const d = new Date(weekStart);
@@ -484,8 +569,10 @@
         if (dayEvents.length) {
           weekEventsFound += dayEvents.length;
           html += `
-            <div class="week-day-group">
-              <div class="week-day-header"><i class="fa-solid fa-calendar-day text-pink"></i> ${d.toDateString().slice(0,10)}</div>
+            <div class="week-day-group" style="margin-bottom:16px">
+              <div class="week-day-header" style="font-weight:700;color:var(--text-dim);font-size:0.82rem;margin-bottom:8px">
+                <i class="fa-solid fa-calendar-day text-pink"></i> ${d.toDateString().slice(0,10)}
+              </div>
               ${dayEvents.map(e => renderEventCardHtml(e)).join('')}
             </div>
           `;
@@ -507,26 +594,52 @@
     }
 
     function renderEventCardHtml(item) {
+      const isGoing = !!userRsvps[item.id];
+      const baseCount = (item.id % 6) + 12;
+      const totalCount = baseCount + (isGoing ? 1 : 0);
+
+      let stackHtml = '';
+      if (isGoing && meProfile) {
+        stackHtml += `<div class="avatar-stack-item-box" title="You (${meProfile.full_name})">${renderGeoAvatar(meProfile.member_code, 26)}</div>`;
+      }
+      SAMPLE_MEMBERS.slice(0, 3).forEach(m => {
+        stackHtml += `<div class="avatar-stack-item-box" title="${m.name}">${renderGeoAvatar(m.code, 26)}</div>`;
+      });
+
       return `
         <div class="event-card-item">
-          <div class="event-date-box">
-            <span class="day-num">${item.dayNum}</span>
-            <span class="day-name">${item.dayName}</span>
-          </div>
-          <div style="flex:1;min-width:0">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-              <div style="display:flex;align-items:center;gap:8px">
-                <div style="width:24px;height:24px;border-radius:6px;overflow:hidden;display:inline-flex;align-items:center;justify-content:center">
-                  <img src="${item.logo}" alt="" style="width:100%;height:100%;object-fit:cover;${item.cat === 'karaoke' ? 'transform:scale(1.85);' : ''}" />
-                </div>
-                <span class="badge badge-socio">20% OFF</span>
-                ${item.special ? `<span class="badge badge-live">${item.special}</span>` : ''}
-              </div>
-              <span class="dim" style="font-size:0.75rem">${item.time}</span>
+          <div class="event-card-top">
+            <div class="event-date-box">
+              <span class="day-num">${item.dayNum}</span>
+              <span class="day-name">${item.dayName}</span>
             </div>
-            <h2 style="font-size:1.05rem;color:#FFF;margin-bottom:4px">${escapeHtml(item.title)}</h2>
-            <p class="dim" style="margin-bottom:8px"><i class="fa-solid fa-location-dot text-pink"></i> ${escapeHtml(item.venue)}</p>
-            ${item.link ? `<a href="${item.link}" class="btn btn-pink" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Join Song Queue</a>` : `<a href="profile.html" class="btn btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Show Member Card</a>`}
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="width:24px;height:24px;border-radius:6px;overflow:hidden;display:inline-flex;align-items:center;justify-content:center">
+                    <img src="${item.logo}" alt="" style="width:100%;height:100%;object-fit:cover;${item.cat === 'karaoke' ? 'transform:scale(1.85);' : ''}" />
+                  </div>
+                  <span class="badge badge-socio">20% OFF</span>
+                  ${item.special ? `<span class="badge badge-live">${item.special}</span>` : ''}
+                </div>
+                <span class="dim" style="font-size:0.75rem">${item.time}</span>
+              </div>
+              <h2 style="font-size:1.05rem;color:#FFF;margin-bottom:4px">${escapeHtml(item.title)}</h2>
+              <p class="dim" style="margin-bottom:8px"><i class="fa-solid fa-location-dot text-pink"></i> ${escapeHtml(item.venue)}</p>
+              ${item.link ? `<a href="${item.link}" class="btn btn-pink" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Join Song Queue</a>` : `<a href="profile.html" class="btn btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Show Member Card</a>`}
+            </div>
+          </div>
+
+          <div class="rsvp-row">
+            <div class="avatar-stack-wrapper">
+              <div class="avatar-stack">${stackHtml}</div>
+              <span class="avatar-stack-count"><strong>${totalCount} Going</strong> • ${isGoing ? 'You, ' : ''}Maria + ${totalCount - 2}</span>
+            </div>
+
+            <button type="button" onclick="event.stopPropagation(); toggleRsvp(${item.id})" class="btn-rsvp ${isGoing ? 'going' : ''}">
+              <i class="${isGoing ? 'fa-solid fa-circle-check' : 'fa-regular fa-calendar-plus'}"></i>
+              <span>${isGoing ? "I'm Going!" : "I'm Going"}</span>
+            </button>
           </div>
         </div>
       `;

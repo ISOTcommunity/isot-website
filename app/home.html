@@ -116,6 +116,71 @@
       border-bottom: 1px solid var(--border-light);
       font-size: 0.88rem;
     }
+
+    /* RSVP & Who's Going Avatar Stack Bar */
+    .rsvp-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-light);
+    }
+    .avatar-stack-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .avatar-stack {
+      display: flex;
+      align-items: center;
+    }
+    .avatar-stack-item-box {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1.5px solid var(--bg-card);
+      margin-left: -8px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #1E293B;
+    }
+    .avatar-stack-item-box:first-child {
+      margin-left: 0;
+    }
+    .avatar-stack-count {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .btn-rsvp {
+      padding: 5px 14px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-light);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      transition: var(--transition-fast);
+    }
+    .btn-rsvp:hover {
+      border-color: var(--pink);
+      color: #FFF;
+    }
+    .btn-rsvp.going {
+      background: rgba(16, 185, 129, 0.16);
+      border-color: #10B981;
+      color: #10B981;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+    }
   </style>
 </head>
 <body>
@@ -227,6 +292,8 @@
             <a href="profile.html" class="btn btn-pink" style="width: auto; padding: 10px 20px; font-size: 0.88rem;">Show Member Card <i class="fa-solid fa-qrcode"></i></a>
             <a href="events.html" class="btn btn-outline" style="width: auto; padding: 10px 18px; font-size: 0.88rem;">View Calendar</a>
           </div>
+
+          <div class="rsvp-row" id="heroRsvpRow"></div>
         </div>
       </div>
 
@@ -377,6 +444,59 @@
         actionsEl.innerHTML = `
           <a href="profile.html" class="btn btn-pink" style="width: auto; padding: 10px 20px; font-size: 0.88rem;">Show Member Card <i class="fa-solid fa-qrcode"></i></a>
           <a href="events.html" class="btn btn-outline" style="width: auto; padding: 10px 18px; font-size: 0.88rem;">View Calendar</a>
+        `;
+      }
+
+      currentHeroEventId = eventObj.id || 100;
+      updateHeroRsvpUI(currentHeroEventId);
+    }
+
+    let currentHeroEventId = 100;
+    let userRsvps = JSON.parse(localStorage.getItem('isot_rsvps') || '{}');
+    let meProfile = null;
+
+    const SAMPLE_MEMBERS = [
+      { name: 'Maria Silva', code: 'ISOT-2026-0001' },
+      { name: 'Marco Rossi', code: 'ISOT-2026-0002' },
+      { name: 'Alex Vance', code: 'ISOT-2026-0003' },
+      { name: 'Sofia Rossi', code: 'ISOT-2026-0004' }
+    ];
+
+    function toggleHeroRsvp() {
+      if (userRsvps[currentHeroEventId]) {
+        delete userRsvps[currentHeroEventId];
+      } else {
+        userRsvps[currentHeroEventId] = true;
+      }
+      localStorage.setItem('isot_rsvps', JSON.stringify(userRsvps));
+      updateHeroRsvpUI(currentHeroEventId);
+    }
+
+    function updateHeroRsvpUI(eventId) {
+      const isGoing = !!userRsvps[eventId];
+      const baseCount = (eventId % 6) + 14;
+      const totalCount = baseCount + (isGoing ? 1 : 0);
+
+      let stackHtml = '';
+      if (isGoing && meProfile) {
+        stackHtml += `<div class="avatar-stack-item-box" title="You (${meProfile.full_name})">${renderGeoAvatar(meProfile.member_code, 26)}</div>`;
+      }
+      SAMPLE_MEMBERS.slice(0, 3).forEach(m => {
+        stackHtml += `<div class="avatar-stack-item-box" title="${m.name}">${renderGeoAvatar(m.code, 26)}</div>`;
+      });
+
+      const rowEl = document.getElementById('heroRsvpRow');
+      if (rowEl) {
+        rowEl.innerHTML = `
+          <div class="avatar-stack-wrapper">
+            <div class="avatar-stack">${stackHtml}</div>
+            <span class="avatar-stack-count"><strong>${totalCount} Members Going</strong> • ${isGoing ? 'You, ' : ''}Maria + ${totalCount - 2}</span>
+          </div>
+
+          <button type="button" onclick="toggleHeroRsvp()" class="btn-rsvp ${isGoing ? 'going' : ''}">
+            <i class="${isGoing ? 'fa-solid fa-circle-check' : 'fa-regular fa-calendar-plus'}"></i>
+            <span>${isGoing ? "I'm Going!" : "I'm Going"}</span>
+          </button>
         `;
       }
     }
