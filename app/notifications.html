@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Activity &amp; Notifications · ISOT App</title>
+
+  <link rel="icon" href="icon-180.png" type="image/png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-title" content="ISOT" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0B0F19" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display: flex; align-items: center; gap: 8px;">
+      <i class="fa-solid fa-bell text-pink"></i>
+      <span>Activity Center</span>
+    </a>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div id="headerAvatar" style="cursor: pointer;" data-open-drawer></div>
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: #FFF; font-size: 1.3rem; cursor: pointer; padding: 6px;">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="shell" style="max-width: 520px;">
+
+    <div style="margin-bottom: 20px;">
+      <div class="eyebrow"><i class="fa-solid fa-bolt"></i> Real-time Updates</div>
+      <h1 style="font-size: 1.8rem; margin-top: 4px;">Notifications &amp; Invites</h1>
+    </div>
+
+    <!-- Notifications Container -->
+    <div id="notificationsPageContainer"></div>
+
+  </main>
+
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="tabbar">
+    <a href="home.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 011-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </a>
+    <a href="events.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Calendar
+    </a>
+    <a href="partner.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V9a2 2 0 012-2h2a2 2 0 012 2v12"/></svg>
+      Partners
+    </a>
+    <a href="network.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+      Network
+    </a>
+  </nav>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+
+  <script>
+    let meProfile = null;
+
+    async function initNotificationsPage() {
+      meProfile = await requireAuth();
+      document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(meProfile, 36);
+
+      // Mark all as read when opening notifications page
+      localNotifications.forEach(n => { n.read = true; });
+      localStorage.setItem('isot_notifications', JSON.stringify(localNotifications));
+      updateNotificationBellUI();
+
+      renderNotificationsPage();
+    }
+
+    function renderNotificationsPage() {
+      const container = document.getElementById('notificationsPageContainer');
+      if (!container) return;
+
+      if (!localNotifications.length) {
+        container.innerHTML = `
+          <div class="card card-glass" style="text-align:center;padding:36px">
+            <i class="fa-solid fa-bell-slash text-pink" style="font-size:2.2rem;margin-bottom:12px"></i>
+            <h3 style="font-size:1.1rem;color:#FFF;margin-bottom:4px">No Notifications Yet</h3>
+            <p class="dim" style="font-size:0.85rem;margin-bottom:16px">You're all caught up! You'll see friend requests and event invites here.</p>
+            <a href="network.html" class="btn btn-pink" style="width:auto;display:inline-flex;padding:6px 18px;font-size:0.82rem;">
+              <i class="fa-solid fa-users"></i> Discover ISOT Students 🌐
+            </a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = localNotifications.map(n => `
+        <div class="card card-glass" style="margin-bottom:12px;padding:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div style="font-weight:700;color:#FFF;font-size:0.95rem;display:flex;align-items:center;gap:8px">
+              <i class="${n.type === 'event_invite' ? 'fa-solid fa-envelope-open-text text-pink' : 'fa-solid fa-user-plus text-green'}"></i>
+              ${escapeHtml(n.title)}
+            </div>
+            <span class="dim" style="font-size:0.75rem">${new Date(n.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+          </div>
+          <p class="dim" style="font-size:0.85rem;margin-bottom:12px">${escapeHtml(n.message)}</p>
+          <div style="display:flex;align-items:center;gap:10px">
+            ${n.eventId ? `<a href="events.html" class="btn btn-pink" style="width:auto;padding:5px 14px;font-size:0.78rem;display:inline-flex">View Event Schedule 📅</a>` : ''}
+            ${n.type === 'friend_request' ? `<a href="network.html" class="btn btn-pink" style="width:auto;padding:5px 14px;font-size:0.78rem;display:inline-flex">View Requests in Network 🤝</a>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', initNotificationsPage);
+  </script>
+</body>
+</html>

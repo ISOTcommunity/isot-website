@@ -229,6 +229,10 @@
       "destination": "/app/network.html"
     },
     {
+      "source": "/app/notifications",
+      "destination": "/app/notifications.html"
+    },
+    {
       "source": "/app/account",
       "destination": "/app/account.html"
     },
