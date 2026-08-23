@@ -55,6 +55,18 @@
       padding-top: 12px;
       border-top: 1px solid var(--border-light);
     }
+  
+    /* Map credit — required by the OSM/CARTO licence, so it stays, but it does not
+       need to be a white bar across the map. Muted to sit inside the dark theme. */
+    .leaflet-control-attribution {
+      background: rgba(11, 15, 25, 0.55) !important;
+      color: var(--text-dark) !important;
+      font-size: 9px !important;
+      padding: 1px 5px !important;
+      border-radius: 6px 0 0 0 !important;
+      backdrop-filter: blur(4px);
+    }
+    .leaflet-control-attribution a { color: var(--text-dark) !important; text-decoration: none; }
   </style>
 </head>
 <body>
@@ -204,11 +216,21 @@
       const me = await requireAuth();
       document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(me, 36);
 
-      const map = L.map('mapContainer', { zoomControl: false });
+      // attributionControl prefix:false drops Leaflet's own promo (the flag and the
+      // "Leaflet" link) — that part is optional. The OpenStreetMap and CARTO credit is
+      // not: OSM data is ODbL-licensed and CARTO's tiles carry their own terms, so it
+      // stays. It is styled down in CSS rather than removed.
+      const map = L.map('mapContainer', {
+        zoomControl: false,
+        attributionControl: false,
+      });
+
+      L.control.attribution({ prefix: false, position: 'bottomright' })
+        .addAttribution('&copy; OSM')
+        .addTo(map);
 
       L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png', {
         maxZoom: 19,
-        attribution: '&copy; OpenStreetMap &copy; CARTO'
       }).addTo(map);
 
       const icon = (glyph, cls = '') => L.divIcon({
