@@ -23,7 +23,7 @@
     },
     {
       "source": "/app",
-      "destination": "/app/",
+      "destination": "/app/home.html",
       "permanent": false
     },
     {
@@ -209,6 +209,34 @@
   ],
   "rewrites": [
     {
+      "source": "/app/",
+      "destination": "/app/home.html"
+    },
+    {
+      "source": "/app/home",
+      "destination": "/app/home.html"
+    },
+    {
+      "source": "/app/events",
+      "destination": "/app/events.html"
+    },
+    {
+      "source": "/app/partner",
+      "destination": "/app/partner.html"
+    },
+    {
+      "source": "/app/network",
+      "destination": "/app/network.html"
+    },
+    {
+      "source": "/app/account",
+      "destination": "/app/account.html"
+    },
+    {
+      "source": "/app/profile",
+      "destination": "/app/profile.html"
+    },
+    {
       "source": "/app/login",
       "destination": "/app/login.html"
     },
@@ -217,12 +245,16 @@
       "destination": "/app/signup.html"
     },
     {
-      "source": "/app/home",
-      "destination": "/app/home.html"
+      "source": "/app/forgot",
+      "destination": "/app/forgot.html"
     },
     {
-      "source": "/app/profile",
-      "destination": "/app/profile.html"
+      "source": "/app/reset",
+      "destination": "/app/reset.html"
+    },
+    {
+      "source": "/app/complete-profile",
+      "destination": "/app/complete-profile.html"
     },
     {
       "source": "/app/scan",
@@ -235,10 +267,6 @@
     {
       "source": "/app/karaoke-kj",
       "destination": "/app/karaoke-kj.html"
-    },
-    {
-      "source": "/app/partner",
-      "destination": "/app/partner.html"
     },
     {
       "source": "/app/dashboard",
