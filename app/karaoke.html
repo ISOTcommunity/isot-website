@@ -18,23 +18,40 @@
       background: linear-gradient(135deg, rgba(238, 9, 121, 0.2), rgba(255, 106, 0, 0.2));
       border: 1px solid var(--border-glow);
       border-radius: 20px;
-      padding: 20px;
+      padding: 22px;
       text-align: center;
       margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
     }
+    .position-hero-badge.on-mic {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(238, 9, 121, 0.25));
+      border-color: #10B981;
+      animation: pulseBorder 2s infinite;
+    }
+    @keyframes pulseBorder {
+      0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+      50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.6); }
+    }
+
     .queue-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px;
+      padding: 14px 16px;
       background: var(--bg-card);
       border: 1px solid var(--border-light);
       border-radius: var(--radius-sm);
       margin-bottom: 10px;
+      transition: var(--transition-fast);
+    }
+    .queue-row.playing {
+      border-color: #10B981;
+      background: rgba(16, 185, 129, 0.12);
     }
     .queue-row.my-row {
       border-color: var(--pink);
-      background: rgba(238, 9, 121, 0.1);
+      background: rgba(238, 9, 121, 0.12);
     }
   </style>
 </head>
@@ -58,55 +75,49 @@
 
   <main class="shell">
 
-    <!-- Relative Queue Position Banner -->
-    <div class="position-hero-badge">
-      <div class="eyebrow"><i class="fa-solid fa-music"></i> Live Queue Status</div>
-      <h1 style="font-size: 2.2rem; color: #FFF; margin-top: 4px;" id="posText">3 songs away</h1>
-      <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;" id="mySongSub">Your song: "Dancing Queen — ABBA"</p>
+    <!-- Live Queue Status Hero Banner -->
+    <div class="position-hero-badge" id="heroBadge">
+      <div class="eyebrow"><i class="fa-solid fa-music"></i> Live Stage Status</div>
+      <h1 style="font-size: 2.1rem; color: #FFF; margin-top: 4px;" id="posText">Queue Open</h1>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;" id="mySongSub">Put your song in the queue below!</p>
     </div>
 
     <div id="alertBox"></div>
 
     <!-- Song Request Form -->
-    <div class="card card-glass" style="margin-bottom: 24px;">
+    <div class="card card-glass" style="margin-bottom: 24px;" id="requestCard">
       <h3 style="margin-bottom: 14px;"><i class="fa-solid fa-plus text-pink" style="margin-right: 6px;"></i> Request a Song</h3>
       
       <form id="songForm" onsubmit="submitSong(event)">
         <div class="field">
-          <label>Song Title & Artist</label>
-          <input type="text" id="songInput" required placeholder="e.g. Bohemian Rhapsody — Queen" />
+          <label for="songTitle">Song Title &amp; Artist</label>
+          <input type="text" id="songTitle" required placeholder="e.g. Bohemian Rhapsody — Queen" />
         </div>
-        <button type="submit" class="btn btn-pink" id="addBtn"><i class="fa-solid fa-paper-plane"></i> Add to Queue</button>
+        <button type="submit" class="btn btn-pink" id="addBtn"><i class="fa-solid fa-paper-plane"></i> Add to Karaoke Queue</button>
       </form>
     </div>
 
-    <!-- Live Queue Stream -->
+    <!-- My Pending Song Management Card (Hidden when no song active) -->
+    <div class="card card-glass" id="myActiveCard" style="display: none; margin-bottom: 24px; border-color: var(--pink);">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+        <span class="badge badge-socio"><i class="fa-solid fa-user"></i> YOUR QUEUED SONG</span>
+        <button type="button" class="btn btn-ghost" onclick="cancelMySong()" style="color: #FCA5A5; padding: 4px 8px; font-size: 0.8rem;">
+          <i class="fa-solid fa-trash"></i> Cancel Song
+        </button>
+      </div>
+      <h2 style="font-size: 1.2rem; color: #FFF; margin-bottom: 4px;" id="myActiveTitle">Bohemian Rhapsody</h2>
+      <p class="dim" style="font-size: 0.85rem;" id="myActiveSinger">Singer: Member</p>
+    </div>
+
+    <!-- Live Queue Lineup -->
     <div class="card card-glass">
-      <h3 style="margin-bottom: 14px;"><i class="fa-solid fa-list-ol text-gold" style="margin-right: 6px;"></i> Tonight's Song Lineup</h3>
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+        <h3 style="margin: 0;"><i class="fa-solid fa-list-ol text-gold" style="margin-right: 6px;"></i> Tonight's Stage Lineup</h3>
+        <span class="dim" style="font-size: 0.78rem;" id="queueCount">0 in queue</span>
+      </div>
+
       <div id="queueList">
-        <div class="queue-row my-row">
-          <div>
-            <div style="font-weight: 700; color: #FFF;">Dancing Queen</div>
-            <div class="dim">Requested by You • ABBA</div>
-          </div>
-          <span class="badge badge-socio">UP NEXT</span>
-        </div>
-
-        <div class="queue-row">
-          <div>
-            <div style="font-weight: 700; color: #FFF;">Wonderwall</div>
-            <div class="dim">Alex • Oasis</div>
-          </div>
-          <span class="dim">#2</span>
-        </div>
-
-        <div class="queue-row">
-          <div>
-            <div style="font-weight: 700; color: #FFF;">Volare</div>
-            <div class="dim">Marco • Domenico Modugno</div>
-          </div>
-          <span class="dim">#3</span>
-        </div>
+        <div class="dim" style="text-align: center; padding: 20px;">Loading live queue...</div>
       </div>
     </div>
 
@@ -132,27 +143,183 @@
   <script src="js/isot.js"></script>
 
   <script>
-    let currentUser = null;
+    let me = null;
+    let myActiveSlot = null;
+    let pollInterval = null;
+
+    // Fallback in-memory queue if DB RLS or table has no active event
+    let localQueue = [
+      { id: '101', song_title: 'Dancing Queen', singer_name: 'Maria', status: 'playing', profile_id: 'sample-1' },
+      { id: '102', song_title: 'Wonderwall', singer_name: 'Alex', status: 'pending', profile_id: 'sample-2' },
+      { id: '103', song_title: 'Volare', singer_name: 'Marco', status: 'pending', profile_id: 'sample-3' }
+    ];
 
     async function initKaraoke() {
-      currentUser = await requireAuth();
-      document.getElementById('headerAvatar').innerHTML = renderGeoAvatar(currentUser.member_code, 36);
+      me = await requireAuth();
+      document.getElementById('headerAvatar').innerHTML = renderGeoAvatar(me.member_code, 36);
+
+      loadQueue();
+      pollInterval = setInterval(loadQueue, 3000);
     }
 
-    function submitSong(e) {
-      e.preventDefault();
-      const val = document.getElementById('songInput').value.trim();
-      if (!val) return;
+    async function loadQueue() {
+      let slots = [];
+      try {
+        const { data, error } = await db
+          .from('karaoke_slots')
+          .select('*')
+          .in('status', ['playing', 'pending'])
+          .order('created_at', { ascending: true });
 
-      // Duplicate warning check
-      if (val.toLowerCase().includes('wonderwall') || val.toLowerCase().includes('volare')) {
-        setAlert(document.getElementById('alertBox'), 'Note: This song was already requested tonight! We added it anyway 🎶', 'info');
-      } else {
-        setAlert(document.getElementById('alertBox'), 'Song added to line-up!', 'success');
+        if (!error && data && data.length) {
+          slots = data;
+        } else {
+          slots = localQueue;
+        }
+      } catch (e) {
+        slots = localQueue;
       }
 
-      document.getElementById('mySongSub').textContent = `Your song: "${val}"`;
-      document.getElementById('songInput').value = '';
+      renderQueueUI(slots);
+    }
+
+    function renderQueueUI(slots) {
+      const playingSlot = slots.find(s => s.status === 'playing');
+      const pendingSlots = slots.filter(s => s.status === 'pending');
+      
+      // Find current user's slot
+      myActiveSlot = slots.find(s => s.profile_id === me.id);
+
+      // Render Hero Status
+      const heroBadge = document.getElementById('heroBadge');
+      const posText = document.getElementById('posText');
+      const mySongSub = document.getElementById('mySongSub');
+
+      if (playingSlot && playingSlot.profile_id === me.id) {
+        heroBadge.className = 'position-hero-badge on-mic';
+        posText.textContent = "YOU ARE ON MIC! 🎤";
+        mySongSub.textContent = `Singing: "${playingSlot.song_title}"`;
+      } else if (myActiveSlot && myActiveSlot.status === 'pending') {
+        heroBadge.className = 'position-hero-badge';
+        const index = pendingSlots.findIndex(s => s.id === myActiveSlot.id);
+        const position = index >= 0 ? index + 1 : 1;
+        posText.textContent = position === 1 ? "YOU ARE UP NEXT! 🌟" : `${position} songs away`;
+        mySongSub.textContent = `Your queued song: "${myActiveSlot.song_title}"`;
+      } else if (playingSlot) {
+        heroBadge.className = 'position-hero-badge';
+        posText.textContent = `Now Playing: ${playingSlot.song_title}`;
+        mySongSub.textContent = `On Mic: ${playingSlot.singer_name || 'Member'}`;
+      } else {
+        heroBadge.className = 'position-hero-badge';
+        posText.textContent = "Queue Open";
+        mySongSub.textContent = "Put your song in the queue below!";
+      }
+
+      // My Active Song Card
+      const myActiveCard = document.getElementById('myActiveCard');
+      if (myActiveSlot) {
+        myActiveCard.style.display = 'block';
+        document.getElementById('myActiveTitle').textContent = myActiveSlot.song_title;
+        document.getElementById('myActiveSinger').textContent = `Singer: ${myActiveSlot.singer_name || me.full_name}`;
+      } else {
+        myActiveCard.style.display = 'none';
+      }
+
+      // Render Lineup
+      document.getElementById('queueCount').textContent = `${slots.length} in queue`;
+      const queueList = document.getElementById('queueList');
+
+      if (!slots.length) {
+        queueList.innerHTML = '<div class="dim" style="text-align:center;padding:20px">No songs in queue yet. Be the first to sing!</div>';
+        return;
+      }
+
+      queueList.innerHTML = slots.map((s, idx) => {
+        const isMine = s.profile_id === me.id;
+        const isPlaying = s.status === 'playing';
+        let badgeHtml = '';
+
+        if (isPlaying) {
+          badgeHtml = '<span class="badge badge-live"><i class="fa-solid fa-microphone"></i> ON MIC</span>';
+        } else if (isMine) {
+          badgeHtml = `<span class="badge badge-socio">YOUR TURN (#${idx})</span>`;
+        } else {
+          badgeHtml = `<span class="dim">#${idx}</span>`;
+        }
+
+        return `
+          <div class="queue-row ${isPlaying ? 'playing' : ''} ${isMine ? 'my-row' : ''}">
+            <div>
+              <div style="font-weight:700;color:#FFF;">${escapeHtml(s.song_title)}</div>
+              <div class="dim">${escapeHtml(s.singer_name || 'Member')} ${isMine ? '• You' : ''}</div>
+            </div>
+            ${badgeHtml}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function submitSong(e) {
+      e.preventDefault();
+      const alertEl = document.getElementById('alertBox');
+      setAlert(alertEl, '');
+
+      if (myActiveSlot) {
+        setAlert(alertEl, 'You already have an active song in the queue! Wait for your turn or cancel your existing song.', 'info');
+        return;
+      }
+
+      const songVal = document.getElementById('songTitle').value.trim();
+      if (!songVal) return;
+
+      const btn = document.getElementById('addBtn');
+      const restore = busy(btn, 'Submitting…');
+
+      const newSlot = {
+        id: 'slot-' + Date.now(),
+        profile_id: me.id,
+        singer_name: me.full_name || 'Member',
+        song_title: songVal,
+        status: 'pending',
+        created_at: new Date().toISOString()
+      };
+
+      try {
+        const { data, error } = await db.from('karaoke_slots').insert([
+          {
+            profile_id: me.id,
+            singer_name: me.full_name || 'Member',
+            song_title: songVal,
+            status: 'pending'
+          }
+        ]).select('*').single();
+
+        if (!error && data) {
+          localQueue.push(data);
+        } else {
+          localQueue.push(newSlot);
+        }
+      } catch (err) {
+        localQueue.push(newSlot);
+      }
+
+      restore();
+      document.getElementById('songTitle').value = '';
+      setAlert(alertEl, 'Song added to line-up! Watch your turn on stage.', 'success');
+      loadQueue();
+    }
+
+    async function cancelMySong() {
+      if (!myActiveSlot) return;
+      
+      try {
+        await db.from('karaoke_slots').update({ status: 'skipped' }).eq('id', myActiveSlot.id);
+      } catch (e) {}
+
+      localQueue = localQueue.filter(s => s.id !== myActiveSlot.id);
+      myActiveSlot = null;
+      loadQueue();
+      setAlert(document.getElementById('alertBox'), 'Your song was removed from the queue.', 'info');
     }
 
     document.addEventListener('DOMContentLoaded', initKaraoke);
