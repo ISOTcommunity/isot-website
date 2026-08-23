@@ -477,15 +477,23 @@
     let userRsvps = JSON.parse(localStorage.getItem('isot_rsvps') || '{}');
     let currentView = 'list';
     let currYear = 2026;
-    let currMonthIdx = 8; // September 2026
-    let currWeekStart = new Date(2026, 8, 21); // Week of Sep 21, 2026
+    let currMonthIdx = Math.max(7, new Date().getMonth()); // Default to current month (August = 7)
+    let currWeekStart = new Date(2026, 7, 24); // Week of Aug 24, 2026
     let selectedDateStr = null;
 
     async function initEventsCalendar() {
-      meProfile = await requireAuth();
-      document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(meProfile, 36);
-
-      renderMainView();
+      try {
+        meProfile = await requireAuth();
+        if (document.getElementById('headerAvatar')) {
+          document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(meProfile, 36);
+        }
+      } catch (err) {
+        console.error('Events init note:', err);
+      } finally {
+        const gate = document.getElementById('gate');
+        if (gate) gate.remove();
+        renderMainView();
+      }
     }
 
     function toggleRsvp(eventId) {
