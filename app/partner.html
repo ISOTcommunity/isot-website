@@ -13,6 +13,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#0B0F19" />
+  <!-- Vercel Web Analytics -->
+  <script defer src="/_vercel/insights/script.js"></script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -209,6 +212,7 @@
 
   <script src="vendor/supabase.js"></script>
   <script src="vendor/leaflet.js"></script>
+  <script src="vendor/leaflet-rotate.js"></script>
   <script src="js/isot.js"></script>
 
   <script>
@@ -223,6 +227,12 @@
       const map = L.map('mapContainer', {
         zoomControl: false,
         attributionControl: false,
+        // Two-finger rotate, the way Apple and Google Maps behave. touchRotate is the
+        // gesture; rotate:true enables the bearing machinery it needs.
+        rotate: true,
+        touchRotate: true,
+        rotateControl: false,      // no on-screen compass button; the gesture is enough
+        bearing: 0,                // start north-up
       });
 
       L.control.attribution({ prefix: false, position: 'bottomright' })
