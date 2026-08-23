@@ -97,7 +97,7 @@
 
     <!-- User Header Preview with Tap-to-Crop Camera Overlay -->
     <div class="avatar-preview-box" style="text-align: center; position: relative;">
-      <div style="position: relative; width: 92px; height: 92px; margin: 0 auto; cursor: pointer;" onclick="document.getElementById('avatarFileInput').click()" title="Tap to change & crop photo">
+      <div style="position: relative; width: 92px; height: 92px; margin: 0 auto; cursor: pointer;" onclick="openCropModalForCurrentOrNew()" title="Tap to crop & rotate current photo">
         <div id="avatarContainer" style="width: 100%; height: 100%;"></div>
         <div style="position: absolute; bottom: 0; right: 0; background: var(--pink); color: #FFF; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-dark); font-size: 0.75rem; box-shadow: 0 4px 10px rgba(238,9,121,0.4);">
           <i class="fa-solid fa-camera"></i>
@@ -106,8 +106,8 @@
 
       <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="handleAvatarFileSelect(event)" />
 
-      <button type="button" class="btn btn-outline" style="width: auto; padding: 4px 14px; font-size: 0.75rem; margin-top: 10px; border-color: var(--pink); color: var(--pink);" onclick="document.getElementById('avatarFileInput').click()">
-        <i class="fa-solid fa-crop-simple"></i> Tap Photo to Crop &amp; Rotate
+      <button type="button" class="btn btn-outline" style="width: auto; padding: 4px 14px; font-size: 0.75rem; margin-top: 10px; border-color: var(--pink); color: var(--pink);" onclick="openCropModalForCurrentOrNew()">
+        <i class="fa-solid fa-crop-simple"></i> Crop &amp; Rotate Current Photo
       </button>
 
       <h2 style="font-size: 1.4rem; color: #FFF; margin-top: 8px; margin-bottom: 2px;" id="dispName">Member</h2>
@@ -283,6 +283,26 @@
     let isDragging = false;
     let startX = 0;
     let startY = 0;
+
+    function openCropModalForCurrentOrNew() {
+      if (currentProfile && currentProfile.avatar_url) {
+        cropImg = new Image();
+        cropImg.crossOrigin = "anonymous";
+        cropImg.onload = function() {
+          cropScale = 1.0;
+          cropRotation = 0;
+          cropOffsetX = 0;
+          cropOffsetY = 0;
+          document.getElementById('zoomSlider').value = 1.0;
+          document.getElementById('cropModal').classList.add('active');
+          initCropTouchHandlers();
+          updateCropCanvas();
+        };
+        cropImg.src = currentProfile.avatar_url;
+      } else {
+        document.getElementById('avatarFileInput').click();
+      }
+    }
 
     function openCropModalWithImage(file) {
       const reader = new FileReader();
@@ -526,13 +546,16 @@
         <canvas id="cropCanvas" width="260" height="260" style="width:100%;height:100%;cursor:grab;"></canvas>
       </div>
 
-      <!-- Controls: Rotate & Zoom -->
-      <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:14px">
-        <button type="button" class="btn btn-outline" style="width:auto;padding:6px 14px;font-size:0.8rem;" onclick="rotateCropImage(-90)">
-          <i class="fa-solid fa-rotate-left"></i> Rotate -90°
+      <!-- Controls: Rotate, Zoom & Change Image -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px">
+        <button type="button" class="btn btn-outline" style="width:auto;padding:6px 12px;font-size:0.76rem;" onclick="rotateCropImage(-90)">
+          <i class="fa-solid fa-rotate-left"></i> -90°
         </button>
-        <button type="button" class="btn btn-outline" style="width:auto;padding:6px 14px;font-size:0.8rem;" onclick="rotateCropImage(90)">
-          <i class="fa-solid fa-rotate-right"></i> Rotate +90°
+        <button type="button" class="btn btn-outline" style="width:auto;padding:6px 12px;font-size:0.76rem;border-color:var(--pink);color:var(--pink);" onclick="document.getElementById('avatarFileInput').click()">
+          <i class="fa-solid fa-folder-open"></i> Change Image 📁
+        </button>
+        <button type="button" class="btn btn-outline" style="width:auto;padding:6px 12px;font-size:0.76rem;" onclick="rotateCropImage(90)">
+          <i class="fa-solid fa-rotate-right"></i> +90°
         </button>
       </div>
 
