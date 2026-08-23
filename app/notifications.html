@@ -40,9 +40,14 @@
 
   <main class="shell" style="max-width: 520px;">
 
-    <div style="margin-bottom: 20px;">
-      <div class="eyebrow"><i class="fa-solid fa-bolt"></i> Real-time Updates</div>
-      <h1 style="font-size: 1.8rem; margin-top: 4px;">Notifications &amp; Invites</h1>
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+      <div>
+        <div class="eyebrow"><i class="fa-solid fa-bolt"></i> Real-time Updates</div>
+        <h1 style="font-size: 1.8rem; margin-top: 4px;">Notifications &amp; Invites</h1>
+      </div>
+      <button type="button" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.78rem;" onclick="clearAllNotifications()">
+        <i class="fa-solid fa-trash-can text-pink"></i> Clear All
+      </button>
     </div>
 
     <!-- Notifications Container -->
@@ -88,6 +93,44 @@
       renderNotificationsPage();
     }
 
+    function handleNotifAccept(notifId, fromId) {
+      if (fromId) {
+        const friendState = JSON.parse(localStorage.getItem('isot_friends') || '{}');
+        friendState[fromId] = 'connected';
+        localStorage.setItem('isot_friends', JSON.stringify(friendState));
+      }
+      localNotifications = localNotifications.filter(n => n.id !== notifId);
+      localStorage.setItem('isot_notifications', JSON.stringify(localNotifications));
+      updateNotificationBellUI();
+      renderNotificationsPage();
+    }
+
+    function handleNotifIgnore(notifId, fromId) {
+      if (fromId) {
+        const friendState = JSON.parse(localStorage.getItem('isot_friends') || '{}');
+        friendState[fromId] = 'declined';
+        localStorage.setItem('isot_friends', JSON.stringify(friendState));
+      }
+      localNotifications = localNotifications.filter(n => n.id !== notifId);
+      localStorage.setItem('isot_notifications', JSON.stringify(localNotifications));
+      updateNotificationBellUI();
+      renderNotificationsPage();
+    }
+
+    function handleNotifRemove(notifId) {
+      localNotifications = localNotifications.filter(n => n.id !== notifId);
+      localStorage.setItem('isot_notifications', JSON.stringify(localNotifications));
+      updateNotificationBellUI();
+      renderNotificationsPage();
+    }
+
+    function clearAllNotifications() {
+      localNotifications = [];
+      localStorage.setItem('isot_notifications', JSON.stringify([]));
+      updateNotificationBellUI();
+      renderNotificationsPage();
+    }
+
     function renderNotificationsPage() {
       const container = document.getElementById('notificationsPageContainer');
       if (!container) return;
@@ -107,18 +150,40 @@
       }
 
       container.innerHTML = localNotifications.map(n => `
-        <div class="card card-glass" style="margin-bottom:12px;padding:16px;">
+        <div class="card card-glass" style="margin-bottom:12px;padding:16px;position:relative;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
             <div style="font-weight:700;color:#FFF;font-size:0.95rem;display:flex;align-items:center;gap:8px">
               <i class="${n.type === 'event_invite' ? 'fa-solid fa-envelope-open-text text-pink' : 'fa-solid fa-user-plus text-green'}"></i>
               ${escapeHtml(n.title)}
             </div>
-            <span class="dim" style="font-size:0.75rem">${new Date(n.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="dim" style="font-size:0.75rem">${new Date(n.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+              <button type="button" onclick="handleNotifRemove('${n.id}')" title="Remove notification" style="background:transparent;border:none;color:var(--text-muted);font-size:0.9rem;cursor:pointer;padding:2px 6px;">
+                <i class="fa-solid fa-trash-can text-pink"></i>
+              </button>
+            </div>
           </div>
           <p class="dim" style="font-size:0.85rem;margin-bottom:12px">${escapeHtml(n.message)}</p>
-          <div style="display:flex;align-items:center;gap:10px">
-            ${n.eventId ? `<a href="events.html" class="btn btn-pink" style="width:auto;padding:5px 14px;font-size:0.78rem;display:inline-flex">View Event Schedule 📅</a>` : ''}
-            ${n.type === 'friend_request' ? `<a href="network.html" class="btn btn-pink" style="width:auto;padding:5px 14px;font-size:0.78rem;display:inline-flex">View Requests in Network 🤝</a>` : ''}
+
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            ${n.type === 'friend_request' ? `
+              <button type="button" class="btn btn-pink" style="width:auto;padding:5px 14px;font-size:0.78rem;" onclick="handleNotifAccept('${n.id}', '${n.fromId || ''}')">
+                <i class="fa-solid fa-handshake"></i> Accept 🤝
+              </button>
+              <button type="button" class="btn btn-outline" style="width:auto;padding:5px 14px;font-size:0.78rem;" onclick="handleNotifIgnore('${n.id}', '${n.fromId || ''}')">
+                <i class="fa-solid fa-xmark"></i> Ignore ❌
+              </button>
+            ` : ''}
+
+            ${n.eventId ? `
+              <a href="events.html" class="btn btn-pink" style="width:auto;padding:5px 14px;font-size:0.78rem;display:inline-flex">
+                <i class="fa-solid fa-calendar"></i> View Event Schedule 📅
+              </a>
+            ` : ''}
+
+            <button type="button" class="btn btn-outline" style="width:auto;padding:5px 14px;font-size:0.78rem;" onclick="handleNotifRemove('${n.id}')">
+              Remove 🗑️
+            </button>
           </div>
         </div>
       `).join('');
