@@ -705,3 +705,54 @@ function renderNotificationsList() {
     </div>
   `).join('');
 }
+
+/* ---------------------------------------------------------------
+ * Show / hide password
+ *
+ * Runs on every page and attaches to any input[type=password], so pages added
+ * later get it without remembering to wire anything up. Matters most on signup
+ * and reset, where someone is typing a password they cannot check — on a phone,
+ * one-handed, often in a bar.
+ * ------------------------------------------------------------- */
+
+const PW_EYE = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+const PW_EYE_OFF = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7c2 0 3.8.7 5.2 1.6M22 12s-3.5 7-10 7c-2 0-3.8-.7-5.2-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="m3 3 18 18"/></svg>`;
+
+function initPasswordToggles(root = document) {
+  root.querySelectorAll('input[type="password"]').forEach((input) => {
+    if (input.dataset.pwToggle) return;          // already wired
+    input.dataset.pwToggle = '1';
+
+    // Wrap the input so the button can sit inside its right edge
+    const wrap = document.createElement('span');
+    wrap.className = 'pw-wrap';
+    input.parentNode.insertBefore(wrap, input);
+    wrap.appendChild(input);
+
+    const btn = document.createElement('button');
+    btn.type = 'button';                          // never submits the form
+    btn.className = 'pw-toggle';
+    btn.innerHTML = PW_EYE;
+    btn.setAttribute('aria-label', 'Show password');
+    btn.setAttribute('aria-pressed', 'false');
+    wrap.appendChild(btn);
+
+    btn.addEventListener('click', () => {
+      const showing = input.type === 'text';
+      input.type = showing ? 'password' : 'text';
+      btn.innerHTML = showing ? PW_EYE : PW_EYE_OFF;
+      btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+      btn.setAttribute('aria-pressed', String(!showing));
+      // Keep the caret where it was rather than jumping to the start
+      const pos = input.value.length;
+      input.focus();
+      input.setSelectionRange(pos, pos);
+    });
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => initPasswordToggles());
+} else {
+  initPasswordToggles();
+}
