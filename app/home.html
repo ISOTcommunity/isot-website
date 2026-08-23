@@ -481,23 +481,17 @@
 
     function updateHeroRsvpUI(eventId) {
       const isGoing = !!userRsvps[eventId];
-      const baseCount = (eventId % 6) + 14;
-      const totalCount = baseCount + (isGoing ? 1 : 0);
 
       let stackHtml = '';
       if (isGoing && meProfile) {
         stackHtml += `<div class="avatar-stack-item-box" title="You (${meProfile.full_name})">${renderGeoAvatar(meProfile.member_code, 26)}</div>`;
       }
-      SAMPLE_MEMBERS.slice(0, 3).forEach(m => {
-        stackHtml += `<div class="avatar-stack-item-box" title="${m.name}">${renderGeoAvatar(m.code, 26)}</div>`;
-      });
 
       const rowEl = document.getElementById('heroRsvpRow');
       if (rowEl) {
         rowEl.innerHTML = `
           <div class="avatar-stack-wrapper">
-            <div class="avatar-stack">${stackHtml}</div>
-            <span class="avatar-stack-count"><strong>${totalCount} Members Going</strong> • ${isGoing ? 'You, ' : ''}Maria + ${totalCount - 2}</span>
+            ${isGoing ? `<div class="avatar-stack">${stackHtml}</div><span class="avatar-stack-count"><strong>1 Member Going</strong> • You</span>` : `<span class="avatar-stack-count">Be the first to RSVP</span>`}
           </div>
 
           <button type="button" onclick="toggleHeroRsvp()" class="btn-rsvp ${isGoing ? 'going' : ''}">

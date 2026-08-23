@@ -602,16 +602,12 @@
 
     function renderEventCardHtml(item) {
       const isGoing = !!userRsvps[item.id];
-      const baseCount = (item.id % 6) + 12;
-      const totalCount = baseCount + (isGoing ? 1 : 0);
+      const totalCount = isGoing ? 1 : 0;
 
       let stackHtml = '';
       if (isGoing && meProfile) {
         stackHtml += `<div class="avatar-stack-item-box" title="You (${meProfile.full_name})">${renderGeoAvatar(meProfile.member_code, 26)}</div>`;
       }
-      SAMPLE_MEMBERS.slice(0, 3).forEach(m => {
-        stackHtml += `<div class="avatar-stack-item-box" title="${m.name}">${renderGeoAvatar(m.code, 26)}</div>`;
-      });
 
       return `
         <div class="event-card-item">
@@ -639,8 +635,7 @@
 
           <div class="rsvp-row">
             <div class="avatar-stack-wrapper">
-              <div class="avatar-stack">${stackHtml}</div>
-              <span class="avatar-stack-count"><strong>${totalCount} Going</strong> • ${isGoing ? 'You, ' : ''}Maria + ${totalCount - 2}</span>
+              ${isGoing ? `<div class="avatar-stack">${stackHtml}</div><span class="avatar-stack-count"><strong>1 Going</strong> • You</span>` : `<span class="avatar-stack-count">Be the first to RSVP</span>`}
             </div>
 
             <button type="button" onclick="event.stopPropagation(); toggleRsvp(${item.id})" class="btn-rsvp ${isGoing ? 'going' : ''}">
