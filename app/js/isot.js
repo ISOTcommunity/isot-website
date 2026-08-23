@@ -102,9 +102,10 @@ const CATEGORY_LABELS = {
 function getCategoryBadgeHtml(catKey, size = 40) {
   const key = String(catKey || 'social').toLowerCase().trim();
   const assetSrc = CATEGORY_ASSETS[key] || CATEGORY_ASSETS.social;
+  const isKaraoke = key === 'karaoke';
   return `
-    <div class="cat-badge" style="width:${size}px;height:${size}px">
-      <img src="${assetSrc}" alt="${key} category" />
+    <div class="cat-badge" style="width:${size}px;height:${size}px;overflow:hidden">
+      <img src="${assetSrc}" alt="${key} category" style="${isKaraoke ? 'transform:scale(1.85);object-fit:cover;' : 'object-fit:cover;'}" />
     </div>
   `;
 }
