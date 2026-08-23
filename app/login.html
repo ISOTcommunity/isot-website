@@ -106,8 +106,9 @@
           return;
         }
 
-        const next = new URLSearchParams(location.search).get('next');
-        const safe = next && /^[a-z0-9-]+\.html$/i.test(next) ? next : 'home.html';
+        const rawNext = new URLSearchParams(location.search).get('next') || '';
+        const pageFile = rawNext.split('/').pop().replace(/\.html$/i, '') + '.html';
+        const safe = /^[a-z0-9-]+\.html$/i.test(pageFile) && pageFile !== '.html' ? pageFile : 'home.html';
         location.replace(safe);
       });
     })();

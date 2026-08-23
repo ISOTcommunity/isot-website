@@ -144,7 +144,9 @@ async function requireAuth(opts = {}) {
   }
 
   if (!session) {
-    location.replace('login.html?next=' + encodeURIComponent(location.pathname.replace(/^\//, '')));
+    const rawPage = location.pathname.split('/').pop().replace(/\.html$/i, '') || 'home';
+    const cleanTarget = (rawPage === 'login' || rawPage === 'signup') ? 'home.html' : rawPage + '.html';
+    location.replace('login.html?next=' + encodeURIComponent(cleanTarget));
     return new Promise(() => {});
   }
 
