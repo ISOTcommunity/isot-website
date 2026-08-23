@@ -13,14 +13,72 @@
 
   <link rel="stylesheet" href="css/app.css" />
   <style>
+    .view-toggle-bar {
+      display: flex;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+      margin-bottom: 16px;
+      gap: 4px;
+    }
+    .view-btn {
+      flex: 1;
+      padding: 8px 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .view-btn.active {
+      background: var(--pink);
+      color: #FFF;
+      box-shadow: 0 4px 12px rgba(238, 9, 121, 0.3);
+    }
+
+    .month-filter-strip {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      margin: 0 -18px 20px;
+      padding: 0 18px 4px;
+      scrollbar-width: none;
+    }
+    .month-filter-strip::-webkit-scrollbar { display: none; }
+    .month-pill {
+      flex-shrink: 0;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+    .month-pill.active {
+      background: rgba(238, 9, 121, 0.15);
+      border-color: var(--pink);
+      color: var(--pink);
+    }
+
     .event-card-item {
       background: var(--bg-card);
       border: 1px solid var(--border-light);
       border-radius: var(--radius-md);
-      padding: 18px;
-      margin-bottom: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
       display: flex;
-      gap: 16px;
+      gap: 14px;
       transition: var(--transition-spring);
     }
     .event-card-item:hover {
@@ -28,8 +86,8 @@
       transform: translateY(-2px);
     }
     .event-date-box {
-      width: 54px;
-      height: 60px;
+      width: 58px;
+      height: 64px;
       background: rgba(238, 9, 121, 0.12);
       border: 1px solid var(--border-glow);
       border-radius: 14px;
@@ -38,19 +96,66 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      text-align: center;
     }
     .event-date-box .day-num {
-      font-size: 1.3rem;
+      font-size: 1.35rem;
       font-weight: 800;
       color: #FFF;
       line-height: 1;
     }
-    .event-date-box .month-name {
-      font-size: 0.68rem;
+    .event-date-box .day-name {
+      font-size: 0.65rem;
       font-weight: 700;
       color: var(--pink);
       text-transform: uppercase;
-      margin-top: 2px;
+      margin-top: 3px;
+    }
+
+    /* Monthly Grid View */
+    .monthly-grid {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 16px;
+    }
+    .month-section-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 18px;
+    }
+    .month-section-header {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--pink);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 10px;
+    }
+
+    /* Weekly View Cards */
+    .week-day-group {
+      margin-bottom: 20px;
+    }
+    .week-day-header {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .week-day-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-light);
     }
   </style>
 </head>
@@ -74,115 +179,35 @@
 
   <main class="shell">
 
-    <div style="margin-bottom: 18px;">
-      <div class="eyebrow"><i class="fa-solid fa-sparkles"></i> Weekly Turin Schedule</div>
-      <h1 style="font-size: 1.8rem; margin-top: 4px;">Upcoming Events</h1>
+    <div style="margin-bottom: 16px;">
+      <div class="eyebrow"><i class="fa-solid fa-sparkles"></i> Official Schedule (Sep – Dec 2026)</div>
+      <h1 style="font-size: 1.8rem; margin-top: 4px;">ISOT Calendar</h1>
     </div>
 
-    <!-- Events List -->
-    <div id="eventsList">
-      
-      <!-- Event Item 1: Monday Karaoke -->
-      <div class="event-card-item">
-        <div class="event-date-box">
-          <span class="day-num">MON</span>
-          <span class="month-name">21:00</span>
-        </div>
-        <div style="flex: 1; min-width: 0;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <img src="../assets/LOGOS/Karaoke.png" alt="Karaoke" style="width: 24px; height: 24px; border-radius: 6px; object-fit: cover;" />
-              <span class="badge badge-socio">20% OFF</span>
-            </div>
-            <span class="dim" style="font-size: 0.75rem;"><i class="fa-solid fa-clock"></i> Every Monday</span>
-          </div>
-          <h2 style="font-size: 1.1rem; color: #FFF; margin-bottom: 4px;">Monday Karaoke Night</h2>
-          <p class="dim" style="margin-bottom: 10px;"><i class="fa-solid fa-location-dot text-pink"></i> Rough Bar, Via San Salvario 12</p>
-          <a href="karaoke.html" class="btn btn-pink" style="width: auto; padding: 6px 14px; font-size: 0.8rem; display: inline-flex;">Join Song Queue <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i></a>
-        </div>
-      </div>
-
-      <!-- Event Item 2: Thursday Social Hub -->
-      <div class="event-card-item">
-        <div class="event-date-box">
-          <span class="day-num">THU</span>
-          <span class="month-name">20:00</span>
-        </div>
-        <div style="flex: 1; min-width: 0;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <img src="../assets/LOGOS/Tog.jpeg" alt="Together & Social" style="width: 24px; height: 24px; border-radius: 6px; object-fit: cover;" />
-              <span class="badge badge-socio">20% OFF</span>
-            </div>
-            <span class="dim" style="font-size: 0.75rem;"><i class="fa-solid fa-clock"></i> Every Thursday</span>
-          </div>
-          <h2 style="font-size: 1.1rem; color: #FFF; margin-bottom: 4px;">International Social Hub</h2>
-          <p class="dim" style="margin-bottom: 10px;"><i class="fa-solid fa-location-dot text-pink"></i> Capodoglio, Murazzi del Po 37</p>
-          <a href="partner.html" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem; display: inline-flex;">Venue Details</a>
-        </div>
-      </div>
-
-      <!-- Event Item 3: Saturday Pre-Party -->
-      <div class="event-card-item">
-        <div class="event-date-box">
-          <span class="day-num">SAT</span>
-          <span class="month-name">22:30</span>
-        </div>
-        <div style="flex: 1; min-width: 0;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <img src="../assets/LOGOS/Party.jpeg" alt="Party" style="width: 24px; height: 24px; border-radius: 6px; object-fit: cover;" />
-              <span class="badge badge-socio">20% OFF</span>
-            </div>
-            <span class="dim" style="font-size: 0.75rem;"><i class="fa-solid fa-clock"></i> Every Saturday</span>
-          </div>
-          <h2 style="font-size: 1.1rem; color: #FFF; margin-bottom: 4px;">Saturday Pre-Party &amp; DJ Night</h2>
-          <p class="dim" style="margin-bottom: 10px;"><i class="fa-solid fa-location-dot text-pink"></i> Rough Bar &amp; Partner Clubs</p>
-          <a href="profile.html" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem; display: inline-flex;">Show Member Card</a>
-        </div>
-      </div>
-
-      <!-- Event Item 4: Career Workshop -->
-      <div class="event-card-item">
-        <div class="event-date-box">
-          <span class="day-num">FRI</span>
-          <span class="month-name">18:00</span>
-        </div>
-        <div style="flex: 1; min-width: 0;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <img src="../assets/LOGOS/Busines.jpeg" alt="Career" style="width: 24px; height: 24px; border-radius: 6px; object-fit: cover;" />
-              <span class="badge badge-participant">WORKSHOP</span>
-            </div>
-            <span class="dim" style="font-size: 0.75rem;">Monthly</span>
-          </div>
-          <h2 style="font-size: 1.1rem; color: #FFF; margin-bottom: 4px;">CV &amp; Italian Work Permit Workshop</h2>
-          <p class="dim" style="margin-bottom: 10px;"><i class="fa-solid fa-location-dot text-pink"></i> UniTo Campus Luigi Einaudi</p>
-          <a href="../blog.html" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem; display: inline-flex;">Read Guides</a>
-        </div>
-      </div>
-
-      <!-- Event Item 5: Sports Day Trip -->
-      <div class="event-card-item">
-        <div class="event-date-box">
-          <span class="day-num">SUN</span>
-          <span class="month-name">09:00</span>
-        </div>
-        <div style="flex: 1; min-width: 0;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <img src="../assets/LOGOS/Sport.jpeg" alt="Sports" style="width: 24px; height: 24px; border-radius: 6px; object-fit: cover;" />
-              <span class="badge badge-participant">DAY TRIP</span>
-            </div>
-            <span class="dim" style="font-size: 0.75rem;">Bi-Weekly</span>
-          </div>
-          <h2 style="font-size: 1.1rem; color: #FFF; margin-bottom: 4px;">Alps Hiking &amp; Gran Paradiso Trip</h2>
-          <p class="dim" style="margin-bottom: 10px;"><i class="fa-solid fa-location-dot text-pink"></i> Bus Departure from Porta Nuova</p>
-          <a href="home.html" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem; display: inline-flex;">Back to Hub</a>
-        </div>
-      </div>
-
+    <!-- View Mode Switcher (List | Weekly | Monthly) -->
+    <div class="view-toggle-bar">
+      <button type="button" class="view-btn active" id="btnListView" onclick="setViewMode('list')">
+        <i class="fa-solid fa-list-ul"></i> List
+      </button>
+      <button type="button" class="view-btn" id="btnWeeklyView" onclick="setViewMode('weekly')">
+        <i class="fa-solid fa-calendar-week"></i> Weekly
+      </button>
+      <button type="button" class="view-btn" id="btnMonthlyView" onclick="setViewMode('monthly')">
+        <i class="fa-solid fa-calendar-days"></i> Monthly
+      </button>
     </div>
+
+    <!-- Month Filter Pills -->
+    <div class="month-filter-strip" id="monthFilterStrip">
+      <button type="button" class="month-pill active" onclick="filterMonth('all')">All Months</button>
+      <button type="button" class="month-pill" onclick="filterMonth('sep')">September</button>
+      <button type="button" class="month-pill" onclick="filterMonth('oct')">October</button>
+      <button type="button" class="month-pill" onclick="filterMonth('nov')">November</button>
+      <button type="button" class="month-pill" onclick="filterMonth('dec')">December</button>
+    </div>
+
+    <!-- Events Container -->
+    <div id="eventsContainer"></div>
 
   </main>
 
@@ -204,12 +229,172 @@
 
   <script src="vendor/supabase.js"></script>
   <script src="js/isot.js"></script>
+
   <script>
-    async function initEvents() {
+    // Authentic ISOT Events Dataset (September – December 2026)
+    const EVENTS_DATA = [
+      // SEPTEMBER
+      { id: 1, date: '2026-09-11', month: 'sep', dayName: 'FRI', dayNum: '11', title: 'ISOT Pre-Uni Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Semester Opener' },
+      { id: 2, date: '2026-09-25', month: 'sep', dayName: 'FRI', dayNum: '25', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 3, date: '2026-09-26', month: 'sep', dayName: 'SAT', dayNum: '26', title: 'ISOT Pre-Party', venue: 'Rough Bar & Partner Clubs', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 4, date: '2026-09-28', month: 'sep', dayName: 'MON', dayNum: '28', title: 'ISOT Karaoke Night', venue: 'Rough Bar, Via San Salvario 12', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+
+      // OCTOBER
+      { id: 5, date: '2026-10-03', month: 'oct', dayName: 'SAT', dayNum: '03', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 6, date: '2026-10-05', month: 'oct', dayName: 'MON', dayNum: '05', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 7, date: '2026-10-09', month: 'oct', dayName: 'FRI', dayNum: '09', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 8, date: '2026-10-10', month: 'oct', dayName: 'SAT', dayNum: '10', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 9, date: '2026-10-12', month: 'oct', dayName: 'MON', dayNum: '12', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 10, date: '2026-10-17', month: 'oct', dayName: 'SAT', dayNum: '17', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 11, date: '2026-10-19', month: 'oct', dayName: 'MON', dayNum: '19', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 12, date: '2026-10-24', month: 'oct', dayName: 'SAT', dayNum: '24', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 13, date: '2026-10-26', month: 'oct', dayName: 'MON', dayNum: '26', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 14, date: '2026-10-30', month: 'oct', dayName: 'FRI', dayNum: '30', title: 'ISOT Halloween Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Halloween Edition 🎃' },
+      { id: 15, date: '2026-10-31', month: 'oct', dayName: 'SAT', dayNum: '31', title: 'ISOT Pre-Party & Costume Night', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+
+      // NOVEMBER
+      { id: 16, date: '2026-11-02', month: 'nov', dayName: 'MON', dayNum: '02', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 17, date: '2026-11-06', month: 'nov', dayName: 'FRI', dayNum: '06', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 18, date: '2026-11-07', month: 'nov', dayName: 'SAT', dayNum: '07', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 19, date: '2026-11-09', month: 'nov', dayName: 'MON', dayNum: '09', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 20, date: '2026-11-14', month: 'nov', dayName: 'SAT', dayNum: '14', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 21, date: '2026-11-16', month: 'nov', dayName: 'MON', dayNum: '16', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 22, date: '2026-11-20', month: 'nov', dayName: 'FRI', dayNum: '20', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 23, date: '2026-11-21', month: 'nov', dayName: 'SAT', dayNum: '21', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 24, date: '2026-11-23', month: 'nov', dayName: 'MON', dayNum: '23', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 25, date: '2026-11-28', month: 'nov', dayName: 'SAT', dayNum: '28', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 26, date: '2026-11-30', month: 'nov', dayName: 'MON', dayNum: '30', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+
+      // DECEMBER
+      { id: 27, date: '2026-12-04', month: 'dec', dayName: 'FRI', dayNum: '04', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 28, date: '2026-12-05', month: 'dec', dayName: 'SAT', dayNum: '05', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 29, date: '2026-12-07', month: 'dec', dayName: 'MON', dayNum: '07', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 30, date: '2026-12-12', month: 'dec', dayName: 'SAT', dayNum: '12', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 31, date: '2026-12-14', month: 'dec', dayName: 'MON', dayNum: '14', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+      { id: 32, date: '2026-12-18', month: 'dec', dayName: 'FRI', dayNum: '18', title: 'ISOT Winter Gala & Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Semester Finale ❄️' },
+      { id: 33, date: '2026-12-19', month: 'dec', dayName: 'SAT', dayNum: '19', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+      { id: 34, date: '2026-12-21', month: 'dec', dayName: 'MON', dayNum: '21', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' }
+    ];
+
+    const MONTH_LABELS = { sep: 'September 2026', oct: 'October 2026', nov: 'November 2026', dec: 'December 2026' };
+
+    let currentView = 'list';
+    let currentMonth = 'all';
+
+    async function initEventsCalendar() {
       const me = await requireAuth();
       document.getElementById('headerAvatar').innerHTML = renderGeoAvatar(me.member_code, 36);
+
+      renderEvents();
     }
-    document.addEventListener('DOMContentLoaded', initEvents);
+
+    function setViewMode(mode) {
+      currentView = mode;
+      document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+      if (mode === 'list') document.getElementById('btnListView').classList.add('active');
+      if (mode === 'weekly') document.getElementById('btnWeeklyView').classList.add('active');
+      if (mode === 'monthly') document.getElementById('btnMonthlyView').classList.add('active');
+      renderEvents();
+    }
+
+    function filterMonth(m) {
+      currentMonth = m;
+      document.querySelectorAll('.month-pill').forEach(pill => pill.classList.remove('active'));
+      event.target.classList.add('active');
+      renderEvents();
+    }
+
+    function getFilteredEvents() {
+      if (currentMonth === 'all') return EVENTS_DATA;
+      return EVENTS_DATA.filter(item => item.month === currentMonth);
+    }
+
+    function renderEvents() {
+      const container = document.getElementById('eventsContainer');
+      const items = getFilteredEvents();
+
+      if (!items.length) {
+        container.innerHTML = '<div class="card card-glass" style="text-align:center;padding:30px">No events for this selection.</div>';
+        return;
+      }
+
+      if (currentView === 'list') {
+        container.innerHTML = items.map(item => renderEventItemHtml(item)).join('');
+      } else if (currentView === 'weekly') {
+        container.innerHTML = renderWeeklyView(items);
+      } else if (currentView === 'monthly') {
+        container.innerHTML = renderMonthlyView(items);
+      }
+    }
+
+    function renderEventItemHtml(item) {
+      return `
+        <div class="event-card-item">
+          <div class="event-date-box">
+            <span class="day-num">${item.dayNum}</span>
+            <span class="day-name">${item.dayName}</span>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <img src="${item.logo}" alt="" style="width:24px;height:24px;border-radius:6px;object-fit:cover;" />
+                <span class="badge badge-socio">20% OFF</span>
+                ${item.special ? `<span class="badge badge-live">${item.special}</span>` : ''}
+              </div>
+              <span class="dim" style="font-size:0.75rem">${item.time}</span>
+            </div>
+            <h2 style="font-size:1.05rem;color:#FFF;margin-bottom:4px">${escapeHtml(item.title)}</h2>
+            <p class="dim" style="margin-bottom:8px"><i class="fa-solid fa-location-dot text-pink"></i> ${escapeHtml(item.venue)}</p>
+            ${item.link ? `<a href="${item.link}" class="btn btn-pink" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Join Song Queue</a>` : `<a href="profile.html" class="btn btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Show Member Card</a>`}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderWeeklyView(items) {
+      const days = ['MON', 'FRI', 'SAT'];
+      let html = '';
+
+      days.forEach(day => {
+        const dayEvents = items.filter(e => e.dayName === day);
+        if (dayEvents.length) {
+          const dayLabel = day === 'MON' ? 'Mondays • Karaoke @ Rough' : (day === 'FRI' ? 'Fridays • ISOT Zenit Parties' : 'Saturdays • ISOT Pre-Parties');
+          html += `
+            <div class="week-day-group">
+              <div class="week-day-header"><i class="fa-solid fa-calendar-day text-pink"></i> ${dayLabel}</div>
+              ${dayEvents.map(item => renderEventItemHtml(item)).join('')}
+            </div>
+          `;
+        }
+      });
+
+      return html || '<div class="card card-glass" style="text-align:center;padding:30px">No events for this week selection.</div>';
+    }
+
+    function renderMonthlyView(items) {
+      const months = ['sep', 'oct', 'nov', 'dec'];
+      let html = '<div class="monthly-grid">';
+
+      months.forEach(mKey => {
+        const mEvents = items.filter(e => e.month === mKey);
+        if (mEvents.length) {
+          html += `
+            <div class="month-section-card">
+              <div class="month-section-header">
+                <span>${MONTH_LABELS[mKey]}</span>
+                <span class="badge badge-participant" style="font-size:0.75rem">${mEvents.length} Events</span>
+              </div>
+              ${mEvents.map(item => renderEventItemHtml(item)).join('')}
+            </div>
+          `;
+        }
+      });
+
+      html += '</div>';
+      return html;
+    }
+
+    document.addEventListener('DOMContentLoaded', initEventsCalendar);
   </script>
 </body>
 </html>
