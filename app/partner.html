@@ -47,34 +47,60 @@
     <!-- Leaflet Dark Map -->
     <div id="mapContainer"></div>
 
-    <!-- Partner Venue Cards -->
+    <!-- Partner Venue Cards with Category Logos -->
     <div class="card card-glass" style="margin-bottom: 16px;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-        <h2 style="font-size: 1.2rem; color: #FFF;">Rough Bar</h2>
-        <span class="badge badge-socio">20% OFF DRINKS</span>
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <img src="../assets/LOGOS/Drink.jpeg" alt="Drinks" style="width: 44px; height: 44px; border-radius: 12px; object-fit: cover;" />
+          <div>
+            <h2 style="font-size: 1.2rem; color: #FFF; margin: 0;">Rough Bar</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">San Salvario • Via San Salvario 12</p>
+          </div>
+        </div>
+        <span class="badge badge-socio">20% OFF</span>
       </div>
-      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">
-        <i class="fa-solid fa-location-dot text-pink"></i> Via San Salvario 12, Torino
-      </p>
-      <div style="font-size: 0.8rem; color: var(--text-dim);">
-        Host venue for Monday Karaoke & Saturday Pre-Party.
+
+      <div style="display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-light);">
+        <span class="badge badge-participant"><i class="fa-solid fa-microphone"></i> Monday Karaoke</span>
+        <span class="badge badge-participant"><i class="fa-solid fa-glass-cheers"></i> Saturday Pre-Party</span>
       </div>
     </div>
 
     <div class="card card-glass">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-        <h2 style="font-size: 1.2rem; color: #FFF;">Capodoglio</h2>
-        <span class="badge badge-socio">20% OFF DRINKS</span>
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <img src="../assets/LOGOS/Tog.jpeg" alt="Together & Social" style="width: 44px; height: 44px; border-radius: 12px; object-fit: cover;" />
+          <div>
+            <h2 style="font-size: 1.2rem; color: #FFF; margin: 0;">Capodoglio</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Murazzi del Po 37</p>
+          </div>
+        </div>
+        <span class="badge badge-socio">20% OFF</span>
       </div>
-      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">
-        <i class="fa-solid fa-location-dot text-pink"></i> Murazzi del Po 37, Torino
-      </p>
-      <div style="font-size: 0.8rem; color: var(--text-dim);">
-        Host venue for Thursday International Social Hub.
+
+      <div style="display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-light);">
+        <span class="badge badge-participant"><i class="fa-solid fa-users"></i> Thursday Social Hub</span>
+        <span class="badge badge-participant"><i class="fa-solid fa-music"></i> DJ Nights</span>
       </div>
     </div>
 
   </main>
+
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="tabbar">
+    <a href="home.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 011-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </a>
+    <a href="profile.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 9h.01M9 9h.01M12 12h.01M12 15h.01M3 20.4V3.6A1.6 1.6 0 014.6 2h14.8A1.6 1.6 0 0121 3.6v16.8M3 20.4h18"/></svg>
+      Card
+    </a>
+    <a href="partner.html" class="tab-item active">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      Venues
+    </a>
+  </nav>
 
   <script src="vendor/supabase.js"></script>
   <script src="vendor/leaflet.js"></script>
@@ -85,7 +111,6 @@
       const me = await requireAuth();
       document.getElementById('headerAvatar').innerHTML = renderGeoAvatar(me.member_code, 36);
 
-      // Initialize Leaflet Map over Turin (45.0703, 7.6869)
       const map = L.map('mapContainer').setView([45.0560, 7.6820], 14);
 
       L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -93,11 +118,9 @@
         attribution: '&copy; OpenStreetMap &copy; CARTO'
       }).addTo(map);
 
-      // Rough Bar marker
       L.marker([45.0545, 7.6832]).addTo(map)
         .bindPopup('<b>Rough Bar</b><br>20% Member Discount');
 
-      // Capodoglio marker
       L.marker([45.0578, 7.6915]).addTo(map)
         .bindPopup('<b>Capodoglio</b><br>20% Member Discount');
     }

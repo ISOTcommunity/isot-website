@@ -71,21 +71,39 @@ function renderGeoAvatar(memberCode, size = 44) {
  * ------------------------------------------------------------- */
 const CATEGORY_ASSETS = {
   drinks: '../assets/LOGOS/Drink.jpeg',
+  drink: '../assets/LOGOS/Drink.jpeg',
+  aperitivo: '../assets/LOGOS/Drink.jpeg',
   social: '../assets/LOGOS/Tog.jpeg',
+  together: '../assets/LOGOS/Tog.jpeg',
+  tog: '../assets/LOGOS/Tog.jpeg',
   party: '../assets/LOGOS/Party.jpeg',
+  nightlife: '../assets/LOGOS/Party.jpeg',
   career: '../assets/LOGOS/Busines.jpeg',
+  busines: '../assets/LOGOS/Busines.jpeg',
+  workshops: '../assets/LOGOS/Busines.jpeg',
   sports: '../assets/LOGOS/Sport.jpeg',
+  sport: '../assets/LOGOS/Sport.jpeg',
+  trips: '../assets/LOGOS/Sport.jpeg',
+};
+
+const CATEGORY_LABELS = {
+  social: 'Together & Social',
+  drinks: 'Drinks & Aperitivo',
+  party: 'Party & Nightlife',
+  career: 'Career & Workshops',
+  sports: 'Sports & Trips',
+  karaoke: 'Karaoke Night'
 };
 
 /**
  * Renders Category Character Badge HTML or Karaoke character SVG
  */
-function getCategoryBadgeHtml(catKey) {
-  const key = String(catKey || 'social').toLowerCase();
+function getCategoryBadgeHtml(catKey, size = 40) {
+  const key = String(catKey || 'social').toLowerCase().trim();
   if (key === 'karaoke') {
     return `
-      <div class="cat-badge">
-        <svg viewBox="0 0 100 100" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+      <div class="cat-badge" style="width:${size}px;height:${size}px">
+        <svg viewBox="0 0 100 100" width="${size * 0.8}" height="${size * 0.8}" xmlns="http://www.w3.org/2000/svg">
           <circle cx="50" cy="50" r="42" fill="#EBC17F"/>
           <rect x="25" y="44" width="50" height="12" rx="6" fill="#3F35A0"/>
           <circle cx="36" cy="50" r="9" fill="#000"/>
@@ -100,7 +118,7 @@ function getCategoryBadgeHtml(catKey) {
 
   const assetSrc = CATEGORY_ASSETS[key] || CATEGORY_ASSETS.social;
   return `
-    <div class="cat-badge">
+    <div class="cat-badge" style="width:${size}px;height:${size}px">
       <img src="${assetSrc}" alt="${key} category" />
     </div>
   `;
