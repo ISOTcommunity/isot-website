@@ -406,16 +406,18 @@ h3 {
 .tab-item.active { color: var(--pink); }
 .tab-item svg { width: 22px; height: 22px; stroke-width: 2.2; }
 
-/* ---------- Deterministic SVG Geometry Avatars ---------- */
+/* ---------- Deterministic Geometry & Initials Avatars ---------- */
 .geo-avatar {
-  width: 44px;
-  height: 44px;
   border-radius: 50%;
   overflow: hidden;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   vertical-align: middle;
   border: 1px solid var(--border-light);
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  flex-shrink: 0;
+  text-align: center;
 }
 
 /* ---------- SVG Category Character Badges ---------- */

@@ -50,49 +50,39 @@ const IDENTITY_PALETTE = [
 ];
 
 /**
- * Generates an Apple-grade deterministic dual-color split circle SVG avatar
- * based on the member's unique `member_code`.
+ * Renders user photo avatar if profile.avatar_url exists, otherwise renders crisp centered Initials / User Icon
  */
-function renderGeoAvatar(memberCode, size = 44) {
-  const codeStr = String(memberCode || 'ISOT-2026-0000');
-  let hash = 0;
-  for (let i = 0; i < codeStr.length; i++) {
-    hash = (hash << 5) - hash + codeStr.charCodeAt(i);
-    hash |= 0;
+function renderUserAvatarHtml(profile, size = 44) {
+  const s = size;
+  const name = profile ? (profile.full_name || 'Member') : 'Member';
+  const initial = name.trim().charAt(0).toUpperCase() || 'M';
+  const code = profile ? (profile.member_code || 'ISOT-2026') : 'ISOT-2026';
+
+  if (profile && profile.avatar_url) {
+    return `<img src="${escapeHtml(profile.avatar_url)}" alt="${escapeHtml(name)}" style="width:${s}px;height:${s}px;border-radius:50%;object-fit:cover;border:1.5px solid var(--pink);display:block;flex-shrink:0;" />`;
   }
 
-  const index1 = Math.abs(hash) % IDENTITY_PALETTE.length;
-  const index2 = Math.abs(hash >> 3) % IDENTITY_PALETTE.length;
-  const color1 = IDENTITY_PALETTE[index1];
-  const color2 = index1 === index2 ? IDENTITY_PALETTE[(index2 + 1) % IDENTITY_PALETTE.length] : IDENTITY_PALETTE[index2];
+  // Deterministic color selection from Identity Palette
+  let hash = 0;
+  for (let i = 0; i < code.length; i++) {
+    hash = (hash << 5) - hash + code.charCodeAt(i);
+    hash |= 0;
+  }
+  const index = Math.abs(hash) % IDENTITY_PALETTE.length;
+  const color1 = IDENTITY_PALETTE[index];
+  const color2 = IDENTITY_PALETTE[(index + 3) % IDENTITY_PALETTE.length];
+
+  const fontSize = Math.max(12, Math.round(s * 0.42));
 
   return `
-    <svg class="geo-avatar" width="${size}" height="${size}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <clipPath id="leftHalf-${codeStr}">
-          <rect x="0" y="0" width="50" height="100"/>
-        </clipPath>
-        <clipPath id="rightHalf-${codeStr}">
-          <rect x="50" y="0" width="100" height="100"/>
-        </clipPath>
-      </defs>
-      <circle cx="50" cy="50" r="50" fill="${color1}" clip-path="url(#leftHalf-${codeStr})"/>
-      <circle cx="50" cy="50" r="50" fill="${color2}" clip-path="url(#rightHalf-${codeStr})"/>
-      <circle cx="50" cy="50" r="14" fill="#000000" opacity="0.15"/>
-    </svg>
+    <div class="geo-avatar" style="width:${s}px;height:${s}px;border-radius:50%;background:linear-gradient(135deg, ${color1}, ${color2});display:inline-flex;align-items:center;justify-content:center;color:#FFF;font-weight:700;font-size:${fontSize}px;border:1.5px solid rgba(255,255,255,0.25);box-shadow:0 4px 12px rgba(0,0,0,0.3);flex-shrink:0;user-select:none;text-transform:uppercase;">
+      ${initial}
+    </div>
   `;
 }
 
-/**
- * Renders user photo avatar if profile.avatar_url exists, otherwise renders GeoAvatar
- */
-function renderUserAvatarHtml(profile, size = 44) {
-  if (!profile) return renderGeoAvatar('ISOT-2026-0000', size);
-
-  if (profile.avatar_url) {
-    return `<img src="${escapeHtml(profile.avatar_url)}" alt="Avatar" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;border:1.5px solid var(--pink);" />`;
-  }
-  return renderGeoAvatar(profile.member_code, size);
+function renderGeoAvatar(memberCode, size = 44) {
+  return renderUserAvatarHtml({ member_code: memberCode, full_name: 'Member' }, size);
 }
 
 /**
