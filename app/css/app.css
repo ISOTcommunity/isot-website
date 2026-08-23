@@ -185,6 +185,9 @@ a { color: inherit; text-decoration: none; }
   right: 0;
   bottom: 0;
   width: min(340px, 85vw);
+  /* dvh tracks the visible viewport as iOS shows/hides its chrome; without it the
+     drawer's bottom can sit below the screen. Falls back to the top/bottom:0 above. */
+  height: 100dvh;
   background: rgba(18, 24, 38, 0.95);
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
@@ -221,7 +224,12 @@ a { color: inherit; text-decoration: none; }
 
 .drawer-nav {
   flex: 1;
+  /* Without min-height:0 a flex child will not shrink below its content height, so a
+     long nav list pushes the footer (and the Sign Out button) off the bottom of the
+     screen instead of scrolling inside the drawer. */
+  min-height: 0;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 12px;
 }
 
@@ -256,8 +264,13 @@ a { color: inherit; text-decoration: none; }
 }
 
 .drawer-footer {
-  padding: 16px 20px;
+  /* flex-shrink:0 keeps the footer at full height when the nav is long.
+     The safe-area padding keeps Sign Out clear of the iPhone home indicator,
+     which matters most in the installed PWA where there is no browser chrome. */
+  flex-shrink: 0;
+  padding: 16px 20px calc(16px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--border-light);
+  background: inherit;
 }
 
 /* ---------- Typography ---------- */
