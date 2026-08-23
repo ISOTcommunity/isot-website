@@ -228,7 +228,7 @@ function initBurgerMenu(profile) {
         <i class="fa-solid fa-qrcode text-pink"></i>
         <span>My Member Card &amp; QR</span>
       </a>
-      <a href="complete-profile.html" class="drawer-item">
+      <a href="account.html" class="drawer-item">
         <i class="fa-solid fa-user-gear text-pink"></i>
         <span>Account &amp; Profile Settings</span>
       </a>

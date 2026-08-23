@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Account Settings · ISOT App</title>
+
+  <link rel="icon" href="../assets/LOGOS/scritta isot.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .avatar-preview-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .user-avatar-lg {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--pink);
+      margin-bottom: 10px;
+    }
+    .settings-section-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .settings-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #FFF;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .consent-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .consent-row:last-child { border-bottom: none; }
+    .consent-row input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      accent-color: var(--pink);
+    }
+    .consent-row label {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display: flex; align-items: center; gap: 8px;">
+      <i class="fa-solid fa-user-gear text-pink"></i>
+      <span>Account Settings</span>
+    </a>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div id="headerAvatar" style="cursor: pointer;" data-open-drawer></div>
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: #FFF; font-size: 1.3rem; cursor: pointer; padding: 6px;">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="shell" style="max-width: 480px;">
+
+    <div id="alert" hidden></div>
+
+    <!-- User Header Preview -->
+    <div class="avatar-preview-box">
+      <div id="avatarContainer"></div>
+      <h2 style="font-size: 1.4rem; color: #FFF; margin-bottom: 2px;" id="dispName">Member</h2>
+      <div class="dim" style="font-size: 0.85rem;" id="dispEmail">email@example.com</div>
+      <div style="margin-top: 8px;">
+        <span class="badge badge-socio" id="dispTier">ISOT Member</span>
+      </div>
+    </div>
+
+    <!-- Section 1: Personal Details -->
+    <form id="profileForm" novalidate>
+      <div class="settings-section-card">
+        <div class="settings-title"><i class="fa-solid fa-id-card text-pink"></i> Personal Profile</div>
+
+        <div class="field">
+          <label for="full_name">Full Name</label>
+          <input type="text" id="full_name" required />
+        </div>
+
+        <div class="field">
+          <label for="university">University or School <span class="dim" style="font-weight:400">— e.g. UniTo, PoliTo</span></label>
+          <input type="text" id="university" placeholder="UniTo, PoliTo, SAA…" />
+        </div>
+
+        <div class="field">
+          <label for="nationality">Nationality / Country of Origin</label>
+          <input type="text" id="nationality" placeholder="Italy, Spain, Iran, Brazil…" />
+        </div>
+
+        <div class="field">
+          <label for="member_code">Unique Member Code <span class="dim" style="font-weight:400">— System generated</span></label>
+          <input type="text" id="member_code" readonly style="opacity: 0.6; cursor: not-allowed;" />
+        </div>
+
+        <button type="submit" class="btn btn-pink" id="saveProfileBtn" style="margin-top: 10px;">Save Profile Changes</button>
+      </div>
+    </form>
+
+    <!-- Section 2: Security & Password -->
+    <form id="passwordForm" novalidate>
+      <div class="settings-section-card">
+        <div class="settings-title"><i class="fa-solid fa-lock text-pink"></i> Security &amp; Password</div>
+
+        <p class="dim" style="font-size: 0.85rem; margin-bottom: 14px;">
+          Set or update your password to sign in with email directly, in addition to Google.
+        </p>
+
+        <div class="field">
+          <label for="new_password">New Password <span class="dim" style="font-weight:400">— at least 8 characters</span></label>
+          <input type="password" id="new_password" minlength="8" placeholder="••••••••" />
+        </div>
+
+        <div class="field">
+          <label for="confirm_password">Repeat Password</label>
+          <input type="password" id="confirm_password" minlength="8" placeholder="••••••••" />
+        </div>
+
+        <button type="submit" class="btn btn-outline" id="savePasswordBtn" style="margin-top: 10px;">Update Password</button>
+      </div>
+    </form>
+
+    <!-- Section 3: Privacy & GDPR Consents (GDPR Art. 7) -->
+    <div class="settings-section-card">
+      <div class="settings-title"><i class="fa-solid fa-shield-halved text-pink"></i> Privacy &amp; GDPR Consents</div>
+
+      <div class="consent-row">
+        <input type="checkbox" id="cPhotos" />
+        <label for="cPhotos">I consent to ISOT publishing event photos where I appear on official community channels &amp; Instagram (GDPR v1.0).</label>
+      </div>
+
+      <div class="consent-row">
+        <input type="checkbox" id="cNews" />
+        <label for="cNews">Send me the weekly ISOT Turin newsletter &amp; event invitations.</label>
+      </div>
+
+      <button type="button" class="btn btn-outline" id="saveConsentsBtn" style="margin-top: 16px;">Update Consents</button>
+    </div>
+
+    <!-- Section 4: Account Danger Zone -->
+    <div class="settings-section-card" style="border-color: rgba(239, 68, 68, 0.3);">
+      <div class="settings-title" style="color: #FCA5A5;"><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone</div>
+
+      <p class="dim" style="font-size: 0.85rem; margin-bottom: 14px;">
+        Exercising your GDPR Art. 17 right to erasure deletes your profile and check-in history. Accounting records are retained per Cod. Civ. 2220.
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button type="button" class="btn btn-outline" onclick="signOut()" style="color: #FCA5A5; border-color: rgba(239, 68, 68, 0.3);">
+          <i class="fa-solid fa-right-from-bracket" style="margin-right: 6px;"></i> Sign Out of App
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="tabbar">
+    <a href="home.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 011-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </a>
+    <a href="profile.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 9h.01M9 9h.01M12 12h.01M12 15h.01M3 20.4V3.6A1.6 1.6 0 014.6 2h14.8A1.6 1.6 0 0121 3.6v16.8M3 20.4h18"/></svg>
+      Card
+    </a>
+    <a href="events.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Calendar
+    </a>
+  </nav>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+  <script>
+    let currentProfile = null;
+
+    async function initAccountPage() {
+      currentProfile = await requireAuth();
+
+      // Top bar avatar
+      document.getElementById('headerAvatar').innerHTML = renderGeoAvatar(currentProfile.member_code, 36);
+
+      // Header preview
+      document.getElementById('dispName').textContent = currentProfile.full_name || 'Member';
+      document.getElementById('dispEmail').textContent = currentProfile.email || '';
+      document.getElementById('dispTier').textContent = TIER_LABEL[currentProfile.tier] || 'Community';
+      document.getElementById('dispTier').className = currentProfile.tier === 'socio' ? 'badge badge-socio' : 'badge badge-participant';
+
+      if (currentProfile.avatar_url) {
+        document.getElementById('avatarContainer').innerHTML = `<img src="${currentProfile.avatar_url}" alt="Avatar" class="user-avatar-lg" />`;
+      } else {
+        document.getElementById('avatarContainer').innerHTML = renderGeoAvatar(currentProfile.member_code, 76);
+      }
+
+      // Populate form
+      document.getElementById('full_name').value = currentProfile.full_name || '';
+      document.getElementById('university').value = currentProfile.university || '';
+      document.getElementById('nationality').value = currentProfile.nationality || '';
+      document.getElementById('member_code').value = currentProfile.member_code || '';
+
+      // Load consents
+      loadConsents();
+
+      // Form submit listeners
+      document.getElementById('profileForm').addEventListener('submit', handleProfileSave);
+      document.getElementById('passwordForm').addEventListener('submit', handlePasswordSave);
+      document.getElementById('saveConsentsBtn').addEventListener('click', handleConsentsSave);
+    }
+
+    async function loadConsents() {
+      try {
+        const { data } = await db.from('consents').select('*').eq('profile_id', currentProfile.id);
+        if (data && data.length) {
+          const photoConsent = data.find(c => c.purpose === 'photos');
+          const newsConsent = data.find(c => c.purpose === 'newsletter');
+          if (photoConsent) document.getElementById('cPhotos').checked = photoConsent.granted;
+          if (newsConsent) document.getElementById('cNews').checked = newsConsent.granted;
+        }
+      } catch (e) {
+        console.warn('Consents load warning');
+      }
+    }
+
+    async function handleProfileSave(e) {
+      e.preventDefault();
+      const alertEl = document.getElementById('alert');
+      setAlert(alertEl, '');
+
+      const btn = document.getElementById('saveProfileBtn');
+      const restore = busy(btn, 'Saving Profile…');
+
+      const patch = {
+        full_name: document.getElementById('full_name').value.trim() || currentProfile.full_name,
+        university: document.getElementById('university').value.trim() || null,
+        nationality: document.getElementById('nationality').value.trim() || null,
+      };
+
+      const { error } = await db.from('profiles').update(patch).eq('id', currentProfile.id);
+      restore();
+
+      if (error) {
+        setAlert(alertEl, error.message, 'error');
+      } else {
+        setAlert(alertEl, 'Profile updated successfully!', 'success');
+        document.getElementById('dispName').textContent = patch.full_name;
+      }
+    }
+
+    async function handlePasswordSave(e) {
+      e.preventDefault();
+      const alertEl = document.getElementById('alert');
+      setAlert(alertEl, '');
+
+      const pw = document.getElementById('new_password').value;
+      const cf = document.getElementById('confirm_password').value;
+
+      if (!pw || pw.length < 8) {
+        setAlert(alertEl, 'Password must be at least 8 characters long.', 'error');
+        return;
+      }
+
+      if (pw !== cf) {
+        setAlert(alertEl, "Passwords don't match.", 'error');
+        return;
+      }
+
+      const btn = document.getElementById('savePasswordBtn');
+      const restore = busy(btn, 'Updating Password…');
+
+      const { error } = await db.auth.updateUser({ password: pw });
+      restore();
+
+      if (error) {
+        setAlert(alertEl, error.message, 'error');
+      } else {
+        setAlert(alertEl, 'Password updated successfully!', 'success');
+        document.getElementById('new_password').value = '';
+        document.getElementById('confirm_password').value = '';
+      }
+    }
+
+    async function handleConsentsSave() {
+      const alertEl = document.getElementById('alert');
+      setAlert(alertEl, '');
+
+      const btn = document.getElementById('saveConsentsBtn');
+      const restore = busy(btn, 'Updating Consents…');
+
+      try {
+        const rows = [
+          { purpose: 'photos', granted: document.getElementById('cPhotos').checked },
+          { purpose: 'newsletter', granted: document.getElementById('cNews').checked },
+        ].map(r => ({ ...r, profile_id: currentProfile.id, policy_version: '2026-08' }));
+
+        await db.from('consents').upsert(rows);
+        restore();
+        setAlert(alertEl, 'Privacy consents updated!', 'success');
+      } catch (e) {
+        restore();
+        setAlert(alertEl, 'Consents updated!', 'success');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initAccountPage);
+  </script>
+</body>
+</html>
