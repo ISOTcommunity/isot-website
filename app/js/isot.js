@@ -300,6 +300,9 @@ async function requireAuth(opts = {}) {
     return new Promise(() => {});
   }
 
+  // Remembered so sendNotification can stamp actor_id without re-fetching.
+  window.__isotProfileId = profile.id;
+
   const isBoard = profile.staff_role === 'board';
   const isStaff = isBoard || profile.staff_role === 'volunteer';
 
@@ -591,13 +594,46 @@ function googleButtonHtml(label = 'Continue with Google') {
 /* ---------------------------------------------------------------
  * Global Notification & Event Invitation System
  * ------------------------------------------------------------- */
-let localNotifications = JSON.parse(localStorage.getItem('isot_notifications') || '[]');
+// Notifications live on the server and belong to their recipient. This array is only a
+// render cache for the current user's own rows, refilled by loadNotifications().
+// It used to be seeded from localStorage, which is how a notification the user *sent*
+// ended up displayed as one they had *received*.
+let localNotifications = [];
+
+/** Fetch this user's notifications. RLS restricts the rows to auth.uid(). */
+async function loadNotifications() {
+  if (!db) return [];
+  const { data, error } = await db
+    .from('notifications')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  if (error) {
+    console.error('Could not load notifications:', error.message);
+    return [];
+  }
+  localNotifications = data || [];
+  updateNotificationBellUI();
+  return localNotifications;
+}
+
+/** Mark one as read. */
+async function markNotificationRead(id) {
+  if (!db) return;
+  const { error } = await db.from('notifications').update({ read: true }).eq('id', id);
+  if (error) { console.error('Could not mark read:', error.message); return; }
+  const n = localNotifications.find(x => x.id === id);
+  if (n) n.read = true;
+  updateNotificationBellUI();
+}
 
 function getUnreadNotificationsCount() {
   return localNotifications.filter(n => !n.read).length;
 }
 
 function sendNotification(recipientId, type, title, message, eventId = null) {
+  const currentProfileId = window.__isotProfileId || null;
   const notif = {
     id: 'n_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
     recipientId,
@@ -609,20 +645,33 @@ function sendNotification(recipientId, type, title, message, eventId = null) {
     created_at: new Date().toISOString()
   };
 
-  localNotifications.unshift(notif);
-  localStorage.setItem('isot_notifications', JSON.stringify(localNotifications));
-
-  if (db) {
-    db.from('notifications').insert({
-      user_id: recipientId,
-      type,
-      title,
-      message,
-      event_id: eventId,
-      read: false
-    }).then(() => {}).catch(e => console.warn('Notif DB sync:', e));
+  // Do NOT put it in our own list. This is the bug that made a friend request sent to
+  // someone else appear in the sender's own notifications: the object was unshifted into
+  // localNotifications regardless of who recipientId was, and the database insert
+  // underneath failed silently because the notifications table did not exist.
+  //
+  // A notification belongs to its recipient, so it only goes to the server. The recipient
+  // reads it back with loadNotifications(), filtered to their own id by RLS.
+  if (!db) {
+    console.warn('Cannot send notification: no database connection.');
+    return { ok: false, error: 'offline' };
   }
-  updateNotificationBellUI();
+
+  return db.from('notifications').insert({
+    user_id: recipientId,          // who should see it
+    actor_id: currentProfileId,    // who caused it — RLS requires this to be us
+    type,
+    title,
+    message,
+    event_id: eventId,
+    read: false,
+  }).then(({ error }) => {
+    if (error) {
+      console.error('Notification failed:', error.message);
+      return { ok: false, error: error.message };
+    }
+    return { ok: true };
+  });
 }
 
 function updateNotificationBellUI() {
@@ -665,10 +714,17 @@ function openNotificationCenterModal() {
   renderNotificationsList();
   modal.classList.add('active');
 
-  // Mark as read
-  localNotifications.forEach(n => { n.read = true; });
-  localStorage.setItem('isot_notifications', JSON.stringify(localNotifications));
-  updateNotificationBellUI();
+  // Mark as read on the server, not in localStorage — otherwise the badge clears on this
+  // device and comes straight back on the next one.
+  const unread = localNotifications.filter(n => !n.read).map(n => n.id);
+  if (db && unread.length) {
+    db.from('notifications').update({ read: true }).in('id', unread)
+      .then(({ error }) => {
+        if (error) return console.error('Could not mark read:', error.message);
+        localNotifications.forEach(n => { n.read = true; });
+        updateNotificationBellUI();
+      });
+  }
 }
 
 function closeNotificationCenterModal() {
