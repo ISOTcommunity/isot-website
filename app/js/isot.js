@@ -83,7 +83,6 @@ const CATEGORY_ASSETS = {
 function getCategoryBadgeHtml(catKey) {
   const key = String(catKey || 'social').toLowerCase();
   if (key === 'karaoke') {
-    // Custom Karaoke Category Character SVG (Asterisk with sunglasses & microphone)
     return `
       <div class="cat-badge">
         <svg viewBox="0 0 100 100" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
@@ -149,37 +148,15 @@ async function requireAuth(opts = {}) {
     return new Promise(() => {});
   }
 
-  let { data: profile, error } = await db
+  const { data: profile, error } = await db
     .from('profiles')
     .select('*')
     .eq('id', session.user.id)
-    .maybeSingle();
+    .single();
 
-  // Self-heal profile row for OAuth user if DB trigger was missing/delayed
-  if (!profile) {
-    const meta = session.user.user_metadata || {};
-    const fallbackName = meta.full_name || meta.name || session.user.email?.split('@')[0] || 'Member';
-    const fallbackAvatar = meta.avatar_url || meta.picture || null;
-    const fallbackCode = 'ISOT-2026-' + Math.floor(1000 + Math.random() * 9000);
-
-    const { data: created, error: upsertErr } = await db
-      .from('profiles')
-      .upsert({
-        id: session.user.id,
-        email: session.user.email,
-        full_name: fallbackName,
-        avatar_url: fallbackAvatar,
-        member_code: fallbackCode
-      })
-      .select('*')
-      .single();
-
-    if (!upsertErr && created) {
-      profile = created;
-    } else {
-      showGateError('Profile missing', 'Your account exists but has no profile row.');
-      return new Promise(() => {});
-    }
+  if (error || !profile) {
+    showGateError('Profile missing', 'Your account exists but has no profile row. Make sure migration 004 has been run in Supabase.');
+    return new Promise(() => {});
   }
 
   const isBoard = profile.staff_role === 'board';
@@ -261,14 +238,10 @@ const ROLE_LABEL = { board: 'Board', volunteer: 'Volunteer', partner: 'Venue par
  * Google sign-in + password recovery
  * ------------------------------------------------------------- */
 
-/** Where OAuth and recovery links should come back to. Works on the deployed
- *  site, on localhost, and in a Capacitor build, because it is derived from
- *  wherever the app is actually running rather than hardcoded. */
 function appUrl(page) {
   return new URL(page, location.href).href;
 }
 
-/** Continue with Google. Redirects away; nothing after this runs. */
 async function signInWithGoogle(btn) {
   const restore = btn ? busy(btn, 'Opening Google…') : () => {};
   const { error } = await db.auth.signInWithOAuth({
@@ -278,7 +251,6 @@ async function signInWithGoogle(btn) {
   if (error) { restore(); throw error; }
 }
 
-/** Send a password reset email pointing back at reset.html. */
 async function sendPasswordReset(email) {
   const { error } = await db.auth.resetPasswordForEmail(email.trim(), {
     redirectTo: appUrl('reset.html'),
@@ -286,7 +258,6 @@ async function sendPasswordReset(email) {
   return error ? { ok: false, error: error.message } : { ok: true };
 }
 
-/** Markup for the Google button + divider. Identical on login and signup. */
 function googleButtonHtml(label = 'Continue with Google') {
   return `
     <div style="display:flex;align-items:center;gap:12px;margin:18px 0">

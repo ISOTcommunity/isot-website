@@ -31,7 +31,7 @@
       <p class="muted" style="font-size:0.92rem" id="greeting">Just a couple of things.</p>
     </div>
 
-    <div class="card">
+    <div class="card card-glass card-glow">
       <div id="alert" hidden></div>
 
       <form id="form" novalidate>
@@ -48,8 +48,7 @@
           <input type="text" id="nationality" />
         </div>
 
-        <!-- Set a password so Google is not the only way in. Optional by design:
-             forcing one on an OAuth user is friction for no security gain. -->
+        <!-- Optional password section for OAuth users -->
         <div class="sub" id="pwSection">
           <p class="eyebrow" style="margin-bottom:6px">Add a password <span class="dim" style="font-weight:400;text-transform:none;letter-spacing:0">— optional</span></p>
           <p class="dim" style="font-size:0.8rem;margin-bottom:14px">
@@ -57,17 +56,15 @@
           </p>
           <div class="field">
             <label for="password">Password <span class="dim" style="font-weight:400">— at least 8 characters</span></label>
-            <input type="password" id="password" autocomplete="new-password" minlength="8" />
+            <input type="password" id="password" autocomplete="new-password" minlength="8" placeholder="••••••••" />
           </div>
           <div class="field">
             <label for="confirm">Repeat it</label>
-            <input type="password" id="confirm" autocomplete="new-password" minlength="8" />
+            <input type="password" id="confirm" autocomplete="new-password" minlength="8" placeholder="••••••••" />
           </div>
           <p id="pwMatch" class="dim" style="font-size:0.8rem;margin-top:-6px" hidden></p>
         </div>
 
-        <!-- GDPR: separate, unticked, never bundled into the account itself.
-             The account runs on contract; these two run on consent. -->
         <div class="sub">
           <p class="eyebrow" style="margin-bottom:10px">Optional</p>
           <div class="consent">
@@ -80,7 +77,7 @@
           </div>
         </div>
 
-        <button type="submit" class="btn btn-pink" id="submit" style="margin-top:18px">Finish</button>
+        <button type="submit" class="btn btn-pink" id="submit" style="margin-top:18px">Finish & Open App →</button>
       </form>
 
       <button type="button" class="btn btn-ghost" id="skip" style="margin-top:10px">Skip for now</button>
@@ -105,7 +102,7 @@
     const matchEl = document.getElementById('pwMatch');
 
     document.getElementById('greeting').textContent =
-      'Welcome, ' + me.full_name.split(' ')[0] + '. Just a couple of things.';
+      'Welcome, ' + (me.full_name ? me.full_name.split(' ')[0] : 'Member') + '. Just a couple of things.';
 
     if (me.avatar_url) {
       const img = document.getElementById('avatar');
@@ -117,12 +114,10 @@
     document.getElementById('university').value  = me.university ?? '';
     document.getElementById('nationality').value = me.nationality ?? '';
 
-    // Someone who signed up with email already has a password — do not offer another.
     const { data: { user } } = await db.auth.getUser();
     const viaOAuth = (user?.app_metadata?.providers ?? []).some(p => p !== 'email');
     if (!viaOAuth) document.getElementById('pwSection').hidden = true;
 
-    // Live match feedback, so they find out before they hit the button.
     function checkMatch() {
       if (!pwEl.value && !cfEl.value) { matchEl.hidden = true; return true; }
       if (pwEl.value.length < 8) {
@@ -141,12 +136,15 @@
     cfEl.addEventListener('input', checkMatch);
 
     async function saveConsents() {
-      const rows = [
-        { purpose: 'photos',     granted: document.getElementById('cPhotos').checked },
-        { purpose: 'newsletter', granted: document.getElementById('cNews').checked },
-      ].map(r => ({ ...r, profile_id: me.id, policy_version: '2026-08' }));
-      const { error } = await db.from('consents').insert(rows);
-      if (error) console.warn('consent save failed:', error.message);
+      try {
+        const rows = [
+          { purpose: 'photos',     granted: document.getElementById('cPhotos').checked },
+          { purpose: 'newsletter', granted: document.getElementById('cNews').checked },
+        ].map(r => ({ ...r, profile_id: me.id, policy_version: '2026-08' }));
+        await db.from('consents').insert(rows);
+      } catch (e) {
+        console.warn('consent save skipped');
+      }
     }
 
     async function finish(withDetails) {
@@ -175,7 +173,13 @@
         patch.nationality = document.getElementById('nationality').value.trim() || null;
       }
 
-      const { error } = await db.from('profiles').update(patch).eq('id', me.id);
+      let { error } = await db.from('profiles').update(patch).eq('id', me.id);
+      if (error && error.message && error.message.includes('profile_completed_at')) {
+        delete patch.profile_completed_at;
+        const res = await db.from('profiles').update(patch).eq('id', me.id);
+        error = res.error;
+      }
+
       if (error) { restore(); setAlert(alertEl, error.message); return; }
 
       if (withDetails) await saveConsents();
