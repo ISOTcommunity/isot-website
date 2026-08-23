@@ -186,7 +186,14 @@ async function requireAuth(opts = {}) {
     return new Promise(() => {});
   }
 
-  let { data: { session } } = await db.auth.getSession();
+  let session = null;
+  try {
+    const sessionPromise = db.auth.getSession().then(res => res.data?.session || null);
+    const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 1200));
+    session = await Promise.race([sessionPromise, timeoutPromise]);
+  } catch (e) {
+    session = null;
+  }
 
   // If returning from OAuth redirect with ?code= or #access_token=, wait for auth state event
   const hasOAuthParams = location.hash.includes('access_token=') || location.search.includes('code=');
@@ -274,7 +281,7 @@ async function requireAuth(opts = {}) {
   return profile;
 }
 
-// Global safety fallback: remove gate spinner after 2.5 seconds max so mobile safari/webviews never freeze on turning circle
+// Global safety fallback: remove gate spinner after 1.2 seconds max so mobile safari/webviews never freeze on turning circle
 setTimeout(() => {
   const gate = document.getElementById('gate');
   if (gate) {
@@ -282,7 +289,7 @@ setTimeout(() => {
     gate.style.transition = 'opacity 0.3s ease';
     setTimeout(() => gate.remove(), 300);
   }
-}, 2500);
+}, 1200);
 
 /* ---------------------------------------------------------------
  * Account Burger Drawer Component (Apple Glass Slide-In)
