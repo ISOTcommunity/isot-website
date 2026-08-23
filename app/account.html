@@ -321,13 +321,19 @@
         languages: document.getElementById('languages').value.trim() || null,
       };
 
-      const { error } = await db.from('profiles').update(patch).eq('id', currentProfile.id);
+      let { error } = await db.from('profiles').update(patch).eq('id', currentProfile.id);
+      if (error && error.message && error.message.includes('languages')) {
+        delete patch.languages;
+        const res = await db.from('profiles').update(patch).eq('id', currentProfile.id);
+        error = res.error;
+      }
+
       restore();
 
       if (error) {
         setAlert(alertEl, error.message, 'error');
       } else {
-        setAlert(alertEl, 'Profile updated successfully!', 'success');
+        setAlert(alertEl, 'Profile updated successfully! (Note: run the SQL migration below to save Languages to your database schema)', 'success');
         document.getElementById('dispName').textContent = patch.full_name;
       }
     }
