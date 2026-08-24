@@ -666,7 +666,7 @@
       const rowEl = document.getElementById('heroRsvpRow');
       if (rowEl) {
         rowEl.innerHTML = `
-          <div class="avatar-stack-wrapper" onclick="openAttendeesModal('', ${eventId})">
+          <div class="avatar-stack-wrapper" onclick="openAttendeesModal('', '${eventId}')">
             ${isGoing ? `<div class="avatar-stack">${stackHtml}</div><span class="avatar-stack-count"><strong>1 Member Going</strong> • You <i class="fa-solid fa-chevron-right text-pink" style="font-size:0.7rem;margin-left:4px"></i></span>` : `<span class="avatar-stack-count">Be the first to RSVP <i class="fa-solid fa-chevron-right text-pink" style="font-size:0.7rem;margin-left:4px"></i></span>`}
           </div>
 

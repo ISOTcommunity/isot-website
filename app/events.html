@@ -371,6 +371,9 @@
       <button type="button" class="view-btn" id="btnMonthlyView" onclick="setViewMode('monthly')">
         <i class="fa-solid fa-calendar-days"></i> Monthly
       </button>
+      <button type="button" class="view-btn" id="btnGoingView" onclick="setViewMode('going')">
+        <i class="fa-solid fa-circle-check"></i> Going <span id="goingCount"></span>
+      </button>
     </div>
 
     <!-- Calendar View Container -->
@@ -646,7 +649,7 @@
                   <div class="dim" style="font-size:0.75rem">${escapeHtml(f.nationality || 'Turin Student')} • ${escapeHtml(f.university || 'UniTo')}</div>
                 </div>
               </div>
-              <button type="button" id="btnInvite_${key}" class="btn ${isAlreadyInvited ? 'btn-outline' : 'btn-pink'}" style="width:auto;padding:6px 14px;font-size:0.78rem;" onclick="sendSingleFriendInvite('${f.id}', '${escapeHtml(f.full_name)}', '${escapeHtml(eventTitle)}', ${eventId}, '${key}')">
+              <button type="button" id="btnInvite_${key}" class="btn ${isAlreadyInvited ? 'btn-outline' : 'btn-pink'}" style="width:auto;padding:6px 14px;font-size:0.78rem;" onclick="sendSingleFriendInvite('${f.id}', '${escapeHtml(f.full_name)}', '${escapeHtml(eventTitle)}', '${eventId}', '${key}')">
                 ${isAlreadyInvited ? '<i class="fa-solid fa-check text-green"></i> Invited' : '<i class="fa-solid fa-envelope"></i> Invite 💌'}
               </button>
             </div>
@@ -675,6 +678,7 @@
       if (mode === 'list') document.getElementById('btnListView').classList.add('active');
       if (mode === 'weekly') document.getElementById('btnWeeklyView').classList.add('active');
       if (mode === 'monthly') document.getElementById('btnMonthlyView').classList.add('active');
+      if (mode === 'going') document.getElementById('btnGoingView').classList.add('active');
       renderMainView();
     }
 
@@ -694,7 +698,16 @@
     function renderMainView() {
       const container = document.getElementById('calendarViewContainer');
 
-      if (currentView === 'list') {
+      // Keep the count on the tab current whichever view is showing.
+      const goingBadge = document.getElementById('goingCount');
+      if (goingBadge) {
+        const n = Object.keys(userRsvps).length;
+        goingBadge.textContent = n ? `(${n})` : '';
+      }
+
+      if (currentView === 'going') {
+        container.innerHTML = renderGoingView();
+      } else if (currentView === 'list') {
         container.innerHTML = renderListView();
       } else if (currentView === 'weekly') {
         container.innerHTML = renderWeeklyMatrixView();
@@ -850,6 +863,38 @@
       return EVENTS_DATA.map(item => renderEventCardHtml(item)).join('');
     }
 
+    /** The nights you have said you are coming to. There was previously nowhere to see
+     *  this — you could mark yourself going and then have no way to find it again. */
+    function renderGoingView() {
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const mine = EVENTS_DATA
+        .filter(e => userRsvps[e.id])
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+      const upcoming = mine.filter(e => e.date >= todayStr);
+      const past     = mine.filter(e => e.date <  todayStr).reverse();
+
+      if (!mine.length) {
+        return `
+          <div class="dim" style="text-align:center;padding:48px 20px">
+            <i class="fa-solid fa-calendar-check" style="font-size:2rem;opacity:0.35;display:block;margin-bottom:14px"></i>
+            You haven't marked yourself going to anything yet.<br />
+            <span style="font-size:0.85rem">Tap <strong>I'm Going</strong> on any event and it will show up here.</span>
+          </div>`;
+      }
+
+      let html = '';
+      if (upcoming.length) {
+        html += `<div class="dim" style="font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin:4px 0 10px">Coming up</div>`;
+        html += upcoming.map(renderEventCardHtml).join('');
+      }
+      if (past.length) {
+        html += `<div class="dim" style="font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin:22px 0 10px">Been</div>`;
+        html += `<div style="opacity:0.55">${past.map(renderEventCardHtml).join('')}</div>`;
+      }
+      return html;
+    }
+
     function renderEventCardHtml(item) {
       const isGoing = !!userRsvps[item.id];
       const totalCount = isGoing ? 1 : 0;
@@ -880,7 +925,7 @@
               <h2 style="font-size:1.05rem;color:#FFF;margin-bottom:4px">${escapeHtml(item.title)}</h2>
               <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
                 ${item.link ? `<a href="${item.link}" class="btn btn-pink" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Join Song Queue</a>` : `<a href="profile.html" class="btn btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Show Member Card</a>`}
-                <button type="button" class="btn btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex" onclick="openInviteModal('${escapeHtml(item.title)}', ${item.id})">
+                <button type="button" class="btn btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex" onclick="openInviteModal('${escapeHtml(item.title)}', '${item.id}')">
                   <i class="fa-solid fa-paper-plane text-pink"></i> Invite Friends
                 </button>
               </div>
@@ -888,7 +933,7 @@
           </div>
 
           <div class="rsvp-row">
-            <div class="avatar-stack-wrapper" onclick="openAttendeesModal('${escapeHtml(item.title)}', ${item.id})">
+            <div class="avatar-stack-wrapper" onclick="openAttendeesModal('${escapeHtml(item.title)}', '${item.id}')">
               ${isGoing ? `<div class="avatar-stack">${stackHtml}</div><span class="avatar-stack-count"><strong>1 Going</strong> • You <i class="fa-solid fa-chevron-right text-pink" style="font-size:0.7rem;margin-left:4px"></i></span>` : `<span class="avatar-stack-count">Be the first to RSVP <i class="fa-solid fa-chevron-right text-pink" style="font-size:0.7rem;margin-left:4px"></i></span>`}
             </div>
 
