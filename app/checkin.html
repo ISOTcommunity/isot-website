@@ -3,47 +3,88 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-  <title>ISOT Event Check-In</title>
+  <meta name="robots" content="noindex" />
+  <title>Check In · ISOT App</title>
 
-  <link rel="icon" href="../assets/LOGOS/scritta isot.png" type="image/png" />
+  <link rel="icon" href="logo.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-
   <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .mark { font-size:3.2rem; line-height:1; margin-bottom:14px; }
+  </style>
 </head>
 <body>
 
   <div id="gate"><div class="spinner"></div></div>
 
   <header class="topbar">
-    <a href="home.html" class="topbar-title" style="display: flex; align-items: center; gap: 8px;">
-      <i class="fa-solid fa-location-dot text-pink"></i>
-      <span>Event Poster Check-In</span>
-    </a>
+    <a href="home.html" class="topbar-title">Check In</a>
   </header>
 
-  <main class="shell" style="text-align: center; padding-top: 40px;">
-
-    <div class="card card-glow" style="padding: 36px 24px;">
-      <div style="font-size: 3.5rem; color: var(--green); margin-bottom: 16px;"><i class="fa-solid fa-circle-check"></i></div>
-      <h1 style="font-size: 2rem; margin-bottom: 8px;">Checked In!</h1>
-      <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 24px;" id="checkinEventName">
-        Welcome to Monday Karaoke Night @ Rough Bar!
-      </p>
-
-      <a href="home.html" class="btn btn-pink">Go to App Home →</a>
+  <main class="shell" style="max-width:420px;padding-top:36px">
+    <div class="card card-glass card-glow" style="padding:34px 24px;text-align:center">
+      <div id="body">
+        <div class="spinner" style="margin:0 auto 14px"></div>
+        <p class="muted" style="font-size:0.92rem">Checking you in…</p>
+      </div>
+      <a href="home.html" class="btn btn-ghost" style="margin-top:18px">Go to App Home →</a>
     </div>
-
   </main>
 
   <script src="vendor/supabase.js"></script>
   <script src="js/isot.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      await requireAuth();
-    });
+  (async () => {
+    const bodyEl = document.getElementById('body');
+
+    // The token comes off the poster QR: /checkin?v=<self_checkin_token>
+    const token = new URLSearchParams(location.search).get('v');
+
+    // requireAuth sends them to login with ?next=, so the scan survives signing in.
+    await requireAuth();
+
+    function render(mark, colour, title, detail) {
+      bodyEl.innerHTML =
+        '<div class="mark" style="color:' + colour + '">' + mark + '</div>' +
+        '<h1 style="font-size:1.6rem;margin-bottom:8px">' + escapeHtml(title) + '</h1>' +
+        '<p class="muted" style="font-size:0.95rem">' + escapeHtml(detail) + '</p>';
+    }
+
+    if (!token) {
+      render('!', 'var(--text-muted)', 'No check-in code',
+             'Open this by scanning the QR on the poster at the venue.');
+      return;
+    }
+
+    // This page used to render "Checked In!" and a hardcoded event name without
+    // touching the database. Attendance is what justifies the partner contribution
+    // and, once the karaoke gate is back on, decides who can queue — so it has to be
+    // the real answer or a real error, never a green tick by default.
+    let res, err;
+    try {
+      const r = await db.rpc('self_check_in', { p_token: token });
+      res = r.data; err = r.error;
+    } catch (e) {
+      err = e;
+    }
+
+    if (err) {
+      render('!', '#FCA5A5', "Couldn't check you in", err.message || String(err));
+      return;
+    }
+
+    if (!res || !res.ok) {
+      render('!', 'var(--text-muted)', 'Not checked in',
+             (res && res.reason) || 'Nothing is on here tonight.');
+      return;
+    }
+
+    render('✓', 'var(--green)',
+           res.already ? 'Already checked in' : 'Checked in',
+           res.event + ' at ' + res.venue + '.');
+  })();
   </script>
 </body>
 </html>

@@ -254,7 +254,7 @@
       // Capodoglio sat 160m west of its real address, in the middle of a street rather
       // than on Murazzi del Po, and adding a venue meant editing this file.
       const { data: venues, error } = await db
-        .from('venues')
+        .from('venue_public')
         .select('name, address, neighbourhood, lat, lng, member_discount, active')
         .eq('active', true);
 

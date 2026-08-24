@@ -205,6 +205,16 @@
       "source": "/our-partners/",
       "destination": "/partners",
       "permanent": true
+    },
+    {
+      "source": "/checkin",
+      "destination": "/app/checkin",
+      "permanent": false
+    },
+    {
+      "source": "/checkin/",
+      "destination": "/app/checkin",
+      "permanent": false
     }
   ],
   "rewrites": [
@@ -279,10 +289,6 @@
     {
       "source": "/app/assembly",
       "destination": "/app/assembly.html"
-    },
-    {
-      "source": "/checkin",
-      "destination": "/app/checkin.html"
     }
   ],
   "headers": [
