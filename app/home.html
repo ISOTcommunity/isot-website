@@ -474,13 +474,57 @@
   <script src="js/isot.js"></script>
 
   <script>
-    const EVENTS_DATA = [
-      { date: '2026-08-29', dayName: 'SAT', dayNum: '29', monthName: 'AUG', title: 'ISOT Pre-Party', venue: 'Rough Bar & Partner Clubs', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { date: '2026-08-31', dayName: 'MON', dayNum: '31', monthName: 'AUG', title: 'ISOT Karaoke Night', venue: 'Rough Bar, Via San Salvario 12', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { date: '2026-09-05', dayName: 'SAT', dayNum: '05', monthName: 'SEP', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { date: '2026-09-07', dayName: 'MON', dayNum: '07', monthName: 'SEP', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { date: '2026-09-11', dayName: 'FRI', dayNum: '11', monthName: 'SEP', title: 'ISOT Pre-Uni Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Semester Opener' }
-    ];
+    // Was five hardcoded events. Now the same source as the calendar page, so the
+    // "next event" on the home screen cannot drift from what events.html shows.
+    let EVENTS_DATA = [];
+
+    const CATEGORY_LOGO = {
+      karaoke: '../assets/LOGOS/Karaoke.png',
+      social:  '../assets/LOGOS/Tog.jpeg',
+      party:   '../assets/LOGOS/Party.jpeg',
+      drinks:  '../assets/LOGOS/Drink.jpeg',
+      career:  '../assets/LOGOS/Busines.jpeg',
+      sports:  '../assets/LOGOS/Sport.jpeg',
+    };
+    const DAY_NAMES   = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+    const MONTH_NAMES = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+
+    async function loadUpcoming() {
+      const today = new Date();
+      const to    = new Date(); to.setMonth(to.getMonth() + 3);
+      const iso   = d => d.toISOString().slice(0, 10);
+
+      const { data, error } = await db.rpc('calendar_between', {
+        p_from: iso(today), p_to: iso(to),
+      });
+      if (error) { console.error('Could not load events:', error.message); return; }
+
+      EVENTS_DATA = (data || []).map(e => {
+        const d = new Date(e.event_date + 'T00:00:00');
+        return {
+          id: `${e.event_id}|${e.event_date}`,
+          eventId: e.event_id,
+          instanceId: e.instance_id,
+          date: e.event_date,
+          dayName: DAY_NAMES[d.getDay()],
+          dayNum: String(d.getDate()).padStart(2, '0'),
+          monthName: MONTH_NAMES[d.getMonth()],
+          title: e.title,
+          venue: e.venue_address ? `${e.venue_name} • ${e.venue_address}` : e.venue_name,
+          time: (e.start_time || '').slice(0, 5),
+          cat: e.category || 'social',
+          logo: CATEGORY_LOGO[e.category] || CATEGORY_LOGO.social,
+          goingCount: Number(e.going_count) || 0,
+          link: e.has_karaoke ? 'karaoke.html' : null,
+          special: e.description || null,
+        };
+      });
+
+      const { data: mine } = await db.rpc('my_rsvps', { p_from: iso(today), p_to: iso(to) });
+      userRsvps = {};
+      (mine || []).forEach(r => { userRsvps[`${r.event_id}|${r.event_date}`] = true; });
+    }
+
 
     async function initHome() {
       try {
@@ -499,8 +543,9 @@
           document.getElementById('actionKaraokeIcon').innerHTML = getCategoryBadgeHtml('karaoke', 38);
         }
 
+        await loadUpcoming();
         const nextEvent = getNextUpcomingEvent();
-        updateHeroEvent(nextEvent);
+        if (nextEvent) updateHeroEvent(nextEvent);
 
         const isStaff = meProfile && (meProfile.staff_role === 'volunteer' || meProfile.staff_role === 'board');
 
@@ -557,34 +602,47 @@
         `;
       }
 
-      currentHeroEventId = eventObj.id || 100;
+      currentHeroEventId = eventObj.id || null;
       updateHeroRsvpUI(currentHeroEventId);
     }
 
-    let currentHeroEventId = 100;
-    let userRsvps = JSON.parse(localStorage.getItem('isot_rsvps') || '{}');
+    let currentHeroEventId = null;   // `${event_id}|${date}` once an event is loaded
+    let userRsvps = {};   // filled by loadUpcoming() from the database
     let meProfile = null;
 
-    function toggleHeroRsvp() {
-      if (userRsvps[currentHeroEventId]) {
-        delete userRsvps[currentHeroEventId];
-      } else {
-        userRsvps[currentHeroEventId] = true;
-      }
-      localStorage.setItem('isot_rsvps', JSON.stringify(userRsvps));
+    async function toggleHeroRsvp() {
+      if (!currentHeroEventId || !currentHeroEventId.includes('|')) return;
+      const [eventId, date] = currentHeroEventId.split('|');
+
+      const { data, error } = await db.rpc('toggle_rsvp', { p_event_id: eventId, p_date: date });
+      if (error) { alert('Could not update your RSVP: ' + error.message); return; }
+
+      if (data.going) userRsvps[currentHeroEventId] = true;
+      else delete userRsvps[currentHeroEventId];
+
+      const occ = EVENTS_DATA.find(e => e.id === currentHeroEventId);
+      if (occ) { occ.goingCount = data.going_count; occ.instanceId = data.instance_id; }
+
       updateHeroRsvpUI(currentHeroEventId);
     }
 
-    function openAttendeesModal(eventTitle, eventId) {
-      const isGoing = !!userRsvps[eventId];
-      let html = '';
+    async function openAttendeesModal(eventTitle, eventId) {
+      // Previously this could only ever show you, because RSVPs lived in your own
+      // browser. event_attendees() returns everyone going, with directory-safe columns.
+      let html = '<div class="dim" style="text-align:center;padding:30px">Loading…</div>';
+      const occ = EVENTS_DATA.find(e => e.id === eventId);
 
-      if (isGoing && meProfile) {
-        html += renderMemberCardHtml(meProfile, true);
-      }
-
-      if (!isGoing) {
-        html = `<div class="dim" style="text-align:center;padding:30px">No members have marked going yet. Click "I'm Going" to join the list!</div>`;
+      if (!occ || !occ.instanceId) {
+        html = `<div class="dim" style="text-align:center;padding:30px">No one has marked going yet. Tap "I'm Going" to be first.</div>`;
+      } else {
+        const { data, error } = await db.rpc('event_attendees', { p_instance: occ.instanceId });
+        if (error) {
+          html = `<div class="dim" style="text-align:center;padding:30px">Could not load the list.</div>`;
+        } else if (!data || !data.length) {
+          html = `<div class="dim" style="text-align:center;padding:30px">No one has marked going yet. Tap "I'm Going" to be first.</div>`;
+        } else {
+          html = data.map(m => renderMemberCardHtml(m, m.id === meProfile?.id)).join('');
+        }
       }
 
       const title = eventTitle || document.getElementById('heroEventName').textContent;

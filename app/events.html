@@ -419,65 +419,85 @@
   <script src="js/isot.js"></script>
 
   <script>
-    // Authentic ISOT Events Dataset (Starting August 29 – December 2026)
-    const EVENTS_DATA = [
-      // AUGUST 2026
-      { id: 100, date: '2026-08-29', year: 2026, monthIdx: 7, dayNum: 29, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough San Salvario • Via Principe Tommaso 3', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Season Kickoff 🎉' },
-      { id: 101, date: '2026-08-31', year: 2026, monthIdx: 7, dayNum: 31, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough San Salvario • Via Principe Tommaso 3', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+    // The calendar comes from the database. This was 42 hardcoded event objects, which
+    // meant changing a time required editing HTML and redeploying — and the calendar
+    // disagreed with the check-in system, because resolve_instance() reads the database
+    // while this read an array.
+    //
+    // Recurring events are rules, not rows per date: calendar_between() expands them.
+    // Each occurrence is keyed `${event_id}|${date}` because one event now happens on
+    // many dates.
+    let EVENTS_DATA = [];
 
-      // SEPTEMBER 2026
-      { id: 102, date: '2026-09-05', year: 2026, monthIdx: 8, dayNum: 5, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 103, date: '2026-09-07', year: 2026, monthIdx: 8, dayNum: 7, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 1, date: '2026-09-11', year: 2026, monthIdx: 8, dayNum: 11, dayName: 'FRI', title: 'ISOT Pre-Uni Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Semester Opener' },
-      { id: 104, date: '2026-09-12', year: 2026, monthIdx: 8, dayNum: 12, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 105, date: '2026-09-14', year: 2026, monthIdx: 8, dayNum: 14, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 106, date: '2026-09-19', year: 2026, monthIdx: 8, dayNum: 19, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 107, date: '2026-09-21', year: 2026, monthIdx: 8, dayNum: 21, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 2, date: '2026-09-25', year: 2026, monthIdx: 8, dayNum: 25, dayName: 'FRI', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 3, date: '2026-09-26', year: 2026, monthIdx: 8, dayNum: 26, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 4, date: '2026-09-28', year: 2026, monthIdx: 8, dayNum: 28, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+    const CATEGORY_LOGO = {
+      karaoke: '../assets/LOGOS/Karaoke.png',
+      social:  '../assets/LOGOS/Tog.jpeg',
+      party:   '../assets/LOGOS/Party.jpeg',
+      drinks:  '../assets/LOGOS/Drink.jpeg',
+      career:  '../assets/LOGOS/Busines.jpeg',
+      sports:  '../assets/LOGOS/Sport.jpeg',
+    };
 
-      // OCTOBER 2026
-      { id: 5, date: '2026-10-03', year: 2026, monthIdx: 9, dayNum: 3, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 6, date: '2026-10-05', year: 2026, monthIdx: 9, dayNum: 5, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 7, date: '2026-10-09', year: 2026, monthIdx: 9, dayNum: 9, dayName: 'FRI', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 8, date: '2026-10-10', year: 2026, monthIdx: 9, dayNum: 10, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 9, date: '2026-10-12', year: 2026, monthIdx: 9, dayNum: 12, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 10, date: '2026-10-17', year: 2026, monthIdx: 9, dayNum: 17, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 11, date: '2026-10-19', year: 2026, monthIdx: 9, dayNum: 19, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 12, date: '2026-10-24', year: 2026, monthIdx: 9, dayNum: 24, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 13, date: '2026-10-26', year: 2026, monthIdx: 9, dayNum: 26, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 14, date: '2026-10-30', year: 2026, monthIdx: 9, dayNum: 30, dayName: 'FRI', title: 'ISOT Halloween Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Halloween Edition 🎃' },
-      { id: 15, date: '2026-10-31', year: 2026, monthIdx: 9, dayNum: 31, dayName: 'SAT', title: 'ISOT Pre-Party & Costume Night', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
+    const DAY_NAMES = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
-      // NOVEMBER 2026
-      { id: 16, date: '2026-11-02', year: 2026, monthIdx: 10, dayNum: 2, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 17, date: '2026-11-06', year: 2026, monthIdx: 10, dayNum: 6, dayName: 'FRI', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 18, date: '2026-11-07', year: 2026, monthIdx: 10, dayNum: 7, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 19, date: '2026-11-09', year: 2026, monthIdx: 10, dayNum: 9, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 20, date: '2026-11-14', year: 2026, monthIdx: 10, dayNum: 14, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 21, date: '2026-11-16', year: 2026, monthIdx: 10, dayNum: 16, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 22, date: '2026-11-20', year: 2026, monthIdx: 10, dayNum: 20, dayName: 'FRI', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 23, date: '2026-11-21', year: 2026, monthIdx: 10, dayNum: 21, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 24, date: '2026-11-23', year: 2026, monthIdx: 10, dayNum: 23, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 25, date: '2026-11-28', year: 2026, monthIdx: 10, dayNum: 28, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 26, date: '2026-11-30', year: 2026, monthIdx: 10, dayNum: 30, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
+    async function loadCalendar() {
+      // Wide enough to cover the month and week views without refetching as you page.
+      const from = new Date(); from.setMonth(from.getMonth() - 1);
+      const to   = new Date(); to.setMonth(to.getMonth() + 6);
+      const iso  = d => d.toISOString().slice(0, 10);
 
-      // DECEMBER 2026
-      { id: 27, date: '2026-12-04', year: 2026, monthIdx: 11, dayNum: 4, dayName: 'FRI', title: 'ISOT Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 28, date: '2026-12-05', year: 2026, monthIdx: 11, dayNum: 5, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 29, date: '2026-12-07', year: 2026, monthIdx: 11, dayNum: 7, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 30, date: '2026-12-12', year: 2026, monthIdx: 11, dayNum: 12, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 31, date: '2026-12-14', year: 2026, monthIdx: 11, dayNum: 14, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' },
-      { id: 32, date: '2026-12-18', year: 2026, monthIdx: 11, dayNum: 18, dayName: 'FRI', title: 'ISOT Winter Gala & Zenit Party', venue: 'Zenit Club', time: '23:00', cat: 'party', logo: '../assets/LOGOS/Party.jpeg', special: 'Semester Finale ❄️' },
-      { id: 33, date: '2026-12-19', year: 2026, monthIdx: 11, dayNum: 19, dayName: 'SAT', title: 'ISOT Pre-Party', venue: 'Rough Bar', time: '22:30', cat: 'party', logo: '../assets/LOGOS/Party.jpeg' },
-      { id: 34, date: '2026-12-21', year: 2026, monthIdx: 11, dayNum: 21, dayName: 'MON', title: 'ISOT Karaoke Night', venue: 'Rough Bar', time: '21:00', cat: 'karaoke', logo: '../assets/LOGOS/Karaoke.png', link: 'karaoke.html' }
-    ];
+      const { data, error } = await db.rpc('calendar_between', {
+        p_from: iso(from), p_to: iso(to),
+      });
+
+      if (error) {
+        console.error('Could not load the calendar:', error.message);
+        EVENTS_DATA = [];
+        return;
+      }
+
+      EVENTS_DATA = (data || []).map(e => {
+        const d = new Date(e.event_date + 'T00:00:00');
+        return {
+          id: `${e.event_id}|${e.event_date}`,   // unique per occurrence
+          eventId: e.event_id,
+          instanceId: e.instance_id,
+          date: e.event_date,
+          year: d.getFullYear(),
+          monthIdx: d.getMonth(),
+          dayNum: d.getDate(),
+          dayName: DAY_NAMES[d.getDay()],
+          title: e.title,
+          venue: e.venue_address ? `${e.venue_name} • ${e.venue_address}` : e.venue_name,
+          venueName: e.venue_name,
+          time: (e.start_time || '').slice(0, 5),
+          cat: e.category || 'social',
+          logo: CATEGORY_LOGO[e.category] || CATEGORY_LOGO.social,
+          goingCount: Number(e.going_count) || 0,
+          link: e.has_karaoke ? 'karaoke.html' : null,
+          membersOnly: e.members_only,
+          special: e.description || null,
+        };
+      });
+    }
+
+    async function loadMyRsvps() {
+      const from = new Date(); from.setMonth(from.getMonth() - 1);
+      const to   = new Date(); to.setMonth(to.getMonth() + 6);
+      const iso  = d => d.toISOString().slice(0, 10);
+
+      const { data, error } = await db.rpc('my_rsvps', { p_from: iso(from), p_to: iso(to) });
+      if (error) { console.error('Could not load your RSVPs:', error.message); return; }
+
+      userRsvps = {};
+      (data || []).forEach(r => { userRsvps[`${r.event_id}|${r.event_date}`] = true; });
+    }
+
 
     const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
     let meProfile = null;
-    let userRsvps = JSON.parse(localStorage.getItem('isot_rsvps') || '{}');
+    let userRsvps = {};   // filled by loadMyRsvps() from the database
     let currentView = 'list';
     let currYear = 2026;
     let currMonthIdx = Math.max(7, new Date().getMonth()); // Default to current month (August = 7)
@@ -490,6 +510,8 @@
         if (document.getElementById('headerAvatar')) {
           document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(meProfile, 36);
         }
+        await loadCalendar();
+        await loadMyRsvps();
       } catch (err) {
         console.error('Events init note:', err);
       } finally {
@@ -499,14 +521,24 @@
       }
     }
 
-    function toggleRsvp(eventId) {
-      if (userRsvps[eventId]) {
-        delete userRsvps[eventId];
-      } else {
-        userRsvps[eventId] = true;
-      }
-      localStorage.setItem('isot_rsvps', JSON.stringify(userRsvps));
-      
+    async function toggleRsvp(occurrenceKey) {
+      // RSVPs were kept in localStorage, so they never synced between a phone and a
+      // laptop and the board could not see them. toggle_rsvp() creates the event
+      // instance if that night has never been touched, then flips the row.
+      const [eventId, date] = occurrenceKey.split('|');
+
+      const { data, error } = await db.rpc('toggle_rsvp', {
+        p_event_id: eventId, p_date: date,
+      });
+
+      if (error) { alert('Could not update your RSVP: ' + error.message); return; }
+
+      if (data.going) userRsvps[occurrenceKey] = true;
+      else delete userRsvps[occurrenceKey];
+
+      const occ = EVENTS_DATA.find(e => e.id === occurrenceKey);
+      if (occ) { occ.goingCount = data.going_count; occ.instanceId = data.instance_id; }
+
       renderMainView();
     }
 
