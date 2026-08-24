@@ -584,7 +584,9 @@
       const connectedIds = Object.keys(friendState).filter(id => friendState[id] === 'connected');
 
       try {
-        const { data } = await db.from('profiles').select('*').neq('id', meProfile ? meProfile.id : '');
+        // member_directory, not profiles: the profiles policy is now self + staff only,
+        // so this query returned nothing and the invite list came up empty.
+        const { data } = await db.from('member_directory').select('*').neq('id', meProfile ? meProfile.id : '');
         if (data && data.length) {
           // Strictly filter ONLY connected/accepted friends
           friendsList = data.filter(p => connectedIds.includes(p.id));
