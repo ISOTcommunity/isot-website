@@ -209,6 +209,7 @@ function getCategoryBadgeHtml(catKey, size = 40) {
  * Auth Guard
  * ------------------------------------------------------------- */
 async function requireAuth(opts = {}) {
+  __authState = 'pending';
   if (!db) {
     showGateError(
       'Not configured yet',
@@ -257,6 +258,7 @@ async function requireAuth(opts = {}) {
     // It also made sign-out look broken: you were bounced to login, but any guarded
     // page still rendered.
     const here = location.pathname.split('/').pop() || 'home.html';
+    __authState = 'leaving';          // gate stays up until the navigation lands
     location.replace('login.html?next=' + encodeURIComponent(here));
     return new Promise(() => {});
   }
@@ -291,6 +293,26 @@ async function requireAuth(opts = {}) {
     }
   }
 
+  // Still nothing. The account exists in auth.users but has no profiles row.
+  //
+  // handle_new_user() swallows its own exceptions on purpose — a failed profile insert
+  // must never block account creation — so this state is reachable and silent: signup
+  // succeeds, the confirmation email arrives, and then every guarded page hangs here.
+  // Repair it instead of dead-ending someone who has just confirmed their email.
+  if (!profile) {
+    try {
+      const { error } = await db.rpc('ensure_my_profile');
+      if (!error) {
+        const { data } = await db.from('profiles').select('*').eq('id', session.user.id).single();
+        if (data) profile = data;
+      } else {
+        console.warn('ensure_my_profile:', error.message);
+      }
+    } catch (e) {
+      console.warn('ensure_my_profile threw:', e);
+    }
+  }
+
   if (!profile) {
     showGateError(
       'Your profile is missing',
@@ -313,6 +335,7 @@ async function requireAuth(opts = {}) {
   if (opts.partner && profile.staff_role !== 'partner' && !isBoard)
     return denyAccess('This page is for venue partners.');
 
+  __authState = 'done';
   const gateEl = document.getElementById('gate');
   if (gateEl) gateEl.remove();
 
@@ -320,15 +343,55 @@ async function requireAuth(opts = {}) {
   return profile;
 }
 
-// Global safety fallback: remove gate spinner after 1.2 seconds max so mobile safari/webviews never freeze on turning circle
+/* ---------------------------------------------------------------
+ * Gate lifecycle
+ *
+ * #gate is the full-screen spinner every guarded page opens with. It must come
+ * down when requireAuth() resolves — and it must NOT come down before that.
+ *
+ * This used to remove the gate unconditionally after 1.2s "so mobile safari never
+ * freezes on a turning circle". That was wrong in two ways:
+ *
+ *   1. A page whose script is suspended at `await requireAuth()` has none of its
+ *      own event listeners attached yet. Uncovering it gave the user a page whose
+ *      buttons did nothing — and on complete-profile.html the <button type="submit">
+ *      fell through to a NATIVE form submit, which reloaded the same URL. That is
+ *      the "I press Finish and it just loads the same page" bug.
+ *
+ *   2. It erased gate ERRORS. showGateError() and denyAccess() both write into the
+ *      gate and then hang forever on purpose; 1.2s later the message vanished and
+ *      the page rendered underneath as though access had been granted.
+ *
+ * So: an error gate is permanent, a pending gate stays until auth decides, and the
+ * "never freeze" promise is kept by a watchdog that shows a real message instead.
+ * ------------------------------------------------------------- */
+let __authState = 'idle';   // idle | pending | leaving | error | done
+
 setTimeout(() => {
   const gate = document.getElementById('gate');
-  if (gate) {
-    gate.style.opacity = '0';
-    gate.style.transition = 'opacity 0.3s ease';
-    setTimeout(() => gate.remove(), 300);
-  }
+  if (!gate) return;
+  if (gate.dataset.error === '1') return;                    // a message must stay put
+  if (__authState === 'pending' || __authState === 'leaving') return;  // not our call yet
+  gate.style.transition = 'opacity 0.3s ease';
+  gate.style.opacity = '0';
+  setTimeout(() => gate.remove(), 300);
 }, 1200);
+
+// Kept promise: never spin forever. Say what happened instead of exposing a dead page.
+setTimeout(() => {
+  if (__authState === 'pending' && document.getElementById('gate')) {
+    showGateError(
+      'Still connecting',
+      'Signing you in is taking longer than usual. Check your connection and reload the page.'
+    );
+  }
+}, 15000);
+
+/* While the gate is up the page's own submit handler is not attached yet, so a
+ * <button type="submit"> would do a native form submit and reload the page. */
+document.addEventListener('submit', (e) => {
+  if (document.getElementById('gate')) e.preventDefault();
+}, true);
 
 /* ---------------------------------------------------------------
  * Account Burger Drawer Component (Apple Glass Slide-In)
@@ -466,6 +529,9 @@ function denyAccess(message) {
 function showGateError(title, message, showHome = false) {
   const gate = document.getElementById('gate');
   if (!gate) return;
+  // Sticky: the 1.2s fallback below must not wipe this and reveal the page behind it.
+  gate.dataset.error = '1';
+  __authState = 'error';
   gate.innerHTML = `
     <div class="card" style="max-width:380px;margin:20px;text-align:center">
       <h2 style="margin-bottom:10px">${escapeHtml(title)}</h2>

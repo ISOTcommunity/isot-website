@@ -89,6 +89,13 @@
   <script src="js/isot.js"></script>
   <script>
   (async () => {
+    // Attached synchronously, before any await. Everything below runs only after
+    // requireAuth() resolves — so until then this form has no submit handler, and
+    // "Finish & Open App" (type="submit") would fall through to a native form
+    // submit and reload this very page. That is what it looked like when a signup
+    // left the account without a profiles row and requireAuth never returned.
+    document.getElementById('form').addEventListener('submit', (e) => e.preventDefault());
+
     // Forward OAuth error parameters to login page if present
     const searchParams = new URLSearchParams(location.search);
     const hashParams = new URLSearchParams(location.hash.replace(/^#/, ''));
