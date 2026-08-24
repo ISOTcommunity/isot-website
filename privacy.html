@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Privacy Policy & Statuto APS | ISOT Community Turin</title>
-  <meta name="description" content="Official GDPR Privacy Policy, Cookie Policy, and Association Statute summary for ISOT APS (Associazione di Promozione Sociale) in Turin." />
+  <title>Privacy Policy, Cookie Notice & Legal Statuto APS | ISOT Community Turin</title>
+  <meta name="description" content="Official GDPR Privacy Policy, Cookie Notice, Data Subject Rights, and Association Statute summary for ISOT APS (Associazione di Promozione Sociale) in Turin, Italy." />
   <link rel="icon" href="assets/LOGOS/scritta isot.png" type="image/png" />
+
+  <!-- Vercel Web Analytics -->
+  <script defer src="/_vercel/insights/script.js"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,6 +22,8 @@
       --bg-darker: #0B1120;
       --pink: #EE0979;
       --navy: #243673;
+      --gold: #F59E0B;
+      --green: #10B981;
       --text-main: #F8FAFC;
       --text-muted: #CBD5E1;
       --text-dim: #94A3B8;
@@ -39,29 +44,36 @@
     ::-webkit-scrollbar-thumb { background: #243673; border-radius: 9999px; }
 
     a { color: var(--pink); text-decoration: none; }
+    a:hover { text-decoration: underline; }
     img { max-width: 100%; height: auto; display: block; }
 
-    .container { width: 100%; max-width: 900px; margin: 0 auto; padding: 0 24px; }
-    .section-padding { padding: 80px 0; }
+    .container { width: 100%; max-width: 920px; margin: 0 auto; padding: 0 24px; }
+    .section-padding { padding: 60px 0; }
 
     .header {
       position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
-      background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px);
+      background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border-light);
     }
-    .nav-box { display: flex; align-items: center; justify-content: space-between; height: 80px; }
-    .nav-logo img { height: 48px; width: auto; }
-    .nav-links { display: flex; align-items: center; gap: 24px; list-style: none; }
-    .nav-links a { font-size: 0.9rem; color: var(--text-muted); }
+    .nav-box { display: flex; align-items: center; justify-content: space-between; height: 76px; }
+    .nav-logo img { height: 44px; width: auto; }
+    .nav-links { display: flex; align-items: center; gap: 20px; list-style: none; }
+    .nav-links a { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
+    .nav-links a:hover { color: #FFF; }
 
-    .page-hero { padding-top: 140px; padding-bottom: 40px; text-align: center; border-bottom: 1px solid var(--border-light); }
+    .page-hero { padding-top: 130px; padding-bottom: 40px; text-align: center; border-bottom: 1px solid var(--border-light); }
     .page-title { font-family: var(--font-display); font-size: 4rem; line-height: 1; color: #FFF; margin-bottom: 12px; }
 
-    .legal-block { background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-light); padding: 40px; margin-bottom: 30px; }
-    .legal-block h2 { font-size: 1.6rem; color: #FFF; margin-bottom: 16px; font-weight: 700; }
-    .legal-block p { color: var(--text-muted); margin-bottom: 14px; font-size: 1rem; }
+    .legal-block { background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-light); padding: 36px; margin-bottom: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .legal-block h2 { font-size: 1.5rem; color: #FFF; margin-bottom: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .legal-block h3 { font-size: 1.15rem; color: var(--gold); margin: 20px 0 10px 0; font-weight: 600; }
+    .legal-block p { color: var(--text-muted); margin-bottom: 14px; font-size: 0.96rem; }
+    .legal-block ul { margin-left: 20px; margin-bottom: 16px; color: var(--text-muted); font-size: 0.95rem; }
+    .legal-block li { margin-bottom: 8px; }
 
-    .footer { background: #070B14; border-top: 1px solid var(--border-light); padding: 50px 0 30px; text-align: center; color: var(--text-dim); font-size: 0.85rem; }
+    .badge-legal { background: rgba(238, 9, 121, 0.15); border: 1px solid var(--pink); color: var(--pink); padding: 4px 12px; border-radius: 9999px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; margin-bottom: 12px; }
+
+    .footer { background: #070B14; border-top: 1px solid var(--border-light); padding: 40px 0; text-align: center; color: var(--text-dim); font-size: 0.85rem; }
   </style>
 </head>
 <body>
@@ -84,47 +96,122 @@
   <!-- Hero -->
   <section class="page-hero">
     <div class="container">
-      <h1 class="page-title">Privacy Policy & Legal APS</h1>
-      <p style="color: var(--text-dim); font-size: 1.05rem;">Associazione di Promozione Sociale (ISOT APS) • Turin, Italy</p>
+      <span class="badge-legal"><i class="fa-solid fa-shield-halved"></i> Privacy &amp; Statutory Transparency</span>
+      <h1 class="page-title">Privacy Policy &amp; Legal Notices</h1>
+      <p style="color: var(--text-dim); font-size: 1.05rem;">
+        Associazione di Promozione Sociale (ISOT APS) • Turin, Italy<br />
+        <span style="font-size: 0.85rem; color: var(--text-muted);">In compliance with Regulation (EU) 2016/679 (GDPR), D.Lgs. 196/2003, D.Lgs. 101/2018, and D.Lgs. 117/2017 (Codice del Terzo Settore)</span>
+      </p>
     </div>
   </section>
 
   <!-- Legal Body -->
   <main class="container section-padding">
-    
+
+    <!-- 1. Data Controller Identification -->
     <div class="legal-block">
-      <h2>1. Privacy Policy & GDPR Compliance</h2>
+      <h2><i class="fa-solid fa-building text-pink"></i> 1. Data Controller (Titolare del Trattamento)</h2>
       <p>
-        ISOT Community (International Students of Turin non-profit organization) is committed to protecting the privacy of international students and community members in compliance with EU General Data Protection Regulation (GDPR) 2016/679 and Italian privacy laws.
+        The Data Controller responsible for processing your personal data on this website and the ISOT Member App is:
       </p>
       <p>
-        <strong>Data Collected:</strong> When you complete our Free Community Access or Supporting Membership registration forms, we collect your name, email address, university affiliation, nationality, and city verification answer.
-      </p>
-      <p>
-        <strong>Purpose of Processing:</strong> Your personal data is used solely to issue membership receipts, send weekly community event invites, grant access to our official Telegram/WhatsApp groups, and manage community member registers. We never sell or share your data with commercial third-party advertisers.
+        <strong>ISOT APS (Associazione di Promozione Sociale)</strong><br />
+        Registered Headquarters: Turin (TO), Piedmont, Italy<br />
+        Official Contact Email: <a href="mailto:privacy@isotcommunity.com">privacy@isotcommunity.com</a> or <a href="mailto:info@isotcommunity.com">info@isotcommunity.com</a><br />
+        Official Website: <a href="https://isotcommunity.com">https://isotcommunity.com</a>
       </p>
     </div>
 
+    <!-- 2. Personal Data Collected & Purpose -->
     <div class="legal-block">
-      <h2>2. Cookie Policy</h2>
+      <h2><i class="fa-solid fa-database text-pink"></i> 2. Categories of Personal Data &amp; Purpose of Processing</h2>
       <p>
-        The ISOT Community website uses strictly necessary session cookies and local storage tokens to provide seamless web navigation, hero photo gallery state, and form security verification.
+        We collect and process personal data exclusively for non-profit social integration, membership register management, and community event organization:
       </p>
+
+      <h3>A. Account Registration &amp; Membership Profiles</h3>
+      <ul>
+        <li><strong>Data Elements:</strong> Full Name, Email Address, University Affiliation (e.g. UniTo, PoliTo, SAA), Nationality, Spoken Languages, Profile Photo / Avatar, and Member Registration Code.</li>
+        <li><strong>Legal Basis:</strong> Performance of a contract / membership agreement (Art. 6(1)(b) GDPR) and fulfillment of statutory non-profit duties under Italian Third Sector Code (D.Lgs. 117/2017).</li>
+        <li><strong>Purpose:</strong> Issuing official digital member passes, maintaining the statutory Association Member Register (<em>Libro Soci</em>), verifying student status, and facilitating peer student connections.</li>
+      </ul>
+
+      <h3>B. Event Check-ins &amp; Karaoke Queue</h3>
+      <ul>
+        <li><strong>Data Elements:</strong> RSVP status for cultural events, check-in timestamps, karaoke song titles, artist names, and stage queue position.</li>
+        <li><strong>Legal Basis:</strong> Legitimate interest in managing event capacity, venue safety, and community activities (Art. 6(1)(f) GDPR).</li>
+      </ul>
+
+      <h3>C. Supporting Membership Contributions &amp; Payments</h3>
+      <ul>
+        <li><strong>Data Elements:</strong> Payment receipt confirmation numbers, payment timestamps, and transaction metadata. (Note: Financial credit card processing is handled securely by external PCI-DSS compliant providers; ISOT never stores full credit card numbers).</li>
+        <li><strong>Legal Basis:</strong> Legal statutory compliance (Art. 6(1)(c) GDPR) and accounting record-keeping under Article 2220 of the Italian Civil Code (<em>Codice Civile</em>).</li>
+      </ul>
+    </div>
+
+    <!-- 3. Cookie & Web Analytics Policy -->
+    <div class="legal-block">
+      <h2><i class="fa-solid fa-cookie-bite text-pink"></i> 3. Cookie Notice &amp; Web Analytics Policy</h2>
       <p>
-        No invasive third-party tracking cookies or advertising profile pixels are stored without your explicit consent. You can clear cookies at any time via your browser settings.
+        Our website and web application are designed with privacy-first principles in accordance with the Italian Data Protection Authority (<em>Garante per la protezione dei dati personali</em>) Guidelines of 10 June 2021:
+      </p>
+
+      <h3>A. Technical &amp; Essential Session Storage</h3>
+      <p>
+        We use essential Local Storage keys and session tokens (such as <code>isot_auth_token</code>, <code>isot_profile</code>, <code>isot_friends</code>, <code>isot_rsvps</code>) strictly necessary to keep you securely signed in, preserve your PWA theme preferences, and render your member pass offline. These do not require explicit cookie consent under Art. 122 of D.Lgs. 196/2003.
+      </p>
+
+      <h3>B. Privacy-Preserving Web Analytics</h3>
+      <p>
+        We use cookieless <strong>Vercel Web Analytics</strong> (<code>/_vercel/insights/script.js</code>) to monitor general site traffic, page view counts, and platform performance. Vercel Web Analytics does <strong>NOT</strong> set persistent cookies, does <strong>NOT</strong> collect IP addresses, and does <strong>NOT</strong> track users across third-party websites or sell advertising profiles.
+      </p>
+
+      <h3>C. Third-Party Embedded Maps</h3>
+      <p>
+        For partner venue location maps on our <em>Partners</em> page, we use open-source <strong>Leaflet.js</strong> with OpenStreetMap tiles, ensuring no third-party tracking pixels or ad networks are loaded.
       </p>
     </div>
 
+    <!-- 4. Data Retention & GDPR Rights -->
     <div class="legal-block">
-      <h2>3. Community Guidelines & Non-Profit Principle</h2>
+      <h2><i class="fa-solid fa-user-shield text-pink"></i> 4. Data Retention &amp; Your GDPR Data Subject Rights</h2>
       <p>
-        <strong>Organization:</strong> ISOT is an international student community initiative operating in Turin.
+        Under Articles 15 to 22 of the EU General Data Protection Regulation (GDPR), you possess the following rights regarding your personal data:
+      </p>
+
+      <ul>
+        <li><strong>Right of Access (Art. 15):</strong> You have the right to request a complete copy of all personal data held by ISOT APS.</li>
+        <li><strong>Right to Rectification (Art. 16):</strong> You can update or correct your profile details anytime inside the <em>Account Settings</em> tab.</li>
+        <li><strong>Right to Erasure / "Right to be Forgotten" (Art. 17):</strong> You can instantly delete your account and profile data self-service inside <em>Account Settings &gt; Danger Zone &gt; Delete Account</em>. Upon deletion, your profile, check-in history, and social connections are permanently erased. Statutory accounting receipts for supporting membership fees are retained for 10 years per Art. 2220 Cod. Civ.</li>
+        <li><strong>Right to Restriction &amp; Objection (Art. 18 &amp; 21):</strong> You may object at any time to receiving community newsletter announcements.</li>
+        <li><strong>Right to Data Portability (Art. 20):</strong> You have the right to receive your personal data in a structured, machine-readable JSON format.</li>
+        <li><strong>Right to Lodge a Complaint:</strong> If you believe your data protection rights have been infringed, you have the statutory right to file a complaint with the Italian Supervisory Authority: <strong>Garante per la protezione dei dati personali</strong> (<a href="https://www.garanteprivacy.it" target="_blank" rel="noopener">www.garanteprivacy.it</a>, Piazza Venezia 11, 00187 Roma).</li>
+      </ul>
+    </div>
+
+    <!-- 5. Association Statute & Non-Profit Disclosures -->
+    <div class="legal-block">
+      <h2><i class="fa-solid fa-file-contract text-pink"></i> 5. Association Statute (Statuto APS) &amp; Non-Profit Principles</h2>
+      <p>
+        ISOT operates strictly as a non-profit Social Promotion Association (<em>Associazione di Promozione Sociale - APS</em>) governed by the Italian Third Sector Code (D.Lgs. 117/2017):
+      </p>
+      <ul>
+        <li><strong>Non-Profit Principle:</strong> ISOT does not distribute commercial profits. All membership contributions (€10/year) and voluntary donations are reinvested 100% into international student cultural events, language exchanges, academic workshops, and community integration initiatives.</li>
+        <li><strong>Member Intrasmissibility:</strong> In accordance with Italian law, membership fees (<em>quote associative</em>) are personal, non-transferable, and non-refundable.</li>
+        <li><strong>Statutory Transparency:</strong> Active supporting members (<em>Soci</em>) have full rights to inspect association financial books, vote in the General Assembly, and stand for volunteer board election.</li>
+      </ul>
+    </div>
+
+    <!-- 6. Security Measures & Contact -->
+    <div class="legal-block">
+      <h2><i class="fa-solid fa-lock text-pink"></i> 6. Technical Security &amp; Contact Us</h2>
+      <p>
+        All communications between your device and ISOT servers are encrypted using industry-standard TLS 1.3 encryption. Passwords and authentication tokens are hashed and handled via enterprise-grade Supabase Auth infrastructure.
       </p>
       <p>
-        <strong>Non-Profit Principle:</strong> All community funds, membership contributions (€10/year), and voluntary donations are strictly dedicated to fulfilling our mission—fostering international student integration, hosting cultural festivals, and running career mentorship labs.
-      </p>
-      <p>
-        <strong>Member Rights:</strong> Supporting community members have full rights to participate in open community assemblies, inspect financial registers, and receive formal payment receipts.
+        For any privacy inquiries, data access requests, or statutory questions, please contact our privacy compliance team at:
+        <br />
+        <a href="mailto:privacy@isotcommunity.com" style="font-weight: 700; font-size: 1.05rem;">privacy@isotcommunity.com</a>
       </p>
     </div>
 
@@ -133,8 +220,8 @@
   <!-- Footer -->
   <footer class="footer">
     <div class="container">
-      <p>© 2026 ISOT Community (Associazione di Promozione Sociale) • Turin, Italy</p>
-      <a href="index.html" style="margin-top: 8px; display: inline-block;">Return to Homepage →</a>
+      <p>© 2026 ISOT APS (Associazione di Promozione Sociale) • Turin, Italy</p>
+      <a href="index.html" style="margin-top: 8px; display: inline-block;">← Return to ISOT Homepage</a>
     </div>
   </footer>
 

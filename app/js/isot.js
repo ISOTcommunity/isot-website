@@ -807,8 +807,68 @@ function initPasswordToggles(root = document) {
   });
 }
 
+/**
+ * Garante Privacy & ePrivacy Compliant Cookie Consent Banner
+ */
+function initCookieConsentBanner() {
+  if (localStorage.getItem('isot_cookie_consent')) return;
+
+  const banner = document.createElement('div');
+  banner.id = 'isotCookieBanner';
+  banner.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    max-width: 440px;
+    margin: 0 auto;
+    z-index: 99999;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(238, 9, 121, 0.4);
+    border-radius: 20px;
+    padding: 18px 20px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+    color: #F8FAFC;
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  `;
+
+  banner.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px">
+      <span style="font-size:1.4rem">🛡️</span>
+      <div>
+        <div style="font-weight:700;color:#FFF;font-size:0.92rem;margin-bottom:2px">Privacy &amp; Cookie Preferences</div>
+        <div style="color:#CBD5E1">We use essential session storage and anonymized cookieless analytics to secure your profile and improve student integration.</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;justify-content:flex-end">
+      <a href="/privacy.html" target="_blank" style="color:#EE0979;font-weight:600;font-size:0.8rem;text-decoration:none;padding:6px 10px;">Privacy Policy ➔</a>
+      <button type="button" id="acceptCookieBtn" style="background:#EE0979;color:#FFF;border:none;border-radius:9999px;padding:8px 18px;font-weight:600;font-size:0.82rem;cursor:pointer;box-shadow:0 4px 12px rgba(238,9,121,0.4)">
+        Got It / Accept
+      </button>
+    </div>
+  `;
+
+  document.body.appendChild(banner);
+
+  document.getElementById('acceptCookieBtn')?.addEventListener('click', () => {
+    localStorage.setItem('isot_cookie_consent', 'accepted');
+    banner.style.opacity = '0';
+    banner.style.transform = 'translateY(20px)';
+    banner.style.transition = 'all 0.3s ease';
+    setTimeout(() => banner.remove(), 300);
+  });
+}
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => initPasswordToggles());
+  document.addEventListener('DOMContentLoaded', () => {
+    initPasswordToggles();
+    initCookieConsentBanner();
+  });
 } else {
   initPasswordToggles();
+  initCookieConsentBanner();
 }
