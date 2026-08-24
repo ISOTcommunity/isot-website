@@ -937,7 +937,7 @@
               ${isGoing ? `<div class="avatar-stack">${stackHtml}</div><span class="avatar-stack-count"><strong>1 Going</strong> • You <i class="fa-solid fa-chevron-right text-pink" style="font-size:0.7rem;margin-left:4px"></i></span>` : `<span class="avatar-stack-count">Be the first to RSVP <i class="fa-solid fa-chevron-right text-pink" style="font-size:0.7rem;margin-left:4px"></i></span>`}
             </div>
 
-            <button type="button" onclick="event.stopPropagation(); toggleRsvp(${item.id})" class="btn-rsvp ${isGoing ? 'going' : ''}">
+            <button type="button" onclick="event.stopPropagation(); toggleRsvp('${item.id}')" class="btn-rsvp ${isGoing ? 'going' : ''}">
               <i class="${isGoing ? 'fa-solid fa-circle-check' : 'fa-regular fa-calendar-plus'}"></i>
               <span>${isGoing ? "I'm Going!" : "I'm Going"}</span>
             </button>
