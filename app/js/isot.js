@@ -257,7 +257,10 @@ async function requireAuth(opts = {}) {
     // require auth, and anyone opening /app/home was let in as "ISOT Member".
     // It also made sign-out look broken: you were bounced to login, but any guarded
     // page still rendered.
-    const here = location.pathname.split('/').pop() || 'home.html';
+    // The query string has to come too. A poster scan is /checkin?v=<token>; sending
+    // only "checkin" to the login page loses the token, and the student signs in to be
+    // told there is no check-in code. login.html re-validates before using any of this.
+    const here = (location.pathname.split('/').pop() || 'home.html') + location.search;
     __authState = 'leaving';          // gate stays up until the navigation lands
     location.replace('login.html?next=' + encodeURIComponent(here));
     return new Promise(() => {});

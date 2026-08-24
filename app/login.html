@@ -107,9 +107,28 @@
         }
 
         const rawNext = new URLSearchParams(location.search).get('next') || '';
-        const pageFile = rawNext.split('/').pop().replace(/\.html$/i, '') + '.html';
-        const safe = /^[a-z0-9-]+\.html$/i.test(pageFile) && pageFile !== '.html' ? pageFile : 'home.html';
-        location.replace(safe);
+        const qIndex   = rawNext.indexOf('?');
+        const rawPath  = qIndex === -1 ? rawNext : rawNext.slice(0, qIndex);
+        const rawQuery = qIndex === -1 ? ''      : rawNext.slice(qIndex + 1);
+
+        const pageFile = rawPath.split('/').pop().replace(/\.html$/i, '') + '.html';
+        const okPage   = /^[a-z0-9-]+\.html$/i.test(pageFile) && pageFile !== '.html';
+
+        // Rebuilt from parsed pairs rather than passed through as a string, so a second
+        // '?', a '#', or a scheme cannot ride along and turn this into an open redirect.
+        // Needed because a poster scan is /checkin?v=<token> — dropping the query means
+        // the student signs in and is told there is no check-in code.
+        let query = '';
+        if (okPage && rawQuery) {
+          const keep = new URLSearchParams();
+          new URLSearchParams(rawQuery).forEach((v, k) => {
+            if (/^[a-z0-9_]{1,32}$/i.test(k) && v.length <= 200) keep.append(k, v);
+          });
+          const built = keep.toString();
+          if (built) query = '?' + built;
+        }
+
+        location.replace((okPage ? pageFile : 'home.html') + query);
       });
     })();
   </script>
