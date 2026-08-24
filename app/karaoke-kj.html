@@ -112,45 +112,62 @@
 
   <script>
     let pollTimer = null;
-    let localKjQueue = [
-      { id: '101', song_title: 'Dancing Queen', singer_name: 'Maria', status: 'playing' },
-      { id: '102', song_title: 'Wonderwall', singer_name: 'Alex', status: 'pending' },
-      { id: '103', song_title: 'Volare', singer_name: 'Marco', status: 'pending' }
-    ];
+    // Was a hardcoded queue of invented singers kept in memory. Every database call
+    // referenced columns that do not exist, so the KJ screen showed a fictional line-up
+    // and "Mark done" changed nothing anyone else could see.
+    let kjQueue = [];
+    let tonight = null;
 
     async function initKjController() {
       await requireAuth({ staff: true });
-      fetchQueue();
-      pollTimer = setInterval(fetchQueue, 3000);
+
+      const { data, error } = await db.rpc('tonight_karaoke');
+      if (error) console.error('Could not resolve tonight:', error.message);
+      tonight = data || { open: false };
+
+      if (!tonight.open) {
+        const box = document.getElementById('alertBox');
+        setAlert(box, tonight.reason || 'No karaoke tonight — nothing to run.', 'info');
+        renderKjUI();
+        return;
+      }
+
+      await fetchQueue();
+      pollTimer = setInterval(fetchQueue, 5000);
     }
 
     async function fetchQueue() {
-      try {
-        const { data, error } = await db
-          .from('karaoke_slots')
-          .select('*')
-          .in('status', ['playing', 'pending'])
-          .order('created_at', { ascending: true });
+      if (!tonight?.open) return;
 
-        if (!error && data && data.length) {
-          localKjQueue = data;
-        }
-      } catch (e) {}
+      const { data, error } = await db.rpc('karaoke_queue', { p_instance: tonight.instance_id });
+      if (error) {
+        // Was an empty catch, so a broken queue looked identical to an empty one.
+        setAlert(document.getElementById('alertBox'), 'Could not load the queue: ' + error.message, 'error');
+        return;
+      }
+
+      // The page speaks 'playing'/'pending'; the schema says 'performing'/'queued'.
+      kjQueue = (data || []).map(r => ({
+        ...r,
+        artist_name: r.song_artist,
+        position: r.queue_position,
+        status: r.status === 'performing' ? 'playing' : 'pending',
+      }));
 
       renderKjUI();
     }
 
     function renderKjUI() {
-      const playingSlot = localKjQueue.find(s => s.status === 'playing');
-      const pendingSlots = localKjQueue.filter(s => s.status === 'pending');
+      const playingSlot = kjQueue.find(s => s.status === 'playing');
+      const pendingSlots = kjQueue.filter(s => s.status === 'pending');
 
       // Hero
       if (playingSlot) {
         document.getElementById('nowPlayingTitle').textContent = playingSlot.song_title;
-        document.getElementById('nowPlayingSinger').textContent = `Artist: ${playingSlot.artist_name || 'Original Artist'} • Singer: ${playingSlot.singer_name || 'Member'}`;
+        document.getElementById('nowPlayingSinger').textContent = `Artist: ${escapeHtml(playingSlot.artist_name || 'Original Artist')} • Singer: ${escapeHtml(playingSlot.singer_name || 'Member')}`;
       } else if (pendingSlots.length) {
         document.getElementById('nowPlayingTitle').textContent = 'Ready to start';
-        document.getElementById('nowPlayingSinger').textContent = `Next up: ${pendingSlots[0].singer_name} ("${pendingSlots[0].song_title}" by ${pendingSlots[0].artist_name || 'Artist'})`;
+        document.getElementById('nowPlayingSinger').textContent = `Next up: ${escapeHtml(pendingSlots[0].singer_name)} ("${escapeHtml(pendingSlots[0].song_title)}" by ${escapeHtml(pendingSlots[0].artist_name || 'Artist')})`;
       } else {
         document.getElementById('nowPlayingTitle').textContent = 'No song playing';
         document.getElementById('nowPlayingSinger').textContent = 'Stage Empty • Waiting for singers';
@@ -184,76 +201,72 @@
     }
 
     async function markDoneAndNext() {
-      const playingSlot = localKjQueue.find(s => s.status === 'playing');
-      const pendingSlots = localKjQueue.filter(s => s.status === 'pending');
+      const box = document.getElementById('alertBox');
+      // One call: karaoke_next marks whoever is performing as done and promotes the next
+      // singer in a single statement, so the "one performing per night" index always
+      // holds. Two separate updates could briefly leave two performers or none.
+      const { data, error } = await db.rpc('karaoke_next', { p_instance: tonight.instance_id });
 
-      if (playingSlot) {
-        playingSlot.status = 'done';
-        try {
-          await db.from('karaoke_slots').update({ status: 'done', performed_at: new Date().toISOString() }).eq('id', playingSlot.id);
-        } catch (e) {}
-      }
+      if (error) { setAlert(box, 'Could not advance: ' + error.message, 'error'); return; }
 
-      if (pendingSlots.length) {
-        const nextSlot = pendingSlots[0];
-        nextSlot.status = 'playing';
-        try {
-          await db.from('karaoke_slots').update({ status: 'playing' }).eq('id', nextSlot.id);
-        } catch (e) {}
-        setAlert(document.getElementById('alertBox'), `Advanced to next song: "${nextSlot.song_title}"!`, 'success');
-      } else {
-        setAlert(document.getElementById('alertBox'), 'Stage finished! No more pending songs in queue.', 'info');
-      }
-
-      localKjQueue = localKjQueue.filter(s => s.status !== 'done');
-      renderKjUI();
+      await fetchQueue();
+      const nowPlaying = kjQueue.find(s => s.status === 'playing');
+      setAlert(box, nowPlaying
+        ? `Up now: "${escapeHtml(nowPlaying.song_title)}" — ${escapeHtml(nowPlaying.singer_name)}`
+        : 'Queue is empty.', nowPlaying ? 'success' : 'info');
     }
 
     async function playNow(id) {
-      localKjQueue.forEach(s => { if (s.status === 'playing') s.status = 'done'; });
-      const target = localKjQueue.find(s => s.id === id);
-      if (target) {
-        target.status = 'playing';
-        try {
-          await db.from('karaoke_slots').update({ status: 'playing' }).eq('id', id);
-        } catch (e) {}
-      }
-      localKjQueue = localKjQueue.filter(s => s.status !== 'done');
-      renderKjUI();
+      const box = document.getElementById('alertBox');
+      // Promote out of turn: end whoever is on, then set this one performing.
+      const { error: e1 } = await db.from('karaoke_slots')
+        .update({ status: 'done', performed_at: new Date().toISOString() })
+        .eq('event_instance_id', tonight.instance_id).eq('status', 'performing');
+      if (e1) { setAlert(box, 'Could not close the current song: ' + e1.message, 'error'); return; }
+
+      const { error: e2 } = await db.from('karaoke_slots')
+        .update({ status: 'performing' }).eq('id', id);
+      if (e2) { setAlert(box, 'Could not start that song: ' + e2.message, 'error'); return; }
+
+      await fetchQueue();
     }
 
     async function removeSlot(id) {
-      localKjQueue = localKjQueue.filter(s => s.id !== id);
-      try {
-        await db.from('karaoke_slots').update({ status: 'skipped' }).eq('id', id);
-      } catch (e) {}
-      renderKjUI();
+      const box = document.getElementById('alertBox');
+      const { error } = await db.rpc('karaoke_skip', { p_slot: id });
+      if (error) { setAlert(box, 'Could not skip: ' + error.message, 'error'); return; }
+      await fetchQueue();
     }
 
     async function addManualSinger(e) {
       e.preventDefault();
-      const val = document.getElementById('walkupSong').value.trim();
-      if (!val) return;
+      const box  = document.getElementById('alertBox');
+      const song = document.getElementById('walkupSong').value.trim();
+      if (!song) return;
 
-      const newSlot = {
-        id: 'walkup-' + Date.now(),
-        song_title: val,
-        singer_name: 'Walk-up Singer',
-        status: 'pending',
-        created_at: new Date().toISOString()
-      };
+      // A walk-up has no account, so singer_profile_id stays null — the schema allows
+      // that, which is exactly what the field is for. The insert previously used
+      // status 'pending' and omitted event_instance_id and position, all three of which
+      // made it fail; the failure was swallowed and the singer only ever existed in
+      // this browser's memory.
+      const { data: pos, error: posErr } =
+        await db.rpc('next_karaoke_position', { p_instance: tonight.instance_id });
+      if (posErr) { setAlert(box, 'Could not add: ' + posErr.message, 'error'); return; }
 
-      try {
-        await db.from('karaoke_slots').insert([{
-          song_title: val,
-          singer_name: 'Walk-up Singer',
-          status: 'pending'
-        }]);
-      } catch (e) {}
+      const { error } = await db.from('karaoke_slots').insert({
+        event_instance_id: tonight.instance_id,
+        singer_profile_id: null,
+        singer_name: 'Walk-up singer',
+        song_title: song,
+        status: 'queued',
+        position: pos,
+      });
 
-      localKjQueue.push(newSlot);
+      if (error) { setAlert(box, 'Could not add: ' + error.message, 'error'); return; }
+
       document.getElementById('walkupSong').value = '';
-      renderKjUI();
+      await fetchQueue();
+      setAlert(box, `Added "${escapeHtml(song)}" to the queue.`, 'success');
     }
 
     document.addEventListener('DOMContentLoaded', initKjController);

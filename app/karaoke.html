@@ -187,11 +187,12 @@
     let myActiveSlot = null;
     let pollInterval = null;
 
-    let localQueue = [
-      { id: '101', song_title: 'Dancing Queen', artist_name: 'ABBA', singer_name: 'Maria Silva', status: 'playing', profile_id: 'sample-1' },
-      { id: '102', song_title: 'Wonderwall', artist_name: 'Oasis', singer_name: 'Alex Vance', status: 'pending', profile_id: 'sample-2' },
-      { id: '103', song_title: 'Volare', artist_name: 'Domenico Modugno', singer_name: 'Marco Rossi', status: 'pending', profile_id: 'sample-3' }
-    ];
+    // Was a hardcoded queue of three invented singers, used as a fallback whenever the
+    // database returned nothing — which was always, because every query referenced
+    // columns that do not exist (artist_name, profile_id, created_at). The page showed
+    // "Maria Silva singing Dancing Queen" as though it were real. There is no fallback
+    // now: an empty queue shows an empty queue.
+    let tonight = null;      // { open, instance_id, title, start_time, day }
 
     async function initKaraoke() {
       me = await requireAuth();
@@ -201,62 +202,55 @@
         document.getElementById('performerName').value = me.full_name || 'Member';
       }
 
-      checkKaraokeSchedule();
-      loadQueue();
-      pollInterval = setInterval(loadQueue, 3000);
-    }
+      // The database decides whether karaoke is on, using the ISOT day (06:00-06:00)
+      // so a Monday night past midnight still counts. It also creates tonight's event
+      // instance the first time anyone opens the page.
+      const { data, error } = await db.rpc('tonight_karaoke');
+      if (error) console.error('Could not resolve tonight:', error.message);
+      tonight = data || { open: false };
 
-    function checkKaraokeSchedule() {
-      const now = new Date();
-      const day = now.getDay(); // 1 = Monday
-      const hour = now.getHours(); // 21 = 9 PM
-
-      const isMondayNight = (day === 1 && hour >= 21) || (day === 2 && hour < 3);
-      const isOverride = localStorage.getItem('isot_karaoke_override') === 'true';
-
-      const isOpen = isMondayNight || isOverride;
-
-      const closedCard = document.getElementById('closedScheduleCard');
-      const requestCard = document.getElementById('requestCard');
-      const overrideNotice = document.getElementById('scheduleOverrideNotice');
-
-      if (!isOpen) {
-        if (closedCard) closedCard.style.display = 'block';
-        if (requestCard) requestCard.style.display = 'none';
-        if (overrideNotice) overrideNotice.style.display = 'block';
-      } else {
-        if (closedCard) closedCard.style.display = 'none';
-        if (requestCard) requestCard.style.display = 'block';
-        if (overrideNotice) overrideNotice.style.display = isOverride ? 'block' : 'none';
+      applyScheduleState();
+      if (tonight.open) {
+        await loadQueue();
+        pollInterval = setInterval(loadQueue, 5000);
       }
     }
 
-    function toggleStaffOverride() {
-      const curr = localStorage.getItem('isot_karaoke_override') === 'true';
-      localStorage.setItem('isot_karaoke_override', (!curr).toString());
-      checkKaraokeSchedule();
-      setAlert(document.getElementById('alertBox'), !curr ? 'Staff Override Activated: Karaoke Queue Unlocked 🔑' : 'Staff Override Deactivated', 'info');
+    function applyScheduleState() {
+      // Was a client-side clock check (day === 1 && hour >= 21) with a localStorage
+      // override. The server already knows, from the events table and the ISOT day,
+      // and it cannot be bypassed by changing your phone's clock.
+      const closedCard  = document.getElementById('closedScheduleCard');
+      const requestCard = document.getElementById('requestCard');
+      const override    = document.getElementById('scheduleOverrideNotice');
+
+      if (tonight.open) {
+        if (closedCard)  closedCard.style.display = 'none';
+        if (requestCard) requestCard.style.display = 'block';
+      } else {
+        if (closedCard)  closedCard.style.display = 'block';
+        if (requestCard) requestCard.style.display = 'none';
+      }
+      // The override notice belonged to the localStorage bypass, which is gone.
+      if (override) override.style.display = 'none';
     }
 
     async function loadQueue() {
-      let slots = [];
-      try {
-        const { data, error } = await db
-          .from('karaoke_slots')
-          .select('*')
-          .in('status', ['playing', 'pending'])
-          .order('created_at', { ascending: true });
+      if (!tonight?.open) return;
 
-        if (!error && data && data.length) {
-          slots = data;
-        } else {
-          slots = localQueue;
-        }
-      } catch (e) {
-        slots = localQueue;
+      const { data, error } = await db.rpc('karaoke_queue', { p_instance: tonight.instance_id });
+      if (error) {
+        console.error('Could not load the queue:', error.message);
+        return;                       // keep what is on screen rather than inventing a queue
       }
 
-      renderQueueUI(slots);
+      renderQueueUI((data || []).map(r => ({
+        ...r,
+        // the page was written against these names; map once here rather than everywhere
+        artist_name: r.song_artist,
+        profile_id: r.singer_profile_id,
+        position: r.queue_position,
+      })));
     }
 
     function renderQueueUI(slots) {
@@ -272,17 +266,17 @@
       if (playingSlot && playingSlot.profile_id === me.id) {
         heroBadge.className = 'position-hero-badge on-mic';
         posText.textContent = "YOU ARE ON MIC! 🎤";
-        mySongSub.textContent = `Singing: "${playingSlot.song_title}" by ${playingSlot.artist_name || 'Artist'}`;
+        mySongSub.textContent = `Singing: "${escapeHtml(playingSlot.song_title)}" by ${escapeHtml(playingSlot.artist_name || 'Artist')}`;
       } else if (myActiveSlot && myActiveSlot.status === 'pending') {
         heroBadge.className = 'position-hero-badge';
         const index = pendingSlots.findIndex(s => s.id === myActiveSlot.id);
         const position = index >= 0 ? index + 1 : 1;
         posText.textContent = position === 1 ? "YOU ARE UP NEXT! 🌟" : `${position} songs away`;
-        mySongSub.textContent = `Your song: "${myActiveSlot.song_title}" by ${myActiveSlot.artist_name || 'Artist'}`;
+        mySongSub.textContent = `Your song: "${escapeHtml(myActiveSlot.song_title)}" by ${escapeHtml(myActiveSlot.artist_name || 'Artist')}`;
       } else if (playingSlot) {
         heroBadge.className = 'position-hero-badge';
-        posText.textContent = `Now Playing: ${playingSlot.song_title}`;
-        mySongSub.textContent = `Artist: ${playingSlot.artist_name || 'Original Artist'} • Performed by ${playingSlot.singer_name || 'Member'}`;
+        posText.textContent = `Now Playing: ${escapeHtml(playingSlot.song_title)}`;
+        mySongSub.textContent = `Artist: ${escapeHtml(playingSlot.artist_name || 'Original Artist')} • Performed by ${escapeHtml(playingSlot.singer_name || 'Member')}`;
       } else {
         heroBadge.className = 'position-hero-badge';
         posText.textContent = "Monday Karaoke @ Rough";
@@ -320,7 +314,9 @@
           badgeHtml = `<span class="dim" style="font-weight:700;">#${idx}</span>`;
         }
 
-        const performerProfile = { full_name: s.singer_name || 'Member', member_code: s.profile_id || 'ISOT-2026' };
+        // member_code seeds the geometric avatar. It was being fed a UUID, so every
+        // singer got a different avatar from the one on their profile.
+        const performerProfile = { full_name: s.singer_name || 'Member', member_code: s.member_code, avatar_url: s.avatar_url };
 
         return `
           <div class="queue-row ${isPlaying ? 'playing' : ''} ${isMine ? 'my-row' : ''}">
@@ -344,71 +340,62 @@
       const alertEl = document.getElementById('alertBox');
       setAlert(alertEl, '');
 
-      if (myActiveSlot) {
-        setAlert(alertEl, 'You already have an active song in the queue! Wait for your turn or cancel your existing song.', 'info');
-        return;
-      }
+      if (!tonight?.open) { setAlert(alertEl, 'There is no karaoke tonight.', 'info'); return; }
 
-      const songVal = document.getElementById('songTitle').value.trim();
-      const artistVal = document.getElementById('artistName').value.trim();
-      const performerVal = document.getElementById('performerName').value.trim() || me.full_name || 'Member';
+      const songVal      = document.getElementById('songTitle').value.trim();
+      const artistVal    = document.getElementById('artistName').value.trim();
+      const performerVal = document.getElementById('performerName').value.trim();
 
-      if (!songVal || !artistVal) {
-        setAlert(alertEl, 'Please enter both the Song Title and the Original Singer/Artist name!', 'error');
-        return;
-      }
+      if (!songVal) { setAlert(alertEl, 'What song are you singing?', 'error'); return; }
 
       const btn = document.getElementById('addBtn');
-      const restore = busy(btn, 'Submitting…');
+      const restore = busy(btn, 'Adding…');
 
-      const newSlot = {
-        id: 'slot-' + Date.now(),
-        profile_id: me.id,
-        singer_name: performerVal,
-        artist_name: artistVal,
-        song_title: songVal,
-        status: 'pending',
-        created_at: new Date().toISOString()
-      };
-
-      try {
-        const { data, error } = await db.from('karaoke_slots').insert([
-          {
-            profile_id: me.id,
-            singer_name: performerVal,
-            artist_name: artistVal,
-            song_title: songVal,
-            status: 'pending'
-          }
-        ]).select('*').single();
-
-        if (!error && data) {
-          localQueue.push(data);
-        } else {
-          localQueue.push(newSlot);
-        }
-      } catch (err) {
-        localQueue.push(newSlot);
-      }
+      // join_karaoke_queue assigns the position inside the transaction, so two people
+      // tapping at the same moment cannot land on the same number. It also enforces
+      // one live request each. Previously the insert used columns that do not exist and
+      // silently pushed into an in-memory array that vanished on refresh.
+      const { data, error } = await db.rpc('join_karaoke_queue', {
+        p_instance: tonight.instance_id,
+        p_song: songVal,
+        p_artist: artistVal || null,
+        p_singer: performerVal || null,
+      });
 
       restore();
+
+      if (error) {
+        setAlert(alertEl, error.message.replace(/^.*?:\s*/, ''), 'error');
+        return;
+      }
+
       document.getElementById('songTitle').value = '';
       document.getElementById('artistName').value = '';
-      setAlert(alertEl, 'Song added to line-up! Watch your turn on stage.', 'success');
-      loadQueue();
+      setAlert(alertEl, `You're number ${data.position} in the queue.`, 'success');
+      await loadQueue();
     }
+
 
     async function cancelMySong() {
       if (!myActiveSlot) return;
+      const alertEl = document.getElementById('alertBox');
 
-      try {
-        await db.from('karaoke_slots').update({ status: 'skipped' }).eq('id', myActiveSlot.id);
-      } catch (e) {}
+      // Delete rather than mark skipped: 'skipped' is the KJ's word for "we moved past
+      // them", and it would still count against the one-song-each rule. Withdrawing
+      // should let you put a different song in. karaoke_self_delete allows this while
+      // the slot is still queued.
+      const { error } = await db.from('karaoke_slots').delete().eq('id', myActiveSlot.id);
 
-      localQueue = localQueue.filter(s => s.id !== myActiveSlot.id);
+      if (error) {
+        // The old code swallowed this in an empty catch, so a failed cancel looked
+        // identical to a successful one.
+        setAlert(alertEl, 'Could not remove your song: ' + error.message, 'error');
+        return;
+      }
+
       myActiveSlot = null;
-      loadQueue();
-      setAlert(document.getElementById('alertBox'), 'Your song was removed from the queue.', 'info');
+      await loadQueue();
+      setAlert(alertEl, 'Your song was removed. You can add another.', 'info');
     }
 
     document.addEventListener('DOMContentLoaded', initKaraoke);
