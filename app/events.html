@@ -536,7 +536,19 @@
     async function openInviteModal(eventTitle, eventId) {
       let friendsList = [];
 
-      const friendState = JSON.parse(localStorage.getItem('isot_friends') || '{}');
+      // Connected friends come from the database. Reading localStorage here meant the
+      // invite sheet showed whatever this browser happened to remember — including
+      // people who had not accepted, and nobody added on another device.
+      const { data: fRows } = await db
+        .from('friendships')
+        .select('user_id, friend_id, status')
+        .eq('status', 'connected')
+        .or(`user_id.eq.${meProfile.id},friend_id.eq.${meProfile.id}`);
+
+      const friendState = {};
+      (fRows || []).forEach(f => {
+        friendState[f.user_id === meProfile.id ? f.friend_id : f.user_id] = 'connected';
+      });
       const connectedIds = Object.keys(friendState).filter(id => friendState[id] === 'connected');
 
       try {

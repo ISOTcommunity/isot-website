@@ -241,7 +241,10 @@
   <script>
     let allProfiles = [];
     let meProfile = null;
-    let friendState = JSON.parse(localStorage.getItem('isot_friends') || '{}');
+    // Filled by loadFriendships() from the database. Seeding it from localStorage meant
+    // a stale local copy could contradict the server, and it never contained incoming
+    // requests at all.
+    let friendState = {};
     let currentFilter = 'all';
 
     async function initNetworkPage() {
@@ -261,57 +264,84 @@
         console.warn('Profiles load note:', e);
       }
 
-      // Sync friendships from Supabase
-      try {
-        const { data } = await db.from('friendships').select('*').eq('user_id', meProfile.id);
-        if (data && data.length) {
-          data.forEach(f => { friendState[f.friend_id] = f.status; });
-          localStorage.setItem('isot_friends', JSON.stringify(friendState));
-        }
-      } catch (e) {
-        console.warn('Friendship sync note:', e);
-      }
+      // A friendship is ONE row: user_id asked, friend_id was asked. Reading only
+      // .eq('user_id', me) returned outgoing requests only, so an incoming request was
+      // invisible to the person who received it. Read both directions, and record which
+      // way round it is — 'sent' and 'incoming' need different buttons.
+      await loadFriendships();
 
       renderStudents();
     }
 
-    async function toggleFriendship(studentId, action = null) {
-      const student = allProfiles.find(p => p.id === studentId);
-      const current = friendState[studentId];
-      let newStatus = 'requested';
+    /** Friendship state comes from the database, never localStorage. Keyed by the other
+     *  person's id, with the direction preserved:
+     *    'connected' — accepted, either direction
+     *    'sent'      — I asked, waiting on them
+     *    'incoming'  — they asked, waiting on me
+     */
+    async function loadFriendships() {
+      friendState = {};
+      const { data, error } = await db
+        .from('friendships')
+        .select('user_id, friend_id, status')
+        .or(`user_id.eq.${meProfile.id},friend_id.eq.${meProfile.id}`);
 
-      if (action === 'accept') {
-        friendState[studentId] = 'connected';
-        newStatus = 'connected';
-        sendNotification(studentId, 'friend_accept', 'Friend Request Accepted 🤝', `${meProfile.full_name || 'A member'} accepted your friend request!`);
-      } else if (action === 'decline') {
-        delete friendState[studentId];
-        newStatus = 'deleted';
-      } else if (current === 'connected') {
-        delete friendState[studentId];
-        newStatus = 'deleted';
-      } else if (current === 'requested') {
-        friendState[studentId] = 'connected';
-        newStatus = 'connected';
-      } else {
-        friendState[studentId] = 'requested';
-        newStatus = 'requested';
-        sendNotification(studentId, 'friend_request', 'New Friend Request 📩', `${meProfile.full_name || 'A member'} sent you a friend request in ISOT Network.`);
-      }
+      if (error) { console.error('Could not load friendships:', error.message); return; }
 
-      localStorage.setItem('isot_friends', JSON.stringify(friendState));
+      (data || []).forEach(f => {
+        const other = f.user_id === meProfile.id ? f.friend_id : f.user_id;
+        if (f.status === 'connected') friendState[other] = 'connected';
+        else if (f.user_id === meProfile.id) friendState[other] = 'sent';
+        else friendState[other] = 'incoming';
+      });
+    }
+
+    async function sendFriendRequest(studentId) {
+      const { error } = await db.from('friendships')
+        .insert({ user_id: meProfile.id, friend_id: studentId, status: 'pending' });
+      if (error) { alert('Could not send the request: ' + error.message); return; }
+
+      await sendNotification(studentId, 'friend_request', 'New friend request',
+        `${meProfile.full_name || 'A member'} sent you a friend request.`);
+      await loadFriendships();
       renderStudents();
+    }
 
-      // Upsert to Supabase friendships table
-      try {
-        if (newStatus === 'deleted') {
-          await db.from('friendships').delete().eq('user_id', meProfile.id).eq('friend_id', studentId);
-        } else {
-          await db.from('friendships').upsert({ user_id: meProfile.id, friend_id: studentId, status: newStatus });
-        }
-      } catch (e) {
-        console.warn('Friendship DB upsert:', e);
-      }
+    async function acceptFriendRequest(studentId) {
+      // Update THEIR row. Writing a second row in the opposite direction — which is what
+      // the old upsert did — left the original stuck at 'pending' and created a duplicate.
+      const { error } = await db.from('friendships')
+        .update({ status: 'connected' })
+        .eq('user_id', studentId)
+        .eq('friend_id', meProfile.id);
+      if (error) { alert('Could not accept: ' + error.message); return; }
+
+      await sendNotification(studentId, 'friend_accept', 'Friend request accepted',
+        `${meProfile.full_name || 'A member'} accepted your friend request.`);
+      await loadFriendships();
+      renderStudents();
+    }
+
+    /** Decline, cancel, or unfriend — all the same thing: remove the row, whichever
+     *  direction it was created in. */
+    async function removeFriendship(studentId) {
+      const { error } = await db.from('friendships')
+        .delete()
+        .or(`and(user_id.eq.${meProfile.id},friend_id.eq.${studentId}),` +
+            `and(user_id.eq.${studentId},friend_id.eq.${meProfile.id})`);
+      if (error) { alert('Could not remove: ' + error.message); return; }
+      await loadFriendships();
+      renderStudents();
+    }
+
+    async function toggleFriendship(studentId, action = null) {
+      const current = friendState[studentId];
+      if (action === 'accept')            return acceptFriendRequest(studentId);
+      if (action === 'decline')           return removeFriendship(studentId);
+      if (current === 'connected')        return removeFriendship(studentId);
+      if (current === 'sent')             return removeFriendship(studentId);  // cancel
+      if (current === 'incoming')         return acceptFriendRequest(studentId);
+      return sendFriendRequest(studentId);
     }
 
     function setFilter(filter) {
@@ -332,7 +362,8 @@
     function renderStudents() {
       const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
       const connectedCount = Object.values(friendState).filter(s => s === 'connected').length;
-      const requestsCount = Object.values(friendState).filter(s => s === 'requested' || s === 'pending').length;
+      // Only incoming requests need action, so that is what the badge counts.
+      const requestsCount = Object.values(friendState).filter(s => s === 'incoming').length;
 
       document.getElementById('friendsCount').textContent = connectedCount;
       document.getElementById('requestsCount').textContent = requestsCount;
@@ -348,7 +379,7 @@
         }
 
         if (currentFilter === 'friends' && friendState[s.id] !== 'connected') return false;
-        if (currentFilter === 'requests' && friendState[s.id] !== 'requested' && friendState[s.id] !== 'pending') return false;
+        if (currentFilter === 'requests' && friendState[s.id] !== 'incoming') return false;
         if (currentFilter === 'unitto' && !uniStr.includes('unito')) return false;
         if (currentFilter === 'polito' && !uniStr.includes('polito')) return false;
 
@@ -374,9 +405,17 @@
         const status = friendState[s.id];
         let btnHtml = '';
         if (status === 'connected') {
-          btnHtml = `<button type="button" class="btn-connect connected" onclick="toggleFriendship('${s.id}')"><i class="fa-solid fa-user-check"></i> Friends 🤝</button>`;
-        } else if (status === 'requested') {
-          btnHtml = `<button type="button" class="btn-connect requested" onclick="toggleFriendship('${s.id}')"><i class="fa-solid fa-clock"></i> Sent ⏳</button>`;
+          btnHtml = `<button type="button" class="btn-connect connected" onclick="toggleFriendship('${s.id}')"><i class="fa-solid fa-user-check"></i> Friends</button>`;
+        } else if (status === 'sent') {
+          btnHtml = `<button type="button" class="btn-connect requested" onclick="toggleFriendship('${s.id}')"><i class="fa-solid fa-clock"></i> Sent</button>`;
+        } else if (status === 'incoming') {
+          // They asked you. Previously there was no state for this at all, so an incoming
+          // request rendered as "+ Add Friend" and tapping it tried to create a duplicate.
+          btnHtml = `
+            <div style="display:flex;gap:6px">
+              <button type="button" class="btn-connect" onclick="toggleFriendship('${s.id}', 'accept')"><i class="fa-solid fa-check"></i> Accept</button>
+              <button type="button" class="btn-connect" style="background:transparent;border:1px solid var(--border-light);color:var(--text-dim)" onclick="toggleFriendship('${s.id}', 'decline')">Decline</button>
+            </div>`;
         } else {
           btnHtml = `<button type="button" class="btn-connect" onclick="toggleFriendship('${s.id}')"><i class="fa-solid fa-user-plus"></i> + Add Friend</button>`;
         }
