@@ -661,14 +661,33 @@
     }
 
 
-    function sendSingleFriendInvite(friendId, friendName, eventTitle, eventId, key) {
-      sendNotification(friendId, 'event_invite', `Event Invitation: ${eventTitle}`, `${meProfile ? meProfile.full_name : 'A friend'} invited you to join ${eventTitle}!`, eventId);
-      invitedFriendsMap[key] = true;
-
+    // The result has to be awaited. This used to fire sendNotification() and then say
+    // "Invited" whatever came back — so a failed insert looked exactly like a sent
+    // invite, and the sender had no way to know their friend was never told.
+    async function sendSingleFriendInvite(friendId, friendName, eventTitle, eventId, key) {
       const btn = document.getElementById(`btnInvite_${key}`);
+      if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; }
+
+      const res = await sendNotification(
+        friendId, 'event_invite', `Event invitation: ${eventTitle}`,
+        `${meProfile ? meProfile.full_name : 'A friend'} invited you to ${eventTitle}.`,
+        eventId);
+
+      if (!res || !res.ok) {
+        if (btn) {
+          btn.disabled = false;
+          btn.className = 'btn btn-outline';
+          btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Try again';
+        }
+        alert("Could not send that invite: " + ((res && res.error) || 'unknown error'));
+        return;
+      }
+
+      invitedFriendsMap[key] = true;
       if (btn) {
+        btn.disabled = true;
         btn.className = 'btn btn-outline';
-        btn.innerHTML = '<i class="fa-solid fa-check text-green"></i> Invited ✅';
+        btn.innerHTML = '<i class="fa-solid fa-check text-green"></i> Invited';
       }
     }
 

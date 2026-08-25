@@ -343,6 +343,12 @@ async function requireAuth(opts = {}) {
   if (gateEl) gateEl.remove();
 
   initBurgerMenu(profile);
+
+  // Populate the bell. No page called loadNotifications(), so localNotifications was
+  // always empty and the unread badge never appeared anywhere in the app. Not awaited:
+  // a count is not worth delaying the page for, and it repaints itself when it lands.
+  loadNotifications().catch(e => console.warn('notifications:', e));
+
   return profile;
 }
 

@@ -83,55 +83,94 @@
 
   <script>
     let meProfile = null;
+    let actors = {};          // actor_id -> directory row, so we can show who it was from
 
     async function initNotificationsPage() {
       meProfile = await requireAuth();
       document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(meProfile, 36);
-
-      // Mark all as read when opening notifications page
-      localNotifications.forEach(n => { n.read = true; });
-      localStorage.setItem('isot_notifications', JSON.stringify(localNotifications));
-      updateNotificationBellUI();
-
-      renderNotificationsPage();
+      await refresh();
     }
 
-    function handleNotifAccept(notifId, fromId) {
-      if (fromId) {
-        const friendState = JSON.parse(localStorage.getItem('isot_friends') || '{}');
-        friendState[fromId] = 'connected';
-        localStorage.setItem('isot_friends', JSON.stringify(friendState));
+    /* This page used to read and write localStorage for everything.
+     *
+     * An invite is written by the SENDER into the notifications table, so the
+     * recipient's own browser store never contained it — an event invite could not
+     * appear here at all, no matter how it was sent. Accepting a friend request had
+     * the same problem in reverse: it set isot_friends in localStorage and never
+     * touched the friendships table, so nobody was ever actually connected.
+     *
+     * Everything below goes through the database. RLS already limits every row to
+     * auth.uid(), so there is no filtering to do here. */
+    async function refresh() {
+      await loadNotifications();
+      await loadActors();
+      renderNotificationsPage();
+
+      // Mark as read only once they are actually on screen.
+      const unread = localNotifications.filter(n => !n.read);
+      if (unread.length) {
+        const { error } = await db.from('notifications')
+          .update({ read: true })
+          .eq('user_id', meProfile.id)
+          .eq('read', false);
+        if (error) { console.warn('Could not mark read:', error.message); return; }
+        unread.forEach(n => { n.read = true; });
+        updateNotificationBellUI();
       }
-      localNotifications = localNotifications.filter(n => n.id !== notifId);
-      localStorage.setItem('isot_notifications', JSON.stringify(localNotifications));
-      updateNotificationBellUI();
-      renderNotificationsPage();
     }
 
-    function handleNotifIgnore(notifId, fromId) {
-      if (fromId) {
-        const friendState = JSON.parse(localStorage.getItem('isot_friends') || '{}');
-        friendState[fromId] = 'declined';
-        localStorage.setItem('isot_friends', JSON.stringify(friendState));
+    /** Names and avatars for whoever caused these — via the directory view, which
+     *  exposes only safe columns. */
+    async function loadActors() {
+      actors = {};
+      const ids = [...new Set(localNotifications.map(n => n.actor_id).filter(Boolean))];
+      if (!ids.length) return;
+      const { data, error } = await db.from('member_directory')
+        .select('id, full_name, avatar_url, member_code, tier')
+        .in('id', ids);
+      if (error) { console.warn('Could not load senders:', error.message); return; }
+      (data || []).forEach(p => { actors[p.id] = p; });
+    }
+
+    async function handleNotifAccept(notifId, actorId) {
+      if (!actorId) { alert('This request has no sender recorded, so it cannot be accepted.'); return; }
+
+      // Update THEIR row rather than inserting a second one in the opposite direction —
+      // same rule as network.html, or the original stays stuck at 'pending'.
+      const { error } = await db.from('friendships')
+        .update({ status: 'connected' })
+        .eq('user_id', actorId)
+        .eq('friend_id', meProfile.id);
+      if (error) { alert('Could not accept: ' + error.message); return; }
+
+      await sendNotification(actorId, 'friend_accept', 'Friend request accepted',
+        (meProfile.full_name || 'A member') + ' accepted your friend request.');
+      await removeRow(notifId);
+    }
+
+    async function handleNotifIgnore(notifId, actorId) {
+      if (actorId) {
+        const { error } = await db.from('friendships')
+          .delete()
+          .or('and(user_id.eq.' + meProfile.id + ',friend_id.eq.' + actorId + '),' +
+              'and(user_id.eq.' + actorId + ',friend_id.eq.' + meProfile.id + ')');
+        if (error) { alert('Could not decline: ' + error.message); return; }
       }
-      localNotifications = localNotifications.filter(n => n.id !== notifId);
-      localStorage.setItem('isot_notifications', JSON.stringify(localNotifications));
-      updateNotificationBellUI();
-      renderNotificationsPage();
+      await removeRow(notifId);
     }
 
-    function handleNotifRemove(notifId) {
-      localNotifications = localNotifications.filter(n => n.id !== notifId);
-      localStorage.setItem('isot_notifications', JSON.stringify(localNotifications));
-      updateNotificationBellUI();
-      renderNotificationsPage();
+    async function handleNotifRemove(notifId) { await removeRow(notifId); }
+
+    async function removeRow(notifId) {
+      const { error } = await db.from('notifications').delete().eq('id', notifId);
+      if (error) { alert('Could not remove it: ' + error.message); return; }
+      await refresh();
     }
 
-    function clearAllNotifications() {
-      localNotifications = [];
-      localStorage.setItem('isot_notifications', JSON.stringify([]));
-      updateNotificationBellUI();
-      renderNotificationsPage();
+    async function clearAllNotifications() {
+      const { error } = await db.from('notifications').delete().eq('user_id', meProfile.id);
+      if (error) { alert('Could not clear them: ' + error.message); return; }
+      await refresh();
     }
 
     function renderNotificationsPage() {
@@ -142,54 +181,62 @@
         container.innerHTML = `
           <div class="card card-glass" style="text-align:center;padding:36px">
             <i class="fa-solid fa-bell-slash text-pink" style="font-size:2.2rem;margin-bottom:12px"></i>
-            <h3 style="font-size:1.1rem;color:#FFF;margin-bottom:4px">No Notifications Yet</h3>
-            <p class="dim" style="font-size:0.85rem;margin-bottom:16px">You're all caught up! You'll see friend requests and event invites here.</p>
+            <h3 style="font-size:1.1rem;color:#FFF;margin-bottom:4px">No notifications yet</h3>
+            <p class="dim" style="font-size:0.85rem;margin-bottom:16px">Friend requests and event invites from other students land here.</p>
             <a href="network.html" class="btn btn-pink" style="width:auto;display:inline-flex;padding:6px 18px;font-size:0.82rem;">
-              <i class="fa-solid fa-users"></i> Discover ISOT Students 🌐
+              <i class="fa-solid fa-users"></i> Discover ISOT students
             </a>
           </div>
         `;
         return;
       }
 
-      container.innerHTML = localNotifications.map(n => `
-        <div class="card card-glass" style="margin-bottom:12px;padding:16px;position:relative;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-            <div style="font-weight:700;color:#FFF;font-size:0.95rem;display:flex;align-items:center;gap:8px">
-              <i class="${n.type === 'event_invite' ? 'fa-solid fa-envelope-open-text text-pink' : 'fa-solid fa-user-plus text-green'}"></i>
-              ${escapeHtml(n.title)}
+      container.innerHTML = localNotifications.map(n => {
+        // The columns are actor_id and event_id. This used to read n.fromId and
+        // n.eventId, which do not exist on a database row — so Accept was handed an
+        // empty id and the event link never rendered.
+        const who  = n.actor_id ? actors[n.actor_id] : null;
+        const when = new Date(n.created_at).toLocaleString([], {
+          weekday: 'short', day: 'numeric', month: 'short',
+          hour: '2-digit', minute: '2-digit'
+        });
+        const icon = n.type === 'event_invite'
+          ? 'fa-solid fa-envelope-open-text text-pink'
+          : 'fa-solid fa-user-plus text-green';
+
+        return `
+        <div class="card card-glass" style="margin-bottom:12px;padding:16px;${n.read ? '' : 'border-left:2px solid var(--pink);'}">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            ${who ? renderUserAvatarHtml(who, 34) : `<i class="${icon}" style="font-size:1.1rem;width:34px;text-align:center"></i>`}
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;color:#FFF;font-size:0.95rem">${escapeHtml(n.title)}</div>
+              <span class="dim" style="font-size:0.75rem">${escapeHtml(when)}</span>
             </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <span class="dim" style="font-size:0.75rem">${new Date(n.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
-              <button type="button" onclick="handleNotifRemove('${n.id}')" title="Remove notification" style="background:transparent;border:none;color:var(--text-muted);font-size:0.9rem;cursor:pointer;padding:2px 6px;">
-                <i class="fa-solid fa-trash-can text-pink"></i>
-              </button>
-            </div>
+            <button type="button" onclick="handleNotifRemove('${n.id}')" title="Remove" style="background:transparent;border:none;color:var(--text-muted);font-size:0.9rem;cursor:pointer;padding:2px 6px;">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
           </div>
-          <p class="dim" style="font-size:0.85rem;margin-bottom:12px">${escapeHtml(n.message)}</p>
+
+          <p class="dim" style="font-size:0.85rem;margin-bottom:12px">${escapeHtml(n.message || '')}</p>
 
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             ${n.type === 'friend_request' ? `
-              <button type="button" class="btn btn-pink" style="width:auto;padding:5px 14px;font-size:0.78rem;" onclick="handleNotifAccept('${n.id}', '${n.fromId || ''}')">
-                <i class="fa-solid fa-handshake"></i> Accept 🤝
+              <button type="button" class="btn btn-pink" style="width:auto;padding:5px 14px;font-size:0.78rem;" onclick="handleNotifAccept('${n.id}', '${n.actor_id || ''}')">
+                <i class="fa-solid fa-handshake"></i> Accept
               </button>
-              <button type="button" class="btn btn-outline" style="width:auto;padding:5px 14px;font-size:0.78rem;" onclick="handleNotifIgnore('${n.id}', '${n.fromId || ''}')">
-                <i class="fa-solid fa-xmark"></i> Ignore ❌
+              <button type="button" class="btn btn-outline" style="width:auto;padding:5px 14px;font-size:0.78rem;" onclick="handleNotifIgnore('${n.id}', '${n.actor_id || ''}')">
+                <i class="fa-solid fa-xmark"></i> Ignore
               </button>
             ` : ''}
 
-            ${n.eventId ? `
+            ${n.type === 'event_invite' ? `
               <a href="events.html" class="btn btn-pink" style="width:auto;padding:5px 14px;font-size:0.78rem;display:inline-flex">
-                <i class="fa-solid fa-calendar"></i> View Event Schedule 📅
+                <i class="fa-solid fa-calendar"></i> Open the calendar
               </a>
             ` : ''}
-
-            <button type="button" class="btn btn-outline" style="width:auto;padding:5px 14px;font-size:0.78rem;" onclick="handleNotifRemove('${n.id}')">
-              Remove 🗑️
-            </button>
           </div>
-        </div>
-      `).join('');
+        </div>`;
+      }).join('');
     }
 
     document.addEventListener('DOMContentLoaded', initNotificationsPage);
