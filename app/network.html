@@ -206,6 +206,7 @@
       <button type="button" class="filter-pill active" id="fAll" onclick="setFilter('all')">All Students</button>
       <button type="button" class="filter-pill" id="fFriends" onclick="setFilter('friends')">My Friends (<span id="friendsCount">0</span>)</button>
       <button type="button" class="filter-pill" id="fRequests" onclick="setFilter('requests')">Pending Requests (<span id="requestsCount">0</span>)</button>
+      <button type="button" class="filter-pill" id="fInvites" onclick="setFilter('invites')">My Invites (<span id="invitesCount">0</span>)</button>
       <button type="button" class="filter-pill" id="fUniTo" onclick="setFilter('unitto')">UniTo</button>
       <button type="button" class="filter-pill" id="fPoliTo" onclick="setFilter('polito')">PoliTo</button>
     </div>
@@ -269,6 +270,7 @@
       // invisible to the person who received it. Read both directions, and record which
       // way round it is — 'sent' and 'incoming' need different buttons.
       await loadFriendships();
+      await loadInvites();
 
       renderStudents();
     }
@@ -350,6 +352,7 @@
       if (filter === 'all') document.getElementById('fAll').classList.add('active');
       if (filter === 'friends') document.getElementById('fFriends').classList.add('active');
       if (filter === 'requests') document.getElementById('fRequests').classList.add('active');
+      if (filter === 'invites') document.getElementById('fInvites').classList.add('active');
       if (filter === 'unitto') document.getElementById('fUniTo').classList.add('active');
       if (filter === 'polito') document.getElementById('fPoliTo').classList.add('active');
       renderStudents();
@@ -360,6 +363,10 @@
     }
 
     function renderStudents() {
+      // "Invites" is a different kind of list — events you were invited to, not people —
+      // so it takes over the container rather than filtering the student array.
+      if (currentFilter === 'invites') { renderInvites(); return; }
+
       const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
       const connectedCount = Object.values(friendState).filter(s => s === 'connected').length;
       // Only incoming requests need action, so that is what the badge counts.
@@ -459,6 +466,100 @@
       }).join('');
     }
 
+    /* ── Invites addressed to me ────────────────────────────────────────────
+     * my_invites() returns each invite WITH its event resolved — title, venue, time —
+     * and whether I have already RSVPed. Without the event_date column added in 012
+     * this could only have said "you were invited to Karaoke Night", which is not an
+     * answer when it runs every Monday.
+     */
+    let myInvites = [];
+
+    async function loadInvites() {
+      const { data, error } = await db.rpc('my_invites');
+      if (error) { console.warn('Could not load invites:', error.message); myInvites = []; return; }
+      myInvites = data || [];
+      const upcoming = myInvites.filter(i => !i.past).length;
+      const badge = document.getElementById('invitesCount');
+      if (badge) badge.textContent = upcoming;
+    }
+
+    function renderInvites() {
+      const container = document.getElementById('studentContainer');
+      const live = myInvites.filter(i => !i.past);
+
+      if (!live.length) {
+        container.innerHTML = `
+          <div class="card card-glass" style="text-align:center;padding:34px">
+            <i class="fa-solid fa-envelope-open-text text-pink" style="font-size:2rem;margin-bottom:10px"></i>
+            <h3 style="font-size:1.1rem;color:#FFF;margin-bottom:4px">No invites right now</h3>
+            <p class="dim" style="font-size:0.85rem">When a friend invites you to a night, it shows up here with the date and venue.</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = live.map((n, i) => {
+        // An invite whose event was deleted still exists as a notification. Say so
+        // rather than rendering a card with blank fields.
+        if (!n.title) {
+          return `
+            <div class="card card-glass" style="margin-bottom:12px;padding:16px">
+              <div style="font-weight:700;color:#FFF;font-size:0.95rem;margin-bottom:4px">Invite to an event that no longer exists</div>
+              <p class="dim" style="font-size:0.82rem">${escapeHtml(n.message || '')}</p>
+            </div>`;
+        }
+
+        const when = new Date(n.event_date + 'T00:00:00').toLocaleDateString([], {
+          weekday: 'long', day: 'numeric', month: 'long' });
+        const who = n.actor_name || 'A friend';
+
+        return `
+          <div class="card card-glass" style="margin-bottom:12px;padding:16px;${n.read ? '' : 'border-left:2px solid var(--pink);'}">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              ${renderUserAvatarHtml({ full_name: who, avatar_url: n.actor_avatar, member_code: n.actor_id || '' }, 34)}
+              <div class="dim" style="font-size:0.8rem"><strong style="color:#FFF">${escapeHtml(who)}</strong> invited you</div>
+            </div>
+
+            <h3 style="font-size:1.1rem;color:#FFF;margin:0 0 6px">${escapeHtml(n.title)}</h3>
+            <div class="student-meta-pills" style="margin-bottom:12px">
+              <span class="student-meta-pill"><i class="fa-solid fa-calendar-day text-pink"></i> ${escapeHtml(when)}</span>
+              <span class="student-meta-pill"><i class="fa-solid fa-clock text-gold"></i> ${escapeHtml((n.start_time || '').slice(0,5))}</span>
+              <span class="student-meta-pill"><i class="fa-solid fa-location-dot text-green"></i> ${escapeHtml(n.venue_name || '')}</span>
+            </div>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button type="button" id="invRsvp_${i}" class="btn ${n.going ? 'btn-outline' : 'btn-pink'}"
+                      style="width:auto;padding:6px 14px;font-size:0.8rem"
+                      onclick="rsvpFromInvite(${i}, '${n.event_id}', '${n.event_date}')">
+                <i class="fa-solid ${n.going ? 'fa-circle-check text-green' : 'fa-calendar-plus'}"></i>
+                ${n.going ? "You're going" : "I'm going"}
+              </button>
+              <a href="events.html" class="btn btn-outline" style="width:auto;padding:6px 14px;font-size:0.8rem;display:inline-flex">
+                <i class="fa-solid fa-calendar"></i> Calendar
+              </a>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    async function rsvpFromInvite(idx, eventId, eventDate) {
+      const btn = document.getElementById('invRsvp_' + idx);
+      if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; }
+
+      const { data, error } = await db.rpc('toggle_rsvp',
+        { p_event_id: eventId, p_date: eventDate });
+
+      if (error) {
+        if (btn) btn.disabled = false;
+        alert('Could not RSVP: ' + error.message);
+        renderInvites();
+        return;
+      }
+
+      const inv = myInvites.find(x => x.event_id === eventId && x.event_date === eventDate);
+      if (inv) inv.going = !!(data && data.going);
+      renderInvites();
+    }
+
     /* ── Invite a friend to a night, from their card ────────────────────────
      * The calendar is expanded server-side by calendar_between(), so a recurring
      * Monday is a list of real dates rather than a rule the client has to unroll.
@@ -519,7 +620,7 @@
         return `
           <button type="button" id="invEvt_${i}" class="btn btn-outline"
                   style="width:100%;justify-content:flex-start;text-align:left;padding:10px 12px;font-size:0.84rem"
-                  onclick="sendEventInvite(${i}, '${e.event_id}', '${escapeHtml(e.title).replace(/'/g, "&#39;")}', '${escapeHtml(when)}', '${escapeHtml(e.venue_name || '')}')">
+                  onclick="sendEventInvite(${i}, '${e.event_id}', '${e.event_date}', '${escapeHtml(e.title).replace(/'/g, "&#39;")}', '${escapeHtml(when)}', '${escapeHtml(e.venue_name || '')}')">
             <span style="display:flex;flex-direction:column;gap:2px">
               <span style="color:#FFF;font-weight:600">${escapeHtml(e.title)}</span>
               <span class="dim" style="font-size:0.76rem">${escapeHtml(when)} · ${escapeHtml((e.start_time || '').slice(0,5))} · ${escapeHtml(e.venue_name || '')}</span>
@@ -528,7 +629,7 @@
       }).join('');
     }
 
-    async function sendEventInvite(idx, eventId, title, when, venue) {
+    async function sendEventInvite(idx, eventId, eventDate, title, when, venue) {
       const btn = document.getElementById('invEvt_' + idx);
       if (btn) { btn.disabled = true; }
 
@@ -536,7 +637,7 @@
         inviteTargetId, 'event_invite', 'Event invitation: ' + title,
         (meProfile.full_name || 'A friend') + ' invited you to ' + title +
         ' on ' + when + (venue ? ' at ' + venue : '') + '.',
-        eventId);
+        eventId, eventDate);
 
       if (!res || !res.ok) {
         if (btn) btn.disabled = false;

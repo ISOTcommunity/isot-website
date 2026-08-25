@@ -568,7 +568,7 @@
 
     let invitedFriendsMap = {};
 
-    async function openInviteModal(eventTitle, eventId) {
+    async function openInviteModal(eventTitle, eventId, eventDate) {
       let friendsList = [];
 
       // Connected friends come from the database. Reading localStorage here meant the
@@ -649,7 +649,7 @@
                   <div class="dim" style="font-size:0.75rem">${escapeHtml(f.nationality || 'Turin Student')} • ${escapeHtml(f.university || 'UniTo')}</div>
                 </div>
               </div>
-              <button type="button" id="btnInvite_${key}" class="btn ${isAlreadyInvited ? 'btn-outline' : 'btn-pink'}" style="width:auto;padding:6px 14px;font-size:0.78rem;" onclick="sendSingleFriendInvite('${f.id}', '${escapeHtml(f.full_name)}', '${escapeHtml(eventTitle)}', '${eventId}', '${key}')">
+              <button type="button" id="btnInvite_${key}" class="btn ${isAlreadyInvited ? 'btn-outline' : 'btn-pink'}" style="width:auto;padding:6px 14px;font-size:0.78rem;" onclick="sendSingleFriendInvite('${f.id}', '${escapeHtml(f.full_name)}', '${escapeHtml(eventTitle)}', '${eventId}', '${key}', '${eventDate}')">
                 ${isAlreadyInvited ? '<i class="fa-solid fa-check text-green"></i> Invited' : '<i class="fa-solid fa-envelope"></i> Invite 💌'}
               </button>
             </div>
@@ -664,14 +664,14 @@
     // The result has to be awaited. This used to fire sendNotification() and then say
     // "Invited" whatever came back — so a failed insert looked exactly like a sent
     // invite, and the sender had no way to know their friend was never told.
-    async function sendSingleFriendInvite(friendId, friendName, eventTitle, eventId, key) {
+    async function sendSingleFriendInvite(friendId, friendName, eventTitle, eventId, key, eventDate) {
       const btn = document.getElementById(`btnInvite_${key}`);
       if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; }
 
       const res = await sendNotification(
         friendId, 'event_invite', `Event invitation: ${eventTitle}`,
         `${meProfile ? meProfile.full_name : 'A friend'} invited you to ${eventTitle}.`,
-        eventId);
+        eventId, eventDate);
 
       if (!res || !res.ok) {
         if (btn) {
@@ -944,7 +944,7 @@
               <h2 style="font-size:1.05rem;color:#FFF;margin-bottom:4px">${escapeHtml(item.title)}</h2>
               <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
                 ${item.link ? `<a href="${item.link}" class="btn btn-pink" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Join Song Queue</a>` : `<a href="profile.html" class="btn btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Show Member Card</a>`}
-                <button type="button" class="btn btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex" onclick="openInviteModal('${escapeHtml(item.title)}', '${item.id}')">
+                <button type="button" class="btn btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex" onclick="openInviteModal('${escapeHtml(item.title)}', '${item.eventId}', '${item.date}')">
                   <i class="fa-solid fa-paper-plane text-pink"></i> Invite Friends
                 </button>
               </div>

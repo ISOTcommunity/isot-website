@@ -104,6 +104,7 @@
     async function refresh() {
       await loadNotifications();
       await loadActors();
+      await loadInviteDetail();
       renderNotificationsPage();
 
       // Mark as read only once they are actually on screen.
@@ -130,6 +131,36 @@
         .in('id', ids);
       if (error) { console.warn('Could not load senders:', error.message); return; }
       (data || []).forEach(p => { actors[p.id] = p; });
+    }
+
+    /* An event_invite row carries event_id and event_date but no event detail, so on its
+     * own it can only say "you were invited to Karaoke Night" — not which Monday, where,
+     * or whether you already said yes. my_invites() resolves all of that server-side. */
+    let inviteDetail = {};
+
+    async function loadInviteDetail() {
+      inviteDetail = {};
+      if (!localNotifications.some(n => n.type === 'event_invite')) return;
+      const { data, error } = await db.rpc('my_invites');
+      if (error) { console.warn('Could not load invite detail:', error.message); return; }
+      (data || []).forEach(i => { inviteDetail[i.id] = i; });
+    }
+
+    async function rsvpFromNotification(notifId, eventId, eventDate) {
+      const btn = document.getElementById('notifRsvp_' + notifId);
+      if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; }
+
+      const { data, error } = await db.rpc('toggle_rsvp',
+        { p_event_id: eventId, p_date: eventDate });
+
+      if (error) {
+        if (btn) btn.disabled = false;
+        alert('Could not RSVP: ' + error.message);
+        renderNotificationsPage();
+        return;
+      }
+      if (inviteDetail[notifId]) inviteDetail[notifId].going = !!(data && data.going);
+      renderNotificationsPage();
     }
 
     async function handleNotifAccept(notifId, actorId) {
@@ -171,6 +202,40 @@
       const { error } = await db.from('notifications').delete().eq('user_id', meProfile.id);
       if (error) { alert('Could not clear them: ' + error.message); return; }
       await refresh();
+    }
+
+    function renderInviteActions(n) {
+      const inv = inviteDetail[n.id];
+      if (!inv || !inv.title) {
+        return `<a href="events.html" class="btn btn-outline" style="width:auto;padding:5px 14px;font-size:0.78rem;display:inline-flex">
+                  <i class="fa-solid fa-calendar"></i> Open the calendar
+                </a>`;
+      }
+
+      const when = new Date(inv.event_date + 'T00:00:00').toLocaleDateString([], {
+        weekday: 'long', day: 'numeric', month: 'long' });
+
+      return `
+        <div style="width:100%">
+          <div class="student-meta-pills" style="margin-bottom:10px">
+            <span class="student-meta-pill"><i class="fa-solid fa-calendar-day text-pink"></i> ${escapeHtml(when)}</span>
+            <span class="student-meta-pill"><i class="fa-solid fa-clock text-gold"></i> ${escapeHtml((inv.start_time || '').slice(0,5))}</span>
+            <span class="student-meta-pill"><i class="fa-solid fa-location-dot text-green"></i> ${escapeHtml(inv.venue_name || '')}</span>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            ${inv.past
+              ? '<span class="dim" style="font-size:0.8rem">This night has already happened.</span>'
+              : `<button type="button" id="notifRsvp_${n.id}" class="btn ${inv.going ? 'btn-outline' : 'btn-pink'}"
+                        style="width:auto;padding:5px 14px;font-size:0.78rem"
+                        onclick="rsvpFromNotification('${n.id}', '${inv.event_id}', '${inv.event_date}')">
+                   <i class="fa-solid ${inv.going ? 'fa-circle-check text-green' : 'fa-calendar-plus'}"></i>
+                   ${inv.going ? "You're going" : "I'm going"}
+                 </button>`}
+            <a href="events.html" class="btn btn-outline" style="width:auto;padding:5px 14px;font-size:0.78rem;display:inline-flex">
+              <i class="fa-solid fa-calendar"></i> Calendar
+            </a>
+          </div>
+        </div>`;
     }
 
     function renderNotificationsPage() {
@@ -229,11 +294,7 @@
               </button>
             ` : ''}
 
-            ${n.type === 'event_invite' ? `
-              <a href="events.html" class="btn btn-pink" style="width:auto;padding:5px 14px;font-size:0.78rem;display:inline-flex">
-                <i class="fa-solid fa-calendar"></i> Open the calendar
-              </a>
-            ` : ''}
+            ${n.type === 'event_invite' ? renderInviteActions(n) : ''}
           </div>
         </div>`;
       }).join('');

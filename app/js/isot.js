@@ -707,7 +707,7 @@ function getUnreadNotificationsCount() {
   return localNotifications.filter(n => !n.read).length;
 }
 
-function sendNotification(recipientId, type, title, message, eventId = null) {
+function sendNotification(recipientId, type, title, message, eventId = null, eventDate = null) {
   const currentProfileId = window.__isotProfileId || null;
   const notif = {
     id: 'n_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
@@ -739,6 +739,9 @@ function sendNotification(recipientId, type, title, message, eventId = null) {
     title,
     message,
     event_id: eventId,
+    // The rule id alone cannot say WHICH Monday karaoke — a recurring event needs the
+    // occurrence date too, or the invite cannot be resolved back to a real night.
+    event_date: eventDate,
     read: false,
   }).then(({ error }) => {
     if (error) {
