@@ -391,8 +391,8 @@
         container.innerHTML = `
           <div class="card card-glass" style="text-align:center;padding:34px">
             <i class="fa-solid fa-users text-pink" style="font-size:2rem;margin-bottom:10px"></i>
-            <h3 style="font-size:1.1rem;color:#FFF;margin-bottom:4px">No Other Members Displayed</h3>
-            <p class="dim" style="font-size:0.85rem;margin-bottom:14px">Run the Supabase SQL fix command to allow registered members to see each other in the directory!</p>
+            <h3 style="font-size:1.1rem;color:#FFF;margin-bottom:4px">Nobody to show yet</h3>
+            <p class="dim" style="font-size:0.85rem;margin-bottom:14px">No members match that search. Share the app with the people you meet at events and they will appear here.</p>
             <button type="button" class="btn btn-pink" style="width:auto;display:inline-flex;padding:6px 16px;font-size:0.82rem;" onclick="navigator.clipboard.writeText('https://isotcommunity.com'); alert('Community web app link copied!')">
               <i class="fa-solid fa-share-nodes"></i> Share Web App Link
             </button>
@@ -405,7 +405,15 @@
         const status = friendState[s.id];
         let btnHtml = '';
         if (status === 'connected') {
-          btnHtml = `<button type="button" class="btn-connect connected" onclick="toggleFriendship('${s.id}')"><i class="fa-solid fa-user-check"></i> Friends</button>`;
+          // Inviting used to be possible only from the calendar: you had to already know
+          // which night you wanted, then hunt for the person. Doing it from their card is
+          // the other half of the same action. Connected friends only — an invite button
+          // on every student in the directory is a spam vector.
+          btnHtml = `
+            <div style="display:flex;gap:6px">
+              <button type="button" class="btn-connect" onclick="openEventInvite('${s.id}', '${escapeHtml(s.full_name || 'Member').replace(/'/g, "&#39;")}')"><i class="fa-solid fa-paper-plane"></i> Invite</button>
+              <button type="button" class="btn-connect connected" onclick="toggleFriendship('${s.id}')"><i class="fa-solid fa-user-check"></i> Friends</button>
+            </div>`;
         } else if (status === 'sent') {
           btnHtml = `<button type="button" class="btn-connect requested" onclick="toggleFriendship('${s.id}')"><i class="fa-solid fa-clock"></i> Sent</button>`;
         } else if (status === 'incoming') {
@@ -449,6 +457,97 @@
           </div>
         `;
       }).join('');
+    }
+
+    /* ── Invite a friend to a night, from their card ────────────────────────
+     * The calendar is expanded server-side by calendar_between(), so a recurring
+     * Monday is a list of real dates rather than a rule the client has to unroll.
+     * The date is carried into the message: "Karaoke Night" alone is ambiguous when
+     * it happens every week.
+     */
+    let inviteTargetId = null;
+
+    async function openEventInvite(friendId, friendName) {
+      inviteTargetId = friendId;
+
+      let modal = document.getElementById('eventInviteModal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.className = 'modal-backdrop';
+        modal.id = 'eventInviteModal';
+        modal.onclick = () => modal.classList.remove('active');
+        modal.innerHTML = `
+          <div class="modal-sheet" onclick="event.stopPropagation()">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+              <div>
+                <div class="eyebrow"><i class="fa-solid fa-paper-plane text-pink"></i> Event invitation</div>
+                <h3 style="font-size:1.15rem;color:#FFF;margin-top:2px" id="eventInviteTitle">Invite</h3>
+              </div>
+              <button type="button" onclick="document.getElementById('eventInviteModal').classList.remove('active')" style="background:transparent;border:none;color:var(--text-muted);font-size:1.3rem;cursor:pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="dim" style="font-size:0.82rem;margin-bottom:14px">Pick a night to invite them to:</p>
+            <div id="eventInviteList" style="display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow-y:auto;"></div>
+          </div>`;
+        document.body.appendChild(modal);
+      }
+
+      document.getElementById('eventInviteTitle').textContent = 'Invite ' + friendName;
+      const list = document.getElementById('eventInviteList');
+      list.innerHTML = '<div class="spinner" style="margin:20px auto"></div>';
+      modal.classList.add('active');
+
+      const from = new Date();
+      const to   = new Date(Date.now() + 21 * 86400000);
+      const iso  = d => d.toISOString().slice(0, 10);
+
+      const { data, error } = await db.rpc('calendar_between',
+        { p_from: iso(from), p_to: iso(to) });
+
+      if (error) {
+        list.innerHTML = '<p class="dim" style="font-size:0.85rem">Could not load the calendar: '
+          + escapeHtml(error.message) + '</p>';
+        return;
+      }
+      if (!data || !data.length) {
+        list.innerHTML = '<p class="dim" style="font-size:0.85rem">Nothing scheduled in the next three weeks.</p>';
+        return;
+      }
+
+      list.innerHTML = data.map((e, i) => {
+        const when = new Date(e.event_date + 'T00:00:00').toLocaleDateString([], {
+          weekday: 'short', day: 'numeric', month: 'short' });
+        return `
+          <button type="button" id="invEvt_${i}" class="btn btn-outline"
+                  style="width:100%;justify-content:flex-start;text-align:left;padding:10px 12px;font-size:0.84rem"
+                  onclick="sendEventInvite(${i}, '${e.event_id}', '${escapeHtml(e.title).replace(/'/g, "&#39;")}', '${escapeHtml(when)}', '${escapeHtml(e.venue_name || '')}')">
+            <span style="display:flex;flex-direction:column;gap:2px">
+              <span style="color:#FFF;font-weight:600">${escapeHtml(e.title)}</span>
+              <span class="dim" style="font-size:0.76rem">${escapeHtml(when)} · ${escapeHtml((e.start_time || '').slice(0,5))} · ${escapeHtml(e.venue_name || '')}</span>
+            </span>
+          </button>`;
+      }).join('');
+    }
+
+    async function sendEventInvite(idx, eventId, title, when, venue) {
+      const btn = document.getElementById('invEvt_' + idx);
+      if (btn) { btn.disabled = true; }
+
+      const res = await sendNotification(
+        inviteTargetId, 'event_invite', 'Event invitation: ' + title,
+        (meProfile.full_name || 'A friend') + ' invited you to ' + title +
+        ' on ' + when + (venue ? ' at ' + venue : '') + '.',
+        eventId);
+
+      if (!res || !res.ok) {
+        if (btn) btn.disabled = false;
+        alert('Could not send that invite: ' + ((res && res.error) || 'unknown error'));
+        return;
+      }
+      if (btn) {
+        btn.className = 'btn btn-outline';
+        btn.style.borderColor = 'var(--green)';
+        btn.innerHTML = '<span style="color:var(--green)"><i class="fa-solid fa-check"></i> Invite sent</span>';
+      }
     }
 
     document.addEventListener('DOMContentLoaded', initNetworkPage);
