@@ -501,10 +501,31 @@
 
     let meProfile = null;
     let userRsvps = {};   // filled by loadMyRsvps() from the database
+    /** The ISOT day: a night belongs to the day it started, so the boundary is 06:00,
+     *  not midnight. Matches isot_day() in the database — at 01:00 on Tuesday, Monday's
+     *  karaoke is still "today" and must not drop off the list. */
+    function isotToday() {
+      const d = new Date(Date.now() - 6 * 3600 * 1000);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    /** Monday of the week containing d, in local time. */
+    function mondayOf(d) {
+      const m = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      m.setDate(m.getDate() - ((m.getDay() + 6) % 7));
+      return m;
+    }
+
     let currentView = 'list';
-    let currYear = 2026;
-    let currMonthIdx = Math.max(7, new Date().getMonth()); // Default to current month (August = 7)
-    let currWeekStart = new Date(2026, 7, 24); // Week of Aug 24, 2026
+
+    // These were three frozen literals: currYear = 2026, currWeekStart pinned to
+    // 24 Aug 2026, and currMonthIdx = Math.max(7, thisMonth) — a clamp that would show
+    // August for the whole of January to July of any year, and 2026 forever. The weekly
+    // view opened on the same week no matter when you looked at it.
+    const _now = new Date();
+    let currYear = _now.getFullYear();
+    let currMonthIdx = _now.getMonth();
+    let currWeekStart = mondayOf(_now);
     let selectedDateStr = null;
 
     async function initEventsCalendar() {
@@ -879,13 +900,27 @@
      * 3. LIST FEED VIEW
      * ------------------------------------------------------------- */
     function renderListView() {
-      return EVENTS_DATA.map(item => renderEventCardHtml(item)).join('');
+      // loadCalendar() fetches from one month back so the month and week views can page
+      // without refetching. The list is "what's on", though — opening it on events that
+      // already happened is just noise. Past nights stay reachable under Going → Been.
+      const today = isotToday();
+      const upcoming = EVENTS_DATA.filter(e => e.date >= today);
+
+      if (!upcoming.length) {
+        return `
+          <div class="dim" style="text-align:center;padding:48px 20px">
+            <i class="fa-solid fa-calendar-xmark" style="font-size:2rem;opacity:0.35;display:block;margin-bottom:14px"></i>
+            Nothing scheduled yet.<br />
+            <span style="font-size:0.85rem">New nights appear here as soon as the board adds them.</span>
+          </div>`;
+      }
+      return upcoming.map(item => renderEventCardHtml(item)).join('');
     }
 
     /** The nights you have said you are coming to. There was previously nowhere to see
      *  this — you could mark yourself going and then have no way to find it again. */
     function renderGoingView() {
-      const todayStr = new Date().toISOString().slice(0, 10);
+      const todayStr = isotToday();
       const mine = EVENTS_DATA
         .filter(e => userRsvps[e.id])
         .sort((a, b) => a.date.localeCompare(b.date));
