@@ -2,6 +2,16 @@
   "cleanUrls": true,
   "redirects": [
     {
+      "source": "/isot-art-and-painting-workshop-turin",
+      "destination": "/blog-post?slug=isot-art-and-painting-workshop-turin",
+      "permanent": true
+    },
+    {
+      "source": "/castello-del-valentino-polito-architecture-guide",
+      "destination": "/blog-post?slug=castello-del-valentino-polito-architecture-guide",
+      "permanent": true
+    },
+    {
       "source": "/app",
       "destination": "/app/home.html",
       "permanent": false
