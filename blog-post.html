@@ -467,6 +467,14 @@
 
           document.getElementById('articleBody').innerHTML = bodyHtml;
 
+          // Imported WordPress content occasionally carries its own <h1> (Google Docs
+          // paste artifact) which would duplicate the page's own #articleTitle h1.
+          document.querySelectorAll('#articleBody h1').forEach(h1 => {
+            const h2 = document.createElement('h2');
+            h2.innerHTML = h1.innerHTML;
+            h1.replaceWith(h2);
+          });
+
           document.querySelectorAll('.post-content-body img').forEach(img => {
             img.onerror = function() { this.src = heroSrc; };
           });
