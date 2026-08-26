@@ -458,8 +458,20 @@
 
         if (post) {
           const cleanTitle = (post.title.rendered || 'Guide').replace(/[—–]/g, '-');
+
+          // Keep the <title> tag within Bing/Google's ~60-char display budget:
+          // drop the brand suffix first, then truncate at a word boundary if still too long.
+          const SUFFIX = ' | ISOT Turin';
+          let pageTitle = cleanTitle + SUFFIX;
+          if (pageTitle.length > 60) pageTitle = cleanTitle;
+          if (pageTitle.length > 60) {
+            const cut = pageTitle.slice(0, 57);
+            const lastSpace = cut.lastIndexOf(' ');
+            pageTitle = (lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trim() + '…';
+          }
+
           document.getElementById('articleTitle').innerText = cleanTitle;
-          document.title = cleanTitle + ' | ISOT Turin';
+          document.title = pageTitle;
           document.getElementById('articleDate').innerHTML = '<i class="fa-regular fa-calendar"></i> ' + new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
           
           let bodyHtml = post.content.rendered || '<p>Content preview available.</p>';
@@ -481,7 +493,34 @@
 
           // Dynamic Canonical & JSON-LD Article Schema (ISO 8601 date)
           const isoDate = post.date ? new Date(post.date).toISOString().split('T')[0] : '2026-08-22';
-          const cleanDesc = (post.excerpt ? post.excerpt.rendered.replace(/<[^>]*>/g, '').replace(/[—–]/g, '-').trim() : cleanTitle);
+
+          // Decode HTML entities (WP excerpts arrive un-decoded, e.g. "&hellip;")
+          const decodeEntities = (str) => {
+            const el = document.createElement('textarea');
+            el.innerHTML = str;
+            return el.value;
+          };
+
+          let cleanDesc = post.excerpt
+            ? decodeEntities(post.excerpt.rendered.replace(/<[^>]*>/g, '')).replace(/[—–]/g, '-').trim()
+            : cleanTitle;
+          cleanDesc = cleanDesc.replace(/\s*\[…\]\s*$/, '').trim();
+
+          // Meta description: per-article summary, truncated to the ~155-160 char
+          // budget search engines display, instead of the generic static fallback.
+          let metaDescText = cleanDesc;
+          if (metaDescText.length > 160) {
+            const cut = metaDescText.slice(0, 157);
+            const lastSpace = cut.lastIndexOf(' ');
+            metaDescText = (lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trim() + '…';
+          }
+          let metaDesc = document.querySelector('meta[name="description"]');
+          if (!metaDesc) {
+            metaDesc = document.createElement('meta');
+            metaDesc.setAttribute('name', 'description');
+            document.head.appendChild(metaDesc);
+          }
+          metaDesc.setAttribute('content', metaDescText);
 
           let canonical = document.querySelector("link[rel='canonical']");
           if (!canonical) {
