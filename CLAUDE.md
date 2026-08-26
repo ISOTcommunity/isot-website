@@ -65,6 +65,28 @@ ISOT/
 
 ---
 
+## 🎨 Mandatory UI/UX & Design Rules for Webstack & App Components
+
+1. **FontAwesome Vector Icon Centering Rule**:
+   * Never rely on default `<i>` font baseline alignment.
+   * Enforce `display: inline-flex; align-items: center; justify-content: center; line-height: 1; margin: 0; padding: 0;` on FontAwesome `<i>` tags inside fixed-size icon circles or squares (e.g. `36px × 36px` or `38px × 38px`).
+
+2. **Sidebar Card Text Overflow & Wrapping Prevention**:
+   * Sidebar cards have tight horizontal widths (`~260px - 300px`).
+   * Button titles like "Telegram Group" or "WhatsApp Group" MUST use `white-space: nowrap; overflow: hidden; text-overflow: ellipsis;` to prevent text from breaking onto multiple lines.
+
+3. **Apple iOS Settings Row Pattern for Unlocked Social Links**:
+   * Use an iOS Settings / Glassmorphism Row layout:
+     * **Left**: 38px 3D gradient circular icon badge (`background: linear-gradient(135deg, #0088CC, #229ED9)` for Telegram, `#25D366` for WhatsApp).
+     * **Center**: Title (Bold 0.88rem) + Subtitle (Muted 0.72rem).
+     * **Right**: External arrow (`↗`).
+     * **Wrapper**: `display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 16px; background: rgba(255, 255, 255, 0.04); border: 1px solid ...`
+
+4. **Pre-Verification Badge Visibility**:
+   * Always display clear, high-visibility platform logos/badges (e.g., Telegram cyan-blue & WhatsApp green) BEFORE an interactive puzzle or Captcha check, so users immediately know what platform links will be unlocked.
+
+---
+
 ## 🚀 How to Commit & Push Code
 
 ```bash
