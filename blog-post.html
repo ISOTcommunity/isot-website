@@ -21,6 +21,7 @@
       --pink-glow: rgba(238, 9, 121, 0.35);
       --navy: #243673;
       --orange: #FF6A00;
+      --green: #10B981;
       --text-main: #F8FAFC;
       --text-muted: #CBD5E1;
       --text-dim: #94A3B8;
@@ -28,8 +29,9 @@
       --font-display: 'Amatic SC', cursive, sans-serif;
       --font-body: 'Outfit', sans-serif;
       --radius-md: 20px;
-      --radius-lg: 32px;
+      --radius-lg: 28px;
       --radius-full: 9999px;
+      --transition: all 0.2s ease;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -43,40 +45,116 @@
     a { color: var(--pink); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
-    .container { width: 100%; max-width: 900px; margin: 0 auto; padding: 0 24px; }
-
     .header {
       position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
       background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border-light);
     }
-    .nav-box { display: flex; align-items: center; justify-content: space-between; height: 80px; }
+    .nav-box { display: flex; align-items: center; justify-content: space-between; height: 80px; width: 100%; max-width: 1320px; margin: 0 auto; padding: 0 24px; }
     .nav-logo img { height: 48px; width: auto; }
 
-    .post-header { padding-top: 130px; padding-bottom: 30px; }
+    /* 3-PART GRID LAYOUT */
+    .blog-layout-wrapper {
+      width: 100%; max-width: 1320px; margin: 0 auto; padding: 120px 24px 60px;
+      display: grid; grid-template-columns: 280px 1fr 300px; gap: 32px; align-items: start;
+    }
+
+    /* STICKY SIDEBARS */
+    .sidebar-sticky {
+      position: sticky; top: 100px; display: flex; flex-direction: column; gap: 24px;
+    }
+
+    /* LEFT SIDEBAR: APP SHOWCASE & HOOKS */
+    .app-promo-card {
+      background: linear-gradient(180deg, #1E293B 0%, #151F30 100%);
+      border: 1px solid var(--border-light); border-radius: var(--radius-lg);
+      padding: 24px; text-align: left; box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+    }
+    .app-badge {
+      display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px; color: var(--pink);
+      background: rgba(238, 9, 121, 0.15); padding: 4px 12px; border-radius: var(--radius-full); margin-bottom: 12px;
+    }
+    .app-promo-title { font-size: 1.3rem; font-weight: 800; color: #FFF; line-height: 1.2; margin-bottom: 10px; }
+    .app-promo-desc { font-size: 0.88rem; color: var(--text-dim); margin-bottom: 18px; line-height: 1.5; }
+    
+    .app-hook-feature {
+      display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; font-size: 0.85rem; color: var(--text-muted);
+    }
+    .app-hook-icon {
+      width: 32px; height: 32px; border-radius: 10px; background: rgba(238, 9, 121, 0.15);
+      color: var(--pink); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.9rem;
+    }
+
+    .btn-app-install {
+      display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+      padding: 12px; border-radius: var(--radius-full); font-weight: 700; font-size: 0.9rem;
+      background: linear-gradient(135deg, #EE0979, #FF6A00); color: #FFF; text-transform: uppercase; letter-spacing: 0.5px;
+      box-shadow: 0 8px 20px var(--pink-glow); transition: var(--transition); margin-top: 10px;
+    }
+    .btn-app-install:hover { transform: translateY(-2px); text-decoration: none; color: #FFF; }
+
+    /* RIGHT SIDEBAR: ANTI-BOT COMMUNITY CAPTCHA */
+    .community-card {
+      background: linear-gradient(180deg, #1E293B 0%, #172236 100%);
+      border: 1px solid var(--border-light); border-radius: var(--radius-lg);
+      padding: 24px; text-align: left; box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+    }
+    .captcha-box {
+      background: rgba(15, 23, 42, 0.8); border: 1px dashed var(--pink);
+      border-radius: var(--radius-md); padding: 18px; text-align: center; margin-top: 14px;
+    }
+    .captcha-title { font-size: 0.9rem; font-weight: 700; color: #FFF; margin-bottom: 8px; }
+    .captcha-desc { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 14px; line-height: 1.4; }
+    .captcha-question { font-size: 1.1rem; font-weight: 800; color: var(--pink); margin-bottom: 12px; }
+    
+    .captcha-input-group { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; }
+    .captcha-input {
+      width: 70px; padding: 8px; border-radius: 8px; border: 1px solid var(--border-light);
+      background: #0F172A; color: #FFF; font-size: 1rem; font-weight: 700; text-align: center; outline: none;
+    }
+    .captcha-btn {
+      padding: 8px 16px; border-radius: 8px; border: none; background: var(--pink); color: #FFF;
+      font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: var(--transition);
+    }
+    .captcha-btn:hover { background: #FF6A00; }
+
+    .community-links-unlocked { display: none; flex-direction: column; gap: 12px; margin-top: 16px; }
+    .community-links-unlocked.active { display: flex; }
+
+    .social-btn {
+      display: flex; align-items: center; justify-content: space-between; padding: 12px 18px;
+      border-radius: var(--radius-full); font-weight: 700; font-size: 0.9rem; color: #FFF;
+      transition: var(--transition); border: 1px solid rgba(255,255,255,0.1);
+    }
+    .social-btn-telegram { background: #229ED9; }
+    .social-btn-telegram:hover { background: #1D8CBF; text-decoration: none; color: #FFF; transform: translateY(-2px); }
+    .social-btn-whatsapp { background: #25D366; }
+    .social-btn-whatsapp:hover { background: #1EBE5A; text-decoration: none; color: #FFF; transform: translateY(-2px); }
+
+    /* CENTER COLUMN: MAIN ARTICLE */
+    .article-main-container { width: 100%; min-width: 0; }
+    
+    .post-header { padding-bottom: 24px; }
     .post-category-tag {
       display: inline-block; font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 1.5px; color: var(--pink); margin-bottom: 16px;
+      letter-spacing: 1.5px; color: var(--pink); margin-bottom: 14px;
       background: rgba(238, 9, 121, 0.12); padding: 6px 16px; border-radius: var(--radius-full);
       border: 1px solid rgba(238, 9, 121, 0.3);
     }
-    .post-main-title { font-size: 2.5rem; font-weight: 800; color: #FFF; line-height: 1.25; margin-bottom: 20px; }
-    .post-author-bar { display: flex; align-items: center; gap: 16px; font-size: 0.95rem; color: var(--text-dim); }
+    .post-main-title { font-size: 2.5rem; font-weight: 800; color: #FFF; line-height: 1.25; margin-bottom: 16px; }
+    .post-author-bar { display: flex; align-items: center; gap: 16px; font-size: 0.9rem; color: var(--text-dim); }
 
-    /* Featured Hero Image Banner */
     .post-hero-image-box {
-      width: 100%; height: 400px; border-radius: var(--radius-lg); overflow: hidden;
-      margin: 24px 0 40px; border: 1px solid var(--border-light);
+      width: 100%; height: 380px; border-radius: var(--radius-lg); overflow: hidden;
+      margin: 24px 0 36px; border: 1px solid var(--border-light);
       box-shadow: 0 20px 40px rgba(0,0,0,0.5); position: relative; background: var(--bg-card);
     }
-    .post-hero-image-box img {
-      width: 100%; height: 100%; object-fit: cover; display: block;
-    }
+    .post-hero-image-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     /* Content Body Strict Contrast Overrides */
-    .post-content-body { padding-bottom: 60px; font-size: 1.15rem; color: var(--text-muted); line-height: 1.8; }
+    .post-content-body { padding-bottom: 60px; font-size: 1.12rem; color: var(--text-muted); line-height: 1.85; }
     
-    /* OVERRIDE ALL INLINE STYLES FROM WORDPRESS / ELEMENTOR */
     .post-content-body,
     .post-content-body *,
     .post-content-body div,
@@ -101,15 +179,13 @@
       font-weight: 700 !important;
     }
 
-    .post-content-body h2 { font-size: 1.8rem; margin: 40px 0 18px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; }
-    .post-content-body h3 { font-size: 1.4rem; margin: 30px 0 14px; }
+    .post-content-body h2 { font-size: 1.75rem; margin: 38px 0 16px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; }
+    .post-content-body h3 { font-size: 1.35rem; margin: 28px 0 12px; }
     .post-content-body p { margin-bottom: 22px; }
     
     .post-content-body a,
     .post-content-body a * {
-      color: #EE0979 !important;
-      font-weight: 600 !important;
-      text-decoration: underline !important;
+      color: #EE0979 !important; font-weight: 600 !important; text-decoration: underline !important;
     }
     .post-content-body a:hover { color: #FF6A00 !important; }
 
@@ -128,26 +204,31 @@
       box-shadow: 0 12px 30px rgba(0,0,0,0.4) !important;
     }
 
-    .post-content-body code {
-      background: rgba(255,255,255,0.1) !important; padding: 3px 8px; border-radius: 6px;
-      font-family: monospace; color: #FF6A00 !important; font-size: 0.95em;
-    }
-
     .back-btn {
       display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: #FFF;
-      background: rgba(255,255,255,0.05); padding: 10px 22px; border-radius: var(--radius-full);
-      border: 1px solid var(--border-light); margin-bottom: 20px; transition: all 0.2s ease;
+      background: rgba(255,255,255,0.05); padding: 9px 20px; border-radius: var(--radius-full);
+      border: 1px solid var(--border-light); margin-bottom: 20px; transition: all 0.2s ease; font-size: 0.9rem;
     }
     .back-btn:hover { background: var(--pink); text-decoration: none; border-color: var(--pink); }
 
     .footer { background: #070B14; border-top: 1px solid var(--border-light); padding: 60px 0 30px; text-align: center; }
+
+    /* RESPONSIVE LAYOUT BREAKPOINTS */
+    @media (max-width: 1140px) {
+      .blog-layout-wrapper { grid-template-columns: 240px 1fr 260px; gap: 20px; }
+    }
+
+    @media (max-width: 992px) {
+      .blog-layout-wrapper { grid-template-columns: 1fr; padding-top: 100px; }
+      .sidebar-sticky { position: static; margin-bottom: 30px; }
+    }
   </style>
 </head>
 <body>
 
   <!-- Sticky Header -->
   <header class="header">
-    <div class="container nav-box">
+    <div class="nav-box">
       <a href="index.html" class="nav-logo">
         <img src="assets/LOGOS/scritta isot.png" alt="ISOT Logo" />
       </a>
@@ -155,29 +236,101 @@
     </div>
   </header>
 
-  <!-- Article Container -->
-  <article class="container">
-    <div class="post-header">
-      <a href="blog.html" class="back-btn">← Back to All Guides</a>
-      <br />
-      <span class="post-category-tag" id="articleCat"><i class="fa-solid fa-book-open"></i> Student Guide</span>
-      <h1 class="post-main-title" id="articleTitle">Loading Guide Title...</h1>
-      <div class="post-author-bar">
-        <span><i class="fa-solid fa-user-pen"></i> ISOT Editorial Team</span>
-        <span>•</span>
-        <span id="articleDate"><i class="fa-regular fa-calendar"></i> Published in Turin</span>
+  <!-- 3-PART SCROLLABLE LAYOUT WAPPER -->
+  <div class="blog-layout-wrapper">
+    
+    <!-- LEFT SIDEBAR: APP SHOWCASE & HOOKS -->
+    <aside class="sidebar-sticky">
+      <div class="app-promo-card">
+        <span class="app-badge"><i class="fa-solid fa-mobile-screen"></i> ISOT Pocket App</span>
+        <h3 class="app-promo-title">Your ISOT in Your Pocket</h3>
+        <p class="app-promo-desc">Free student web app. Install in 10 seconds without App Store.</p>
+
+        <div class="app-hook-feature">
+          <div class="app-hook-icon"><i class="fa-solid fa-qrcode"></i></div>
+          <div><strong>Digital Member Card</strong><br>Show for bar discounts at Rough & partners</div>
+        </div>
+
+        <div class="app-hook-feature">
+          <div class="app-hook-icon"><i class="fa-solid fa-microphone-lines"></i></div>
+          <div><strong>Live Karaoke Queue</strong><br>Add songs & see live queue on Monday nights</div>
+        </div>
+
+        <div class="app-hook-feature">
+          <div class="app-hook-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+          <div><strong>Turin Venue Map</strong><br>Partner spots & student discounts across Turin</div>
+        </div>
+
+        <a href="join.html" class="btn-app-install">Get Free App Access <i class="fa-solid fa-arrow-right"></i></a>
       </div>
-    </div>
+    </aside>
 
-    <!-- Featured Hero Banner Image -->
-    <div class="post-hero-image-box" id="heroImageBox">
-      <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT Student Guide Turin" />
-    </div>
+    <!-- CENTER COLUMN: ARTICLE CONTENT -->
+    <main class="article-main-container">
+      <div class="post-header">
+        <a href="blog.html" class="back-btn">← Back to All Guides</a>
+        <br />
+        <span class="post-category-tag" id="articleCat"><i class="fa-solid fa-book-open"></i> Student Guide</span>
+        <h1 class="post-main-title" id="articleTitle">Loading Guide Title...</h1>
+        <div class="post-author-bar">
+          <span><i class="fa-solid fa-user-pen"></i> ISOT Editorial Team</span>
+          <span>•</span>
+          <span id="articleDate"><i class="fa-regular fa-calendar"></i> Published in Turin</span>
+        </div>
+      </div>
 
-    <div class="post-content-body" id="articleBody">
-      <p>Loading full article content...</p>
-    </div>
-  </article>
+      <!-- Featured Hero Banner Image -->
+      <div class="post-hero-image-box" id="heroImageBox">
+        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT Student Guide Turin" />
+      </div>
+
+      <div class="post-content-body" id="articleBody">
+        <p>Loading full article content...</p>
+      </div>
+    </main>
+
+    <!-- RIGHT SIDEBAR: ANTI-BOT TELEGRAM & WHATSAPP CAPTCHA -->
+    <aside class="sidebar-sticky">
+      <div class="community-card">
+        <span class="app-badge" style="color: var(--green); background: rgba(16,185,129,0.15);"><i class="fa-solid fa-shield-halved"></i> Anti-Spam Check</span>
+        <h3 class="app-promo-title">Turin Student Groups</h3>
+        <p class="app-promo-desc">Join active WhatsApp & Telegram student chat groups for Turin.</p>
+
+        <!-- CAPTCHA PUZZLE CONTAINER -->
+        <div class="captcha-box" id="captchaBox">
+          <div class="captcha-title"><i class="fa-solid fa-robot"></i> Are you human?</div>
+          <div class="captcha-desc">Solve this quick check to unlock group invite links:</div>
+          
+          <div class="captcha-question" id="captchaMathQuestion">3 + 4 = ?</div>
+          
+          <div class="captcha-input-group">
+            <input type="number" id="captchaAnswer" class="captcha-input" placeholder="?" autocomplete="off" />
+            <button type="button" onclick="verifyHumanCaptcha()" class="captcha-btn">Verify</button>
+          </div>
+          <div id="captchaError" style="color: #EF4444; font-size: 0.78rem; display: none;">Incorrect answer, try again!</div>
+        </div>
+
+        <!-- UNLOCKED SOCIAL LINKS -->
+        <div class="community-links-unlocked" id="communityLinksUnlocked">
+          <div style="font-size: 0.85rem; color: var(--green); font-weight: 700; margin-bottom: 6px; text-align: center;">
+            <i class="fa-solid fa-circle-check"></i> Human Verified!
+          </div>
+          <a href="https://t.me/isotcommunity" target="_blank" rel="noopener" class="social-btn social-btn-telegram">
+            <span><i class="fa-brands fa-telegram"></i> Telegram Group</span>
+            <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;"></i>
+          </a>
+          <a href="https://chat.whatsapp.com/ISOTcommunity" target="_blank" rel="noopener" class="social-btn social-btn-whatsapp">
+            <span><i class="fa-brands fa-whatsapp"></i> WhatsApp Group</span>
+            <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;"></i>
+          </a>
+          <a href="social.html" style="font-size: 0.8rem; color: var(--text-dim); text-align: center; margin-top: 6px;">
+            View all social channels →
+          </a>
+        </div>
+      </div>
+    </aside>
+
+  </div>
 
   <!-- Footer -->
   <footer class="footer">
@@ -209,12 +362,38 @@
       'welcome': 'assets/optimized/social_group_1.jpg'
     };
 
+    // Dynamic Captcha Generator
+    let num1 = Math.floor(Math.random() * 6) + 2;
+    let num2 = Math.floor(Math.random() * 5) + 1;
+    let expectedAnswer = num1 + num2;
+    document.getElementById('captchaMathQuestion').innerText = `${num1} + ${num2} = ?`;
+
+    function checkExistingVerification() {
+      if (sessionStorage.getItem('isot_human_verified') === 'true') {
+        document.getElementById('captchaBox').style.display = 'none';
+        document.getElementById('communityLinksUnlocked').classList.add('active');
+      }
+    }
+
+    function verifyHumanCaptcha() {
+      const val = parseInt(document.getElementById('captchaAnswer').value, 10);
+      if (val === expectedAnswer) {
+        sessionStorage.setItem('isot_human_verified', 'true');
+        document.getElementById('captchaBox').style.display = 'none';
+        document.getElementById('captchaError').style.display = 'none';
+        document.getElementById('communityLinksUnlocked').classList.add('active');
+      } else {
+        document.getElementById('captchaError').style.display = 'block';
+      }
+    }
+
+    checkExistingVerification();
+
     // Load article data from exported JSON
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
       const slug = params.get('slug') || 'a-complete-guide-to-living-in-turin-for-international-students';
 
-      // Set hero image
       const heroSrc = HERO_IMAGES[slug] || 'assets/optimized/social_group_1.jpg';
       document.getElementById('articleHeroImg').src = heroSrc;
 
@@ -231,19 +410,13 @@
           document.title = cleanTitle + ' | ISOT Turin';
           document.getElementById('articleDate').innerHTML = '<i class="fa-regular fa-calendar"></i> ' + new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
           
-          // Clean up HTML content (fix broken images & elementor wrapper artifacts)
           let bodyHtml = post.content.rendered || '<p>Content preview available.</p>';
-          
-          // Replace old WP uploads URLs or broken image tags if needed
           bodyHtml = bodyHtml.replace(/src="https:\/\/isotcommunity\.com\/wp-content\/uploads\/[^"]+"/g, `src="${heroSrc}"`);
 
           document.getElementById('articleBody').innerHTML = bodyHtml;
 
-          // Ensure inline images have error handlers
           document.querySelectorAll('.post-content-body img').forEach(img => {
-            img.onerror = function() {
-              this.src = heroSrc;
-            };
+            img.onerror = function() { this.src = heroSrc; };
           });
 
           // Dynamic Canonical & JSON-LD Article Schema (ISO 8601 date)
@@ -265,23 +438,9 @@
             "description": cleanDesc,
             "datePublished": isoDate,
             "dateModified": isoDate,
-            "mainEntityOfPage": {
-              "@type": "WebPage",
-              "@id": "https://isotcommunity.com/" + slug
-            },
-            "author": {
-              "@type": "Organization",
-              "name": "ISOT Editorial Team",
-              "url": "https://isotcommunity.com"
-            },
-            "publisher": {
-              "@type": "Organization",
-              "name": "ISOT Community",
-              "logo": {
-                "@type": "ImageObject",
-                "url": "https://isotcommunity.com/assets/LOGOS/scritta%20isot.png"
-              }
-            }
+            "mainEntityOfPage": { "@type": "WebPage", "@id": "https://isotcommunity.com/" + slug },
+            "author": { "@type": "Organization", "name": "ISOT Editorial Team", "url": "https://isotcommunity.com" },
+            "publisher": { "@type": "Organization", "name": "ISOT Community", "logo": { "@type": "ImageObject", "url": "https://isotcommunity.com/assets/LOGOS/scritta%20isot.png" } }
           };
           const ldScript = document.createElement('script');
           ldScript.type = 'application/ld+json';

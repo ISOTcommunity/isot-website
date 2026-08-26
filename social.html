@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Social Hub & Official Student Groups | ISOT Community Turin</title>
+  <meta name="description" content="Join the official Telegram and WhatsApp groups for international students in Turin. Anti-spam human verified links." />
+  <link rel="icon" href="assets/LOGOS/scritta isot.png" type="image/png" />
+  <link rel="canonical" href="https://isotcommunity.com/social" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    :root {
+      --bg-dark: #0F172A;
+      --bg-card: #1E293B;
+      --bg-darker: #0B1120;
+      --pink: #EE0979;
+      --pink-glow: rgba(238, 9, 121, 0.35);
+      --navy: #243673;
+      --orange: #FF6A00;
+      --green: #10B981;
+      --gold: #D4AF50;
+      --text-main: #F8FAFC;
+      --text-muted: #CBD5E1;
+      --text-dim: #94A3B8;
+      --border-light: rgba(255, 255, 255, 0.12);
+      --font-display: 'Amatic SC', cursive, sans-serif;
+      --font-body: 'Outfit', sans-serif;
+      --radius-sm: 12px;
+      --radius-md: 20px;
+      --radius-lg: 32px;
+      --radius-full: 9999px;
+      --transition: all 0.2s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-body); line-height: 1.6; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #243673; border-radius: 9999px; }
+
+    a { color: inherit; text-decoration: none; transition: var(--transition); }
+    img { max-width: 100%; height: auto; display: block; }
+
+    .container { width: 100%; max-width: 960px; margin: 0 auto; padding: 0 24px; }
+    
+    .header {
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+      background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .nav-box { display: flex; align-items: center; justify-content: space-between; height: 80px; }
+    .nav-logo img { height: 48px; width: auto; }
+
+    .page-hero {
+      padding-top: 150px; padding-bottom: 50px; text-align: center; position: relative;
+      background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(238,9,121,0.15), transparent 70%);
+    }
+    .pill-tag {
+      display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px;
+      border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px; background: rgba(238, 9, 121, 0.15);
+      border: 1px solid rgba(238, 9, 121, 0.3); color: var(--pink); margin-bottom: 20px;
+    }
+    .page-title { font-family: var(--font-display); font-size: 5rem; line-height: 0.9; margin-bottom: 16px; }
+
+    .social-card-wrapper {
+      background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-light);
+      padding: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); margin-bottom: 80px; text-align: center;
+    }
+
+    .captcha-box {
+      background: rgba(15, 23, 42, 0.9); border: 2px dashed var(--pink);
+      border-radius: var(--radius-md); padding: 32px 24px; margin: 24px 0;
+    }
+    .captcha-title { font-size: 1.2rem; font-weight: 800; color: #FFF; margin-bottom: 8px; }
+    .captcha-desc { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; max-width: 460px; margin-left: auto; margin-right: auto; }
+    .captcha-question { font-size: 1.8rem; font-weight: 800; color: var(--pink); margin-bottom: 16px; }
+    
+    .captcha-input-group { display: flex; gap: 12px; justify-content: center; align-items: center; }
+    .captcha-input {
+      width: 100px; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-light);
+      background: #0F172A; color: #FFF; font-size: 1.3rem; font-weight: 800; text-align: center; outline: none;
+    }
+    .captcha-btn {
+      padding: 12px 28px; border-radius: var(--radius-full); border: none; background: linear-gradient(135deg, #EE0979, #FF6A00);
+      color: #FFF; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: var(--transition);
+      box-shadow: 0 8px 20px var(--pink-glow); text-transform: uppercase;
+    }
+    .captcha-btn:hover { transform: translateY(-2px); }
+
+    .unlocked-section { display: none; flex-direction: column; gap: 18px; margin-top: 24px; text-align: left; }
+    .unlocked-section.active { display: flex; }
+
+    .channel-row {
+      display: flex; align-items: center; justify-content: space-between; padding: 20px 24px;
+      border-radius: var(--radius-md); background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-light);
+      transition: var(--transition);
+    }
+    .channel-row:hover { border-color: var(--pink); transform: translateY(-2px); }
+
+    .channel-info { display: flex; align-items: center; gap: 16px; }
+    .channel-icon {
+      width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center;
+      justify-content: center; font-size: 1.5rem; color: #FFF; flex-shrink: 0;
+    }
+    .channel-icon-tg { background: #229ED9; }
+    .channel-icon-wa { background: #25D366; }
+    .channel-icon-ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+    .channel-icon-app { background: var(--pink); }
+
+    .channel-text h3 { font-size: 1.1rem; font-weight: 700; color: #FFF; margin-bottom: 2px; }
+    .channel-text p { font-size: 0.85rem; color: var(--text-dim); }
+
+    .btn-join-channel {
+      padding: 10px 20px; border-radius: var(--radius-full); font-weight: 700; font-size: 0.85rem;
+      color: #FFF; border: 1px solid rgba(255,255,255,0.2); transition: var(--transition);
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-tg { background: #229ED9; }
+    .btn-wa { background: #25D366; }
+    .btn-ig { background: rgba(255,255,255,0.1); }
+    .btn-app { background: var(--pink); }
+
+    .btn-join-channel:hover { opacity: 0.9; text-decoration: none; color: #FFF; transform: scale(1.03); }
+
+    .footer { background: #070B14; border-top: 1px solid var(--border-light); padding: 50px 0 30px; text-align: center; }
+
+    @media (max-width: 640px) {
+      .page-title { font-size: 3.5rem; }
+      .social-card-wrapper { padding: 24px 16px; }
+      .channel-row { flex-direction: column; align-items: flex-start; gap: 14px; }
+      .btn-join-channel { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container nav-box">
+      <a href="index.html" class="nav-logo">
+        <img src="assets/LOGOS/scritta isot.png" alt="ISOT Logo" />
+      </a>
+      <a href="blog.html" style="color: #FFF; font-weight: 600; font-size: 0.9rem;">← Back to Main Site</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="pill-tag"><i class="fa-solid fa-users"></i> ISOT Turin Community</div>
+      <h1 class="page-title">STAY CONNECTED<span style="color: var(--pink);">.</span></h1>
+      <p style="color: var(--text-muted); font-size: 1.15rem; max-width: 540px; margin: 0 auto;">
+        Official Telegram & WhatsApp groups for international students in Turin. Anti-spam protected.
+      </p>
+    </div>
+  </section>
+
+  <!-- Main Social Hub Card -->
+  <main class="container">
+    <div class="social-card-wrapper">
+      
+      <!-- Anti-bot Captcha Check -->
+      <div class="captcha-box" id="captchaBox">
+        <div class="pill-tag" style="background: rgba(16,185,129,0.15); color: var(--green); border-color: rgba(16,185,129,0.3);">
+          <i class="fa-solid fa-shield-halved"></i> Anti-Bot Security Check
+        </div>
+        <h2 class="captcha-title">Are you a real student in Turin?</h2>
+        <p class="captcha-desc">
+          To prevent spam bots from harvesting our group invite links, please answer this simple verification:
+        </p>
+
+        <div class="captcha-question" id="captchaQuestionText">4 + 5 = ?</div>
+
+        <div class="captcha-input-group">
+          <input type="number" id="captchaInputValue" class="captcha-input" placeholder="?" autocomplete="off" />
+          <button type="button" onclick="unlockSocialLinks()" class="captcha-btn">Unlock Group Links <i class="fa-solid fa-lock-open"></i></button>
+        </div>
+        <div id="captchaErrorMessage" style="color: #EF4444; font-size: 0.85rem; margin-top: 10px; display: none;">
+          Incorrect answer. Please try again!
+        </div>
+      </div>
+
+      <!-- Unlocked Channel List -->
+      <div class="unlocked-section" id="unlockedSection">
+        <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); border-radius: var(--radius-md); padding: 14px 20px; color: var(--green); font-weight: 700; display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+          <i class="fa-solid fa-circle-check" style="font-size: 1.2rem;"></i>
+          <div>Human Verification Passed! Group invite links unlocked below:</div>
+        </div>
+
+        <!-- Telegram Group -->
+        <div class="channel-row">
+          <div class="channel-info">
+            <div class="channel-icon channel-icon-tg"><i class="fa-brands fa-telegram"></i></div>
+            <div class="channel-text">
+              <h3>ISOT Official Telegram Group</h3>
+              <p>Main student chat, events, housing, and Q&A for PoliTo & UniTo students.</p>
+            </div>
+          </div>
+          <a href="https://t.me/isotcommunity" target="_blank" rel="noopener" class="btn-join-channel btn-tg">
+            Join Telegram <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+
+        <!-- WhatsApp Group -->
+        <div class="channel-row">
+          <div class="channel-info">
+            <div class="channel-icon channel-icon-wa"><i class="fa-brands fa-whatsapp"></i></div>
+            <div class="channel-text">
+              <h3>WhatsApp Student Community</h3>
+              <p>General chat, batch announcements, and local student meetups.</p>
+            </div>
+          </div>
+          <a href="https://chat.whatsapp.com/ISOTcommunity" target="_blank" rel="noopener" class="btn-join-channel btn-wa">
+            Join WhatsApp <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+
+        <!-- Instagram -->
+        <div class="channel-row">
+          <div class="channel-info">
+            <div class="channel-icon channel-icon-ig"><i class="fa-brands fa-instagram"></i></div>
+            <div class="channel-text">
+              <h3>Instagram @isot.community</h3>
+              <p>Weekly event photos, stories, karaoke announcements & party reels.</p>
+            </div>
+          </div>
+          <a href="https://instagram.com/isot.community" target="_blank" rel="noopener" class="btn-join-channel btn-ig">
+            Follow Instagram <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+
+        <!-- Web App -->
+        <div class="channel-row">
+          <div class="channel-info">
+            <div class="channel-icon channel-icon-app"><i class="fa-solid fa-mobile-screen"></i></div>
+            <div class="channel-text">
+              <h3>ISOT Pocket Web App</h3>
+              <p>Digital member card, karaoke queue, and venue discounts.</p>
+            </div>
+          </div>
+          <a href="join.html" class="btn-join-channel btn-app">
+            Open Web App <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p style="color: var(--text-dim); font-size: 0.9rem;">© 2026 ISOT Community (Associazione di Promozione Sociale) • Turin, Italy</p>
+    </div>
+  </footer>
+
+  <script>
+    let n1 = Math.floor(Math.random() * 5) + 3;
+    let n2 = Math.floor(Math.random() * 5) + 2;
+    let targetSum = n1 + n2;
+    document.getElementById('captchaQuestionText').innerText = `${n1} + ${n2} = ?`;
+
+    function checkVerificationStatus() {
+      if (sessionStorage.getItem('isot_human_verified') === 'true') {
+        document.getElementById('captchaBox').style.display = 'none';
+        document.getElementById('unlockedSection').classList.add('active');
+      }
+    }
+
+    function unlockSocialLinks() {
+      const inputVal = parseInt(document.getElementById('captchaInputValue').value, 10);
+      if (inputVal === targetSum) {
+        sessionStorage.setItem('isot_human_verified', 'true');
+        document.getElementById('captchaBox').style.display = 'none';
+        document.getElementById('captchaErrorMessage').style.display = 'none';
+        document.getElementById('unlockedSection').classList.add('active');
+      } else {
+        document.getElementById('captchaErrorMessage').style.display = 'block';
+      }
+    }
+
+    checkVerificationStatus();
+  </script>
+</body>
+</html>
