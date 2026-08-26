@@ -175,6 +175,201 @@
     @media (max-width: 640px) {
       .footer-grid { grid-template-columns: 1fr; gap: 24px; }
     }
+  
+    /* APP INTERACTIVE CALENDAR COMPONENT FOR WEBSITE */
+    .app-cal-section {
+      background: var(--bg-darker);
+      border-top: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+      padding: 70px 0;
+    }
+    .view-toggle-bar {
+      display: flex;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+      margin-bottom: 20px;
+      gap: 6px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .view-btn {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .view-btn.active {
+      background: var(--pink);
+      color: #FFF;
+      box-shadow: 0 4px 14px rgba(238, 9, 121, 0.35);
+    }
+    .cal-nav-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+    }
+    .cal-nav-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-light);
+      color: #FFF;
+      border-radius: var(--radius-sm);
+      padding: 8px 16px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+    .cal-nav-btn:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: var(--pink);
+    }
+    .cal-month-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #FFF;
+    }
+    .cal-matrix {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-bottom: 24px;
+    }
+    .cal-matrix-head {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--pink);
+      text-align: center;
+      padding: 8px 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .cal-matrix-day {
+      min-height: 64px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 4px;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: var(--transition);
+    }
+    .cal-matrix-day:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .cal-matrix-day.other-month {
+      opacity: 0.2;
+      pointer-events: none;
+    }
+    .cal-matrix-day.has-event {
+      border-color: rgba(238, 9, 121, 0.4);
+      background: rgba(238, 9, 121, 0.12);
+    }
+    .cal-matrix-day.selected {
+      border-color: var(--pink);
+      background: rgba(238, 9, 121, 0.28);
+      box-shadow: 0 0 16px rgba(238, 9, 121, 0.45);
+    }
+    .cal-day-num {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #FFF;
+    }
+    .cal-event-dots {
+      display: flex;
+      gap: 4px;
+    }
+    .cal-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--pink);
+    }
+    .cal-dot.party { background: #FF6A00; }
+    .cal-dot.karaoke { background: #EBC17F; }
+    .cal-dot.sports { background: #10B981; }
+
+    .event-card-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: var(--transition);
+    }
+    .event-card-item:hover {
+      border-color: var(--pink);
+      transform: translateY(-2px);
+    }
+    .event-card-top {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .event-date-box {
+      width: 64px;
+      height: 70px;
+      background: rgba(238, 9, 121, 0.12);
+      border: 1px solid rgba(238, 9, 121, 0.35);
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      text-align: center;
+    }
+    .event-date-box .day-num {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #FFF;
+      line-height: 1;
+    }
+    .event-date-box .day-name {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--pink);
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    @media (max-width: 640px) {
+      .cal-matrix-day { min-height: 48px; padding: 4px 2px; }
+      .cal-day-num { font-size: 0.8rem; }
+      .event-card-top { flex-direction: column; gap: 10px; }
+    }
+
   </style>
 </head>
 <body>
@@ -437,5 +632,262 @@
       document.getElementById('lightboxModal').classList.remove('active');
     }
   </script>
+
+  <script src="app/vendor/supabase.js"></script>
+  <script>
+    const ISOT_CONFIG = {
+      SUPABASE_URL: 'https://ywmdaekblhabyajzusfm.supabase.co',
+      SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3bWRhZWtibGhhYnlhanp1c2ZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNDM2NDYsImV4cCI6MjEwMjcxOTY0Nn0.PyMpTzffZ12j1HoheuRQMYH8d0WvfYkLXGfd1wJXTWw',
+    };
+
+    const db = window.supabase ? window.supabase.createClient(ISOT_CONFIG.SUPABASE_URL, ISOT_CONFIG.SUPABASE_ANON_KEY) : null;
+
+    let EVENTS_DATA = [];
+    const DAY_NAMES = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    let currentView = 'monthly';
+    const _now = new Date();
+    let currYear = _now.getFullYear();
+    let currMonthIdx = _now.getMonth();
+    let selectedDateStr = null;
+
+    async function loadCalendarData() {
+      const from = new Date(currYear, 0, 1);
+      const to = new Date(currYear, 11, 31);
+      const iso = d => d.toISOString().slice(0, 10);
+
+      if (db) {
+        try {
+          const { data, error } = await db.rpc('calendar_between', { p_from: iso(from), p_to: iso(to) });
+          if (!error && data && data.length) {
+            EVENTS_DATA = data.map(e => {
+              const d = new Date(e.event_date + 'T00:00:00');
+              return {
+                id: `${e.event_id}|${e.event_date}`,
+                date: e.event_date,
+                year: d.getFullYear(),
+                monthIdx: d.getMonth(),
+                dayNum: d.getDate(),
+                dayName: DAY_NAMES[d.getDay()],
+                title: e.title,
+                venue: e.venue_name ? `${e.venue_name} • ${e.venue_address || 'Turin'}` : 'Turin Venue',
+                time: (e.start_time || '21:00').slice(0, 5),
+                cat: e.category || 'social',
+                goingCount: Number(e.going_count) || 0
+              };
+            });
+            renderMainView();
+            return;
+          }
+        } catch (e) {
+          console.warn('Supabase fetch note:', e);
+        }
+      }
+
+      // Fallback 2026 recurring events schedule
+      EVENTS_DATA = generateStatic2026Schedule();
+      renderMainView();
+    }
+
+    function generateStatic2026Schedule() {
+      const events = [];
+      for (let m = 7; m <= 11; m++) { // Aug - Dec 2026
+        const totalDays = new Date(2026, m + 1, 0).getDate();
+        for (let d = 1; d <= totalDays; d++) {
+          const dt = new Date(2026, m, d);
+          const dayOfWeek = dt.getDay();
+          const dStr = String(d).padStart(2, '0');
+          const mStr = String(m + 1).padStart(2, '0');
+          const dateStr = `2026-${mStr}-${dStr}`;
+
+          if (dayOfWeek === 1) { // Monday
+            events.push({
+              id: `m_${dateStr}`, date: dateStr, year: 2026, monthIdx: m, dayNum: d, dayName: 'MON',
+              title: 'Monday Karaoke Night', venue: 'Rough Bar • San Salvario, Turin', time: '21:30', cat: 'karaoke', goingCount: 45
+            });
+          } else if (dayOfWeek === 3) { // Wednesday
+            events.push({
+              id: `w_${dateStr}`, date: dateStr, year: 2026, monthIdx: m, dayNum: d, dayName: 'WED',
+              title: 'SAS Startup Lab (From Problem to Pitch)', venue: 'SAA School of Management • Via Ventimiglia 115', time: '17:30', cat: 'career', goingCount: 30
+            });
+          } else if (dayOfWeek === 4) { // Thursday
+            events.push({
+              id: `t_${dateStr}`, date: dateStr, year: 2026, monthIdx: m, dayNum: d, dayName: 'THU',
+              title: 'International Social Hub', venue: 'Capodoglio • Murazzi del Po, Turin', time: '21:00', cat: 'social', goingCount: 85
+            });
+          } else if (dayOfWeek === 6) { // Saturday
+            events.push({
+              id: `s_${dateStr}`, date: dateStr, year: 2026, monthIdx: m, dayNum: d, dayName: 'SAT',
+              title: 'Saturday Pre-Party', venue: 'Rough Bar • San Salvario, Turin', time: '22:00', cat: 'party', goingCount: 60
+            });
+          }
+        }
+      }
+      return events;
+    }
+
+    function setViewMode(mode) {
+      currentView = mode;
+      document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+      if (mode === 'monthly') document.getElementById('btnMonthlyView').classList.add('active');
+      if (mode === 'list') document.getElementById('btnListView').classList.add('active');
+      renderMainView();
+    }
+
+    function changeMonth(delta) {
+      currMonthIdx += delta;
+      if (currMonthIdx < 0) { currMonthIdx = 11; currYear--; }
+      if (currMonthIdx > 11) { currMonthIdx = 0; currYear++; }
+      selectedDateStr = null;
+      renderMainView();
+    }
+
+    function selectDate(dateStr) {
+      selectedDateStr = selectedDateStr === dateStr ? null : dateStr;
+      renderMainView();
+    }
+
+    function renderMainView() {
+      const container = document.getElementById('calendarViewContainer');
+      if (!container) return;
+
+      if (currentView === 'monthly') {
+        container.innerHTML = renderMonthlyMatrixView();
+      } else {
+        container.innerHTML = renderListView();
+      }
+    }
+
+    function renderMonthlyMatrixView() {
+      const firstDay = new Date(currYear, currMonthIdx, 1);
+      const totalDays = new Date(currYear, currMonthIdx + 1, 0).getDate();
+      const firstDayOfWeek = (firstDay.getDay() + 6) % 7; // Monday start
+
+      let html = `
+        <div class="cal-nav-header">
+          <button type="button" class="cal-nav-btn" onclick="changeMonth(-1)">
+            <i class="fa-solid fa-chevron-left"></i> Prev Month
+          </button>
+          <div class="cal-month-title">${MONTH_NAMES[currMonthIdx]} ${currYear}</div>
+          <button type="button" class="cal-nav-btn" onclick="changeMonth(1)">
+            Next Month <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <div class="cal-matrix">
+          <div class="cal-matrix-head">MON</div>
+          <div class="cal-matrix-head">TUE</div>
+          <div class="cal-matrix-head">WED</div>
+          <div class="cal-matrix-head">THU</div>
+          <div class="cal-matrix-head">FRI</div>
+          <div class="cal-matrix-head">SAT</div>
+          <div class="cal-matrix-head">SUN</div>
+      `;
+
+      for (let i = 0; i < firstDayOfWeek; i++) {
+        html += `<div class="cal-matrix-day other-month"><span class="cal-day-num"></span></div>`;
+      }
+
+      for (let day = 1; day <= totalDays; day++) {
+        const mStr = String(currMonthIdx + 1).padStart(2, '0');
+        const dStr = String(day).padStart(2, '0');
+        const dateStr = `${currYear}-${mStr}-${dStr}`;
+
+        const dayEvents = EVENTS_DATA.filter(e => e.date === dateStr);
+        const hasEvents = dayEvents.length > 0;
+        const isSelected = selectedDateStr === dateStr;
+
+        let dotsHtml = '';
+        if (hasEvents) {
+          dotsHtml = '<div class="cal-event-dots">' + dayEvents.map(e => `<span class="cal-dot ${e.cat}"></span>`).join('') + '</div>';
+        }
+
+        html += `
+          <div class="cal-matrix-day ${hasEvents ? 'has-event' : ''} ${isSelected ? 'selected' : ''}" onclick="selectDate('${dateStr}')">
+            <span class="cal-day-num">${day}</span>
+            ${dotsHtml}
+          </div>
+        `;
+      }
+
+      html += `</div>`;
+
+      if (selectedDateStr) {
+        const selectedEvents = EVENTS_DATA.filter(e => e.date === selectedDateStr);
+        html += `
+          <div style="margin-top:20px;">
+            <h3 style="font-size:1.1rem; color:var(--pink); margin-bottom:14px; font-weight:800;">
+              <i class="fa-solid fa-calendar-day"></i> Events on ${selectedDateStr}
+            </h3>
+            ${selectedEvents.length ? selectedEvents.map(e => renderEventItemHtml(e)).join('') : '<div style="color:var(--text-dim); text-align:center; padding:20px;">No events scheduled for this specific day.</div>'}
+          </div>
+        `;
+      } else {
+        const monthEvents = EVENTS_DATA.filter(e => e.monthIdx === currMonthIdx && e.year === currYear);
+        html += `
+          <div style="margin-top:20px;">
+            <div style="font-size:0.85rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-dim); margin-bottom:14px;">
+              ${MONTH_NAMES[currMonthIdx]} ${currYear} Events (${monthEvents.length})
+            </div>
+            ${monthEvents.length ? monthEvents.map(e => renderEventItemHtml(e)).join('') : '<div style="color:var(--text-dim); text-align:center; padding:20px;">No events listed for this month.</div>'}
+          </div>
+        `;
+      }
+
+      return html;
+    }
+
+    function renderListView() {
+      const monthEvents = EVENTS_DATA.filter(e => e.monthIdx === currMonthIdx && e.year === currYear);
+      return `
+        <div class="cal-nav-header">
+          <button type="button" class="cal-nav-btn" onclick="changeMonth(-1)">
+            <i class="fa-solid fa-chevron-left"></i> Prev Month
+          </button>
+          <div class="cal-month-title">${MONTH_NAMES[currMonthIdx]} ${currYear} Agenda</div>
+          <button type="button" class="cal-nav-btn" onclick="changeMonth(1)">
+            Next Month <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+        <div style="margin-top:14px;">
+          ${monthEvents.length ? monthEvents.map(e => renderEventItemHtml(e)).join('') : '<div style="color:var(--text-dim); text-align:center; padding:30px;">No events listed for this month.</div>'}
+        </div>
+      `;
+    }
+
+    function renderEventItemHtml(e) {
+      return `
+        <div class="event-card-item">
+          <div class="event-card-top">
+            <div class="event-date-box">
+              <div class="day-num">${e.dayNum}</div>
+              <div class="day-name">${e.dayName}</div>
+            </div>
+            <div style="flex:1; min-width:0;">
+              <h3 style="font-size:1.25rem; font-weight:800; color:#FFF; margin-bottom:4px;">${e.title}</h3>
+              <div style="font-size:0.88rem; color:var(--pink); font-weight:600; margin-bottom:8px;">
+                <i class="fa-solid fa-location-dot"></i> ${e.venue} • <i class="fa-regular fa-clock"></i> ${e.time}
+              </div>
+              <div style="font-size:0.82rem; color:var(--text-dim);">
+                <i class="fa-solid fa-user-check"></i> ${e.goingCount}+ members going
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; border-top:1px solid var(--border-light); padding-top:12px; justify-content:flex-end;">
+            <a href="social.html" class="btn btn-outline" style="padding:8px 16px; font-size:0.8rem;">
+              <i class="fa-brands fa-telegram"></i> Join Chat Group
+            </a>
+            <a href="/app" class="btn btn-pink" style="padding:8px 16px; font-size:0.8rem;">
+              RSVP in App <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      `;
+    }
+
+    document.addEventListener('DOMContentLoaded', loadCalendarData);
+  </script>
+
 </body>
 </html>
