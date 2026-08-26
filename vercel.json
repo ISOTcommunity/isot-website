@@ -2,6 +2,156 @@
   "cleanUrls": true,
   "redirects": [
     {
+      "source": "/turin-public-transport-gtt-student-pass",
+      "destination": "/blog-post?slug=turin-public-transport-gtt-student-pass",
+      "permanent": true
+    },
+    {
+      "source": "/healthcare-tessera-sanitaria-turin",
+      "destination": "/blog-post?slug=healthcare-tessera-sanitaria-turin",
+      "permanent": true
+    },
+    {
+      "source": "/permesso-di-soggiorno-turin-guide",
+      "destination": "/blog-post?slug=permesso-di-soggiorno-turin-guide",
+      "permanent": true
+    },
+    {
+      "source": "/codice-fiscale-turin-guide",
+      "destination": "/blog-post?slug=codice-fiscale-turin-guide",
+      "permanent": true
+    },
+    {
+      "source": "/universities-and-colleges-in-turin-for-international-students",
+      "destination": "/blog-post?slug=universities-and-colleges-in-turin-for-international-students",
+      "permanent": true
+    },
+    {
+      "source": "/universities-and-colleges-in-turin-for-international-students/",
+      "destination": "/blog-post?slug=universities-and-colleges-in-turin-for-international-students",
+      "permanent": true
+    },
+    {
+      "source": "/a-complete-guide-to-living-in-turin-for-international-students",
+      "destination": "/blog-post?slug=a-complete-guide-to-living-in-turin-for-international-students",
+      "permanent": true
+    },
+    {
+      "source": "/a-complete-guide-to-living-in-turin-for-international-students/",
+      "destination": "/blog-post?slug=a-complete-guide-to-living-in-turin-for-international-students",
+      "permanent": true
+    },
+    {
+      "source": "/isot-brazilian-karaoke-night-at-rough-bar-san-salvario",
+      "destination": "/blog-post?slug=isot-brazilian-karaoke-night-at-rough-bar-san-salvario",
+      "permanent": true
+    },
+    {
+      "source": "/isot-brazilian-karaoke-night-at-rough-bar-san-salvario/",
+      "destination": "/blog-post?slug=isot-brazilian-karaoke-night-at-rough-bar-san-salvario",
+      "permanent": true
+    },
+    {
+      "source": "/happy-nowruz-iranian-new-year-isot-community",
+      "destination": "/blog-post?slug=happy-nowruz-iranian-new-year-isot-community",
+      "permanent": true
+    },
+    {
+      "source": "/happy-nowruz-iranian-new-year-isot-community/",
+      "destination": "/blog-post?slug=happy-nowruz-iranian-new-year-isot-community",
+      "permanent": true
+    },
+    {
+      "source": "/saahorizon2025",
+      "destination": "/blog-post?slug=saahorizon2025",
+      "permanent": true
+    },
+    {
+      "source": "/saahorizon2025/",
+      "destination": "/blog-post?slug=saahorizon2025",
+      "permanent": true
+    },
+    {
+      "source": "/studenthousinginturin",
+      "destination": "/blog-post?slug=studenthousinginturin",
+      "permanent": true
+    },
+    {
+      "source": "/studenthousinginturin/",
+      "destination": "/blog-post?slug=studenthousinginturin",
+      "permanent": true
+    },
+    {
+      "source": "/italianacademicexamsystem",
+      "destination": "/blog-post?slug=italianacademicexamsystem",
+      "permanent": true
+    },
+    {
+      "source": "/italianacademicexamsystem/",
+      "destination": "/blog-post?slug=italianacademicexamsystem",
+      "permanent": true
+    },
+    {
+      "source": "/turin-student-canteens",
+      "destination": "/blog-post?slug=turin-student-canteens",
+      "permanent": true
+    },
+    {
+      "source": "/turin-student-canteens/",
+      "destination": "/blog-post?slug=turin-student-canteens",
+      "permanent": true
+    },
+    {
+      "source": "/celebrating-migration-a-journey-of-resilience-and-opportunity",
+      "destination": "/blog-post?slug=celebrating-migration-a-journey-of-resilience-and-opportunity",
+      "permanent": true
+    },
+    {
+      "source": "/celebrating-migration-a-journey-of-resilience-and-opportunity/",
+      "destination": "/blog-post?slug=celebrating-migration-a-journey-of-resilience-and-opportunity",
+      "permanent": true
+    },
+    {
+      "source": "/edisuscholarship2024",
+      "destination": "/blog-post?slug=edisuscholarship2024",
+      "permanent": true
+    },
+    {
+      "source": "/edisuscholarship2024/",
+      "destination": "/blog-post?slug=edisuscholarship2024",
+      "permanent": true
+    },
+    {
+      "source": "/sexual-behaviour-in-italy",
+      "destination": "/blog-post?slug=sexual-behaviour-in-italy",
+      "permanent": true
+    },
+    {
+      "source": "/sexual-behaviour-in-italy/",
+      "destination": "/blog-post?slug=sexual-behaviour-in-italy",
+      "permanent": true
+    },
+    {
+      "source": "/post_medical1",
+      "destination": "/blog-post?slug=post_medical1",
+      "permanent": true
+    },
+    {
+      "source": "/post_medical1/",
+      "destination": "/blog-post?slug=post_medical1",
+      "permanent": true
+    },
+    {
+      "source": "/welcome",
+      "destination": "/blog-post?slug=welcome",
+      "permanent": true
+    },
+    {
+      "source": "/welcome/",
+      "destination": "/blog-post?slug=welcome",
+      "permanent": true
+    },
+    {
       "source": "/app",
       "destination": "/app/home.html",
       "permanent": false
@@ -68,126 +218,6 @@
     }
   ],
   "rewrites": [
-    {
-      "source": "/turin-public-transport-gtt-student-pass",
-      "destination": "/blog-post?slug=turin-public-transport-gtt-student-pass"
-    },
-    {
-      "source": "/healthcare-tessera-sanitaria-turin",
-      "destination": "/blog-post?slug=healthcare-tessera-sanitaria-turin"
-    },
-    {
-      "source": "/permesso-di-soggiorno-turin-guide",
-      "destination": "/blog-post?slug=permesso-di-soggiorno-turin-guide"
-    },
-    {
-      "source": "/codice-fiscale-turin-guide",
-      "destination": "/blog-post?slug=codice-fiscale-turin-guide"
-    },
-    {
-      "source": "/universities-and-colleges-in-turin-for-international-students",
-      "destination": "/blog-post?slug=universities-and-colleges-in-turin-for-international-students"
-    },
-    {
-      "source": "/universities-and-colleges-in-turin-for-international-students/",
-      "destination": "/blog-post?slug=universities-and-colleges-in-turin-for-international-students"
-    },
-    {
-      "source": "/a-complete-guide-to-living-in-turin-for-international-students",
-      "destination": "/blog-post?slug=a-complete-guide-to-living-in-turin-for-international-students"
-    },
-    {
-      "source": "/a-complete-guide-to-living-in-turin-for-international-students/",
-      "destination": "/blog-post?slug=a-complete-guide-to-living-in-turin-for-international-students"
-    },
-    {
-      "source": "/isot-brazilian-karaoke-night-at-rough-bar-san-salvario",
-      "destination": "/blog-post?slug=isot-brazilian-karaoke-night-at-rough-bar-san-salvario"
-    },
-    {
-      "source": "/isot-brazilian-karaoke-night-at-rough-bar-san-salvario/",
-      "destination": "/blog-post?slug=isot-brazilian-karaoke-night-at-rough-bar-san-salvario"
-    },
-    {
-      "source": "/happy-nowruz-iranian-new-year-isot-community",
-      "destination": "/blog-post?slug=happy-nowruz-iranian-new-year-isot-community"
-    },
-    {
-      "source": "/happy-nowruz-iranian-new-year-isot-community/",
-      "destination": "/blog-post?slug=happy-nowruz-iranian-new-year-isot-community"
-    },
-    {
-      "source": "/saahorizon2025",
-      "destination": "/blog-post?slug=saahorizon2025"
-    },
-    {
-      "source": "/saahorizon2025/",
-      "destination": "/blog-post?slug=saahorizon2025"
-    },
-    {
-      "source": "/studenthousinginturin",
-      "destination": "/blog-post?slug=studenthousinginturin"
-    },
-    {
-      "source": "/studenthousinginturin/",
-      "destination": "/blog-post?slug=studenthousinginturin"
-    },
-    {
-      "source": "/italianacademicexamsystem",
-      "destination": "/blog-post?slug=italianacademicexamsystem"
-    },
-    {
-      "source": "/italianacademicexamsystem/",
-      "destination": "/blog-post?slug=italianacademicexamsystem"
-    },
-    {
-      "source": "/turin-student-canteens",
-      "destination": "/blog-post?slug=turin-student-canteens"
-    },
-    {
-      "source": "/turin-student-canteens/",
-      "destination": "/blog-post?slug=turin-student-canteens"
-    },
-    {
-      "source": "/celebrating-migration-a-journey-of-resilience-and-opportunity",
-      "destination": "/blog-post?slug=celebrating-migration-a-journey-of-resilience-and-opportunity"
-    },
-    {
-      "source": "/celebrating-migration-a-journey-of-resilience-and-opportunity/",
-      "destination": "/blog-post?slug=celebrating-migration-a-journey-of-resilience-and-opportunity"
-    },
-    {
-      "source": "/edisuscholarship2024",
-      "destination": "/blog-post?slug=edisuscholarship2024"
-    },
-    {
-      "source": "/edisuscholarship2024/",
-      "destination": "/blog-post?slug=edisuscholarship2024"
-    },
-    {
-      "source": "/sexual-behaviour-in-italy",
-      "destination": "/blog-post?slug=sexual-behaviour-in-italy"
-    },
-    {
-      "source": "/sexual-behaviour-in-italy/",
-      "destination": "/blog-post?slug=sexual-behaviour-in-italy"
-    },
-    {
-      "source": "/post_medical1",
-      "destination": "/blog-post?slug=post_medical1"
-    },
-    {
-      "source": "/post_medical1/",
-      "destination": "/blog-post?slug=post_medical1"
-    },
-    {
-      "source": "/welcome",
-      "destination": "/blog-post?slug=welcome"
-    },
-    {
-      "source": "/welcome/",
-      "destination": "/blog-post?slug=welcome"
-    },
     {
       "source": "/app/",
       "destination": "/app/home.html"
