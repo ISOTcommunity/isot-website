@@ -13,8 +13,8 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Join ISOT | Free Access & Official APS Membership</title>
-  <meta name="description" content="Join ISOT Community in Turin. Choose between Free Community Access or Official €10/year APS Membership with Intesa Sanpaolo bank transfer." />
+  <title>Join ISOT | Free Access & Official Membership</title>
+  <meta name="description" content="Join ISOT Community in Turin. Choose between Free Community Access or Official €10/year Membership with Intesa Sanpaolo bank transfer." />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="assets/favicon.svg" />
 
@@ -214,7 +214,7 @@
       <div class="pill-tag"><i class="fa-solid fa-user-plus"></i> Membership Options</div>
       <h1 class="page-title">Choose How to <span class="text-gradient">Connect</span></h1>
       <p style="color: var(--text-muted); max-width: 680px; margin: 0 auto; font-size: 1.15rem;">
-        Whether you want free community access or full official APS non-profit member rights, welcome to ISOT!
+        Whether you want free community access or full official non-profit membership rights, welcome to ISOT!
       </p>
     </div>
   </section>
@@ -257,7 +257,8 @@
               <label>Verification Question: What city is ISOT based in?</label>
               <input type="text" id="commCity" required placeholder="Type city name" class="form-input" />
             </div>
-            <button type="submit" class="btn btn-outline" style="width: 100%;">Get Community Access →</button>
+            <button type="submit" id="commBtn" class="btn btn-outline" style="width: 100%;">Get Community Access →</button>
+            <p id="commError" style="display:none; color: var(--pink); font-size: 0.85rem; margin-top: 10px; text-align: center;"></p>
           </form>
 
           <div id="commSuccess" style="display:none; text-align:center; padding:20px; background: rgba(15,23,42,0.9); border-radius: var(--radius-md); border:1px solid var(--pink); margin-top:20px;">
@@ -306,7 +307,8 @@
               <label>Verification Question: What city is ISOT based in?</label>
               <input type="text" id="memberCity" required placeholder="Type city name" class="form-input" />
             </div>
-            <button type="submit" class="btn btn-pink" style="width: 100%;">Become an Official Member →</button>
+            <button type="submit" id="memberBtn" class="btn btn-pink" style="width: 100%;">Become an Official Member →</button>
+            <p id="memberError" style="display:none; color: var(--pink); font-size: 0.85rem; margin-top: 10px; text-align: center;"></p>
           </form>
 
           <div id="memberSuccess" style="display:none; text-align:left; padding:24px; background: rgba(15,23,42,0.95); border-radius: var(--radius-md); border:1px solid var(--pink); margin-top:20px;">
@@ -333,7 +335,7 @@
       <div class="footer-grid">
         <div>
           <a href="index.html" class="nav-logo"><img src="assets/LOGOS/scritta isot.png" alt="ISOT Logo" /></a>
-          <p style="color: var(--text-dim); font-size: 0.9rem; margin-top: 14px;">Live globally, connect locally. The international student community of Turin (APS).</p>
+          <p style="color: var(--text-dim); font-size: 0.9rem; margin-top: 14px;">Live globally, connect locally. The international student community of Turin.</p>
         </div>
         <div>
           <h4 style="color: #FFF; margin-bottom: 16px;">Pages</h4>
@@ -348,7 +350,7 @@
           <h4 style="color: #FFF; margin-bottom: 16px;">Community</h4>
           <ul style="list-style: none; font-size: 0.9rem; color: var(--text-dim);">
             <li style="margin-bottom: 8px;"><a href="join.html">Free Access</a></li>
-            <li style="margin-bottom: 8px;"><a href="join.html">Official APS Member (€10)</a></li>
+            <li style="margin-bottom: 8px;"><a href="join.html">Official Member (€10)</a></li>
             <li style="margin-bottom: 8px;"><a href="partners.html">Venue Partners</a></li>
             <li style="margin-bottom: 8px;"><a href="donate.html">Donate & Support</a></li>
           </ul>
@@ -367,11 +369,14 @@
         </div>
       </div>
       <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 24px; text-align: center; color: var(--text-dark); font-size: 0.85rem;">
-        © 2026 ISOT Community (Associazione di Promozione Sociale) • Turin, Italy
+        © 2026 ISOT Community • Turin, Italy (APS registration in progress)
       </div>
     </div>
   </footer>
 
+  <!-- Signups write to Supabase contact_messages (anon INSERT policy) — same table/policy contact.html already uses -->
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot-public.js"></script>
   <script>
     document.getElementById('mobileToggle').addEventListener('click', () => {
       document.getElementById('mobileMenu').classList.toggle('active');
@@ -382,7 +387,7 @@
     );
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    function submitForm(event, type) {
+    async function submitForm(event, type) {
       event.preventDefault();
       const form = event.target;
       const honeypot = form.querySelector('input[name="website_url"]').value;
@@ -394,11 +399,41 @@
         return;
       }
 
+      const btn = document.getElementById(type === 'community' ? 'commBtn' : 'memberBtn');
+      const err = document.getElementById(type === 'community' ? 'commError' : 'memberError');
+      err.style.display = 'none';
+      btn.disabled = true;
+      const btnLabel = btn.textContent;
+      btn.textContent = 'Sending…';
+
+      let name, email, message;
+      if (type === 'community') {
+        name = document.getElementById('commName').value.trim();
+        email = document.getElementById('commEmail').value.trim();
+        const uni = document.getElementById('commUni').value.trim();
+        message = `[JOIN — Free Community Access]\nUniversity: ${uni}`;
+      } else {
+        name = document.getElementById('memberName').value.trim();
+        email = document.getElementById('memberEmail').value.trim();
+        const uni = document.getElementById('memberUni').value.trim();
+        const nation = document.getElementById('memberNation').value.trim();
+        message = `[JOIN — €10/yr Official Member application]\nUniversity: ${uni}\nNationality: ${nation}\nAwaiting bank transfer confirmation before board creates the pending membership record.`;
+      }
+
+      const res = await sendEnquiry('contact', { name, email, message });
+
+      if (!res.ok) {
+        btn.disabled = false;
+        btn.textContent = btnLabel;
+        err.textContent = 'Could not submit — please email isot.infocenter@gmail.com instead so we don\'t lose your application.';
+        err.style.display = 'block';
+        return;
+      }
+
       if (type === 'community') {
         document.getElementById('commForm').style.display = 'none';
         document.getElementById('commSuccess').style.display = 'block';
       } else {
-        const name = document.getElementById('memberName').value.trim();
         document.getElementById('refName').innerText = name || 'Member';
         document.getElementById('memberForm').style.display = 'none';
         document.getElementById('memberSuccess').style.display = 'block';
