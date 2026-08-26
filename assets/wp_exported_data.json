@@ -1,6 +1,34 @@
 {
   "posts": [
     {
+      "id": 5008,
+      "date": "2026-08-26T11:15:00",
+      "slug": "turin-student-sports-bouldering-climbing-guide",
+      "title": {
+        "rendered": "Student Sports & Bouldering in Turin: ISOT Indoor Rock Climbing Group"
+      },
+      "excerpt": {
+        "rendered": "<p>Complete guide to indoor bouldering, rock climbing gyms, and student sports activities in Turin with the ISOT Community active sports group.</p>"
+      },
+      "content": {
+        "rendered": "<div class=\"seo-guide-container\">\n  <p>Turin is located right at the foot of the Italian Alps, making it one of Europe's top capitals for mountain sports, outdoor adventures, and indoor bouldering. For international students studying at PoliTo or UniTo, staying active with <strong>ISOT Community's Bouldering & Sports Group</strong> is a great way to stay fit and build long-lasting friendships.</p>\n\n  <h2>Indoor Bouldering & Rock Climbing Gyms in Turin</h2>\n  <p>Indoor bouldering has exploded in popularity among Turin university students because it requires minimal equipment\u2014just climbing shoes and chalk\u2014and offers a fun, problem-solving social workout.</p>\n\n  <div style=\"margin: 24px 0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3);\">\n    <img src=\"assets/optimized/isot_bouldering_climbing_group.jpg\" alt=\"ISOT Student Bouldering & Indoor Rock Climbing Group in Turin Gym\" style=\"width:100%; display:block;\" />\n    <p style=\"font-size:0.85rem; color:var(--text-dim); text-align:center; padding:8px; background:rgba(0,0,0,0.4);\">ISOT Sports Group: Indoor bouldering session at B-Side / Block-Out climbing gym in Turin.</p>\n  </div>\n\n  <h2>Top Climbing Gyms Popular with Students</h2>\n  <ul>\n    <li><strong>B-Side Climbing Park</strong> (Via Ravina 28): One of Turin's largest and most famous bouldering halls with student discounts.</li>\n    <li><strong>Block-Out Bouldering Gym</strong> (Corso Cosenza): Modern walls with routes ranging from beginner (V0) to expert levels.</li>\n    <li><strong>Escape Climbing Garden</strong> (Via G. Bruno 191): Great community vibe with strength training zones.</li>\n  </ul>\n\n  <h2>Other ISOT Sports & Outdoor Activities</h2>\n  <ul>\n    <li><strong>Weekend Alpine Hikes</strong>: Day trips to Val di Susa, Sacra di San Michele, and Gran Paradiso National Park.</li>\n    <li><strong>Weekly Football & Volleyball Matches</strong>: Recreational matches organized via our Telegram sports subgroup.</li>\n    <li><strong>Running & Riverside Jogging</strong>: Group runs along Parco del Valentino and the Po River banks.</li>\n  </ul>\n\n  <h2>How to Join the ISOT Sports Group</h2>\n  <p>Join our verified <a href=\"social.html\" style=\"color:var(--pink);\">Telegram & WhatsApp Student Chat Groups</a> and ask for the Sports & Bouldering subgroup link!</p>\n</div>"
+      }
+    },
+    {
+      "id": 5007,
+      "date": "2026-08-26T11:00:00",
+      "slug": "isot-board-game-social-nights-turin",
+      "title": {
+        "rendered": "ISOT Board Game & Card Game Social Evenings for International Students in Turin"
+      },
+      "excerpt": {
+        "rendered": "<p>Discover ISOT Community's weekly board game and Uno card nights in Turin. Relaxed, cozy student gatherings in San Salvario & Murazzi.</p>"
+      },
+      "content": {
+        "rendered": "<div class=\"seo-guide-container\">\n  <p>Looking for a fun, relaxed way to meet international students in Turin without the noise of a nightclub? <strong>ISOT Community's Board Game & Card Game Nights</strong> offer the perfect cozy setting to make friends, practice languages, and enjoy strategic fun.</p>\n\n  <h2>Uno, Catan, Chess & International Card Games</h2>\n  <p>Our members bring a wide variety of card games and board games from around the world. Whether you are a fan of fast-paced <strong>Uno showdowns</strong>, strategic <em>Settlers of Catan</em>, chess, or party trivia games, there is always a table open for you.</p>\n\n  <div style=\"margin: 24px 0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3);\">\n    <img src=\"assets/optimized/isot_boardgames_social_night.jpg\" alt=\"ISOT International Students Playing Uno Card Games Together at Night\" style=\"width:100%; display:block;\" />\n    <p style=\"font-size:0.85rem; color:var(--text-dim); text-align:center; padding:8px; background:rgba(0,0,0,0.4);\">ISOT Board Game Night: Students enjoying Uno and card games at Capodoglio Murazzi.</p>\n  </div>\n\n  <h2>Why Attend ISOT Board Game Evenings?</h2>\n  <ul>\n    <li><strong>Relaxed & Low-Pressure Environment</strong>: Easy to chat, laugh, and introduce yourself to fellow UniTo and PoliTo students.</li>\n    <li><strong>All Games Provided</strong>: You can bring your own favorite card or board games from home, or play with games provided by ISOT.</li>\n    <li><strong>Venue Discounts for Members</strong>: Enjoy member discounts on teas, craft beers, and aperitivo snacks with your ISOT Web App card.</li>\n  </ul>\n\n  <h2>How to Join the Next Game Night</h2>\n  <p>Check out our <a href=\"events.html\" style=\"color:var(--pink);\">Weekly Events Schedule</a> or join our verified <a href=\"social.html\" style=\"color:var(--pink);\">Telegram & WhatsApp Student Chat Groups</a> to see this week's game night location!</p>\n</div>"
+      }
+    },
+    {
       "id": 5006,
       "date": "2026-08-26T10:00:00",
       "slug": "isot-art-and-painting-workshop-turin",

@@ -2,6 +2,16 @@
   "cleanUrls": true,
   "redirects": [
     {
+      "source": "/turin-student-sports-bouldering-climbing-guide",
+      "destination": "/blog-post?slug=turin-student-sports-bouldering-climbing-guide",
+      "permanent": true
+    },
+    {
+      "source": "/isot-board-game-social-nights-turin",
+      "destination": "/blog-post?slug=isot-board-game-social-nights-turin",
+      "permanent": true
+    },
+    {
       "source": "/isot-art-and-painting-workshop-turin",
       "destination": "/blog-post?slug=isot-art-and-painting-workshop-turin",
       "permanent": true
