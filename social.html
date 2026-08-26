@@ -170,18 +170,25 @@
       <!-- DIRECT PUBLIC CHANNELS (NO BOT CHECK REQUIRED) -->
       <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 30px; text-align: left;">
         
-        <!-- Instagram -->
-        <div class="channel-row" style="background: linear-gradient(135deg, rgba(225,48,108,0.12) 0%, rgba(131,58,180,0.12) 100%); border-color: rgba(225,48,108,0.35);">
-          <div class="channel-info">
-            <div class="channel-icon channel-icon-ig"><i class="fa-brands fa-instagram"></i></div>
-            <div class="channel-text">
-              <h3>Instagram @isot.community</h3>
-              <p>Weekly event photos, stories, karaoke announcements & party reels in Turin.</p>
+        <!-- Instagram Live Feed -->
+        <div class="channel-row" style="background: linear-gradient(135deg, rgba(225,48,108,0.12) 0%, rgba(131,58,180,0.12) 100%); border-color: rgba(225,48,108,0.35); flex-direction: column; align-items: stretch; gap: 16px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <div class="channel-info">
+              <div class="channel-icon channel-icon-ig"><i class="fa-brands fa-instagram"></i></div>
+              <div class="channel-text">
+                <h3>Instagram @isot.community</h3>
+                <p>Weekly event photos, stories, karaoke announcements & party reels in Turin.</p>
+              </div>
             </div>
+            <a href="https://instagram.com/isot.community" target="_blank" rel="noopener" class="btn-join-channel" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); flex-shrink: 0;">
+              Follow @isot.community <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
           </div>
-          <a href="https://instagram.com/isot.community" target="_blank" rel="noopener" class="btn-join-channel" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);">
-            Follow Instagram <i class="fa-solid fa-arrow-up-right-from-square"></i>
-          </a>
+
+          <!-- EMBEDDED SCROLLABLE INSTAGRAM POST -->
+          <div style="width: 100%; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 8px 25px rgba(0,0,0,0.4);">
+            <iframe src="https://www.instagram.com/p/DKCyJcaCOjn/embed/" width="100%" height="450" frameborder="0" scrolling="no" allowtransparency="true" style="border:none; overflow:hidden; width:100%; display:block; background: #FFF;"></iframe>
+          </div>
         </div>
 
         <!-- Web App -->

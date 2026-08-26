@@ -292,13 +292,20 @@
     <!-- RIGHT SIDEBAR: INSTAGRAM & ANTI-BOT TELEGRAM/WHATSAPP CAPTCHA -->
     <aside class="sidebar-sticky">
       
-      <!-- DIRECT INSTAGRAM WINDOW (NO BOT CHECK REQUIRED) -->
-      <div class="community-card" style="background: linear-gradient(135deg, rgba(225,48,108,0.12) 0%, rgba(131,58,180,0.12) 100%); border-color: rgba(225,48,108,0.35);">
-        <span class="app-badge" style="color: #E1306C; background: rgba(225,48,108,0.2);"><i class="fa-brands fa-instagram"></i> Instagram</span>
-        <h3 class="app-promo-title" style="margin-bottom:6px;">@isot.community</h3>
-        <p class="app-promo-desc" style="margin-bottom:14px;">Weekly event photos, stories, karaoke announcements & student life reels in Turin.</p>
-        <a href="https://instagram.com/isot.community" target="_blank" rel="noopener" class="social-btn" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); justify-content: center; gap: 8px;">
-          <span>Follow on Instagram</span>
+      <!-- DIRECT INSTAGRAM EMBEDDED WINDOW (NO BOT CHECK REQUIRED) -->
+      <div class="community-card" style="background: linear-gradient(135deg, rgba(225,48,108,0.12) 0%, rgba(131,58,180,0.12) 100%); border-color: rgba(225,48,108,0.35); padding: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <span class="app-badge" style="color: #E1306C; background: rgba(225,48,108,0.2); margin-bottom:0;"><i class="fa-brands fa-instagram"></i> Live Feed</span>
+          <a href="https://instagram.com/isot.community" target="_blank" rel="noopener" style="font-size: 0.8rem; font-weight: 700; color: #E1306C;">@isot.community →</a>
+        </div>
+        
+        <!-- EMBEDDED SCROLLABLE INSTAGRAM POST -->
+        <div style="width: 100%; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 8px 20px rgba(0,0,0,0.4); margin-bottom: 12px;">
+          <iframe src="https://www.instagram.com/p/DKCyJcaCOjn/embed/" width="100%" height="420" frameborder="0" scrolling="no" allowtransparency="true" style="border:none; overflow:hidden; width:100%; display:block; background: #FFF;"></iframe>
+        </div>
+
+        <a href="https://instagram.com/isot.community" target="_blank" rel="noopener" class="social-btn" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); justify-content: center; gap: 8px; width: 100%;">
+          <span>Follow @isot.community</span>
           <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;"></i>
         </a>
       </div>
