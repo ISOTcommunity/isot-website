@@ -2,6 +2,11 @@
   "cleanUrls": true,
   "redirects": [
     {
+      "source": "/sas-startup-community-saa-turin",
+      "destination": "/blog-post?slug=sas-startup-community-saa-turin",
+      "permanent": true
+    },
+    {
       "source": "/turin-student-sports-bouldering-climbing-guide",
       "destination": "/blog-post?slug=turin-student-sports-bouldering-climbing-guide",
       "permanent": true

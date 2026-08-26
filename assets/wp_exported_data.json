@@ -1,6 +1,20 @@
 {
   "posts": [
     {
+      "id": 5009,
+      "date": "2026-08-26T11:08:00",
+      "slug": "sas-startup-community-saa-turin",
+      "title": {
+        "rendered": "SAS Startup Community: Weekly Wednesday Pitch Sessions at SAA School of Management"
+      },
+      "excerpt": {
+        "rendered": "<p>Every Wednesday at SAA School of Management in Turin, ISOT Community partners with SAS Startup Community for student pitch presentations, startup workshops, and founder networking.</p>"
+      },
+      "content": {
+        "rendered": "<div class=\"seo-guide-container\">\n  <p>Looking to launch a business, pitch an innovative idea, or meet fellow student entrepreneurs in Turin? <strong>SAS Startup Community (Associazione Alumni SAA)</strong> meets <strong>every Wednesday at SAA School of Management</strong> in Turin.</p>\n\n  <h2>Weekly Wednesday Pitch & Startup Workshops</h2>\n  <p>Every Wednesday evening, students from UniTo, PoliTo, SAA, and ESCP gather in the main SAA auditorium for live pitch sessions, feedback panels, and startup workshops. Presenters share their business models, tackle market challenges, and get constructive advice from experienced alumni and mentors.</p>\n\n  <div style=\"margin: 24px 0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3);\">\n    <img src=\"assets/optimized/saa_horizon_pitch_2025.jpg\" alt=\"SAS Startup Community Pitch Session at SAA School of Management Auditorium\" style=\"width:100%; display:block;\" />\n    <p style=\"font-size:0.85rem; color:var(--text-dim); text-align:center; padding:8px; background:rgba(0,0,0,0.4);\">SAS Startup Community: Pitch session inside SAA School of Management auditorium with ISOT Community banner on stage.</p>\n  </div>\n\n  <h2>Key Highlights of SAS Startup Wednesdays</h2>\n  <ul>\n    <li><strong>Live Pitch Presentation</strong>: Present your startup idea or MVP to a room of supportive peers and alumni.</li>\n    <li><strong>Networking & Cofounder Matchmaking</strong>: Connect with technical developers, business designers, and fellow international cofounders.</li>\n    <li><strong>Open to All International Students</strong>: Free to attend for ISOT Community members studying in Turin.</li>\n  </ul>\n\n  <h2>Location & Schedule</h2>\n  <ul>\n    <li><strong>When</strong>: Every Wednesday evening (18:30 - 20:30)</li>\n    <li><strong>Where</strong>: SAA School of Management, Via Ventimiglia 115, 10126 Torino TO</li>\n    <li><strong>How to Join</strong>: Check the ISOT Telegram channel for this week's pitch agenda and register your spot!</li>\n  </ul>\n</div>"
+      }
+    },
+    {
       "id": 5008,
       "date": "2026-08-26T11:15:00",
       "slug": "turin-student-sports-bouldering-climbing-guide",
