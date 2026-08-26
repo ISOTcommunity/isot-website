@@ -2,6 +2,11 @@
   "cleanUrls": true,
   "redirects": [
     {
+      "source": "/erasmus-life-in-turin-guide",
+      "destination": "/blog-post?slug=erasmus-life-in-turin-guide",
+      "permanent": true
+    },
+    {
       "source": "/sas-startup-community-saa-turin",
       "destination": "/blog-post?slug=sas-startup-community-saa-turin",
       "permanent": true
