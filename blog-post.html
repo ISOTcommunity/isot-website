@@ -299,9 +299,15 @@
           <a href="https://instagram.com/isot.community" target="_blank" rel="noopener" style="font-size: 0.8rem; font-weight: 700; color: #E1306C;">@isot.community →</a>
         </div>
         
+        <!-- MULTI-POST INSTAGRAM FEED SWITCHER -->
+        <div style="display: flex; gap: 6px; margin-bottom: 10px;">
+          <button type="button" onclick="switchIgPost('DKCyJcaCOjn', this)" class="ig-tab-btn active" style="flex:1; padding:5px; border-radius:6px; border:1px solid rgba(225,48,108,0.5); background:rgba(225,48,108,0.2); color:#FFF; font-size:0.75rem; font-weight:700; cursor:pointer;">Post 1</button>
+          <button type="button" onclick="switchIgPost('DKC0VCoiOwE', this)" class="ig-tab-btn" style="flex:1; padding:5px; border-radius:6px; border:1px solid rgba(255,255,255,0.1); background:transparent; color:var(--text-dim); font-size:0.75rem; font-weight:700; cursor:pointer;">Post 2</button>
+        </div>
+
         <!-- EMBEDDED SCROLLABLE INSTAGRAM POST -->
         <div style="width: 100%; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 8px 20px rgba(0,0,0,0.4); margin-bottom: 12px;">
-          <iframe src="https://www.instagram.com/p/DKCyJcaCOjn/embed/" width="100%" height="420" frameborder="0" scrolling="no" allowtransparency="true" style="border:none; overflow:hidden; width:100%; display:block; background: #FFF;"></iframe>
+          <iframe id="igSidebarFrame" src="https://www.instagram.com/p/DKCyJcaCOjn/embed/" width="100%" height="420" frameborder="0" scrolling="no" allowtransparency="true" style="border:none; overflow:hidden; width:100%; display:block; background: #FFF;"></iframe>
         </div>
 
         <a href="https://instagram.com/isot.community" target="_blank" rel="noopener" class="social-btn" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); justify-content: center; gap: 8px; width: 100%;">
@@ -361,6 +367,18 @@
   </footer>
 
   <script>
+    function switchIgPost(postId, btn) {
+      document.getElementById('igSidebarFrame').src = `https://www.instagram.com/p/${postId}/embed/`;
+      document.querySelectorAll('.ig-tab-btn').forEach(b => {
+        b.style.background = 'transparent';
+        b.style.borderColor = 'rgba(255,255,255,0.1)';
+        b.style.color = 'var(--text-dim)';
+      });
+      btn.style.background = 'rgba(225,48,108,0.2)';
+      btn.style.borderColor = 'rgba(225,48,108,0.5)';
+      btn.style.color = '#FFF';
+    }
+
     // Hero image mapping by slug
     const HERO_IMAGES = {
       'codice-fiscale-turin-guide': 'assets/optimized/social_group_1.jpg',
