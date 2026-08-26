@@ -167,8 +167,65 @@
   <main class="container">
     <div class="social-card-wrapper">
       
-      <!-- DIRECT PUBLIC CHANNELS (NO BOT CHECK REQUIRED) -->
-      <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 30px; text-align: left;">
+      <!-- 1. ANTI-BOT CAPTCHA CHECK FOR TURIN STUDENT CHAT GROUPS (TOP) -->
+      <div class="captcha-box" id="captchaBox" style="margin-top:0;">
+        <div class="pill-tag" style="background: rgba(16,185,129,0.15); color: var(--green); border-color: rgba(16,185,129,0.3);">
+          <i class="fa-solid fa-shield-halved"></i> Anti-Spam Security Check
+        </div>
+        <h2 class="captcha-title">Unlock WhatsApp & Telegram Student Groups</h2>
+        <p class="captcha-desc">
+          To prevent spam bots from harvesting our group invite links, please answer this quick check:
+        </p>
+
+        <div class="captcha-question" id="captchaQuestionText">4 + 5 = ?</div>
+
+        <div class="captcha-input-group">
+          <input type="number" id="captchaInputValue" class="captcha-input" placeholder="?" autocomplete="off" />
+          <button type="button" onclick="unlockSocialLinks()" class="captcha-btn">Unlock Chat Groups <i class="fa-solid fa-lock-open"></i></button>
+        </div>
+        <div id="captchaErrorMessage" style="color: #EF4444; font-size: 0.85rem; margin-top: 10px; display: none;">
+          Incorrect answer. Please try again!
+        </div>
+      </div>
+
+      <!-- UNLOCKED CHANNEL LIST -->
+      <div class="unlocked-section" id="unlockedSection" style="margin-bottom:30px;">
+        <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); border-radius: var(--radius-md); padding: 14px 20px; color: var(--green); font-weight: 700; display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+          <i class="fa-solid fa-circle-check" style="font-size: 1.2rem;"></i>
+          <div>Human Verification Passed! Chat group links unlocked below:</div>
+        </div>
+
+        <!-- Telegram Group -->
+        <div class="channel-row">
+          <div class="channel-info">
+            <div class="channel-icon channel-icon-tg"><i class="fa-brands fa-telegram"></i></div>
+            <div class="channel-text">
+              <h3>ISOT Official Telegram Group</h3>
+              <p>Main student chat, events, housing, and Q&A for PoliTo & UniTo students.</p>
+            </div>
+          </div>
+          <a href="https://t.me/isotcommunity" target="_blank" rel="noopener" class="btn-join-channel btn-tg">
+            Join Telegram <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+
+        <!-- WhatsApp Group -->
+        <div class="channel-row">
+          <div class="channel-info">
+            <div class="channel-icon channel-icon-wa"><i class="fa-brands fa-whatsapp"></i></div>
+            <div class="channel-text">
+              <h3>WhatsApp Student Community</h3>
+              <p>General chat, batch announcements, and local student meetups.</p>
+            </div>
+          </div>
+          <a href="https://chat.whatsapp.com/ISOTcommunity" target="_blank" rel="noopener" class="btn-join-channel btn-wa">
+            Join WhatsApp <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- 2. INSTAGRAM LIVE FEED & OTHER CHANNELS -->
+      <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 20px; text-align: left;">
         
         <!-- Instagram Live Feed -->
         <div class="channel-row" style="background: linear-gradient(135deg, rgba(225,48,108,0.12) 0%, rgba(131,58,180,0.12) 100%); border-color: rgba(225,48,108,0.35); flex-direction: column; align-items: stretch; gap: 16px;">
@@ -219,64 +276,6 @@
           </div>
           <a href="join.html" class="btn-join-channel btn-app">
             Open Web App <i class="fa-solid fa-arrow-right"></i>
-          </a>
-        </div>
-
-      </div>
-
-      <!-- Anti-bot Captcha Check for Telegram & WhatsApp -->
-      <div class="captcha-box" id="captchaBox">
-        <div class="pill-tag" style="background: rgba(16,185,129,0.15); color: var(--green); border-color: rgba(16,185,129,0.3);">
-          <i class="fa-solid fa-shield-halved"></i> Anti-Spam Security Check
-        </div>
-        <h2 class="captcha-title">Unlock WhatsApp & Telegram Student Groups</h2>
-        <p class="captcha-desc">
-          To prevent spam bots from harvesting our group invite links, please answer this quick check:
-        </p>
-
-        <div class="captcha-question" id="captchaQuestionText">4 + 5 = ?</div>
-
-        <div class="captcha-input-group">
-          <input type="number" id="captchaInputValue" class="captcha-input" placeholder="?" autocomplete="off" />
-          <button type="button" onclick="unlockSocialLinks()" class="captcha-btn">Unlock Chat Groups <i class="fa-solid fa-lock-open"></i></button>
-        </div>
-        <div id="captchaErrorMessage" style="color: #EF4444; font-size: 0.85rem; margin-top: 10px; display: none;">
-          Incorrect answer. Please try again!
-        </div>
-      </div>
-
-      <!-- Unlocked Channel List -->
-      <div class="unlocked-section" id="unlockedSection">
-        <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); border-radius: var(--radius-md); padding: 14px 20px; color: var(--green); font-weight: 700; display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-          <i class="fa-solid fa-circle-check" style="font-size: 1.2rem;"></i>
-          <div>Human Verification Passed! Chat group links unlocked below:</div>
-        </div>
-
-        <!-- Telegram Group -->
-        <div class="channel-row">
-          <div class="channel-info">
-            <div class="channel-icon channel-icon-tg"><i class="fa-brands fa-telegram"></i></div>
-            <div class="channel-text">
-              <h3>ISOT Official Telegram Group</h3>
-              <p>Main student chat, events, housing, and Q&A for PoliTo & UniTo students.</p>
-            </div>
-          </div>
-          <a href="https://t.me/isotcommunity" target="_blank" rel="noopener" class="btn-join-channel btn-tg">
-            Join Telegram <i class="fa-solid fa-arrow-up-right-from-square"></i>
-          </a>
-        </div>
-
-        <!-- WhatsApp Group -->
-        <div class="channel-row">
-          <div class="channel-info">
-            <div class="channel-icon channel-icon-wa"><i class="fa-brands fa-whatsapp"></i></div>
-            <div class="channel-text">
-              <h3>WhatsApp Student Community</h3>
-              <p>General chat, batch announcements, and local student meetups.</p>
-            </div>
-          </div>
-          <a href="https://chat.whatsapp.com/ISOTcommunity" target="_blank" rel="noopener" class="btn-join-channel btn-wa">
-            Join WhatsApp <i class="fa-solid fa-arrow-up-right-from-square"></i>
           </a>
         </div>
 
