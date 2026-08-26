@@ -443,7 +443,8 @@
     // Load article data from exported JSON
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
-      const slug = params.get('slug') || 'a-complete-guide-to-living-in-turin-for-international-students';
+      const pathSlug = location.pathname.split('/').pop().replace(/\.html$/, '');
+      const slug = params.get('slug') || (pathSlug && pathSlug !== 'blog-post' ? pathSlug : '') || 'a-complete-guide-to-living-in-turin-for-international-students';
 
       const heroSrc = HERO_IMAGES[slug] || 'assets/optimized/social_group_1.jpg';
       document.getElementById('articleHeroImg').src = heroSrc;
