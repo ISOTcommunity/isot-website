@@ -785,13 +785,32 @@
       .hero-ctas .btn { width: 100%; }
     }
   
-    /* 3-PART HOME LAYOUT WRAPPER */
+    /* 3-PART HOME LAYOUT WRAPPER & INDEPENDENT COLUMN SCROLLING */
     .home-layout-wrapper {
       width: 100%; max-width: 1360px; margin: 0 auto; padding: 40px 24px 80px;
       display: grid; grid-template-columns: 280px 1fr 310px; gap: 32px; align-items: start;
     }
     .sidebar-sticky {
-      position: sticky; top: 100px; display: flex; flex-direction: column; gap: 24px;
+      position: sticky; top: 96px;
+      max-height: calc(100vh - 116px);
+      overflow-y: auto;
+      display: flex; flex-direction: column; gap: 24px;
+      padding-right: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(238, 9, 121, 0.4) transparent;
+    }
+    .sidebar-sticky::-webkit-scrollbar {
+      width: 4px;
+    }
+    .sidebar-sticky::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .sidebar-sticky::-webkit-scrollbar-thumb {
+      background: rgba(238, 9, 121, 0.35);
+      border-radius: 9999px;
+    }
+    .sidebar-sticky::-webkit-scrollbar-thumb:hover {
+      background: var(--pink);
     }
     .home-main-container { width: 100%; min-width: 0; }
 
