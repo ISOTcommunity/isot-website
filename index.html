@@ -774,6 +774,69 @@
       .hero-ctas { flex-direction: column; width: 100%; }
       .hero-ctas .btn { width: 100%; }
     }
+  
+    /* 3-PART HOME LAYOUT WRAPPER */
+    .home-layout-wrapper {
+      width: 100%; max-width: 1360px; margin: 0 auto; padding: 40px 24px 80px;
+      display: grid; grid-template-columns: 280px 1fr 310px; gap: 32px; align-items: start;
+    }
+    .sidebar-sticky {
+      position: sticky; top: 100px; display: flex; flex-direction: column; gap: 24px;
+    }
+    .home-main-container { width: 100%; min-width: 0; }
+
+    .app-promo-card, .community-card {
+      background: linear-gradient(180deg, #1E293B 0%, #151F30 100%);
+      border: 1px solid var(--border-light); border-radius: var(--radius-lg);
+      padding: 24px; text-align: left; box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+    }
+    .app-badge {
+      display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px; color: var(--pink);
+      background: rgba(238, 9, 121, 0.15); padding: 4px 12px; border-radius: var(--radius-full); margin-bottom: 12px;
+    }
+    .app-promo-title { font-size: 1.3rem; font-weight: 800; color: #FFF; line-height: 1.2; margin-bottom: 10px; }
+    .app-promo-desc { font-size: 0.88rem; color: var(--text-dim); margin-bottom: 18px; line-height: 1.5; }
+    .app-hook-feature { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; font-size: 0.85rem; color: var(--text-muted); }
+    .app-hook-icon {
+      width: 32px; height: 32px; border-radius: 10px; background: rgba(238, 9, 121, 0.15);
+      color: var(--pink); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.9rem;
+    }
+    .btn-app-install {
+      display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+      padding: 12px; border-radius: var(--radius-full); font-weight: 700; font-size: 0.9rem;
+      background: linear-gradient(135deg, #EE0979, #FF6A00); color: #FFF; text-transform: uppercase; letter-spacing: 0.5px;
+      box-shadow: 0 8px 20px var(--pink-glow); transition: var(--transition); margin-top: 10px;
+    }
+    .btn-app-install:hover { transform: translateY(-2px); text-decoration: none; color: #FFF; }
+
+    .captcha-box {
+      background: rgba(15, 23, 42, 0.8); border: 1px dashed var(--pink);
+      border-radius: var(--radius-md); padding: 18px; text-align: center; margin-top: 14px;
+    }
+    .captcha-title { font-size: 0.9rem; font-weight: 700; color: #FFF; margin-bottom: 8px; }
+    .captcha-desc { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 14px; line-height: 1.4; }
+    .captcha-question { font-size: 1.1rem; font-weight: 800; color: var(--pink); margin-bottom: 12px; }
+    .captcha-input-group { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; }
+    .captcha-input {
+      width: 70px; padding: 8px; border-radius: 8px; border: 1px solid var(--border-light);
+      background: #0F172A; color: #FFF; font-size: 1rem; font-weight: 700; text-align: center; outline: none;
+    }
+    .captcha-btn {
+      padding: 8px 16px; border-radius: 8px; border: none; background: var(--pink); color: #FFF;
+      font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: var(--transition);
+    }
+    .community-links-unlocked { display: none; flex-direction: column; gap: 12px; margin-top: 16px; }
+    .community-links-unlocked.active { display: flex; }
+
+    @media (max-width: 1180px) {
+      .home-layout-wrapper { grid-template-columns: 240px 1fr 270px; gap: 20px; }
+    }
+    @media (max-width: 1024px) {
+      .home-layout-wrapper { grid-template-columns: 1fr; padding-top: 20px; }
+      .sidebar-sticky { position: static; margin-bottom: 30px; }
+    }
+
   </style>
 </head>
 <body>
@@ -885,7 +948,44 @@
     </div>
   </div>
 
-  <!-- Watermark & Stats Section -->
+  <!-- 3-PART HOME LAYOUT WRAPPER -->
+  <div class="home-layout-wrapper">
+
+    <!-- LEFT SIDEBAR: APP SHOWCASE & HOOKS -->
+    <aside class="sidebar-sticky">
+      <div class="app-promo-card">
+        <span class="app-badge"><i class="fa-solid fa-mobile-screen"></i> ISOT Pocket App</span>
+        <h3 class="app-promo-title">Your ISOT in Your Pocket</h3>
+        <p class="app-promo-desc">Free student web app. Install in 10 seconds without App Store.</p>
+
+        <div class="app-hook-feature">
+          <div class="app-hook-icon"><i class="fa-solid fa-qrcode"></i></div>
+          <div><strong>Digital Member Card</strong><br>Show for bar discounts at Rough & Capodoglio</div>
+        </div>
+
+        <div class="app-hook-feature">
+          <div class="app-hook-icon"><i class="fa-solid fa-microphone-lines"></i></div>
+          <div><strong>Live Karaoke Queue</strong><br>Add songs & see live queue on Monday nights</div>
+        </div>
+
+        <div class="app-hook-feature">
+          <div class="app-hook-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+          <div><strong>Turin Venue Map</strong><br>Partner spots & student discounts across Turin</div>
+        </div>
+
+        <div class="app-hook-feature">
+          <div class="app-hook-icon"><i class="fa-solid fa-check-to-slot"></i></div>
+          <div><strong>Assembly Voting</strong><br>Verified APS member governance & motions</div>
+        </div>
+
+        <a href="join.html" class="btn-app-install">Get Free App Access <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </aside>
+
+    <!-- CENTER COLUMN: MAIN CONTENT -->
+    <main class="home-main-container">
+      <!-- Watermark & Stats Section -->
+
   <section class="section-padding watermark-section reveal">
     <div class="watermark-bg">ISOT COMMUNITY</div>
     <div class="container">
@@ -1068,6 +1168,91 @@
     </div>
   </section>
 
+  
+    </main>
+
+    <!-- RIGHT SIDEBAR: GROUPS -> INSTAGRAM -> MANIFESTO -->
+    <aside class="sidebar-sticky">
+      
+      <!-- 1. TURIN STUDENT CHAT GROUPS (ANTI-BOT PROTECTED) -->
+      <div class="community-card">
+        <span class="app-badge" style="color: var(--green); background: rgba(16,185,129,0.15);"><i class="fa-solid fa-shield-halved"></i> Anti-Spam Check</span>
+        <h3 class="app-promo-title">Turin Student Groups</h3>
+        <p class="app-promo-desc">Join active WhatsApp & Telegram student chat groups for Turin.</p>
+
+        <!-- CAPTCHA PUZZLE CONTAINER -->
+        <div class="captcha-box" id="captchaBox">
+          <div class="captcha-title"><i class="fa-solid fa-robot"></i> Are you human?</div>
+          <div class="captcha-desc">Solve this quick check to unlock group invite links:</div>
+          
+          <div class="captcha-question" id="captchaMathQuestion">3 + 4 = ?</div>
+          
+          <div class="captcha-input-group">
+            <input type="number" id="captchaAnswer" class="captcha-input" placeholder="?" autocomplete="off" />
+            <button type="button" onclick="verifyHumanCaptcha()" class="captcha-btn">Verify</button>
+          </div>
+          <div id="captchaError" style="color: #EF4444; font-size: 0.78rem; display: none;">Incorrect answer, try again!</div>
+        </div>
+
+        <!-- UNLOCKED SOCIAL LINKS -->
+        <div class="community-links-unlocked" id="communityLinksUnlocked">
+          <div style="font-size: 0.85rem; color: var(--green); font-weight: 700; margin-bottom: 6px; text-align: center;">
+            <i class="fa-solid fa-circle-check"></i> Human Verified!
+          </div>
+          <a href="https://t.me/isotcommunity" target="_blank" rel="noopener" class="social-btn social-btn-telegram" style="background:#229ED9; color:#FFF; display:flex; align-items:center; justify-content:space-between; padding:10px 16px; border-radius:9999px; font-weight:700; font-size:0.85rem;">
+            <span><i class="fa-brands fa-telegram"></i> Telegram Group</span>
+            <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;"></i>
+          </a>
+          <a href="https://chat.whatsapp.com/ISOTcommunity" target="_blank" rel="noopener" class="social-btn social-btn-whatsapp" style="background:#25D366; color:#FFF; display:flex; align-items:center; justify-content:space-between; padding:10px 16px; border-radius:9999px; font-weight:700; font-size:0.85rem; margin-top:8px;">
+            <span><i class="fa-brands fa-whatsapp"></i> WhatsApp Group</span>
+            <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;"></i>
+          </a>
+          <a href="social.html" style="font-size: 0.8rem; color: var(--text-dim); text-align: center; margin-top: 6px; display:block;">
+            View all social channels →
+          </a>
+        </div>
+      </div>
+
+      <!-- 2. DIRECT INSTAGRAM EMBEDDED WINDOW -->
+      <div class="community-card" style="background: linear-gradient(135deg, rgba(225,48,108,0.12) 0%, rgba(131,58,180,0.12) 100%); border-color: rgba(225,48,108,0.35); padding: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <span class="app-badge" style="color: #E1306C; background: rgba(225,48,108,0.2); margin-bottom:0;"><i class="fa-brands fa-instagram"></i> Live Feed</span>
+          <a href="https://instagram.com/isot.community" target="_blank" rel="noopener" style="font-size: 0.8rem; font-weight: 700; color: #E1306C;">@isot.community →</a>
+        </div>
+        
+        <!-- MULTI-POST INSTAGRAM FEED SWITCHER -->
+        <div style="display: flex; gap: 6px; margin-bottom: 10px;">
+          <button type="button" onclick="switchIgPost('DKCyJcaCOjn', this)" class="ig-tab-btn active" style="flex:1; padding:5px; border-radius:6px; border:1px solid rgba(225,48,108,0.5); background:rgba(225,48,108,0.2); color:#FFF; font-size:0.75rem; font-weight:700; cursor:pointer;">Post 1</button>
+          <button type="button" onclick="switchIgPost('DKC0VCoiOwE', this)" class="ig-tab-btn" style="flex:1; padding:5px; border-radius:6px; border:1px solid rgba(255,255,255,0.1); background:transparent; color:var(--text-dim); font-size:0.75rem; font-weight:700; cursor:pointer;">Post 2</button>
+        </div>
+
+        <!-- EMBEDDED SCROLLABLE INSTAGRAM POST -->
+        <div style="width: 100%; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 8px 20px rgba(0,0,0,0.4); margin-bottom: 12px;">
+          <iframe id="igSidebarFrame" src="https://www.instagram.com/p/DKCyJcaCOjn/embed/" width="100%" height="420" frameborder="0" scrolling="no" allowtransparency="true" style="border:none; overflow:hidden; width:100%; display:block; background: #FFF;"></iframe>
+        </div>
+
+        <a href="https://instagram.com/isot.community" target="_blank" rel="noopener" class="social-btn" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); justify-content: center; gap: 8px; width: 100%; padding:10px 16px; border-radius:9999px; font-weight:700; font-size:0.85rem; color:#FFF; display:flex; align-items:center;">
+          <span>Follow @isot.community</span>
+          <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;"></i>
+        </a>
+      </div>
+
+      <!-- 3. THE ISOT MANIFESTO CARD -->
+      <div class="community-card" style="background: linear-gradient(135deg, rgba(36,54,115,0.4) 0%, rgba(15,23,42,0.9) 100%); border-color: rgba(238,9,121,0.35); padding: 22px;">
+        <span class="app-badge" style="color: var(--pink); background: rgba(238,9,121,0.15); margin-bottom: 12px;"><i class="fa-solid fa-quote-left"></i> ISOT Manifesto</span>
+        <h3 class="app-promo-title" style="font-size: 1.2rem; color: #FFF; margin-bottom: 10px;">Not Just a Group. A Movement.</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; font-style: italic; margin-bottom: 12px;">
+          "We turn the challenge of moving abroad into a journey of connection. ISOT is the bridge between arriving in Turin and truly belonging here. You shouldn't have to figure it out alone."
+        </p>
+        <div style="font-size: 0.8rem; font-weight: 700; color: var(--pink);">
+          ⚡ Live globally, connect locally.
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-watermark">ISOT TURIN</div>
@@ -1171,6 +1356,47 @@
         img.style.opacity = 1;
       }, 200);
     }
+  
+    function switchIgPost(postId, btn) {
+      document.getElementById('igSidebarFrame').src = `https://www.instagram.com/p/${postId}/embed/`;
+      document.querySelectorAll('.ig-tab-btn').forEach(b => {
+        b.style.background = 'transparent';
+        b.style.borderColor = 'rgba(255,255,255,0.1)';
+        b.style.color = 'var(--text-dim)';
+      });
+      btn.style.background = 'rgba(225,48,108,0.2)';
+      btn.style.borderColor = 'rgba(225,48,108,0.5)';
+      btn.style.color = '#FFF';
+    }
+
+    let num1 = Math.floor(Math.random() * 6) + 2;
+    let num2 = Math.floor(Math.random() * 5) + 1;
+    let expectedAnswer = num1 + num2;
+    if(document.getElementById('captchaMathQuestion')) {
+      document.getElementById('captchaMathQuestion').innerText = `${num1} + ${num2} = ?`;
+    }
+
+    function checkExistingVerification() {
+      if (sessionStorage.getItem('isot_human_verified') === 'true') {
+        if(document.getElementById('captchaBox')) document.getElementById('captchaBox').style.display = 'none';
+        if(document.getElementById('communityLinksUnlocked')) document.getElementById('communityLinksUnlocked').classList.add('active');
+      }
+    }
+
+    function verifyHumanCaptcha() {
+      const val = parseInt(document.getElementById('captchaAnswer').value, 10);
+      if (val === expectedAnswer) {
+        sessionStorage.setItem('isot_human_verified', 'true');
+        if(document.getElementById('captchaBox')) document.getElementById('captchaBox').style.display = 'none';
+        if(document.getElementById('captchaError')) document.getElementById('captchaError').style.display = 'none';
+        if(document.getElementById('communityLinksUnlocked')) document.getElementById('communityLinksUnlocked').classList.add('active');
+      } else {
+        if(document.getElementById('captchaError')) document.getElementById('captchaError').style.display = 'block';
+      }
+    }
+
+    checkExistingVerification();
+
   </script>
 </body>
 </html>
