@@ -66,6 +66,59 @@
     .nav-box { display: flex; align-items: center; justify-content: space-between; height: 80px; width: 100%; max-width: 1320px; margin: 0 auto; padding: 0 24px; }
     .nav-logo img { height: 48px; width: auto; }
 
+    .nav-links { display: flex; align-items: center; gap: 24px; list-style: none; margin: 0; padding: 0; }
+    .nav-links a { font-size: 0.92rem; font-weight: 600; color: var(--text-muted); text-decoration: none; position: relative; }
+    .nav-links a:hover, .nav-links a.active { color: #FFF; text-decoration: none; }
+    .nav-links a::after { content: ''; position: absolute; bottom: -6px; left: 0; width: 0%; height: 2px; background: var(--pink); transition: var(--transition); }
+    .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+
+    .mobile-toggle {
+      display: none;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      color: #FFFFFF;
+      width: 44px;
+      height: 44px;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .mobile-toggle:hover { background: rgba(238, 9, 121, 0.2); border-color: var(--pink); color: var(--pink); }
+
+    @media (max-width: 991px) {
+      .nav-links, .nav-btn-desktop { display: none !important; }
+      .mobile-toggle { display: flex !important; }
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 80px;
+      left: 0;
+      width: 100%;
+      background: rgba(11, 17, 32, 0.96);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(238, 9, 121, 0.35);
+      padding: 24px 28px;
+      flex-direction: column;
+      gap: 14px;
+      z-index: 9999;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      animation: slideDown 0.3s ease;
+    }
+    .mobile-menu.active { display: flex !important; }
+    .mobile-menu a {
+      font-size: 1.05rem; font-weight: 600; color: var(--text-muted); text-decoration: none;
+      display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: all 0.2s ease;
+    }
+    .mobile-menu a:hover { color: #FFF; padding-left: 6px; text-decoration: none; }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
     /* 3-PART GRID LAYOUT */
     .blog-layout-wrapper {
       width: 100%; max-width: 1320px; margin: 0 auto; padding: 120px 24px 60px;
@@ -239,13 +292,44 @@
 </head>
 <body>
 
-  <!-- Sticky Header -->
+  <!-- Sticky Header with Full Navigation & Mobile Burger Menu -->
   <header class="header">
     <div class="nav-box">
       <a href="index.html" class="nav-logo">
-        <img src="assets/LOGOS/scritta isot.png" alt="ISOT Logo" />
+        <img src="assets/LOGOS/scritta isot.png" alt="ISOT Community Logo" />
       </a>
-      <a href="blog.html" class="back-btn" style="margin-bottom:0;">← Back to Guides</a>
+
+      <ul class="nav-links">
+        <li><a href="who-we-are.html">Who We Are</a></li>
+        <li><a href="what-we-do.html">What We Do</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="blog.html" class="active">Turin Guide &amp; Blog</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li><a href="donate.html">Donate</a></li>
+        <li><a href="/app/login.html"><i class="fa-solid fa-user"></i> My Profile</a></li>
+      </ul>
+
+      <div class="nav-btn-desktop" style="display:flex; align-items:center; gap:12px;">
+        <a href="blog.html" class="btn btn-outline" style="padding:8px 16px; font-size:0.82rem;">← All Guides</a>
+        <a href="join.html" class="btn btn-pink" style="padding: 10px 22px; font-size: 0.85rem;">Join Free <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation" onclick="toggleMobileMenu()">
+        <i class="fa-solid fa-bars" id="mobileToggleIcon"></i>
+      </button>
+    </div>
+
+    <!-- Mobile Dropdown Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="who-we-are.html"><i class="fa-solid fa-users" style="color:var(--pink); margin-right:8px;"></i> Who We Are</a>
+      <a href="what-we-do.html"><i class="fa-solid fa-rocket" style="color:var(--pink); margin-right:8px;"></i> What We Do</a>
+      <a href="events.html"><i class="fa-solid fa-calendar-days" style="color:var(--pink); margin-right:8px;"></i> Events</a>
+      <a href="blog.html" class="active"><i class="fa-solid fa-book-open" style="color:var(--pink); margin-right:8px;"></i> Turin Guide &amp; Blog</a>
+      <a href="partners.html"><i class="fa-solid fa-handshake" style="color:var(--pink); margin-right:8px;"></i> Partners</a>
+      <a href="donate.html"><i class="fa-solid fa-heart" style="color:var(--pink); margin-right:8px;"></i> Donate</a>
+      <a href="contact.html"><i class="fa-solid fa-headset" style="color:var(--pink); margin-right:8px;"></i> Contact &amp; FAQ</a>
+      <a href="/app/login.html"><i class="fa-solid fa-user" style="color:var(--pink); margin-right:8px;"></i> My Profile / Pass</a>
+      <a href="join.html" class="btn btn-pink" style="margin-top:8px; justify-content:center;">Join Free →</a>
     </div>
   </header>
 
@@ -414,7 +498,7 @@
       'saahorizon2025': 'assets/optimized/saa_horizon_pitch_2025.jpg',
       'sas-startup-community-saa-turin': 'assets/optimized/saa_horizon_pitch_2025.jpg',
       'edisu-student-residences-and-dorms-turin-guide': 'assets/optimized/edisu_residence_hall_turin.webp',
-      'edisu-scholarship-and-housing-turin-guide': 'assets/optimized/social_group_3.jpg',
+      'edisu-scholarship-and-housing-turin-guide': 'assets/optimized/edisu_residence_hall_turin.webp',
       'erasmus-life-in-turin-guide': 'assets/optimized/social_group_2.jpg',
       'codice-fiscale-turin-guide': 'assets/optimized/social_group_1.jpg',
       'permesso-di-soggiorno-turin-guide': 'assets/optimized/social_group_3.jpg',
