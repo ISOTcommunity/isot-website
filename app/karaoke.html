@@ -198,6 +198,7 @@
   <script>
     let me = null;
     let myActiveSlot = null;
+    let night = null;
     let pollInterval = null;
 
     // Was a hardcoded queue of three invented singers, used as a fallback whenever the
@@ -251,11 +252,16 @@
     async function loadQueue() {
       if (!tonight?.open) return;
 
-      const { data, error } = await db.rpc('karaoke_queue', { p_instance: tonight.instance_id });
+      const [{ data, error }, ns] = await Promise.all([
+        db.rpc('karaoke_queue', { p_instance: tonight.instance_id }),
+        db.rpc('karaoke_night_state', { p_instance: tonight.instance_id }),
+      ]);
+
       if (error) {
         console.error('Could not load the queue:', error.message);
         return;                       // keep what is on screen rather than inventing a queue
       }
+      if (!ns.error) night = ns.data;
 
       renderQueueUI((data || []).map(r => ({
         ...r,
@@ -264,6 +270,24 @@
         profile_id: r.singer_profile_id,
         position: r.queue_position,
       })));
+    }
+
+    /** Wording for an estimated time. Never a countdown — that implies a precision we
+     *  do not have. The estimate is the night's own measured pace once a few songs are
+     *  in, and a seeded five minutes before that. */
+    function etaSuffix(slot) {
+      if (!night || !night.started) return ' · the KJ has not opened the night yet';
+      if (night.paused)             return ' · paused right now';
+      if (!slot.eta_at)             return '';
+
+      const d = new Date(slot.eta_at);
+      const mins = Math.max(0, Math.round((d - Date.now()) / 60000));
+      const clock = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const hedge = night.measured ? 'roughly' : 'very roughly';
+
+      if (mins <= 1)  return ` · you're next, ${hedge} now`;
+      if (mins < 60)  return ` · ${hedge} ${mins} min away, around ${clock}`;
+      return ` · ${hedge} around ${clock}`;
     }
 
     function renderQueueUI(slots) {
@@ -285,7 +309,13 @@
         const index = pendingSlots.findIndex(s => s.id === myActiveSlot.id);
         const position = index >= 0 ? index + 1 : 1;
         posText.textContent = position === 1 ? "YOU ARE UP NEXT! 🌟" : `${position} songs away`;
-        mySongSub.textContent = `Your song: "${escapeHtml(myActiveSlot.song_title)}" by ${escapeHtml(myActiveSlot.artist_name || 'Artist')}`;
+
+        // "7th" is not information at a bar — it could be twenty minutes or ninety, and
+        // the singer cannot tell whether they have time to step outside. Give them a
+        // time whenever there is an honest one to give, and say so when there is not.
+        mySongSub.textContent =
+          `Your song: "${myActiveSlot.song_title}" by ${myActiveSlot.artist_name || 'Artist'}`
+          + etaSuffix(myActiveSlot);
       } else if (playingSlot) {
         heroBadge.className = 'position-hero-badge';
         posText.textContent = `Now Playing: ${escapeHtml(playingSlot.song_title)}`;
@@ -327,6 +357,14 @@
           badgeHtml = `<span class="dim" style="font-weight:700;">#${idx}</span>`;
         }
 
+        // A clock time next to each row, so anyone can see how the line is moving
+        // without doing the arithmetic themselves.
+        let etaHtml = '';
+        if (!isPlaying && night && night.started && !night.paused && s.eta_at) {
+          const t = new Date(s.eta_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          etaHtml = `<div class="dim" style="font-size:0.72rem;text-align:right;margin-top:2px">~${escapeHtml(t)}</div>`;
+        }
+
         // member_code seeds the geometric avatar. It was being fed a UUID, so every
         // singer got a different avatar from the one on their profile.
         const performerProfile = { full_name: s.singer_name || 'Member', member_code: s.member_code, avatar_url: s.avatar_url };
@@ -342,7 +380,7 @@
                 </div>
               </div>
             </div>
-            ${badgeHtml}
+            <div style="text-align:right">${badgeHtml}${etaHtml}</div>
           </div>
         `;
       }).join('');

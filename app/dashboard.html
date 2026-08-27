@@ -101,14 +101,98 @@
       </table>
     </div>
 
+    <!-- Volunteers / KJ -->
+    <div class="card card-glass" style="margin-top:16px">
+      <h2 style="font-size:1.2rem;margin-bottom:6px"><i class="fa-solid fa-microphone-lines text-pink" style="margin-right:6px"></i> Volunteers &amp; KJs</h2>
+      <p class="muted" style="font-size:0.88rem;margin-bottom:14px">
+        A volunteer can open the karaoke night, advance the queue and scan check-ins.
+        Until now this could only be set by hand in SQL, so the screen could not be handed
+        to whoever was running the night.
+      </p>
+
+      <input type="text" id="volSearch" placeholder="Search members by name…" oninput="renderVolunteers()"
+             style="width:100%;margin-bottom:12px" />
+      <div id="volList"><div class="spinner" style="margin:20px auto"></div></div>
+    </div>
+
   </main>
 
   <script src="vendor/supabase.js"></script>
   <script src="js/isot.js"></script>
   <script>
+    let staffList = [];
+
     document.addEventListener('DOMContentLoaded', async () => {
       await requireAuth({ board: true });
+      await loadVolunteers();
     });
+
+    // Board members can read profiles directly (profiles_read allows staff), which is
+    // what makes the staff_role column visible here at all.
+    async function loadVolunteers() {
+      const { data, error } = await db
+        .from('profiles')
+        .select('id, full_name, avatar_url, member_code, staff_role, board_position')
+        .order('full_name');
+
+      if (error) {
+        document.getElementById('volList').innerHTML =
+          '<p class="dim" style="font-size:0.85rem">Could not load members: ' + escapeHtml(error.message) + '</p>';
+        return;
+      }
+      staffList = data || [];
+      renderVolunteers();
+    }
+
+    function renderVolunteers() {
+      const q = (document.getElementById('volSearch').value || '').toLowerCase().trim();
+      const el = document.getElementById('volList');
+
+      // Staff first — the people you are most likely to be revoking or checking.
+      const rank = p => p.staff_role === 'board' ? 0 : p.staff_role === 'volunteer' ? 1 : 2;
+      const list = staffList
+        .filter(p => !q || (p.full_name || '').toLowerCase().includes(q))
+        .sort((a, b) => rank(a) - rank(b) || (a.full_name || '').localeCompare(b.full_name || ''))
+        .slice(0, q ? 50 : 12);
+
+      if (!list.length) {
+        el.innerHTML = '<p class="dim" style="font-size:0.85rem">Nobody matches that search.</p>';
+        return;
+      }
+
+      el.innerHTML = list.map(p => {
+        const isBoard = p.staff_role === 'board';
+        const isVol   = p.staff_role === 'volunteer';
+        return `
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light)">
+            ${renderUserAvatarHtml(p, 36)}
+            <div style="flex:1;min-width:0">
+              <div style="color:#FFF;font-weight:600;font-size:0.92rem">${escapeHtml(p.full_name || 'Member')}</div>
+              <div class="dim" style="font-size:0.76rem">${escapeHtml(p.member_code || '')}${isBoard ? ' · ' + escapeHtml(p.board_position || 'Board') : isVol ? ' · Volunteer' : ''}</div>
+            </div>
+            ${isBoard
+              ? '<span class="badge badge-socio">Board</span>'
+              : `<button type="button" id="vol_${p.id}" class="btn ${isVol ? 'btn-outline' : 'btn-pink'}"
+                         style="width:auto;padding:6px 14px;font-size:0.78rem"
+                         onclick="toggleVolunteer('${p.id}', ${isVol ? 'false' : 'true'})">
+                   ${isVol ? 'Remove' : 'Make KJ'}
+                 </button>`}
+          </div>`;
+      }).join('');
+    }
+
+    async function toggleVolunteer(profileId, makeVolunteer) {
+      const btn = document.getElementById('vol_' + profileId);
+      if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; }
+
+      // set_volunteer() is board-gated and whitelisted to volunteer/none, so 'board'
+      // can never be granted from a phone.
+      const { error } = await db.rpc('set_volunteer',
+        { p_profile: profileId, p_is_volunteer: makeVolunteer });
+
+      if (error) { alert('Could not change that: ' + error.message); }
+      await loadVolunteers();
+    }
   </script>
 </body>
 </html>

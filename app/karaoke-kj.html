@@ -83,6 +83,29 @@
 
     <div id="alertBox"></div>
 
+    <!-- The night has to be opened before any estimate is honest: tonight_karaoke()
+         only knows the SCHEDULED time, and a night that starts at 22:15 makes every
+         estimate built on 21:00 wrong. -->
+    <div class="card card-glass" id="nightBar" style="padding:14px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div>
+          <div class="eyebrow" id="nightStatus">Not started</div>
+          <div class="dim" style="font-size:0.8rem" id="nightPace">Pace: 5 min a song (estimated)</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" id="btnOpenNight" class="btn btn-pink" style="width:auto;padding:8px 16px;font-size:0.85rem" onclick="openNight()">
+            <i class="fa-solid fa-play"></i> Start the night
+          </button>
+          <button type="button" id="btnPauseNight" class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:0.85rem" onclick="togglePause()" hidden>
+            <i class="fa-solid fa-pause"></i> Pause
+          </button>
+          <button type="button" id="btnCloseNight" class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:0.85rem" onclick="closeNight()" hidden>
+            <i class="fa-solid fa-flag-checkered"></i> End
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Active Stage Hero Controller -->
     <div class="kj-hero-card">
       <div class="eyebrow"><i class="fa-solid fa-circle-play text-pink"></i> NOW ON STAGE</div>
@@ -130,6 +153,7 @@
     // and "Mark done" changed nothing anyone else could see.
     let kjQueue = [];
     let tonight = null;
+    let night = null;      // karaoke_night_state: started / paused / pace / counts
 
     async function initKjController() {
       await requireAuth({ staff: true });
@@ -152,12 +176,17 @@
     async function fetchQueue() {
       if (!tonight?.open) return;
 
-      const { data, error } = await db.rpc('karaoke_queue', { p_instance: tonight.instance_id });
+      const [{ data, error }, ns] = await Promise.all([
+        db.rpc('karaoke_queue', { p_instance: tonight.instance_id }),
+        db.rpc('karaoke_night_state', { p_instance: tonight.instance_id }),
+      ]);
+
       if (error) {
         // Was an empty catch, so a broken queue looked identical to an empty one.
         setAlert(document.getElementById('alertBox'), 'Could not load the queue: ' + error.message, 'error');
         return;
       }
+      if (!ns.error) night = ns.data;
 
       // The page speaks 'playing'/'pending'; the schema says 'performing'/'queued'.
       kjQueue = (data || []).map(r => ({
@@ -170,7 +199,73 @@
       renderKjUI();
     }
 
+    function fmtEta(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      const mins = Math.max(0, Math.round((d - Date.now()) / 60000));
+      const clock = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return mins <= 1 ? `~${clock} · next` : `~${clock} · in ${mins} min`;
+    }
+
+    function renderNightBar() {
+      const status = document.getElementById('nightStatus');
+      const pace   = document.getElementById('nightPace');
+      const open   = document.getElementById('btnOpenNight');
+      const pause  = document.getElementById('btnPauseNight');
+      const close  = document.getElementById('btnCloseNight');
+      if (!night) return;
+
+      const mins = Math.round((night.slot_seconds || 300) / 60);
+      // Say whether the pace is measured or still the seeded guess. A number presented
+      // without that distinction reads as fact when it is an assumption.
+      pace.textContent = night.measured
+        ? `Pace: about ${mins} min a song, measured tonight · ${night.sung} sung, ${night.waiting} waiting`
+        : `Pace: about ${mins} min a song (estimate until a few songs are in) · ${night.waiting} waiting`;
+
+      if (night.ended) {
+        status.textContent = 'Night closed';
+        open.hidden = false; open.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Reopen';
+        pause.hidden = true; close.hidden = true;
+        return;
+      }
+      if (!night.started) {
+        status.textContent = 'Not started';
+        open.hidden = false; pause.hidden = true; close.hidden = true;
+        return;
+      }
+
+      const since = new Date(night.started_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      status.textContent = night.paused ? `Paused · started ${since}` : `Running since ${since}`;
+      open.hidden = true;
+      pause.hidden = false;
+      pause.innerHTML = night.paused
+        ? '<i class="fa-solid fa-play"></i> Resume'
+        : '<i class="fa-solid fa-pause"></i> Pause';
+      close.hidden = false;
+    }
+
+    async function openNight() {
+      const { error } = await db.rpc('karaoke_open', { p_instance: tonight.instance_id });
+      if (error) { setAlert(document.getElementById('alertBox'), error.message, 'error'); return; }
+      await fetchQueue();
+    }
+
+    async function togglePause() {
+      const { error } = await db.rpc('karaoke_pause',
+        { p_instance: tonight.instance_id, p_paused: !night.paused });
+      if (error) { setAlert(document.getElementById('alertBox'), error.message, 'error'); return; }
+      await fetchQueue();
+    }
+
+    async function closeNight() {
+      if (!confirm('End the night? Anyone still queued will be cleared.')) return;
+      const { error } = await db.rpc('karaoke_close', { p_instance: tonight.instance_id });
+      if (error) { setAlert(document.getElementById('alertBox'), error.message, 'error'); return; }
+      await fetchQueue();
+    }
+
     function renderKjUI() {
+      renderNightBar();
       const playingSlot = kjQueue.find(s => s.status === 'playing');
       const pendingSlots = kjQueue.filter(s => s.status === 'pending');
 
@@ -197,7 +292,7 @@
       container.innerHTML = pendingSlots.map((item, idx) => `
         <div class="kj-song-card">
           <div style="flex:1;min-width:0">
-            <div style="font-size:0.75rem;color:var(--pink);font-weight:700">#${idx + 1} UP NEXT</div>
+            <div style="font-size:0.75rem;color:var(--pink);font-weight:700">#${idx + 1} UP NEXT${item.eta_at ? ` · ${escapeHtml(fmtEta(item.eta_at))}` : ''}</div>
             <div style="font-weight:700;color:#FFF;font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(item.song_title)}</div>
             <div class="dim" style="font-size:0.85rem">Artist: ${escapeHtml(item.artist_name || 'Original Artist')} • Performed by ${escapeHtml(item.singer_name || 'Member')}</div>
           </div>
