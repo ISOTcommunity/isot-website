@@ -2,6 +2,11 @@
   "cleanUrls": true,
   "redirects": [
     {
+      "source": "/life-as-an-international-student-in-turin",
+      "destination": "/blog-post?slug=a-complete-guide-to-living-in-turin-for-international-students",
+      "permanent": true
+    },
+    {
       "source": "/edisu-student-residences-and-dorms-turin-guide",
       "destination": "/blog-post?slug=edisu-student-residences-and-dorms-turin-guide",
       "permanent": true
