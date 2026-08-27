@@ -2,6 +2,11 @@
   "cleanUrls": true,
   "redirects": [
     {
+      "source": "/edisu-student-residences-and-dorms-turin-guide",
+      "destination": "/blog-post?slug=edisu-student-residences-and-dorms-turin-guide",
+      "permanent": true
+    },
+    {
       "source": "/edisu-scholarship-and-housing-turin-guide",
       "destination": "/blog-post?slug=edisu-scholarship-and-housing-turin-guide",
       "permanent": true
