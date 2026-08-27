@@ -903,12 +903,13 @@
     <div class="container">
       <div class="hero-grid">
         <div>
-          <div class="pill-tag">
-            <i class="fa-solid fa-location-dot"></i> Turin, Italy • Student Community
+          <div class="hero-badge-tag">
+            <i class="fa-solid fa-earth-americas text-pink"></i> International Student Association • Turin, Italy
           </div>
-          <h1 class="hero-title">
+          <h1 class="hero-title" style="position:relative;">
             Unlock Your <br />
             <span class="text-gradient">Global Mind</span>
+            <img src="assets/characters/char_leaper.png" alt="ISOT Leaper Character" style="position: absolute; right: -40px; top: -30px; height: 70px; width: auto; pointer-events: none; filter: drop-shadow(0 8px 16px rgba(238,9,121,0.4)); animation: float 3s ease-in-out infinite;" />
           </h1>
           <p class="hero-subtitle">
             We turn the challenge of moving abroad into a journey of connection. Join the <strong>ISOT family</strong> and find your people in the heart of Turin.
@@ -921,7 +922,7 @@
           </div>
         </div>
 
-        <div class="hero-card-wrapper">
+        <div class="hero-card-wrapper" style="position:relative;">
           <div class="hero-card">
             <img id="heroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT International Students Crowd in Turin" />
             
@@ -937,29 +938,29 @@
               </button>
             </div>
           </div>
+          <!-- Character Sitting Duo Accent -->
+          <img src="assets/characters/char_duo_sitting.png" alt="ISOT Sitting Duo Characters" style="position: absolute; right: -25px; bottom: -35px; height: 110px; width: auto; z-index: 10; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));" />
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Marquee Ticker Strip -->
+  <!-- Marquee Ticker Strip with ISOT Character Sprites -->
   <div class="marquee-strip">
     <div class="marquee-track">
-      <span class="marquee-item">INTERNATIONAL FAMILY •</span>
-      <span class="marquee-item">CONNECT •</span>
-      <span class="marquee-item">GROW •</span>
-      <span class="marquee-item">DISCOVER •</span>
+      <span class="marquee-item">INTERNATIONAL FAMILY <img src="assets/characters/char_dancer_1.png" style="height: 32px; width: auto; display: inline-block; vertical-align: middle; margin: 0 8px;" /></span>
+      <span class="marquee-item">CONNECT <img src="assets/characters/char_runner.png" style="height: 30px; width: auto; display: inline-block; vertical-align: middle; margin: 0 8px;" /></span>
+      <span class="marquee-item">GROW <img src="assets/characters/char_starjumper.png" style="height: 32px; width: auto; display: inline-block; vertical-align: middle; margin: 0 8px;" /></span>
+      <span class="marquee-item">DISCOVER <img src="assets/characters/char_wavy_arms.png" style="height: 34px; width: auto; display: inline-block; vertical-align: middle; margin: 0 8px;" /></span>
       <span class="marquee-item">TURIN •</span>
-      <span class="marquee-item">ITALY •</span>
-      <span class="marquee-item">ISOT COMMUNITY •</span>
+      <span class="marquee-item">ISOT COMMUNITY <img src="assets/characters/char_cat_wizards.png" style="height: 38px; width: auto; display: inline-block; vertical-align: middle; margin: 0 8px;" /></span>
       <span class="marquee-item">YOUR HOME AWAY FROM HOME •</span>
-      <span class="marquee-item">INTERNATIONAL FAMILY •</span>
-      <span class="marquee-item">CONNECT •</span>
-      <span class="marquee-item">GROW •</span>
-      <span class="marquee-item">DISCOVER •</span>
+      <span class="marquee-item">INTERNATIONAL FAMILY <img src="assets/characters/char_dancer_1.png" style="height: 32px; width: auto; display: inline-block; vertical-align: middle; margin: 0 8px;" /></span>
+      <span class="marquee-item">CONNECT <img src="assets/characters/char_runner.png" style="height: 30px; width: auto; display: inline-block; vertical-align: middle; margin: 0 8px;" /></span>
+      <span class="marquee-item">GROW <img src="assets/characters/char_starjumper.png" style="height: 32px; width: auto; display: inline-block; vertical-align: middle; margin: 0 8px;" /></span>
+      <span class="marquee-item">DISCOVER <img src="assets/characters/char_wavy_arms.png" style="height: 34px; width: auto; display: inline-block; vertical-align: middle; margin: 0 8px;" /></span>
       <span class="marquee-item">TURIN •</span>
-      <span class="marquee-item">ITALY •</span>
-      <span class="marquee-item">ISOT COMMUNITY •</span>
+      <span class="marquee-item">ISOT COMMUNITY <img src="assets/characters/char_cat_wizards.png" style="height: 38px; width: auto; display: inline-block; vertical-align: middle; margin: 0 8px;" /></span>
       <span class="marquee-item">YOUR HOME AWAY FROM HOME •</span>
     </div>
   </div>
@@ -1273,14 +1274,15 @@
       </div>
 
       <!-- 3. THE ISOT MANIFESTO CARD -->
-      <div class="community-card" style="background: linear-gradient(135deg, rgba(36,54,115,0.4) 0%, rgba(15,23,42,0.9) 100%); border-color: rgba(238,9,121,0.35); padding: 22px;">
+      <div class="community-card" style="background: linear-gradient(135deg, rgba(36,54,115,0.4) 0%, rgba(15,23,42,0.9) 100%); border-color: rgba(238,9,121,0.35); padding: 22px; position:relative; overflow:hidden;">
         <span class="app-badge" style="color: var(--pink); background: rgba(238,9,121,0.15); margin-bottom: 12px;"><i class="fa-solid fa-quote-left"></i> ISOT Manifesto</span>
         <h3 class="app-promo-title" style="font-size: 1.2rem; color: #FFF; margin-bottom: 10px;">Not Just a Group. A Movement.</h3>
         <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; font-style: italic; margin-bottom: 12px;">
           "We turn the challenge of moving abroad into a journey of connection. ISOT is the bridge between arriving in Turin and truly belonging here. You shouldn't have to figure it out alone."
         </p>
-        <div style="font-size: 0.8rem; font-weight: 700; color: var(--pink);">
-          ⚡ Live globally, connect locally.
+        <div style="font-size: 0.8rem; font-weight: 700; color: var(--pink); display:flex; align-items:center; justify-content:space-between;">
+          <span>⚡ Live globally, connect locally.</span>
+          <img src="assets/characters/char_cat_wizards.png" alt="ISOT Cat Wizards Character" style="height: 48px; width: auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));" />
         </div>
       </div>
 
