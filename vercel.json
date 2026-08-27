@@ -2,6 +2,11 @@
   "cleanUrls": true,
   "redirects": [
     {
+      "source": "/edisu-scholarship-and-housing-turin-guide",
+      "destination": "/blog-post?slug=edisu-scholarship-and-housing-turin-guide",
+      "permanent": true
+    },
+    {
       "source": "/erasmus-life-in-turin-guide",
       "destination": "/blog-post?slug=erasmus-life-in-turin-guide",
       "permanent": true
