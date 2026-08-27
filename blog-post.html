@@ -338,24 +338,37 @@
     
     <!-- LEFT SIDEBAR: APP SHOWCASE & HOOKS -->
     <aside class="sidebar-sticky">
-      <div class="app-promo-card">
+      <div class="app-promo-card" style="position:relative; overflow:visible;">
+        <!-- Transparent Bottle Rider Character Accent -->
+        <img src="assets/characters/char_bottle_rider.png" alt="ISOT Bottle Rider Character" style="position: absolute; right: -15px; top: -30px; height: 75px; width: auto; pointer-events: none; filter: drop-shadow(0 6px 16px rgba(36,54,115,0.6));" />
+
         <span class="app-badge"><i class="fa-solid fa-mobile-screen"></i> ISOT Pocket App</span>
         <h3 class="app-promo-title">Your ISOT in Your Pocket</h3>
         <p class="app-promo-desc">Free student web app. Install in 10 seconds without App Store.</p>
 
+        <!-- REAL APP MOBILE SCREENSHOT PREVIEW -->
+        <div style="width: 100%; border-radius: 16px; overflow: hidden; border: 1px solid rgba(238,9,121,0.4); margin-bottom: 18px; box-shadow: 0 12px 30px rgba(0,0,0,0.6); background: #0F172A;">
+          <img src="assets/app_showcase/app_home.jpg" alt="ISOT Pocket Web App Real Screenshot" style="width: 100%; display: block; height: auto; object-fit: cover;" />
+        </div>
+
         <div class="app-hook-feature">
           <div class="app-hook-icon"><i class="fa-solid fa-qrcode"></i></div>
-          <div><strong>Digital Member Card</strong><br>Show for bar discounts at Rough & partners</div>
+          <div><strong>Digital Member Card</strong><br>Show for member perks at Rough &amp; Capodoglio</div>
         </div>
 
         <div class="app-hook-feature">
           <div class="app-hook-icon"><i class="fa-solid fa-microphone-lines"></i></div>
-          <div><strong>Live Karaoke Queue</strong><br>Add songs & see live queue on Monday nights</div>
+          <div><strong>Live Karaoke Queue</strong><br>Add songs &amp; see live queue on Monday nights</div>
         </div>
 
         <div class="app-hook-feature">
           <div class="app-hook-icon"><i class="fa-solid fa-map-location-dot"></i></div>
-          <div><strong>Turin Venue Map</strong><br>Partner spots & student discounts across Turin</div>
+          <div><strong>Turin Venue Map</strong><br>Partner spots &amp; student venues across Turin</div>
+        </div>
+
+        <div class="app-hook-feature">
+          <div class="app-hook-icon"><i class="fa-solid fa-check-to-slot"></i></div>
+          <div><strong>Assembly Voting</strong><br>Verified member governance &amp; motions</div>
         </div>
 
         <a href="/app" class="btn-app-install">Get Free App Access <i class="fa-solid fa-arrow-right"></i></a>
