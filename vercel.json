@@ -2,51 +2,6 @@
   "cleanUrls": true,
   "redirects": [
     {
-      "source": "/life-as-an-international-student-in-turin",
-      "destination": "/blog-post?slug=a-complete-guide-to-living-in-turin-for-international-students",
-      "permanent": true
-    },
-    {
-      "source": "/edisu-student-residences-and-dorms-turin-guide",
-      "destination": "/blog-post?slug=edisu-student-residences-and-dorms-turin-guide",
-      "permanent": true
-    },
-    {
-      "source": "/edisu-scholarship-and-housing-turin-guide",
-      "destination": "/blog-post?slug=edisu-scholarship-and-housing-turin-guide",
-      "permanent": true
-    },
-    {
-      "source": "/erasmus-life-in-turin-guide",
-      "destination": "/blog-post?slug=erasmus-life-in-turin-guide",
-      "permanent": true
-    },
-    {
-      "source": "/sas-startup-community-saa-turin",
-      "destination": "/blog-post?slug=sas-startup-community-saa-turin",
-      "permanent": true
-    },
-    {
-      "source": "/turin-student-sports-bouldering-climbing-guide",
-      "destination": "/blog-post?slug=turin-student-sports-bouldering-climbing-guide",
-      "permanent": true
-    },
-    {
-      "source": "/isot-board-game-social-nights-turin",
-      "destination": "/blog-post?slug=isot-board-game-social-nights-turin",
-      "permanent": true
-    },
-    {
-      "source": "/isot-art-and-painting-workshop-turin",
-      "destination": "/blog-post?slug=isot-art-and-painting-workshop-turin",
-      "permanent": true
-    },
-    {
-      "source": "/castello-del-valentino-polito-architecture-guide",
-      "destination": "/blog-post?slug=castello-del-valentino-polito-architecture-guide",
-      "permanent": true
-    },
-    {
       "source": "/app",
       "destination": "/app/home.html",
       "permanent": false
@@ -114,196 +69,40 @@
   ],
   "rewrites": [
     {
-      "source": "/turin-public-transport-gtt-student-pass",
-      "destination": "/blog-post?slug=turin-public-transport-gtt-student-pass"
-    },
-    {
-      "source": "/healthcare-tessera-sanitaria-turin",
-      "destination": "/blog-post?slug=healthcare-tessera-sanitaria-turin"
-    },
-    {
-      "source": "/permesso-di-soggiorno-turin-guide",
-      "destination": "/blog-post?slug=permesso-di-soggiorno-turin-guide"
-    },
-    {
-      "source": "/codice-fiscale-turin-guide",
-      "destination": "/blog-post?slug=codice-fiscale-turin-guide"
-    },
-    {
-      "source": "/universities-and-colleges-in-turin-for-international-students",
-      "destination": "/blog-post?slug=universities-and-colleges-in-turin-for-international-students"
-    },
-    {
-      "source": "/universities-and-colleges-in-turin-for-international-students/",
-      "destination": "/blog-post?slug=universities-and-colleges-in-turin-for-international-students"
-    },
-    {
-      "source": "/a-complete-guide-to-living-in-turin-for-international-students",
+      "source": "/life-as-an-international-student-in-turin",
       "destination": "/blog-post?slug=a-complete-guide-to-living-in-turin-for-international-students"
     },
     {
-      "source": "/a-complete-guide-to-living-in-turin-for-international-students/",
-      "destination": "/blog-post?slug=a-complete-guide-to-living-in-turin-for-international-students"
+      "source": "/edisu-student-residences-and-dorms-turin-guide",
+      "destination": "/blog-post?slug=edisu-student-residences-and-dorms-turin-guide"
     },
     {
-      "source": "/isot-brazilian-karaoke-night-at-rough-bar-san-salvario",
-      "destination": "/blog-post?slug=isot-brazilian-karaoke-night-at-rough-bar-san-salvario"
+      "source": "/edisu-scholarship-and-housing-turin-guide",
+      "destination": "/blog-post?slug=edisu-scholarship-and-housing-turin-guide"
     },
     {
-      "source": "/isot-brazilian-karaoke-night-at-rough-bar-san-salvario/",
-      "destination": "/blog-post?slug=isot-brazilian-karaoke-night-at-rough-bar-san-salvario"
+      "source": "/erasmus-life-in-turin-guide",
+      "destination": "/blog-post?slug=erasmus-life-in-turin-guide"
     },
     {
-      "source": "/happy-nowruz-iranian-new-year-isot-community",
-      "destination": "/blog-post?slug=happy-nowruz-iranian-new-year-isot-community"
+      "source": "/sas-startup-community-saa-turin",
+      "destination": "/blog-post?slug=sas-startup-community-saa-turin"
     },
     {
-      "source": "/happy-nowruz-iranian-new-year-isot-community/",
-      "destination": "/blog-post?slug=happy-nowruz-iranian-new-year-isot-community"
+      "source": "/turin-student-sports-bouldering-climbing-guide",
+      "destination": "/blog-post?slug=turin-student-sports-bouldering-climbing-guide"
     },
     {
-      "source": "/saahorizon2025",
-      "destination": "/blog-post?slug=saahorizon2025"
+      "source": "/isot-board-game-social-nights-turin",
+      "destination": "/blog-post?slug=isot-board-game-social-nights-turin"
     },
     {
-      "source": "/saahorizon2025/",
-      "destination": "/blog-post?slug=saahorizon2025"
+      "source": "/isot-art-and-painting-workshop-turin",
+      "destination": "/blog-post?slug=isot-art-and-painting-workshop-turin"
     },
     {
-      "source": "/studenthousinginturin",
-      "destination": "/blog-post?slug=studenthousinginturin"
-    },
-    {
-      "source": "/studenthousinginturin/",
-      "destination": "/blog-post?slug=studenthousinginturin"
-    },
-    {
-      "source": "/italianacademicexamsystem",
-      "destination": "/blog-post?slug=italianacademicexamsystem"
-    },
-    {
-      "source": "/italianacademicexamsystem/",
-      "destination": "/blog-post?slug=italianacademicexamsystem"
-    },
-    {
-      "source": "/turin-student-canteens",
-      "destination": "/blog-post?slug=turin-student-canteens"
-    },
-    {
-      "source": "/turin-student-canteens/",
-      "destination": "/blog-post?slug=turin-student-canteens"
-    },
-    {
-      "source": "/celebrating-migration-a-journey-of-resilience-and-opportunity",
-      "destination": "/blog-post?slug=celebrating-migration-a-journey-of-resilience-and-opportunity"
-    },
-    {
-      "source": "/celebrating-migration-a-journey-of-resilience-and-opportunity/",
-      "destination": "/blog-post?slug=celebrating-migration-a-journey-of-resilience-and-opportunity"
-    },
-    {
-      "source": "/edisuscholarship2024",
-      "destination": "/blog-post?slug=edisuscholarship2024"
-    },
-    {
-      "source": "/edisuscholarship2024/",
-      "destination": "/blog-post?slug=edisuscholarship2024"
-    },
-    {
-      "source": "/sexual-behaviour-in-italy",
-      "destination": "/blog-post?slug=sexual-behaviour-in-italy"
-    },
-    {
-      "source": "/sexual-behaviour-in-italy/",
-      "destination": "/blog-post?slug=sexual-behaviour-in-italy"
-    },
-    {
-      "source": "/post_medical1",
-      "destination": "/blog-post?slug=post_medical1"
-    },
-    {
-      "source": "/post_medical1/",
-      "destination": "/blog-post?slug=post_medical1"
-    },
-    {
-      "source": "/welcome",
-      "destination": "/blog-post?slug=welcome"
-    },
-    {
-      "source": "/welcome/",
-      "destination": "/blog-post?slug=welcome"
-    },
-    {
-      "source": "/app/",
-      "destination": "/app/home.html"
-    },
-    {
-      "source": "/app/home",
-      "destination": "/app/home.html"
-    },
-    {
-      "source": "/app/events",
-      "destination": "/app/events.html"
-    },
-    {
-      "source": "/app/partner",
-      "destination": "/app/partner.html"
-    },
-    {
-      "source": "/app/network",
-      "destination": "/app/network.html"
-    },
-    {
-      "source": "/app/notifications",
-      "destination": "/app/notifications.html"
-    },
-    {
-      "source": "/app/account",
-      "destination": "/app/account.html"
-    },
-    {
-      "source": "/app/profile",
-      "destination": "/app/profile.html"
-    },
-    {
-      "source": "/app/login",
-      "destination": "/app/login.html"
-    },
-    {
-      "source": "/app/signup",
-      "destination": "/app/signup.html"
-    },
-    {
-      "source": "/app/forgot",
-      "destination": "/app/forgot.html"
-    },
-    {
-      "source": "/app/reset",
-      "destination": "/app/reset.html"
-    },
-    {
-      "source": "/app/complete-profile",
-      "destination": "/app/complete-profile.html"
-    },
-    {
-      "source": "/app/scan",
-      "destination": "/app/scan.html"
-    },
-    {
-      "source": "/app/karaoke",
-      "destination": "/app/karaoke.html"
-    },
-    {
-      "source": "/app/karaoke-kj",
-      "destination": "/app/karaoke-kj.html"
-    },
-    {
-      "source": "/app/dashboard",
-      "destination": "/app/dashboard.html"
-    },
-    {
-      "source": "/app/assembly",
-      "destination": "/app/assembly.html"
+      "source": "/castello-del-valentino-polito-architecture-guide",
+      "destination": "/blog-post?slug=castello-del-valentino-polito-architecture-guide"
     }
   ],
   "headers": [
