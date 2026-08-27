@@ -374,7 +374,7 @@
           
           <h1 style="font-size: 1.8rem; margin-bottom: 6px;" id="heroEventName">ISOT Pre-Party</h1>
           <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 16px;" id="heroEventSub">
-            <i class="fa-solid fa-location-dot text-pink"></i> Rough Bar &amp; Partner Clubs • 20% Member Discount
+            <i class="fa-solid fa-location-dot text-pink"></i> Rough Bar &amp; Partner Clubs • Member Venue Perks
           </p>
 
           <div style="display: flex; gap: 10px;" id="heroEventActions">
@@ -591,7 +591,7 @@
 
       document.getElementById('categoryIconBadge').innerHTML = getCategoryBadgeHtml(eventObj.cat, 44);
       document.getElementById('heroEventName').textContent = eventObj.title;
-      document.getElementById('heroEventSub').innerHTML = `<i class="fa-solid fa-location-dot text-pink"></i> ${escapeHtml(eventObj.venue)} • 20% Member Discount`;
+      document.getElementById('heroEventSub').innerHTML = `<i class="fa-solid fa-location-dot text-pink"></i> ${escapeHtml(eventObj.venue)} • Member Venue Perks`;
 
       const badgeEl = document.getElementById('heroEventBadge');
       if (isToday) {
@@ -704,8 +704,8 @@
         cat: 'drinks',
         title: 'Aperitivo & Craft Cocktails',
         venue: 'Rough San Salvario • Via Principe Tommaso 3',
-        badge: 'DAILY MEMBER DISCOUNT',
-        sub: '20% discount on all drinks & cocktails for ISOT Members with live daily QR token.',
+        badge: 'DAILY MEMBER PERK',
+        sub: 'Exclusive member perks on drinks & cocktails for ISOT Members with live daily QR token.',
         actions: '<a href="profile.html" class="btn btn-pink" style="width:auto;padding:10px 20px;font-size:0.88rem;">Show Member Card <i class="fa-solid fa-qrcode"></i></a><a href="partner.html" class="btn btn-outline" style="width:auto;padding:10px 18px;font-size:0.88rem;">Partner Venues</a>'
       },
       party: {
@@ -760,7 +760,7 @@
       
       document.getElementById('categoryIconBadge').innerHTML = getCategoryBadgeHtml(hero.cat, 44);
       document.getElementById('heroEventName').textContent = hero.title;
-      document.getElementById('heroEventSub').innerHTML = `<i class="fa-solid fa-location-dot text-pink"></i> ${escapeHtml(hero.venue)} • 20% Member Discount`;
+      document.getElementById('heroEventSub').innerHTML = `<i class="fa-solid fa-location-dot text-pink"></i> ${escapeHtml(hero.venue)} • Member Venue Perks`;
 
       const badgeEl = document.getElementById('heroEventBadge');
       badgeEl.className = 'badge badge-socio';
