@@ -12,17 +12,7 @@
       "permanent": true
     },
     {
-      "source": "/register-login/",
-      "destination": "/join",
-      "permanent": true
-    },
-    {
       "source": "/cookie-policy",
-      "destination": "/privacy",
-      "permanent": true
-    },
-    {
-      "source": "/cookie-policy/",
       "destination": "/privacy",
       "permanent": true
     },
@@ -32,17 +22,7 @@
       "permanent": true
     },
     {
-      "source": "/privacy-policy/",
-      "destination": "/privacy",
-      "permanent": true
-    },
-    {
       "source": "/contact-us",
-      "destination": "/contact",
-      "permanent": true
-    },
-    {
-      "source": "/contact-us/",
       "destination": "/contact",
       "permanent": true
     },
@@ -52,57 +32,9 @@
       "permanent": true
     },
     {
-      "source": "/our-partners/",
-      "destination": "/partners",
-      "permanent": true
-    },
-    {
       "source": "/checkin",
       "destination": "/app/checkin",
       "permanent": false
-    },
-    {
-      "source": "/checkin/",
-      "destination": "/app/checkin",
-      "permanent": false
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/life-as-an-international-student-in-turin",
-      "destination": "/blog-post?slug=a-complete-guide-to-living-in-turin-for-international-students"
-    },
-    {
-      "source": "/edisu-student-residences-and-dorms-turin-guide",
-      "destination": "/blog-post?slug=edisu-student-residences-and-dorms-turin-guide"
-    },
-    {
-      "source": "/edisu-scholarship-and-housing-turin-guide",
-      "destination": "/blog-post?slug=edisu-scholarship-and-housing-turin-guide"
-    },
-    {
-      "source": "/erasmus-life-in-turin-guide",
-      "destination": "/blog-post?slug=erasmus-life-in-turin-guide"
-    },
-    {
-      "source": "/sas-startup-community-saa-turin",
-      "destination": "/blog-post?slug=sas-startup-community-saa-turin"
-    },
-    {
-      "source": "/turin-student-sports-bouldering-climbing-guide",
-      "destination": "/blog-post?slug=turin-student-sports-bouldering-climbing-guide"
-    },
-    {
-      "source": "/isot-board-game-social-nights-turin",
-      "destination": "/blog-post?slug=isot-board-game-social-nights-turin"
-    },
-    {
-      "source": "/isot-art-and-painting-workshop-turin",
-      "destination": "/blog-post?slug=isot-art-and-painting-workshop-turin"
-    },
-    {
-      "source": "/castello-del-valentino-polito-architecture-guide",
-      "destination": "/blog-post?slug=castello-del-valentino-polito-architecture-guide"
     }
   ],
   "headers": [
