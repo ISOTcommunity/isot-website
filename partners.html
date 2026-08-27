@@ -188,20 +188,22 @@
         <a href="join.html" class="btn btn-pink" style="padding: 10px 22px; font-size: 0.85rem;">Join Free <i class="fa-solid fa-arrow-right"></i></a>
       </div>
 
-      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation">
-        <i class="fa-solid fa-bars"></i>
+            <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation" onclick="toggleMobileMenu()">
+        <i class="fa-solid fa-bars" id="mobileToggleIcon"></i>
       </button>
     </div>
 
+    <!-- Mobile Dropdown Menu -->
     <div class="mobile-menu" id="mobileMenu">
-      <a href="who-we-are.html">Who We Are</a>
-      <a href="what-we-do.html">What We Do</a>
-      <a href="events.html">Events</a>
-      <a href="blog.html">Turin Guide & Blog</a>
-      <a href="partners.html" class="active">Partners</a>
-      <a href="donate.html">Donate</a>
-      <a href="contact.html">Contact & FAQ</a>
-      <a href="join.html" class="btn btn-pink">Join Free →</a>
+      <a href="who-we-are.html"><i class="fa-solid fa-users" style="color:var(--pink); margin-right:8px;"></i> Who We Are</a>
+      <a href="what-we-do.html"><i class="fa-solid fa-rocket" style="color:var(--pink); margin-right:8px;"></i> What We Do</a>
+      <a href="events.html"><i class="fa-solid fa-calendar-days" style="color:var(--pink); margin-right:8px;"></i> Events</a>
+      <a href="blog.html"><i class="fa-solid fa-book-open" style="color:var(--pink); margin-right:8px;"></i> Turin Guide &amp; Blog</a>
+      <a href="partners.html"><i class="fa-solid fa-handshake" style="color:var(--pink); margin-right:8px;"></i> Partners</a>
+      <a href="donate.html"><i class="fa-solid fa-heart" style="color:var(--pink); margin-right:8px;"></i> Donate</a>
+      <a href="contact.html"><i class="fa-solid fa-headset" style="color:var(--pink); margin-right:8px;"></i> Contact &amp; FAQ</a>
+      <a href="/app/login.html"><i class="fa-solid fa-user" style="color:var(--pink); margin-right:8px;"></i> My Profile / Pass</a>
+      <a href="join.html" class="btn btn-pink" style="margin-top:8px; justify-content:center;">Join Free →</a>
     </div>
   </header>
 
@@ -417,6 +419,21 @@
       form.style.display = 'none';
       document.getElementById('partnerSent').style.display = 'block';
     });
+  
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      const icon = document.getElementById('mobileToggleIcon');
+      if (!menu) return;
+      menu.classList.toggle('active');
+      if (menu.classList.contains('active')) {
+        icon.className = 'fa-solid fa-xmark';
+        icon.style.color = 'var(--pink)';
+      } else {
+        icon.className = 'fa-solid fa-bars';
+        icon.style.color = '#FFFFFF';
+      }
+    }
+
   </script>
 </body>
 </html>

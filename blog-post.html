@@ -659,6 +659,20 @@
       }
     }
 
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      const icon = document.getElementById('mobileToggleIcon');
+      if (!menu) return;
+      menu.classList.toggle('active');
+      if (menu.classList.contains('active')) {
+        icon.className = 'fa-solid fa-xmark';
+        icon.style.color = 'var(--pink)';
+      } else {
+        icon.className = 'fa-solid fa-bars';
+        icon.style.color = '#FFFFFF';
+      }
+    }
+
     loadArticle();
   </script>
 </body>
