@@ -808,7 +808,11 @@
         const dStr = String(day).padStart(2, '0');
         const dateStr = `${currYear}-${mStr}-${dStr}`;
 
-        const dayEvents = EVENTS_DATA.filter(e => e.date === dateStr);
+        // A night that has been and gone is not "what's on". It stays in the record —
+        // check-ins, RSVPs and karaoke slots are untouched, and Going -> Been still lists
+        // it — but the calendar shows the future.
+        const isPast = dateStr < isotToday();
+        const dayEvents = isPast ? [] : EVENTS_DATA.filter(e => e.date === dateStr);
         const hasEvents = dayEvents.length > 0;
         const isSelected = selectedDateStr === dateStr;
 
@@ -828,7 +832,7 @@
       html += `</div>`;
 
       if (selectedDateStr) {
-        const selectedEvents = EVENTS_DATA.filter(e => e.date === selectedDateStr);
+        const selectedEvents = EVENTS_DATA.filter(e => e.date === selectedDateStr && e.date >= isotToday());
         html += `
           <div class="card card-glass" style="margin-top:16px">
             <h3 style="margin-bottom:12px;font-size:1rem;color:var(--pink)">
@@ -838,7 +842,7 @@
           </div>
         `;
       } else {
-        const monthEvents = EVENTS_DATA.filter(e => e.monthIdx === currMonthIdx);
+        const monthEvents = EVENTS_DATA.filter(e => e.monthIdx === currMonthIdx && e.date >= isotToday());
         html += `
           <div style="margin-top:16px">
             <div class="eyebrow" style="margin-bottom:10px">${MONTH_NAMES[currMonthIdx]} Schedule Feed</div>
@@ -888,7 +892,9 @@
         const dNum = String(d.getDate()).padStart(2, '0');
         const dateStr = `${yStr}-${mStr}-${dNum}`;
 
-        const dayEvents = EVENTS_DATA.filter(e => e.date === dateStr);
+        const dayEvents = dateStr < isotToday()
+          ? []
+          : EVENTS_DATA.filter(e => e.date === dateStr);
         if (dayEvents.length) {
           weekEventsFound += dayEvents.length;
           html += `
