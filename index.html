@@ -458,6 +458,14 @@
       animation: float 3.5s ease-in-out infinite;
     }
 
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
     .hero-event-badge {
       position: absolute;
       bottom: 20px;
@@ -796,7 +804,7 @@
       .hero-title { font-size: clamp(2.5rem, 9vw, 3.5rem) !important; word-break: break-word; }
       .hero-subtitle { font-size: 1rem; padding-left: 14px; margin-bottom: 24px; }
       .section-title { font-size: clamp(2.4rem, 8vw, 3.2rem) !important; }
-      .character-sticker { display: none !important; }
+      .character-sticker { width: 60px !important; top: 70px !important; right: 4% !important; }
       .watermark-bg, .footer-watermark { display: none !important; }
       .hero-card { transform: none !important; }
       .hero-card-wrapper { perspective: none !important; }
@@ -970,7 +978,7 @@
             </div>
           </div>
           <!-- Transparent Character Sitting Duo Accent -->
-          <img src="assets/characters/char_duo_sitting.png" alt="ISOT Sitting Duo Characters" style="position: absolute; right: -35px; bottom: -45px; height: 135px; width: auto; z-index: 10; pointer-events:none; filter: drop-shadow(0 12px 24px rgba(0,0,0,0.6));" />
+          <img src="assets/characters/char_duo_sitting.png" alt="ISOT Sitting Duo Characters" style="position: absolute; right: -35px; bottom: -45px; height: 135px; width: auto; z-index: 10; pointer-events:none; filter: drop-shadow(0 12px 24px rgba(0,0,0,0.6)); animation: float 4.5s ease-in-out infinite;" />
         </div>
       </div>
     </div>
@@ -979,19 +987,19 @@
   <!-- Marquee Ticker Strip with Transparent ISOT Brand Characters -->
   <div class="marquee-strip">
     <div class="marquee-track">
-      <span class="marquee-item">INTERNATIONAL FAMILY <img src="assets/characters/char_white_dancer.png" style="height: 36px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));" /></span>
-      <span class="marquee-item">CONNECT <img src="assets/characters/char_white_runner.png" style="height: 32px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));" /></span>
-      <span class="marquee-item">GROW <img src="assets/characters/char_yellow_dancer.png" style="height: 34px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));" /></span>
-      <span class="marquee-item">DISCOVER <img src="assets/characters/char_bottle_rider.png" style="height: 38px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));" /></span>
+      <span class="marquee-item">INTERNATIONAL FAMILY <img src="assets/characters/char_white_dancer.png" style="height: 36px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4)); animation: float 3s ease-in-out infinite;" /></span>
+      <span class="marquee-item">CONNECT <img src="assets/characters/char_white_runner.png" style="height: 32px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4)); animation: float 2.6s ease-in-out infinite; animation-delay: 0.3s;" /></span>
+      <span class="marquee-item">GROW <img src="assets/characters/char_yellow_dancer.png" style="height: 34px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4)); animation: float 3.4s ease-in-out infinite; animation-delay: 0.6s;" /></span>
+      <span class="marquee-item">DISCOVER <img src="assets/characters/char_bottle_rider.png" style="height: 38px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4)); animation: float 2.8s ease-in-out infinite; animation-delay: 0.9s;" /></span>
       <span class="marquee-item">TURIN •</span>
-      <span class="marquee-item">ISOT COMMUNITY <img src="assets/characters/char_cat_wizards.png" style="height: 40px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));" /></span>
+      <span class="marquee-item">ISOT COMMUNITY <img src="assets/characters/char_cat_wizards.png" style="height: 40px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4)); animation: float 3.2s ease-in-out infinite; animation-delay: 0.2s;" /></span>
       <span class="marquee-item">YOUR HOME AWAY FROM HOME •</span>
-      <span class="marquee-item">INTERNATIONAL FAMILY <img src="assets/characters/char_white_dancer.png" style="height: 36px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));" /></span>
-      <span class="marquee-item">CONNECT <img src="assets/characters/char_white_runner.png" style="height: 32px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));" /></span>
-      <span class="marquee-item">GROW <img src="assets/characters/char_yellow_dancer.png" style="height: 34px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));" /></span>
-      <span class="marquee-item">DISCOVER <img src="assets/characters/char_bottle_rider.png" style="height: 38px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));" /></span>
+      <span class="marquee-item">INTERNATIONAL FAMILY <img src="assets/characters/char_white_dancer.png" style="height: 36px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4)); animation: float 3s ease-in-out infinite;" /></span>
+      <span class="marquee-item">CONNECT <img src="assets/characters/char_white_runner.png" style="height: 32px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4)); animation: float 2.6s ease-in-out infinite; animation-delay: 0.3s;" /></span>
+      <span class="marquee-item">GROW <img src="assets/characters/char_yellow_dancer.png" style="height: 34px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4)); animation: float 3.4s ease-in-out infinite; animation-delay: 0.6s;" /></span>
+      <span class="marquee-item">DISCOVER <img src="assets/characters/char_bottle_rider.png" style="height: 38px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4)); animation: float 2.8s ease-in-out infinite; animation-delay: 0.9s;" /></span>
       <span class="marquee-item">TURIN •</span>
-      <span class="marquee-item">ISOT COMMUNITY <img src="assets/characters/char_cat_wizards.png" style="height: 40px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));" /></span>
+      <span class="marquee-item">ISOT COMMUNITY <img src="assets/characters/char_cat_wizards.png" style="height: 40px; width: auto; display: inline-block; vertical-align: middle; margin: 0 10px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4)); animation: float 3.2s ease-in-out infinite; animation-delay: 0.2s;" /></span>
       <span class="marquee-item">YOUR HOME AWAY FROM HOME •</span>
     </div>
   </div>
@@ -1003,7 +1011,7 @@
     <aside class="sidebar-sticky">
       <div class="app-promo-card" style="position:relative; overflow:visible;">
         <!-- Transparent Bottle Rider Character Accent -->
-        <img src="assets/characters/char_bottle_rider.png" alt="ISOT Bottle Rider Character" style="position: absolute; right: -15px; top: -30px; height: 75px; width: auto; pointer-events: none; filter: drop-shadow(0 6px 16px rgba(36,54,115,0.6));" />
+        <img src="assets/characters/char_bottle_rider.png" alt="ISOT Bottle Rider Character" style="position: absolute; right: -15px; top: -30px; height: 75px; width: auto; pointer-events: none; filter: drop-shadow(0 6px 16px rgba(36,54,115,0.6)); animation: float 4s ease-in-out infinite; animation-delay: 0.3s;" />
         
         <span class="app-badge"><i class="fa-solid fa-mobile-screen"></i> ISOT Pocket App</span>
         <h3 class="app-promo-title">Your ISOT in Your Pocket</h3>
@@ -1165,7 +1173,7 @@
       <!-- FEATURE 1: DIGITAL MEMBER CARD -->
       <div style="background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(238,9,121,0.35); border-radius: 24px; padding: 24px 20px; text-align: center; box-shadow: 0 16px 36px rgba(0,0,0,0.5); position:relative; display:flex; flex-direction:column; justify-content:center;">
         <!-- Transparent Character Accent -->
-        <img src="assets/characters/char_spiky_twins.png" alt="ISOT Spiky Twins Characters" style="position: absolute; right: -10px; top: -30px; height: 75px; width: auto; pointer-events: none; filter: drop-shadow(0 6px 14px rgba(238,9,121,0.5));" />
+        <img src="assets/characters/char_spiky_twins.png" alt="ISOT Spiky Twins Characters" style="position: absolute; right: -10px; top: -30px; height: 75px; width: auto; pointer-events: none; filter: drop-shadow(0 6px 14px rgba(238,9,121,0.5)); animation: float 3.8s ease-in-out infinite;" />
         
         <div>
           <div style="font-size: 0.72rem; font-weight: 700; color: var(--pink); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;"><i class="fa-solid fa-id-card"></i> MEMBER PASS SCREEN</div>
@@ -1177,7 +1185,7 @@
       <!-- FEATURE 2: LIVE KARAOKE QUEUE -->
       <div style="background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(245,158,11,0.35); border-radius: 24px; padding: 24px 20px; text-align: center; box-shadow: 0 16px 36px rgba(0,0,0,0.5); position:relative; display:flex; flex-direction:column; justify-content:center;">
         <!-- Transparent Character Accent -->
-        <img src="assets/characters/char_karaoke_singer.png" alt="ISOT Karaoke Singer Character" style="position: absolute; right: -10px; top: -30px; height: 80px; width: auto; pointer-events: none; filter: drop-shadow(0 6px 14px rgba(245,158,11,0.5));" />
+        <img src="assets/characters/char_karaoke_singer.png" alt="ISOT Karaoke Singer Character" style="position: absolute; right: -10px; top: -30px; height: 80px; width: auto; pointer-events: none; filter: drop-shadow(0 6px 14px rgba(245,158,11,0.5)); animation: float 4.2s ease-in-out infinite; animation-delay: 0.5s;" />
         
         <div>
           <div style="font-size: 0.72rem; font-weight: 700; color: var(--orange); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;"><i class="fa-solid fa-microphone-lines"></i> LIVE KARAOKE QUEUE</div>
@@ -1189,7 +1197,7 @@
       <!-- FEATURE 3: TURIN PARTNER MAP -->
       <div style="background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(34,197,94,0.35); border-radius: 24px; padding: 24px 20px; text-align: center; box-shadow: 0 16px 36px rgba(0,0,0,0.5); position:relative; display:flex; flex-direction:column; justify-content:center;">
         <!-- Transparent Character Accent -->
-        <img src="assets/characters/char_cat_wizards.png" alt="ISOT Cat Wizards Character" style="position: absolute; right: -15px; top: -30px; height: 70px; width: auto; pointer-events: none; filter: drop-shadow(0 6px 14px rgba(34,197,94,0.5));" />
+        <img src="assets/characters/char_cat_wizards.png" alt="ISOT Cat Wizards Character" style="position: absolute; right: -15px; top: -30px; height: 70px; width: auto; pointer-events: none; filter: drop-shadow(0 6px 14px rgba(34,197,94,0.5)); animation: float 3.5s ease-in-out infinite reverse; animation-delay: 1s;" />
         
         <div>
           <div style="font-size: 0.72rem; font-weight: 700; color: #22C55E; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;"><i class="fa-solid fa-map-location-dot"></i> PARTNER VENUES MAP</div>
@@ -1322,7 +1330,7 @@
         </p>
         <div style="font-size: 0.8rem; font-weight: 700; color: var(--pink); display:flex; align-items:center; justify-content:space-between;">
           <span>⚡ Live globally, connect locally.</span>
-          <img src="assets/characters/char_cat_wizards.png" alt="ISOT Cat Wizards Character" style="height: 48px; width: auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));" />
+          <img src="assets/characters/char_cat_wizards.png" alt="ISOT Cat Wizards Character" style="height: 48px; width: auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5)); animation: float 3.6s ease-in-out infinite; animation-delay: 0.4s;" />
         </div>
       </div>
 
