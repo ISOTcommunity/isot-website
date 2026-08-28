@@ -472,6 +472,11 @@ function initBurgerMenu(profile) {
         <i class="fa-solid fa-house"></i>
         <span>App Hub</span>
       </a>
+      ${isBoard ? `
+      <a href="monitor.html" class="drawer-item">
+        <i class="fa-solid fa-wave-square text-pink"></i>
+        <span>Monitor</span>
+      </a>` : ''}
       <a href="karaoke.html" class="drawer-item">
         <i class="fa-solid fa-microphone"></i>
         <span>Karaoke Queue</span>
