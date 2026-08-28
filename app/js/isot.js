@@ -305,9 +305,13 @@ async function requireAuth(opts = {}) {
   let repairError = null;
   if (!profile) {
     try {
-      const { error } = await db.rpc('ensure_my_profile');
+      // Returns { ok, reason } rather than throwing, so a failure arrives as data and
+      // can be shown to the person it happened to.
+      const { data: res, error } = await db.rpc('ensure_my_profile');
       if (error) {
         repairError = error.message;
+      } else if (res && res.ok === false) {
+        repairError = res.reason || 'profile could not be created';
       } else {
         const { data, error: readErr } = await db.from('profiles').select('*').eq('id', session.user.id).single();
         if (data) profile = data;
