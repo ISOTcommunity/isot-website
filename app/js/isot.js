@@ -302,25 +302,32 @@ async function requireAuth(opts = {}) {
   // must never block account creation — so this state is reachable and silent: signup
   // succeeds, the confirmation email arrives, and then every guarded page hangs here.
   // Repair it instead of dead-ending someone who has just confirmed their email.
+  let repairError = null;
   if (!profile) {
     try {
       const { error } = await db.rpc('ensure_my_profile');
-      if (!error) {
-        const { data } = await db.from('profiles').select('*').eq('id', session.user.id).single();
-        if (data) profile = data;
+      if (error) {
+        repairError = error.message;
       } else {
-        console.warn('ensure_my_profile:', error.message);
+        const { data, error: readErr } = await db.from('profiles').select('*').eq('id', session.user.id).single();
+        if (data) profile = data;
+        else if (readErr) repairError = 'created but not readable: ' + readErr.message;
       }
     } catch (e) {
-      console.warn('ensure_my_profile threw:', e);
+      repairError = String(e && e.message ? e.message : e);
     }
   }
 
   if (!profile) {
+    // The cause used to go to console.warn, which nobody standing in a bar can read —
+    // so every report of this arrived as "it says my profile is missing" and no more.
+    // Put the actual reason on the screen: whoever hits it can photograph it.
     showGateError(
-      'Your profile is missing',
-      'Your account exists but has no profile record, so we cannot show your member card. ' +
-      'Tell Amir — the signup trigger may not have run.'
+      'We could not finish setting up your account',
+      (repairError
+        ? 'Show this to Amir: ' + repairError
+        : 'Your account exists but has no profile record.') +
+      ' · ' + (session.user.email || 'no email on account')
     );
     return new Promise(() => {});
   }
