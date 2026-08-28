@@ -647,7 +647,15 @@ async function signInWithGoogle(btn) {
   const restore = btn ? busy(btn, 'Opening Google…') : () => {};
   const { error } = await db.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: appUrl('complete-profile.html') },
+    options: {
+      redirectTo: appUrl('complete-profile.html'),
+      // Without prompt=select_account, Google silently reuses whichever account the
+      // browser is already signed into and never shows the chooser. Someone with two
+      // Google accounts gets signed in as the wrong one with no visible choice — and
+      // since ISOT keys members on the auth user, that quietly creates a SECOND member
+      // record for the same person. It happened to the president's own account.
+      queryParams: { prompt: 'select_account' },
+    },
   });
   if (error) { restore(); throw error; }
 }
