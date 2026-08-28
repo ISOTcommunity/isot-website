@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="robots" content="noindex" />
+  <title>ISOT Admin</title>
+
+  <link rel="icon" href="logo.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr)); gap:10px; }
+    .stat { background:var(--bg-card); border:1px solid var(--border-light); border-radius:14px; padding:14px 16px; }
+    .stat .n { font-size:1.8rem; font-weight:700; color:#FFF; line-height:1; font-variant-numeric:tabular-nums; }
+    .stat .l { font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.07em; margin-top:6px; }
+    .stat.bad  .n { color:#FCA5A5; }
+    .stat.good .n { color:var(--green); }
+
+    .row { display:flex; gap:12px; padding:11px 0; border-bottom:1px solid var(--border-light); align-items:center; }
+    .row:last-child { border-bottom:none; }
+    .when { font-size:0.72rem; color:var(--text-dark); white-space:nowrap; min-width:84px; font-variant-numeric:tabular-nums; }
+    .grow { flex:1; min-width:0; font-size:0.88rem; }
+    .grow b { color:#FFF; font-weight:600; }
+    .tag { font-size:0.62rem; text-transform:uppercase; letter-spacing:0.07em; padding:2px 8px;
+           border-radius:10px; background:rgba(255,255,255,0.07); color:var(--text-dim); white-space:nowrap; }
+    .tag.pink { background:var(--pink-glow); color:#FFF; }
+    .tag.gold { background:rgba(212,175,80,0.18); color:var(--gold); }
+
+    .prob { display:flex; gap:12px; padding:13px 14px; border-radius:12px; margin-bottom:8px; align-items:flex-start; }
+    .prob.critical { background:rgba(239,68,68,0.10); border-left:3px solid #EF4444; }
+    .prob.warning  { background:rgba(212,175,80,0.10); border-left:3px solid var(--gold); }
+    .prob.ok       { background:rgba(16,185,129,0.09); border-left:3px solid var(--green); }
+
+    /* Section nav — horizontally scrollable on a phone rather than wrapping to
+       three ragged lines. */
+    .nav { display:flex; gap:6px; margin:18px 0 14px; overflow-x:auto; padding-bottom:4px; }
+    .nav::-webkit-scrollbar { display:none; }
+    .navbtn { padding:7px 15px; border-radius:20px; font-size:0.82rem; cursor:pointer; white-space:nowrap;
+              background:transparent; border:1px solid var(--border-light); color:var(--text-muted); font-family:inherit; }
+    .navbtn.on { background:var(--pink); border-color:var(--pink); color:#FFF; font-weight:600; }
+
+    .sub { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
+    .subbtn { padding:5px 12px; border-radius:16px; font-size:0.76rem; cursor:pointer;
+              background:transparent; border:1px solid var(--border-light); color:var(--text-dim); font-family:inherit; }
+    .subbtn.on { border-color:var(--pink); color:#FFF; }
+
+    .mini { width:auto; padding:5px 11px; font-size:0.74rem; }
+    .code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:0.74rem;
+            background:rgba(255,255,255,0.05); padding:3px 7px; border-radius:6px;
+            word-break:break-all; color:var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <header class="topbar">
+    <a href="home.html" class="topbar-title">ISOT Admin</a>
+    <button type="button" id="burgerBtn" aria-label="Account menu"
+            style="background:transparent;border:none;color:#FFF;font-size:1.3rem;cursor:pointer;padding:6px">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </header>
+
+  <main class="shell" style="max-width:640px">
+
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+      <div>
+        <div class="eyebrow">Board only</div>
+        <h1 style="font-size:1.7rem;margin-top:2px" id="pageTitle">Overview</h1>
+      </div>
+      <button type="button" class="btn btn-outline mini" onclick="refresh()">
+        <i class="fa-solid fa-rotate-right"></i> Refresh
+      </button>
+    </div>
+
+    <nav class="nav">
+      <button type="button" class="navbtn on" data-s="overview" onclick="go('overview')">Overview</button>
+      <button type="button" class="navbtn" data-s="members"  onclick="go('members')">Members</button>
+      <button type="button" class="navbtn" data-s="activity" onclick="go('activity')">Activity</button>
+      <button type="button" class="navbtn" data-s="events"   onclick="go('events')">Events</button>
+      <button type="button" class="navbtn" data-s="venues"   onclick="go('venues')">Venues</button>
+    </nav>
+
+    <div id="panel"><div class="spinner" style="margin:36px auto"></div></div>
+
+    <p class="dim" style="font-size:0.74rem;margin-top:18px" id="stamp"></p>
+  </main>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+  <script>
+  let me = null;
+  let section = 'overview';
+  let feedView = 'activity';
+  const cache = {};
+
+  const TITLES = {
+    overview: 'Overview', members: 'Members',
+    activity: 'Activity', events: 'Events', venues: 'Venues',
+  };
+
+  (async () => {
+    me = await requireAuth({ board: true });
+    // Deep link, so a bookmark can land straight on Members.
+    const want = (location.hash || '').replace('#', '');
+    if (TITLES[want]) section = want;
+    document.querySelectorAll('.navbtn').forEach(b => b.classList.toggle('on', b.dataset.s === section));
+    render();
+  })();
+
+  function go(s) {
+    section = s;
+    location.hash = s;
+    document.querySelectorAll('.navbtn').forEach(b => b.classList.toggle('on', b.dataset.s === s));
+    render();
+  }
+
+  function refresh() {
+    Object.keys(cache).forEach(k => delete cache[k]);
+    render();
+  }
+
+  function ago(iso) {
+    const m = Math.round((Date.now() - new Date(iso)) / 60000);
+    if (m < 1) return 'just now';
+    if (m < 60) return m + 'm ago';
+    if (m < 1440) return Math.round(m / 60) + 'h ago';
+    const d = Math.round(m / 1440);
+    return d === 1 ? 'yesterday' : d + 'd ago';
+  }
+
+  function fail(msg) {
+    return `<div class="prob critical"><i class="fa-solid fa-triangle-exclamation" style="color:#FCA5A5;margin-top:3px"></i>
+            <div><b style="color:#FFF">Could not load this</b>
+            <div class="dim" style="font-size:0.82rem">${escapeHtml(msg)}</div></div></div>`;
+  }
+
+  async function render() {
+    document.getElementById('pageTitle').textContent = TITLES[section];
+    const el = document.getElementById('panel');
+    el.innerHTML = '<div class="spinner" style="margin:36px auto"></div>';
+    try {
+      await ({ overview: renderOverview, members: renderMembers, activity: renderActivity,
+               events: renderEvents, venues: renderVenues }[section])(el);
+    } catch (e) {
+      el.innerHTML = fail(e.message || String(e));
+    }
+    document.getElementById('stamp').textContent =
+      'Checked ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  /* ── Overview ────────────────────────────────────────────────────────── */
+  async function renderOverview(el) {
+    const [probs, sum] = await Promise.all([
+      db.rpc('monitor_problems'),
+      db.rpc('monitor_summary'),
+    ]);
+
+    let html = '';
+
+    // Problems first, always. Alerts below the fold make this a report, not a monitor.
+    if (probs.error) {
+      html += fail(probs.error.message);
+    } else if (!probs.data || !probs.data.length) {
+      html += `<div class="prob ok"><i class="fa-solid fa-circle-check text-green" style="margin-top:3px"></i>
+        <div><b style="color:#FFF">Nothing needs attention</b>
+        <div class="dim" style="font-size:0.82rem">No stranded accounts, no signup failures, no broken member cards.</div></div></div>`;
+    } else {
+      html += probs.data.map(p => `
+        <div class="prob ${escapeHtml(p.severity)}">
+          <i class="fa-solid ${p.severity === 'critical' ? 'fa-triangle-exclamation' : 'fa-circle-exclamation'}"
+             style="margin-top:3px;color:${p.severity === 'critical' ? '#FCA5A5' : 'var(--gold)'}"></i>
+          <div><b style="color:#FFF">${escapeHtml(p.problem)}</b>
+          <div class="dim" style="font-size:0.82rem">${escapeHtml(p.detail || '')}</div></div>
+        </div>`).join('');
+    }
+
+    if (sum.error) {
+      html += fail(sum.error.message);
+    } else {
+      const s = sum.data;
+      const cell = (n, l, tone = '') => `<div class="stat ${tone}"><div class="n">${n}</div><div class="l">${l}</div></div>`;
+      html += `<div class="stat-grid" style="margin-top:14px">
+        ${cell(s.members_total, 'Members')}
+        ${cell(s.members_7d, 'Joined 7d')}
+        ${cell(s.socios, 'Paid socios')}
+        ${cell(s.staff, 'Staff & KJs')}
+        ${cell(s.checkins_7d, 'Check-ins 7d')}
+        ${cell(s.rsvps_upcoming, 'Going, upcoming')}
+        ${cell(s.songs_7d, 'Songs 7d')}
+        ${cell(s.orphan_accounts, 'Stranded', s.orphan_accounts > 0 ? 'bad' : 'good')}
+        ${cell(s.signup_failures_7d, 'Signup fails', s.signup_failures_7d > 0 ? 'bad' : 'good')}
+      </div>`;
+    }
+    el.innerHTML = html;
+  }
+
+  /* ── Members ─────────────────────────────────────────────────────────── */
+  async function renderMembers(el) {
+    if (!cache.members) {
+      const { data, error } = await db.from('profiles')
+        .select('id, full_name, email, member_code, tier, staff_role, board_position, university, nationality, avatar_url, created_at')
+        .order('created_at', { ascending: false });
+      if (error) { el.innerHTML = fail(error.message); return; }
+      cache.members = data || [];
+    }
+
+    el.innerHTML = `
+      <input type="text" id="mSearch" placeholder="Search name, email or member code…" style="width:100%;margin-bottom:12px" />
+      <div id="mList"></div>`;
+    document.getElementById('mSearch').addEventListener('input', paintMembers);
+    paintMembers();
+  }
+
+  function paintMembers() {
+    const q = (document.getElementById('mSearch')?.value || '').toLowerCase().trim();
+    const rank = p => p.staff_role === 'board' ? 0 : p.staff_role ? 1 : 2;
+
+    const list = cache.members
+      .filter(p => !q || [p.full_name, p.email, p.member_code]
+        .some(v => (v || '').toLowerCase().includes(q)))
+      .sort((a, b) => rank(a) - rank(b) || new Date(b.created_at) - new Date(a.created_at));
+
+    document.getElementById('mList').innerHTML = list.length ? list.map(p => {
+      const isBoard = p.staff_role === 'board';
+      const isVol   = p.staff_role === 'volunteer';
+      const isSocio = p.tier === 'socio';
+      return `
+      <div class="row" style="align-items:flex-start">
+        ${renderUserAvatarHtml(p, 38)}
+        <div class="grow">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <b>${escapeHtml(p.full_name || 'Member')}</b>
+            ${isBoard ? `<span class="tag pink">${escapeHtml(p.board_position || 'Board')}</span>` : ''}
+            ${isVol ? '<span class="tag pink">KJ</span>' : ''}
+            ${isSocio ? '<span class="tag gold">Socio</span>' : ''}
+          </div>
+          <div class="dim" style="font-size:0.76rem">${escapeHtml(p.member_code || '')} · ${escapeHtml(p.email || 'no email')}</div>
+          ${p.university ? `<div class="dim" style="font-size:0.76rem">${escapeHtml(p.university)}</div>` : ''}
+          ${isBoard ? '' : `
+            <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+              <button type="button" class="btn ${isVol ? 'btn-outline' : 'btn-pink'} mini"
+                      onclick="toggleVol('${p.id}', ${isVol ? 'false' : 'true'})">
+                ${isVol ? 'Remove KJ' : 'Make KJ'}
+              </button>
+              <button type="button" class="btn btn-outline mini"
+                      onclick="toggleTier('${p.id}', '${isSocio ? 'participant' : 'socio'}')">
+                ${isSocio ? 'Mark unpaid' : 'Mark socio'}
+              </button>
+            </div>`}
+        </div>
+      </div>`;
+    }).join('') : '<p class="dim" style="padding:22px 0;text-align:center;font-size:0.86rem">Nobody matches that search.</p>';
+  }
+
+  async function toggleVol(id, make) {
+    const { error } = await db.rpc('set_volunteer', { p_profile: id, p_is_volunteer: make });
+    if (error) { alert('Could not change that: ' + error.message); return; }
+    delete cache.members;
+    render();
+  }
+
+  async function toggleTier(id, tier) {
+    // A socio is a paying member with voting rights under the statute — this is a
+    // register change, not a display toggle, so it asks first.
+    const label = tier === 'socio' ? 'Mark as a paid socio (€10 received)?' : 'Remove socio status?';
+    if (!confirm(label)) return;
+    const { error } = await db.from('profiles').update({ tier }).eq('id', id);
+    if (error) { alert('Could not change that: ' + error.message); return; }
+    delete cache.members;
+    render();
+  }
+
+  /* ── Activity ────────────────────────────────────────────────────────── */
+  async function renderActivity(el) {
+    el.innerHTML = `
+      <div class="sub">
+        <button type="button" class="subbtn ${feedView === 'activity' ? 'on' : ''}" onclick="setFeed('activity')">What happened</button>
+        <button type="button" class="subbtn ${feedView === 'signins'  ? 'on' : ''}" onclick="setFeed('signins')">Sign-ins</button>
+        <button type="button" class="subbtn ${feedView === 'signups'  ? 'on' : ''}" onclick="setFeed('signups')">Signup log</button>
+      </div>
+      <div class="card card-glass" style="padding:4px 16px"><div id="feed">
+        <div class="spinner" style="margin:26px auto"></div>
+      </div></div>`;
+    await paintFeed();
+  }
+
+  function setFeed(v) { feedView = v; render(); }
+
+  async function paintFeed() {
+    const el = document.getElementById('feed');
+    const key = 'feed_' + feedView;
+
+    if (!cache[key]) {
+      let res;
+      if (feedView === 'activity')     res = await db.rpc('monitor_activity', { p_days: 30, p_limit: 200 });
+      else if (feedView === 'signins') res = await db.rpc('monitor_signins',  { p_days: 14, p_limit: 100 });
+      else res = await db.from('signup_events').select('*').order('at', { ascending: false }).limit(100);
+      if (res.error) { el.innerHTML = fail(res.error.message); return; }
+      cache[key] = res.data || [];
+    }
+
+    const rows = cache[key];
+    if (!rows.length) {
+      // "No records available" is not "nobody signed in" — say which it is.
+      const empty = {
+        activity: 'Nothing recorded in the last 30 days.',
+        signins:  'No sign-in records available. GoTrue keeps its own audit trail and this database role may not be able to read it — that is different from nobody signing in.',
+        signups:  'No signup attempts logged yet.',
+      }[feedView];
+      el.innerHTML = `<p class="dim" style="padding:26px 0;text-align:center;font-size:0.86rem">${empty}</p>`;
+      return;
+    }
+
+    el.innerHTML = rows.map(r => {
+      if (feedView === 'signins') return `
+        <div class="row"><div class="when">${escapeHtml(ago(r.at))}</div>
+        <div class="grow"><b>${escapeHtml(r.email)}</b> — ${escapeHtml(r.action)}</div></div>`;
+
+      if (feedView === 'signups') return `
+        <div class="row"><div class="when">${escapeHtml(ago(r.at))}</div>
+        <div class="grow"><b>${escapeHtml(r.email || '—')}</b> · ${escapeHtml(r.outcome)}
+        ${r.detail ? `<div style="color:#FCA5A5;font-size:0.78rem">${escapeHtml(r.detail)}</div>` : ''}</div>
+        <span class="tag${r.outcome === 'failed' ? '' : ''}">${escapeHtml(r.source)}</span></div>`;
+
+      return `
+        <div class="row"><div class="when">${escapeHtml(ago(r.at))}</div>
+        <div class="grow"><b>${escapeHtml(r.actor_name || 'Someone')}</b> ${escapeHtml(r.action)}
+        ${r.subject ? ' — ' + escapeHtml(r.subject) : ''}
+        ${r.detail ? `<div class="dim" style="font-size:0.76rem">${escapeHtml(r.detail)}</div>` : ''}</div>
+        <span class="tag">${escapeHtml(r.kind)}</span></div>`;
+    }).join('');
+  }
+
+  /* ── Events ──────────────────────────────────────────────────────────── */
+  async function renderEvents(el) {
+    if (!cache.events) {
+      const iso = d => d.toISOString().slice(0, 10);
+      const { data, error } = await db.rpc('calendar_between', {
+        p_from: iso(new Date()),
+        p_to:   iso(new Date(Date.now() + 42 * 86400000)),
+      });
+      if (error) { el.innerHTML = fail(error.message); return; }
+      cache.events = data || [];
+    }
+
+    if (!cache.events.length) {
+      el.innerHTML = '<p class="dim" style="padding:26px 0;text-align:center;font-size:0.86rem">Nothing scheduled in the next six weeks.</p>';
+      return;
+    }
+
+    el.innerHTML = `<div class="card card-glass" style="padding:4px 16px">` +
+      cache.events.map(e => {
+        const when = new Date(e.event_date + 'T00:00:00')
+          .toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
+        return `
+        <div class="row">
+          <div class="when">${escapeHtml(when)}</div>
+          <div class="grow">
+            <b>${escapeHtml(e.title)}</b>
+            <div class="dim" style="font-size:0.76rem">
+              ${escapeHtml((e.start_time || '').slice(0, 5))} · ${escapeHtml(e.venue_name || '')} · ${e.going_count} going
+            </div>
+          </div>
+          <button type="button" class="btn btn-outline mini"
+                  onclick="cancelNight('${e.event_id}', '${e.event_date}', '${escapeHtml(e.title).replace(/'/g, "&#39;")}')">
+            Cancel
+          </button>
+        </div>`;
+      }).join('') + `</div>
+      <p class="dim" style="font-size:0.76rem;margin-top:10px">
+        Cancelling removes that one night only — the weekly event keeps running.
+      </p>`;
+  }
+
+  async function cancelNight(eventId, date, title) {
+    const reason = prompt(`Cancel ${title} on ${date}?\n\nReason (shown to nobody, kept for the record):`, 'Closed');
+    if (reason === null) return;
+    const { error } = await db.from('event_exceptions')
+      .insert({ event_id: eventId, event_date: date, reason: reason || 'Cancelled' });
+    if (error) { alert('Could not cancel: ' + error.message); return; }
+    delete cache.events;
+    render();
+  }
+
+  /* ── Venues ──────────────────────────────────────────────────────────── */
+  async function renderVenues(el) {
+    if (!cache.venues) {
+      // The board can read the venues table itself, which is where the poster tokens
+      // and the monthly contribution live — neither is in venue_public.
+      const { data, error } = await db.from('venues')
+        .select('id, name, address, neighbourhood, monthly_fee_eur, member_discount, discount_active, self_checkin_token, active')
+        .order('name');
+      if (error) { el.innerHTML = fail(error.message); return; }
+      cache.venues = data || [];
+    }
+
+    el.innerHTML = cache.venues.map(v => `
+      <div class="card card-glass" style="padding:16px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <b style="color:#FFF;font-size:1.02rem">${escapeHtml(v.name)}</b>
+          ${v.active ? '' : '<span class="tag">inactive</span>'}
+        </div>
+        <div class="dim" style="font-size:0.8rem">${escapeHtml(v.neighbourhood || v.address || '')}</div>
+        <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;font-size:0.82rem">
+          <div><span class="dim">Contribution</span><br /><b>${v.monthly_fee_eur ? '€' + v.monthly_fee_eur + '/mo' : '—'}</b></div>
+          <div><span class="dim">Member offer</span><br /><b>${escapeHtml(v.member_discount || '—')}</b></div>
+        </div>
+        <div style="margin-top:12px">
+          <div class="dim" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px">Poster check-in QR</div>
+          <div class="code">https://isotcommunity.com/checkin?v=${escapeHtml(v.self_checkin_token)}</div>
+          <button type="button" class="btn btn-outline mini" style="margin-top:8px"
+                  onclick="copyPoster('${escapeHtml(v.self_checkin_token)}', this)">Copy link</button>
+        </div>
+      </div>`).join('') + `
+      <p class="dim" style="font-size:0.76rem">
+        These links are secrets — anyone holding one can check in without being at the venue.
+        Put them on the printed poster and nowhere else.
+      </p>`;
+  }
+
+  async function copyPoster(token, btn) {
+    const url = 'https://isotcommunity.com/checkin?v=' + token;
+    try {
+      await navigator.clipboard.writeText(url);
+      btn.textContent = 'Copied';
+    } catch {
+      btn.textContent = 'Select the link above';
+    }
+    setTimeout(() => { btn.textContent = 'Copy link'; }, 1800);
+  }
+  </script>
+</body>
+</html>

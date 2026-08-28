@@ -473,9 +473,9 @@ function initBurgerMenu(profile) {
         <span>App Hub</span>
       </a>
       ${isBoard ? `
-      <a href="monitor.html" class="drawer-item">
-        <i class="fa-solid fa-wave-square text-pink"></i>
-        <span>Monitor</span>
+      <a href="admin.html" class="drawer-item">
+        <i class="fa-solid fa-sliders text-pink"></i>
+        <span>Admin panel</span>
       </a>` : ''}
       <a href="karaoke.html" class="drawer-item">
         <i class="fa-solid fa-microphone"></i>
@@ -506,12 +506,7 @@ function initBurgerMenu(profile) {
         </a>
       ` : ''}
 
-      ${isBoard ? `
-        <a href="dashboard.html" class="drawer-item">
-          <i class="fa-solid fa-chart-line text-gold"></i>
-          <span>Board Analytics Dashboard</span>
-        </a>
-      ` : ''}
+
     </div>
 
     <div class="drawer-footer">
@@ -604,7 +599,6 @@ async function signOut() {
  * Navigation Helpers
  * ------------------------------------------------------------- */
 function homeFor(profile) {
-  if (profile.staff_role === 'board')     return 'dashboard.html';
   if (profile.staff_role === 'partner')   return 'partner.html';
   if (profile.staff_role === 'volunteer') return 'home.html';
   return 'home.html';

@@ -79,11 +79,16 @@
         </div>
 
         <div class="sub">
-          <p class="eyebrow" style="margin-bottom:10px">Optional</p>
+          <p class="eyebrow" style="margin-bottom:10px">Required</p>
           <div class="consent">
-            <input type="checkbox" id="cPhotos" />
-            <label for="cPhotos">I'm happy for ISOT to publish photos from events I appear in, on the site and on Instagram. You can withdraw this any time.</label>
+            <input type="checkbox" id="cPhotos" required />
+            <label for="cPhotos">I agree that ISOT may publish photos from events I appear in, on the website and on Instagram. You can withdraw this at any time by writing to us.</label>
           </div>
+          <p id="photoWarn" class="dim" style="font-size:0.8rem;color:#FCA5A5;margin:-4px 0 0 30px" hidden>
+            You need to agree to this to finish setting up your account.
+          </p>
+
+          <p class="eyebrow" style="margin:20px 0 10px">Optional</p>
           <div class="consent">
             <input type="checkbox" id="cNews" />
             <label for="cNews">Email me about upcoming events.</label>
@@ -163,7 +168,13 @@
     }
     pwEl.addEventListener('input', checkMatch);
     cfEl.addEventListener('input', checkMatch);
+    document.getElementById('cPhotos').addEventListener('change', () => {
+      document.getElementById('photoWarn').hidden = document.getElementById('cPhotos').checked;
+    });
 
+    // Recorded on BOTH paths now. Photo consent is required to finish, so it has to be
+    // written whether they filled in the optional details or pressed Skip — otherwise
+    // there is no record of the agreement that was just required of them.
     async function saveConsents() {
       try {
         const rows = [
@@ -176,7 +187,30 @@
       }
     }
 
+    /* Photo consent is mandatory: the account cannot be completed without it.
+     *
+     * This was a deliberate decision by the president on 25 Aug 2026, taken after being
+     * told that consent conditioned on access is not "freely given" under GDPR Art. 7(4)
+     * and Recital 43, and is therefore not valid consent to rely on. Recorded here so it
+     * reads as a choice rather than an oversight, and so it can be revisited if RUNTS,
+     * VOL.TO or a member raises it. The compliant alternative is a required Yes/No where
+     * "No" still creates the account.
+     */
+    function photoConsentGiven() {
+      const ok = document.getElementById('cPhotos').checked;
+      document.getElementById('photoWarn').hidden = ok;
+      if (!ok) document.getElementById('cPhotos').focus();
+      return ok;
+    }
+
     async function finish(withDetails) {
+      // Checked before anything is written, on the Skip path too — Skip must not be a
+      // way round a consent the account cannot be completed without.
+      if (!photoConsentGiven()) {
+        setAlert(alertEl, 'Please agree to the photo policy to finish setting up your account.');
+        return;
+      }
+
       const restore = busy(submit, 'Saving…');
 
       if (withDetails) {
@@ -211,7 +245,7 @@
 
       if (error) { restore(); setAlert(alertEl, error.message); return; }
 
-      if (withDetails) await saveConsents();
+      await saveConsents();
       location.replace('home.html');
     }
 
