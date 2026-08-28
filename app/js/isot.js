@@ -353,6 +353,7 @@ async function requireAuth(opts = {}) {
   const gateEl = document.getElementById('gate');
   if (gateEl) gateEl.remove();
 
+  ensureNav();
   initBurgerMenu(profile);
 
   // Populate the bell. No page called loadNotifications(), so localNotifications was
@@ -412,6 +413,54 @@ setTimeout(() => {
 document.addEventListener('submit', (e) => {
   if (document.getElementById('gate')) e.preventDefault();
 }, true);
+
+/* ---------------------------------------------------------------
+ * Guaranteed way out
+ *
+ * Every guarded page must have a visible route back to the app. It did not:
+ * scan.html had no topbar at all, and admin, assembly, karaoke-kj and checkin have
+ * no tab bar — so on those screens the only exit was the browser's back button, and
+ * in a home-screen PWA there isn't one.
+ *
+ * Done here rather than in each page so it also covers whatever gets built next.
+ * ------------------------------------------------------------- */
+function ensureNav() {
+  const hasTabbar = !!document.querySelector('.tabbar');
+  let topbar = document.querySelector('.topbar');
+
+  if (!topbar) {
+    topbar = document.createElement('header');
+    topbar.className = 'topbar';
+    topbar.innerHTML = '<a href="home.html" class="topbar-title">ISOT</a>';
+    document.body.insertBefore(topbar, document.body.firstChild);
+  }
+
+  // The tab bar already carries Home, so a second control there would be noise.
+  if (!hasTabbar && !topbar.querySelector('[data-home]')) {
+    const home = document.createElement('a');
+    home.href = 'home.html';
+    home.dataset.home = '1';
+    home.setAttribute('aria-label', 'Back to app home');
+    home.style.cssText =
+      'display:inline-flex;align-items:center;gap:7px;flex-shrink:0;' +
+      'color:#FFF;text-decoration:none;font-size:0.82rem;padding:6px 12px;' +
+      'border:1px solid var(--border-light);border-radius:10px;';
+    home.innerHTML = '<i class="fa-solid fa-chevron-left"></i><span>Home</span>';
+    topbar.insertBefore(home, topbar.firstChild);
+  }
+
+  if (!document.getElementById('burgerBtn')) {
+    const burger = document.createElement('button');
+    burger.type = 'button';
+    burger.id = 'burgerBtn';
+    burger.setAttribute('aria-label', 'Account menu');
+    burger.style.cssText =
+      'background:transparent;border:none;color:#FFF;font-size:1.3rem;' +
+      'cursor:pointer;padding:6px;flex-shrink:0;';
+    burger.innerHTML = '<i class="fa-solid fa-bars"></i>';
+    topbar.appendChild(burger);
+  }
+}
 
 /* ---------------------------------------------------------------
  * Account Burger Drawer Component (Apple Glass Slide-In)
