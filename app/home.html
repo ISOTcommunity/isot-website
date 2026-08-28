@@ -295,18 +295,25 @@
 
   <main class="shell">
 
-    <!-- VOLUNTEER / BOARD SHIFT SCREEN (Shown when on staff duty) -->
+    <!-- STAFF TOOLS — shown ABOVE the member home, never instead of it.
+         Staff are members too: this used to replace the whole home screen the moment
+         someone was given a role, so the president lost the app he was president of.
+         It also announced "On Shift" on a Tuesday afternoon with nothing running. -->
     <div id="volunteerShiftView" style="display: none;">
-      <div class="card card-glow" style="margin-bottom: 24px; text-align: center;">
-        <div class="eyebrow"><i class="fa-solid fa-bolt"></i> On Shift • Volunteer Controller</div>
-        <h2 style="font-size: 1.5rem; margin-top: 6px;" id="shiftEventTitle">Monday Karaoke @ Rough</h2>
-        
+      <div class="card card-glow" style="margin-bottom: 20px; text-align: center;">
+        <button type="button" onclick="hideShift()" aria-label="Hide staff tools"
+                style="position:absolute;top:10px;right:12px;background:transparent;border:none;color:var(--text-dim);font-size:1rem;cursor:pointer;padding:4px">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="eyebrow"><i class="fa-solid fa-bolt"></i> Tonight — staff tools</div>
+        <h2 style="font-size: 1.35rem; margin-top: 6px;" id="shiftEventTitle">—</h2>
+
         <!-- Live Headcount Counter -->
         <div class="headcount-badge">
           <i class="fa-solid fa-users-viewfinder" style="font-size: 1.4rem; color: #10B981;"></i>
           <div style="text-align: left;">
-            <div style="font-size: 1.4rem; font-weight: 800; color: #FFF; line-height: 1;" id="headcountNum">24</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">Live Headcount Scanned Tonight</div>
+            <div style="font-size: 1.4rem; font-weight: 800; color: #FFF; line-height: 1;" id="headcountNum">–</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Checked in tonight</div>
           </div>
         </div>
 
@@ -560,16 +567,14 @@
         const nextEvent = getNextUpcomingEvent();
         if (nextEvent) updateHeroEvent(nextEvent);
 
-        const isStaff = meProfile && (meProfile.staff_role === 'volunteer' || meProfile.staff_role === 'board');
+        // The member home is always shown. Staff tools sit above it when there is
+        // actually something on tonight — a role is not a shift.
+        const memberView = document.getElementById('memberHomeView');
+        if (memberView) memberView.style.display = 'block';
 
-        if (isStaff) {
-          if (document.getElementById('volunteerShiftView')) document.getElementById('volunteerShiftView').style.display = 'block';
-          if (document.getElementById('memberHomeView')) document.getElementById('memberHomeView').style.display = 'none';
-          loadShiftData();
-        } else {
-          if (document.getElementById('volunteerShiftView')) document.getElementById('volunteerShiftView').style.display = 'none';
-          if (document.getElementById('memberHomeView')) document.getElementById('memberHomeView').style.display = 'block';
-        }
+        const isStaff = meProfile &&
+          (meProfile.staff_role === 'volunteer' || meProfile.staff_role === 'board');
+        if (isStaff && !sessionStorage.getItem('isot_shift_hidden')) await loadShiftData();
       } catch (err) {
         console.error('Home init catch:', err);
       } finally {
@@ -769,24 +774,70 @@
       document.getElementById('heroEventActions').innerHTML = hero.actions;
     }
 
+    function hideShift() {
+      document.getElementById('volunteerShiftView').style.display = 'none';
+      // Per session, not forever — next time they open the app on a Monday it is back.
+      sessionStorage.setItem('isot_shift_hidden', '1');
+    }
+
+    /** The ISOT day: a night belongs to the day it started, so the boundary is 06:00. */
+    function isotToday() {
+      const d = new Date(Date.now() - 6 * 3600 * 1000);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
     async function loadShiftData() {
-      try {
-        const { data, count } = await db
-          .from('member_validations')
-          .select('full_name:profiles(full_name), created_at, result', { count: 'exact' });
-        
-        document.getElementById('headcountNum').textContent = count || 24;
-        
-        if (data && data.length) {
-          document.getElementById('recentScansList').innerHTML = data.slice(0, 5).map(item => `
-            <div class="recent-scan-item">
-              <div><strong>${escapeHtml(item.full_name?.full_name || 'Member')}</strong></div>
-              <div class="dim">${new Date(item.created_at).toLocaleTimeString().slice(0,5)}</div>
-            </div>
-          `).join('');
-        }
-      } catch (e) {
-        console.log('Shift log fallback active');
+      const today   = isotToday();
+      const tonight = EVENTS_DATA.filter(e => e.date === today);
+
+      // No event tonight means no shift. Showing "On Shift" on a quiet Tuesday made
+      // the panel meaningless, which is how a real one gets ignored.
+      if (!tonight.length) return;
+
+      const panel = document.getElementById('volunteerShiftView');
+      panel.style.display = 'block';
+      panel.style.position = 'relative';
+
+      const ev = tonight[0];
+      document.getElementById('shiftEventTitle').textContent =
+        ev.title + (ev.venueName ? ' · ' + ev.venueName : '');
+
+      // Count TONIGHT's check-ins only. This used to count every validation ever
+      // recorded and label it "Live Headcount Scanned Tonight" — and worse, fell back
+      // to a literal 24 whenever the real count was zero, because `count || 24` treats
+      // zero as missing. A quiet night displayed 24 people.
+      const numEl  = document.getElementById('headcountNum');
+      const listEl = document.getElementById('recentScansList');
+
+      if (!ev.instanceId) {
+        numEl.textContent = '0';
+        if (listEl) listEl.innerHTML = '<div class="dim" style="font-size:0.82rem;padding:8px 0">Nobody has checked in yet.</div>';
+        return;
+      }
+
+      const { data, count, error } = await db
+        .from('check_ins')
+        .select('created_at, method, profiles(full_name)', { count: 'exact' })
+        .eq('event_instance_id', ev.instanceId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        numEl.textContent = '–';
+        if (listEl) listEl.innerHTML =
+          `<div class="dim" style="font-size:0.82rem;padding:8px 0;color:#FCA5A5">Could not load check-ins: ${escapeHtml(error.message)}</div>`;
+        return;
+      }
+
+      numEl.textContent = count ?? 0;
+
+      if (listEl) {
+        listEl.innerHTML = (data && data.length)
+          ? data.slice(0, 6).map(item => `
+              <div class="recent-scan-item">
+                <div><strong>${escapeHtml(item.profiles?.full_name || 'Member')}</strong></div>
+                <div class="dim">${new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+              </div>`).join('')
+          : '<div class="dim" style="font-size:0.82rem;padding:8px 0">Nobody has checked in yet.</div>';
       }
     }
 
