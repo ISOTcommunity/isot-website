@@ -63,5 +63,115 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/turin-international-student-nightlife-guide",
+      "destination": "/turin-international-student-nightlife-guide.html"
+    },
+    {
+      "source": "/life-as-an-international-student-in-turin",
+      "destination": "/life-as-an-international-student-in-turin.html"
+    },
+    {
+      "source": "/edisu-student-residences-and-dorms-turin-guide",
+      "destination": "/edisu-student-residences-and-dorms-turin-guide.html"
+    },
+    {
+      "source": "/edisu-scholarship-and-housing-turin-guide",
+      "destination": "/edisu-scholarship-and-housing-turin-guide.html"
+    },
+    {
+      "source": "/erasmus-life-in-turin-guide",
+      "destination": "/erasmus-life-in-turin-guide.html"
+    },
+    {
+      "source": "/sas-startup-community-saa-turin",
+      "destination": "/sas-startup-community-saa-turin.html"
+    },
+    {
+      "source": "/turin-student-sports-bouldering-climbing-guide",
+      "destination": "/turin-student-sports-bouldering-climbing-guide.html"
+    },
+    {
+      "source": "/isot-board-game-social-nights-turin",
+      "destination": "/isot-board-game-social-nights-turin.html"
+    },
+    {
+      "source": "/isot-art-and-painting-workshop-turin",
+      "destination": "/isot-art-and-painting-workshop-turin.html"
+    },
+    {
+      "source": "/castello-del-valentino-polito-architecture-guide",
+      "destination": "/castello-del-valentino-polito-architecture-guide.html"
+    },
+    {
+      "source": "/turin-public-transport-gtt-student-pass",
+      "destination": "/turin-public-transport-gtt-student-pass.html"
+    },
+    {
+      "source": "/healthcare-tessera-sanitaria-turin",
+      "destination": "/healthcare-tessera-sanitaria-turin.html"
+    },
+    {
+      "source": "/permesso-di-soggiorno-turin-guide",
+      "destination": "/permesso-di-soggiorno-turin-guide.html"
+    },
+    {
+      "source": "/codice-fiscale-turin-guide",
+      "destination": "/codice-fiscale-turin-guide.html"
+    },
+    {
+      "source": "/universities-and-colleges-in-turin-for-international-students",
+      "destination": "/universities-and-colleges-in-turin-for-international-students.html"
+    },
+    {
+      "source": "/a-complete-guide-to-living-in-turin-for-international-students",
+      "destination": "/a-complete-guide-to-living-in-turin-for-international-students.html"
+    },
+    {
+      "source": "/isot-brazilian-karaoke-night-at-rough-bar-san-salvario",
+      "destination": "/isot-brazilian-karaoke-night-at-rough-bar-san-salvario.html"
+    },
+    {
+      "source": "/happy-nowruz-iranian-new-year-isot-community",
+      "destination": "/happy-nowruz-iranian-new-year-isot-community.html"
+    },
+    {
+      "source": "/saahorizon2025",
+      "destination": "/saahorizon2025.html"
+    },
+    {
+      "source": "/studenthousinginturin",
+      "destination": "/studenthousinginturin.html"
+    },
+    {
+      "source": "/italianacademicexamsystem",
+      "destination": "/italianacademicexamsystem.html"
+    },
+    {
+      "source": "/turin-student-canteens",
+      "destination": "/turin-student-canteens.html"
+    },
+    {
+      "source": "/celebrating-migration-a-journey-of-resilience-and-opportunity",
+      "destination": "/celebrating-migration-a-journey-of-resilience-and-opportunity.html"
+    },
+    {
+      "source": "/edisuscholarship2024",
+      "destination": "/edisuscholarship2024.html"
+    },
+    {
+      "source": "/sexual-behaviour-in-italy",
+      "destination": "/sexual-behaviour-in-italy.html"
+    },
+    {
+      "source": "/post_medical1",
+      "destination": "/post_medical1.html"
+    },
+    {
+      "source": "/welcome",
+      "destination": "/welcome.html"
+    }
   ]
 }
