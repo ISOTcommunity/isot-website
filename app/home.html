@@ -266,6 +266,39 @@
       align-items: center;
       gap: 4px;
     }
+
+    /* ── Featured one-off night. Revealed by script only while the night is on. ── */
+    .featured-night-card {
+      background: linear-gradient(135deg, rgba(238, 9, 121, 0.14) 0%, rgba(36, 54, 115, 0.4) 100%);
+      border: 1px solid rgba(238, 9, 121, 0.45);
+      border-radius: 24px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    }
+    .featured-night-card img.poster {
+      display: block; width: 100%; height: auto;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .featured-night-body { padding: 20px; }
+    .featured-night-body h2 {
+      font-size: 1.5rem; font-weight: 800; color: #FFF;
+      margin: 10px 0 8px; line-height: 1.2;
+    }
+    .featured-night-body p {
+      color: var(--text-muted); font-size: 0.9rem; line-height: 1.55; margin-bottom: 16px;
+    }
+    .featured-night-facts { display: flex; flex-direction: column; gap: 10px; }
+    .featured-night-facts div {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.88rem; color: #FFF;
+    }
+    .featured-night-facts i {
+      width: 30px; height: 30px; flex-shrink: 0; border-radius: 9px;
+      display: inline-flex; align-items: center; justify-content: center;
+      line-height: 1; margin: 0; padding: 0;
+      background: rgba(238, 9, 121, 0.15); color: var(--pink); font-size: 0.82rem;
+    }
   </style>
 </head>
 <body>
@@ -366,6 +399,26 @@
           <div class="cat-pill-item" onclick="filterCategory('karaoke')">
             <div class="cat-pill-img" style="position:relative; background:#1E293B;"><img src="../assets/characters/char_karaoke_singer.png" alt="Karaoke Night" style="object-fit:contain; padding:4px;" /></div>
             <span class="cat-pill-label">Karaoke Night</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEATURED NIGHT — hidden by default, revealed by script only while it is on -->
+      <div class="featured-night-card" id="featuredNight" style="display: none;">
+        <img class="poster" src="../assets/optimized/isot_rough_season_warmup_2026.jpg"
+             alt="ROUGH Season Warm-Up poster: DJ set by Nardj and Amir, 29 August, start 22:00, Rough Dive Bar." />
+        <div class="featured-night-body">
+          <span class="badge badge-socio"><i class="fa-solid fa-star"></i> <span id="featuredNightTag">Season Opener</span></span>
+          <h2>Rough &mdash; Season Warm-Up</h2>
+          <p>
+            The semester has not started yet, but ISOT is already warming up for the new season.
+            Grab a drink, meet new people and enjoy some music before the semester kicks off.
+          </p>
+          <div class="featured-night-facts">
+            <div><i class="fa-solid fa-calendar"></i> Saturday, 29 August</div>
+            <div><i class="fa-solid fa-location-dot"></i> Rough Dive Bar &bull; San Salvario</div>
+            <div><i class="fa-solid fa-users"></i> Gathering from 21:00</div>
+            <div><i class="fa-solid fa-headphones"></i> DJ set by Nardj &amp; Amir from 22:00</div>
           </div>
         </div>
       </div>
@@ -841,7 +894,39 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', initHome);
+    // ── Featured night ───────────────────────────────────────────────────
+    // Shown only until the night is over, so the banner retires itself rather
+    // than advertising a past date. Absolute UTC instants, so a member abroad
+    // sees the same window as Turin.
+    //   doors 21:00 Rome (CEST, UTC+2) on 29 Aug  →  19:00Z
+    //   retire 04:00 Rome the following morning    →  02:00Z on 30 Aug
+    const FEATURED_NIGHT = {
+      showFrom: Date.parse('2026-08-22T00:00:00Z'),
+      retireAt: Date.parse('2026-08-30T02:00:00Z'),
+      startsAt: Date.parse('2026-08-29T19:00:00Z')
+    };
+
+    function renderFeaturedNight() {
+      const el = document.getElementById('featuredNight');
+      if (!el) return;
+
+      const now = Date.now();
+      if (now < FEATURED_NIGHT.showFrom || now >= FEATURED_NIGHT.retireAt) return;
+
+      const tag = document.getElementById('featuredNightTag');
+      if (tag) {
+        tag.textContent = now >= FEATURED_NIGHT.startsAt - 21 * 3600 * 1000
+          ? 'Tonight'
+          : 'This Saturday';
+      }
+
+      el.style.display = '';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderFeaturedNight();
+      initHome();
+    });
   </script>
 </body>
 </html>

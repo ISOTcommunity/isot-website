@@ -372,6 +372,47 @@
       .event-card-top { flex-direction: column; gap: 10px; }
     }
 
+    /* ── Featured one-off night. Revealed by script only while the night is on,
+          so it cannot sit here stale once the date has passed. ── */
+    .featured-night {
+      display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+      gap: 36px; align-items: center;
+      background: linear-gradient(135deg, rgba(238, 9, 121, 0.12) 0%, rgba(36, 54, 115, 0.35) 100%);
+      border: 1px solid rgba(238, 9, 121, 0.45); border-radius: var(--radius-lg);
+      padding: 32px;
+    }
+    .featured-night-poster {
+      display: block; border-radius: var(--radius-md); overflow: hidden;
+      border: 1px solid var(--border-light); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+      transition: var(--transition);
+    }
+    .featured-night-poster:hover { transform: translateY(-4px); }
+    .featured-night-poster img { display: block; width: 100%; height: auto; }
+    .featured-night-title {
+      font-family: var(--font-display); font-size: 3.6rem; line-height: 0.95;
+      color: #FFF; margin-bottom: 14px;
+    }
+    .featured-night-lead { color: var(--text-muted); font-size: 1.05rem; margin-bottom: 22px; }
+    .featured-night-facts {
+      display: flex; flex-direction: column; gap: 12px; margin-bottom: 26px;
+      list-style: none; padding: 0;
+    }
+    .featured-night-facts li {
+      display: flex; align-items: center; gap: 12px;
+      color: var(--text-main); font-size: 0.98rem;
+    }
+    .featured-night-facts i {
+      width: 34px; height: 34px; flex-shrink: 0; border-radius: 10px;
+      display: inline-flex; align-items: center; justify-content: center; line-height: 1;
+      background: rgba(238, 9, 121, 0.15); color: var(--pink); font-size: 0.9rem;
+    }
+
+    @media (max-width: 860px) {
+      .featured-night { grid-template-columns: 1fr; gap: 26px; padding: 24px; }
+      .featured-night-poster { max-width: 340px; margin: 0 auto; }
+      .featured-night-title { font-size: 2.9rem; }
+    }
+
   </style>
 </head>
 <body>
@@ -424,6 +465,35 @@
       <p style="color: var(--text-muted); max-width: 680px; margin: 0 auto; font-size: 1.15rem;">
         No registration barriers—just show up, meet international students, and enjoy the vibe in San Salvario & Murazzi.
       </p>
+    </div>
+  </section>
+
+  <!-- FEATURED NIGHT — hidden by default, revealed by script only while it is on -->
+  <section class="section-padding" id="featuredNight" style="display: none; padding-top: 0;">
+    <div class="container">
+      <div class="featured-night">
+        <a class="featured-night-poster" href="assets/optimized/isot_rough_season_warmup_2026.jpg" target="_blank" rel="noopener">
+          <img src="assets/optimized/isot_rough_season_warmup_2026.jpg"
+               alt="ROUGH Season Warm-Up poster: DJ set by Nardj and Amir, 29 August, start 22:00, Rough Dive Bar." />
+        </a>
+        <div>
+          <div class="pill-tag"><i class="fa-solid fa-star"></i> <span id="featuredNightTag">Season Opener</span></div>
+          <h2 class="featured-night-title">Rough <span class="text-gradient">Season Warm-Up</span></h2>
+          <p class="featured-night-lead">
+            The semester has not started yet, but ISOT is already warming up for the new season.
+            Come to Rough Dive Bar, grab a drink, meet new people and enjoy some music before the semester kicks off.
+          </p>
+          <ul class="featured-night-facts">
+            <li><i class="fa-solid fa-calendar"></i> Saturday, 29 August</li>
+            <li><i class="fa-solid fa-location-dot"></i> Rough Dive Bar &mdash; Via Principe Tommaso 3, San Salvario</li>
+            <li><i class="fa-solid fa-users"></i> Gathering from 21:00</li>
+            <li><i class="fa-solid fa-headphones"></i> DJ set by Nardj &amp; Amir from 22:00</li>
+          </ul>
+          <a href="https://www.instagram.com/isot.community/" target="_blank" rel="noopener" class="btn btn-pink">
+            Follow for updates <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -890,7 +960,40 @@
       `;
     }
 
-    document.addEventListener('DOMContentLoaded', loadCalendarData);
+    // ── Featured night ───────────────────────────────────────────────────
+    // Shown only until the night is over, so the banner retires itself rather
+    // than advertising a past date. Absolute UTC instants, so a visitor in
+    // another timezone sees the same window as Turin.
+    //   doors 21:00 Rome (CEST, UTC+2) on 29 Aug  →  19:00Z
+    //   retire 04:00 Rome the following morning    →  02:00Z on 30 Aug
+    const FEATURED_NIGHT = {
+      showFrom: Date.parse('2026-08-22T00:00:00Z'),
+      retireAt: Date.parse('2026-08-30T02:00:00Z'),
+      startsAt: Date.parse('2026-08-29T19:00:00Z')
+    };
+
+    function renderFeaturedNight() {
+      const el = document.getElementById('featuredNight');
+      if (!el) return;
+
+      const now = Date.now();
+      if (now < FEATURED_NIGHT.showFrom || now >= FEATURED_NIGHT.retireAt) return;
+
+      const tag = document.getElementById('featuredNightTag');
+      if (tag) {
+        // "Tonight" only once the day itself has arrived in Turin.
+        tag.textContent = now >= FEATURED_NIGHT.startsAt - 21 * 3600 * 1000
+          ? 'Tonight • Season Opener'
+          : 'This Saturday • Season Opener';
+      }
+
+      el.style.display = '';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderFeaturedNight();
+      loadCalendarData();
+    });
   </script>
 
 </body>
