@@ -27,17 +27,17 @@
 
   <style>
     :root {
-      --bg-dark: #0F172A;
-      --bg-card: #1E293B;
-      --bg-darker: #0B1120;
-      --pink: #EE0979;
-      --pink-glow: rgba(238, 9, 121, 0.35);
-      --navy: #243673;
-      --orange: #FF6A00;
-      --green: #10B981;
-      --text-main: #F8FAFC;
-      --text-muted: #CBD5E1;
-      --text-dim: #94A3B8;
+      --bg-dark: #000000;
+      --bg-card: #0E0E13;
+      --bg-darker: #000000;
+      --pink: #D45AE8;
+      --pink-glow: rgba(212, 90, 232, 0.35);
+      --navy: #1B4CAD;
+      --orange: #E69321;
+      --green: #43DB8F;
+      --text-main: #F6F7F9;
+      --text-muted: #B9BFCB;
+      --text-dim: #8C93A3;
       --border-light: rgba(255, 255, 255, 0.12);
       --font-display: 'Amatic SC', cursive, sans-serif;
       --font-body: 'Outfit', sans-serif;
@@ -53,7 +53,7 @@
 
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #243673; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb { background: #1B4CAD; border-radius: 9999px; }
 
     a { color: var(--pink); text-decoration: none; }
     a:hover { text-decoration: underline; }
@@ -86,7 +86,7 @@
       cursor: pointer;
       transition: all 0.25s ease;
     }
-    .mobile-toggle:hover { background: rgba(238, 9, 121, 0.2); border-color: var(--pink); color: var(--pink); }
+    .mobile-toggle:hover { background: rgba(212, 90, 232, 0.2); border-color: var(--pink); color: var(--pink); }
 
     @media (max-width: 991px) {
       .nav-links, .nav-btn-desktop { display: none !important; }
@@ -102,7 +102,7 @@
       background: rgba(11, 17, 32, 0.96);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
-      border-bottom: 1px solid rgba(238, 9, 121, 0.35);
+      border-bottom: 1px solid rgba(212, 90, 232, 0.35);
       padding: 24px 28px;
       flex-direction: column;
       gap: 14px;
@@ -132,14 +132,14 @@
 
     /* LEFT SIDEBAR: APP SHOWCASE & HOOKS */
     .app-promo-card {
-      background: linear-gradient(180deg, #1E293B 0%, #151F30 100%);
+      background: linear-gradient(180deg, #0E0E13 0%, #0E0E13 100%);
       border: 1px solid var(--border-light); border-radius: var(--radius-lg);
       padding: 24px; text-align: left; box-shadow: 0 12px 30px rgba(0,0,0,0.3);
     }
     .app-badge {
       display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 700;
       text-transform: uppercase; letter-spacing: 1px; color: var(--pink);
-      background: rgba(238, 9, 121, 0.15); padding: 4px 12px; border-radius: var(--radius-full); margin-bottom: 12px;
+      background: rgba(212, 90, 232, 0.15); padding: 4px 12px; border-radius: var(--radius-full); margin-bottom: 12px;
     }
     .app-promo-title { font-size: 1.3rem; font-weight: 800; color: #FFF; line-height: 1.2; margin-bottom: 10px; }
     .app-promo-desc { font-size: 0.88rem; color: var(--text-dim); margin-bottom: 18px; line-height: 1.5; }
@@ -148,21 +148,21 @@
       display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; font-size: 0.85rem; color: var(--text-muted);
     }
     .app-hook-icon {
-      width: 32px; height: 32px; border-radius: 10px; background: rgba(238, 9, 121, 0.15);
+      width: 32px; height: 32px; border-radius: 10px; background: rgba(212, 90, 232, 0.15);
       color: var(--pink); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.9rem;
     }
 
     .btn-app-install {
       display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
       padding: 12px; border-radius: var(--radius-full); font-weight: 700; font-size: 0.9rem;
-      background: linear-gradient(135deg, #EE0979, #FF6A00); color: #FFF; text-transform: uppercase; letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #D45AE8, #E69321); color: #FFF; text-transform: uppercase; letter-spacing: 0.5px;
       box-shadow: 0 8px 20px var(--pink-glow); transition: var(--transition); margin-top: 10px;
     }
     .btn-app-install:hover { transform: translateY(-2px); text-decoration: none; color: #FFF; }
 
     /* RIGHT SIDEBAR: ANTI-BOT COMMUNITY CAPTCHA */
     .community-card {
-      background: linear-gradient(180deg, #1E293B 0%, #172236 100%);
+      background: linear-gradient(180deg, #0E0E13 0%, #16161D 100%);
       border: 1px solid var(--border-light); border-radius: var(--radius-lg);
       padding: 24px; text-align: left; box-shadow: 0 12px 30px rgba(0,0,0,0.3);
     }
@@ -177,13 +177,13 @@
     .captcha-input-group { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; }
     .captcha-input {
       width: 70px; padding: 8px; border-radius: 8px; border: 1px solid var(--border-light);
-      background: #0F172A; color: #FFF; font-size: 1rem; font-weight: 700; text-align: center; outline: none;
+      background: #000000; color: #FFF; font-size: 1rem; font-weight: 700; text-align: center; outline: none;
     }
     .captcha-btn {
       padding: 8px 16px; border-radius: 8px; border: none; background: var(--pink); color: #FFF;
       font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: var(--transition);
     }
-    .captcha-btn:hover { background: #FF6A00; }
+    .captcha-btn:hover { background: #E69321; }
 
     .community-links-unlocked { display: none; flex-direction: column; gap: 12px; margin-top: 16px; }
     .community-links-unlocked.active { display: flex; }
@@ -205,8 +205,8 @@
     .post-category-tag {
       display: inline-block; font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
       letter-spacing: 1.5px; color: var(--pink); margin-bottom: 14px;
-      background: rgba(238, 9, 121, 0.12); padding: 6px 16px; border-radius: var(--radius-full);
-      border: 1px solid rgba(238, 9, 121, 0.3);
+      background: rgba(212, 90, 232, 0.12); padding: 6px 16px; border-radius: var(--radius-full);
+      border: 1px solid rgba(212, 90, 232, 0.3);
     }
     .post-main-title { font-size: 2.5rem; font-weight: 800; color: #FFF; line-height: 1.25; margin-bottom: 16px; }
     .post-author-bar { display: flex; align-items: center; gap: 16px; font-size: 0.9rem; color: var(--text-dim); }
@@ -229,7 +229,7 @@
     .post-content-body li,
     .post-content-body td,
     .post-content-body th {
-      color: #CBD5E1 !important;
+      color: #B9BFCB !important;
       background-color: transparent !important;
     }
 
@@ -251,16 +251,16 @@
     
     .post-content-body a,
     .post-content-body a * {
-      color: #EE0979 !important; font-weight: 600 !important; text-decoration: underline !important;
+      color: #D45AE8 !important; font-weight: 600 !important; text-decoration: underline !important;
     }
-    .post-content-body a:hover { color: #FF6A00 !important; }
+    .post-content-body a:hover { color: #E69321 !important; }
 
     .post-content-body ul, .post-content-body ol { margin-bottom: 24px; padding-left: 28px; }
     .post-content-body li { margin-bottom: 10px; }
     
     .post-content-body blockquote {
       border-left: 4px solid var(--pink); padding: 20px 24px; margin: 32px 0;
-      font-style: italic; color: #FFF !important; background: rgba(238,9,121,0.08) !important;
+      font-style: italic; color: #FFF !important; background: rgba(212,90,232,0.08) !important;
       border-radius: 0 var(--radius-md) var(--radius-md) 0;
     }
 
@@ -277,7 +277,7 @@
     }
     .back-btn:hover { background: var(--pink); text-decoration: none; border-color: var(--pink); }
 
-    .footer { background: #070B14; border-top: 1px solid var(--border-light); padding: 60px 0 30px; text-align: center; }
+    .footer { background: #000000; border-top: 1px solid var(--border-light); padding: 60px 0 30px; text-align: center; }
 
     /* RESPONSIVE LAYOUT BREAKPOINTS */
     @media (max-width: 1140px) {
@@ -340,14 +340,14 @@
     <aside class="sidebar-sticky">
       <div class="app-promo-card" style="position:relative; overflow:visible;">
         <!-- Transparent Bottle Rider Character Accent -->
-        <img src="assets/characters/char_bottle_rider.png" alt="ISOT Bottle Rider Character" style="position: absolute; right: -15px; top: -30px; height: 75px; width: auto; pointer-events: none; filter: drop-shadow(0 6px 16px rgba(36,54,115,0.6));" />
+        <img src="assets/characters/char_bottle_rider.png" alt="ISOT Bottle Rider Character" style="position: absolute; right: -15px; top: -30px; height: 75px; width: auto; pointer-events: none; filter: drop-shadow(0 6px 16px rgba(27,76,173,0.6));" />
 
         <span class="app-badge"><i class="fa-solid fa-mobile-screen"></i> ISOT Pocket App</span>
         <h3 class="app-promo-title">Your ISOT in Your Pocket</h3>
         <p class="app-promo-desc">Free student web app. Install in 10 seconds without App Store.</p>
 
         <!-- REAL APP MOBILE SCREENSHOT PREVIEW -->
-        <div style="width: 100%; border-radius: 16px; overflow: hidden; border: 1px solid rgba(238,9,121,0.4); margin-bottom: 18px; box-shadow: 0 12px 30px rgba(0,0,0,0.6); background: #0F172A;">
+        <div style="width: 100%; border-radius: 16px; overflow: hidden; border: 1px solid rgba(212,90,232,0.4); margin-bottom: 18px; box-shadow: 0 12px 30px rgba(0,0,0,0.6); background: #000000;">
           <img src="assets/app_showcase/app_home.jpg" alt="ISOT Pocket Web App Real Screenshot" style="width: 100%; display: block; height: auto; object-fit: cover;" />
         </div>
 
@@ -404,7 +404,7 @@
       
       <!-- 1. TURIN STUDENT CHAT GROUPS (ANTI-BOT PROTECTED) -->
       <div class="community-card">
-        <span class="app-badge" style="color: var(--green); background: rgba(16,185,129,0.15);"><i class="fa-solid fa-shield-halved"></i> Anti-Spam Check</span>
+        <span class="app-badge" style="color: var(--green); background: rgba(67,219,143,0.15);"><i class="fa-solid fa-shield-halved"></i> Anti-Spam Check</span>
         <h3 class="app-promo-title">Turin Student Groups</h3>
         <p class="app-promo-desc">Join active WhatsApp & Telegram student chat groups for Turin.</p>
 
@@ -419,7 +419,7 @@
             <input type="number" id="captchaAnswer" class="captcha-input" placeholder="?" autocomplete="off" />
             <button type="button" onclick="verifyHumanCaptcha()" class="captcha-btn">Verify</button>
           </div>
-          <div id="captchaError" style="color: #EF4444; font-size: 0.78rem; display: none;">Incorrect answer, try again!</div>
+          <div id="captchaError" style="color: #F36C51; font-size: 0.78rem; display: none;">Incorrect answer, try again!</div>
         </div>
 
         <!-- UNLOCKED SOCIAL LINKS -->
@@ -466,8 +466,8 @@
       </div>
 
       <!-- 3. THE ISOT MANIFESTO CARD -->
-      <div class="community-card" style="background: linear-gradient(135deg, rgba(36,54,115,0.4) 0%, rgba(15,23,42,0.9) 100%); border-color: rgba(238,9,121,0.35); padding: 22px;">
-        <span class="app-badge" style="color: var(--pink); background: rgba(238,9,121,0.15); margin-bottom: 12px;"><i class="fa-solid fa-quote-left"></i> ISOT Manifesto</span>
+      <div class="community-card" style="background: linear-gradient(135deg, rgba(27,76,173,0.4) 0%, rgba(15,23,42,0.9) 100%); border-color: rgba(212,90,232,0.35); padding: 22px;">
+        <span class="app-badge" style="color: var(--pink); background: rgba(212,90,232,0.15); margin-bottom: 12px;"><i class="fa-solid fa-quote-left"></i> ISOT Manifesto</span>
         <h3 class="app-promo-title" style="font-size: 1.2rem; color: #FFF; margin-bottom: 10px;">Not Just a Group. A Movement.</h3>
         <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; font-style: italic; margin-bottom: 12px;">
           "We turn the challenge of moving abroad into a journey of connection. ISOT is the bridge between arriving in Turin and truly belonging here. You shouldn't have to figure it out alone."

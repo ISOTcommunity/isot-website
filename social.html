@@ -28,18 +28,18 @@
 
   <style>
     :root {
-      --bg-dark: #0F172A;
-      --bg-card: #1E293B;
-      --bg-darker: #0B1120;
-      --pink: #EE0979;
-      --pink-glow: rgba(238, 9, 121, 0.35);
-      --navy: #243673;
-      --orange: #FF6A00;
-      --green: #10B981;
-      --gold: #D4AF50;
-      --text-main: #F8FAFC;
-      --text-muted: #CBD5E1;
-      --text-dim: #94A3B8;
+      --bg-dark: #000000;
+      --bg-card: #0E0E13;
+      --bg-darker: #000000;
+      --pink: #D45AE8;
+      --pink-glow: rgba(212, 90, 232, 0.35);
+      --navy: #1B4CAD;
+      --orange: #E69321;
+      --green: #43DB8F;
+      --gold: #C9801A;
+      --text-main: #F6F7F9;
+      --text-muted: #B9BFCB;
+      --text-dim: #8C93A3;
       --border-light: rgba(255, 255, 255, 0.12);
       --font-display: 'Amatic SC', cursive, sans-serif;
       --font-body: 'Outfit', sans-serif;
@@ -56,7 +56,7 @@
 
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #243673; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb { background: #1B4CAD; border-radius: 9999px; }
 
     a { color: inherit; text-decoration: none; transition: var(--transition); }
     img { max-width: 100%; height: auto; display: block; }
@@ -73,13 +73,13 @@
 
     .page-hero {
       padding-top: 150px; padding-bottom: 50px; text-align: center; position: relative;
-      background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(238,9,121,0.15), transparent 70%);
+      background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(212,90,232,0.15), transparent 70%);
     }
     .pill-tag {
       display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px;
       border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 1.5px; background: rgba(238, 9, 121, 0.15);
-      border: 1px solid rgba(238, 9, 121, 0.3); color: var(--pink); margin-bottom: 20px;
+      text-transform: uppercase; letter-spacing: 1.5px; background: rgba(212, 90, 232, 0.15);
+      border: 1px solid rgba(212, 90, 232, 0.3); color: var(--pink); margin-bottom: 20px;
     }
     .page-title { font-family: var(--font-display); font-size: 5rem; line-height: 0.9; margin-bottom: 16px; }
 
@@ -99,10 +99,10 @@
     .captcha-input-group { display: flex; gap: 12px; justify-content: center; align-items: center; }
     .captcha-input {
       width: 100px; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-light);
-      background: #0F172A; color: #FFF; font-size: 1.3rem; font-weight: 800; text-align: center; outline: none;
+      background: #000000; color: #FFF; font-size: 1.3rem; font-weight: 800; text-align: center; outline: none;
     }
     .captcha-btn {
-      padding: 12px 28px; border-radius: var(--radius-full); border: none; background: linear-gradient(135deg, #EE0979, #FF6A00);
+      padding: 12px 28px; border-radius: var(--radius-full); border: none; background: linear-gradient(135deg, #D45AE8, #E69321);
       color: #FFF; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: var(--transition);
       box-shadow: 0 8px 20px var(--pink-glow); text-transform: uppercase;
     }
@@ -143,7 +143,7 @@
 
     .btn-join-channel:hover { opacity: 0.9; text-decoration: none; color: #FFF; transform: scale(1.03); }
 
-    .footer { background: #070B14; border-top: 1px solid var(--border-light); padding: 50px 0 30px; text-align: center; }
+    .footer { background: #000000; border-top: 1px solid var(--border-light); padding: 50px 0 30px; text-align: center; }
 
     @media (max-width: 640px) {
       .page-title { font-size: 3.5rem; }
@@ -182,7 +182,7 @@
       
       <!-- 1. ANTI-BOT CAPTCHA CHECK FOR TURIN STUDENT CHAT GROUPS (TOP) -->
       <div class="captcha-box" id="captchaBox" style="margin-top:0;">
-        <div class="pill-tag" style="background: rgba(16,185,129,0.15); color: var(--green); border-color: rgba(16,185,129,0.3);">
+        <div class="pill-tag" style="background: rgba(67,219,143,0.15); color: var(--green); border-color: rgba(67,219,143,0.3);">
           <i class="fa-solid fa-shield-halved"></i> Anti-Spam Security Check
         </div>
         <h2 class="captcha-title">Unlock WhatsApp & Telegram Student Groups</h2>
@@ -196,14 +196,14 @@
           <input type="number" id="captchaInputValue" class="captcha-input" placeholder="?" autocomplete="off" />
           <button type="button" onclick="unlockSocialLinks()" class="captcha-btn">Unlock Chat Groups <i class="fa-solid fa-lock-open"></i></button>
         </div>
-        <div id="captchaErrorMessage" style="color: #EF4444; font-size: 0.85rem; margin-top: 10px; display: none;">
+        <div id="captchaErrorMessage" style="color: #F36C51; font-size: 0.85rem; margin-top: 10px; display: none;">
           Incorrect answer. Please try again!
         </div>
       </div>
 
       <!-- UNLOCKED CHANNEL LIST -->
       <div class="unlocked-section" id="unlockedSection" style="margin-bottom:30px;">
-        <div style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); border-radius: var(--radius-md); padding: 14px 20px; color: var(--green); font-weight: 700; display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+        <div style="background: rgba(67,219,143,0.12); border: 1px solid rgba(67,219,143,0.3); border-radius: var(--radius-md); padding: 14px 20px; color: var(--green); font-weight: 700; display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
           <i class="fa-solid fa-circle-check" style="font-size: 1.2rem;"></i>
           <div>Human Verification Passed! Chat group links unlocked below:</div>
         </div>
@@ -238,9 +238,9 @@
       </div>
 
       <!-- SIMPLE REAL APP SCREENS INTRODUCING WHATSAPP COMMUNITY SUBGROUPS -->
-      <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-md); padding: 24px; margin-bottom: 24px; text-align: left;">
+      <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(67, 219, 143, 0.3); border-radius: var(--radius-md); padding: 24px; margin-bottom: 24px; text-align: left;">
         <div style="margin-bottom: 18px;">
-          <span class="app-badge" style="color: #10B981; background: rgba(16, 185, 129, 0.15); margin-bottom: 6px;"><i class="fa-brands fa-whatsapp"></i> Community Features</span>
+          <span class="app-badge" style="color: #43DB8F; background: rgba(67, 219, 143, 0.15); margin-bottom: 6px;"><i class="fa-brands fa-whatsapp"></i> Community Features</span>
           <h3 style="font-size: 1.3rem; font-weight: 800; color: #FFF;">WhatsApp Community Subgroups</h3>
           <p style="color: var(--text-dim); font-size: 0.88rem; margin-top: 4px;">Clean, organized chat channels for international students in Turin:</p>
         </div>
@@ -248,21 +248,21 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px;">
           
           <!-- REAL SCREEN 1: WHATSAPP COMMUNITY SUBGROUPS -->
-          <div style="background: #0B0F19; border: 1px solid rgba(16,185,129,0.3); border-radius: 18px; padding: 18px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
-            <div style="display:flex; align-items:center; gap:8px; border-b:1px solid rgba(255,255,255,0.08); padding-bottom:10px; margin-bottom:12px; color:#10B981; font-weight:700; font-size:0.9rem;">
+          <div style="background: #000000; border: 1px solid rgba(67,219,143,0.3); border-radius: 18px; padding: 18px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
+            <div style="display:flex; align-items:center; gap:8px; border-b:1px solid rgba(255,255,255,0.08); padding-bottom:10px; margin-bottom:12px; color:#43DB8F; font-weight:700; font-size:0.9rem;">
               <i class="fa-brands fa-whatsapp" style="font-size:1.1rem;"></i> <span>WhatsApp Community</span>
             </div>
             <div style="display:flex; flex-direction:column; gap:8px; font-size:0.82rem;">
-              <div style="background:rgba(255,255,255,0.04); padding:8px 10px; border-radius:8px; color:#FFF;"><i class="fa-solid fa-bullhorn" style="color:#10B981; margin-right:6px;"></i> <strong>Announcements Channel</strong></div>
-              <div style="background:rgba(255,255,255,0.04); padding:8px 10px; border-radius:8px; color:#FFF;"><i class="fa-solid fa-comments" style="color:#10B981; margin-right:6px;"></i> <strong>Main Turin Student Chat</strong></div>
-              <div style="background:rgba(255,255,255,0.04); padding:8px 10px; border-radius:8px; color:#FFF;"><i class="fa-solid fa-house" style="color:#10B981; margin-right:6px;"></i> <strong>Housing &amp; Roommate Finder</strong></div>
-              <div style="background:rgba(255,255,255,0.04); padding:8px 10px; border-radius:8px; color:#FFF;"><i class="fa-solid fa-graduation-cap" style="color:#10B981; margin-right:6px;"></i> <strong>PoliTo &amp; UniTo Study Hubs</strong></div>
-              <div style="background:rgba(255,255,255,0.04); padding:8px 10px; border-radius:8px; color:#FFF;"><i class="fa-solid fa-person-hiking" style="color:#10B981; margin-right:6px;"></i> <strong>Sports &amp; Outdoor Trips</strong></div>
+              <div style="background:rgba(255,255,255,0.04); padding:8px 10px; border-radius:8px; color:#FFF;"><i class="fa-solid fa-bullhorn" style="color:#43DB8F; margin-right:6px;"></i> <strong>Announcements Channel</strong></div>
+              <div style="background:rgba(255,255,255,0.04); padding:8px 10px; border-radius:8px; color:#FFF;"><i class="fa-solid fa-comments" style="color:#43DB8F; margin-right:6px;"></i> <strong>Main Turin Student Chat</strong></div>
+              <div style="background:rgba(255,255,255,0.04); padding:8px 10px; border-radius:8px; color:#FFF;"><i class="fa-solid fa-house" style="color:#43DB8F; margin-right:6px;"></i> <strong>Housing &amp; Roommate Finder</strong></div>
+              <div style="background:rgba(255,255,255,0.04); padding:8px 10px; border-radius:8px; color:#FFF;"><i class="fa-solid fa-graduation-cap" style="color:#43DB8F; margin-right:6px;"></i> <strong>PoliTo &amp; UniTo Study Hubs</strong></div>
+              <div style="background:rgba(255,255,255,0.04); padding:8px 10px; border-radius:8px; color:#FFF;"><i class="fa-solid fa-person-hiking" style="color:#43DB8F; margin-right:6px;"></i> <strong>Sports &amp; Outdoor Trips</strong></div>
             </div>
           </div>
 
           <!-- REAL SCREEN 2: HOUSING & ACADEMICS INFO -->
-          <div style="background: #0B0F19; border: 1px solid rgba(238,9,121,0.3); border-radius: 18px; padding: 18px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
+          <div style="background: #000000; border: 1px solid rgba(212,90,232,0.3); border-radius: 18px; padding: 18px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
             <div style="display:flex; align-items:center; gap:8px; border-b:1px solid rgba(255,255,255,0.08); padding-bottom:10px; margin-bottom:12px; color:var(--pink); font-weight:700; font-size:0.9rem;">
               <i class="fa-solid fa-shield-halved" style="font-size:1.1rem;"></i> <span>Safety &amp; Verification</span>
             </div>
@@ -306,7 +306,7 @@
         </div>
 
         <!-- ISOT Manifesto Card -->
-        <div style="background: linear-gradient(135deg, rgba(36,54,115,0.4) 0%, rgba(15,23,42,0.9) 100%); border: 1px solid rgba(238,9,121,0.35); border-radius: var(--radius-md); padding: 24px; text-align: left;">
+        <div style="background: linear-gradient(135deg, rgba(27,76,173,0.4) 0%, rgba(15,23,42,0.9) 100%); border: 1px solid rgba(212,90,232,0.35); border-radius: var(--radius-md); padding: 24px; text-align: left;">
           <div class="pill-tag" style="margin-bottom: 10px;"><i class="fa-solid fa-quote-left"></i> The ISOT Manifesto</div>
           <h3 style="font-size: 1.3rem; font-weight: 800; color: #FFF; margin-bottom: 8px;">Not Just a Group. A Movement.</h3>
           <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.65; font-style: italic; margin-bottom: 12px;">

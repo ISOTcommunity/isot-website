@@ -877,7 +877,12 @@
 
       const { data, count, error } = await db
         .from('check_ins')
-        .select('created_at, method, profiles(full_name)', { count: 'exact' })
+        // check_ins has TWO foreign keys to profiles — profile_id (who came in) and
+        // scanned_by (which volunteer scanned them) — so an unqualified profiles(...)
+        // embed is ambiguous and PostgREST refuses it. Name the column explicitly.
+        // Same trap waits in karaoke_slots (singer_profile_id / added_by), assembly_
+        // attendance (profile_id / represented_by) and votes (voter_id / cast_by).
+        .select('created_at, method, profiles!profile_id(full_name)', { count: 'exact' })
         .eq('event_instance_id', ev.instanceId)
         .order('created_at', { ascending: false });
 
