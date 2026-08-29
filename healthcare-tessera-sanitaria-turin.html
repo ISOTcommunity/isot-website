@@ -13,6 +13,7 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#000000" />
   <title>Article Reader | ISOT Turin Student Guide</title>
   <meta name="description" content="Read full guides and articles for international students in Turin on ISOT Community." />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
@@ -44,6 +45,7 @@
       --radius-md: 20px;
       --radius-lg: 28px;
       --radius-full: 9999px;
+      --radius-arc: 46px;   /* the half-circle corner */
       --transition: all 0.2s ease;
     }
 
@@ -133,7 +135,8 @@
     /* LEFT SIDEBAR: APP SHOWCASE & HOOKS */
     .app-promo-card {
       background: linear-gradient(180deg, #0E0E13 0%, #0E0E13 100%);
-      border: 1px solid var(--border-light); border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg) var(--radius-lg) var(--radius-arc) var(--radius-lg);
       padding: 24px; text-align: left; box-shadow: 0 12px 30px rgba(0,0,0,0.3);
     }
     .app-badge {
@@ -163,7 +166,8 @@
     /* RIGHT SIDEBAR: ANTI-BOT COMMUNITY CAPTCHA */
     .community-card {
       background: linear-gradient(180deg, #0E0E13 0%, #16161D 100%);
-      border: 1px solid var(--border-light); border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg) var(--radius-lg) var(--radius-arc) var(--radius-lg);
       padding: 24px; text-align: left; box-shadow: 0 12px 30px rgba(0,0,0,0.3);
     }
     .captcha-box {

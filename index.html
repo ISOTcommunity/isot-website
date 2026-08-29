@@ -13,6 +13,7 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#000000" />
   <title>ISOT Community | International Students of Turin</title>
   <meta name="description" content="ISOT is a student-led non-profit organization in Turin connecting international students through cultural events, workshops, and social gatherings. Live globally, connect locally." />
   <meta name="keywords" content="ISOT, Turin international students, student life Turin, Politecnico di Torino, Università di Torino, international community Italy" />
@@ -96,6 +97,7 @@
       --radius-md: 20px;
       --radius-lg: 32px;
       --radius-full: 9999px;
+      --radius-arc: 46px;   /* the half-circle corner */
       --transition: all 0.15s ease;
     }
 
@@ -840,7 +842,8 @@
 
     .app-promo-card, .community-card {
       background: linear-gradient(180deg, #0E0E13 0%, #0E0E13 100%);
-      border: 1px solid var(--border-light); border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg) var(--radius-lg) var(--radius-arc) var(--radius-lg);
       padding: 24px; text-align: left; box-shadow: 0 12px 30px rgba(0,0,0,0.3);
     }
     .app-badge {
