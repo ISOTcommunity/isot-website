@@ -26,7 +26,7 @@
   
 
 <link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#0F172A" />
+<meta name="theme-color" content="#000000" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,8 +35,8 @@
 <style>
   /* ISOT identity palette. Used only as geometry — never as UI chrome. */
   :root {
-    --steel:#7397B1; --teal:#3E6B7E; --amber:#EBC17F; --orange:#DE8E28;
-    --terracotta:#B64226; --mauve:#A0689A; --lavender:#BBC1F9; --indigo:#3F35A0;
+    --steel:#7AA4C2; --teal:#628DA1; --amber:#E69321; --orange:#C9801A;
+    --terracotta:#AA2709; --mauve:#A8689E; --lavender:#BBC1F9; --indigo:#1B4CAD;
   }
 
   body { display:block; }
@@ -45,7 +45,7 @@
   .hero { position:relative; isolation:isolate; padding:64px 0 40px; }
   .hero::before {
     content:""; position:absolute; inset:-40px 0 0; z-index:-1; pointer-events:none;
-    background:radial-gradient(ellipse 70% 50% at 50% 0%, rgba(238,9,121,0.09), transparent 72%);
+    background:radial-gradient(ellipse 70% 50% at 50% 0%, rgba(212,90,232,0.09), transparent 72%);
   }
 
   /* The wordmark's own construction — domes and split circles — used as a page rule.

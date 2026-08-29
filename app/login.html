@@ -31,6 +31,9 @@
   <main class="shell" style="max-width: 420px; padding-top: 48px;">
 
     <div style="text-align: center; margin-bottom: 28px;">
+      <!-- The artwork's tiles, before the form. Signing in is the first ISOT screen
+           anyone sees, and it used to be a logo on an empty field. -->
+      <div id="loginMosaic" style="margin-bottom:22px"></div>
       <img src="logo.png" alt="ISOT Logo" style="height: 44px; width: auto; margin-bottom: 16px;" />
       <h1 style="font-size: 1.8rem; margin-bottom: 4px;">Welcome Back</h1>
       <p class="muted" style="font-size: 0.92rem;">Sign in to your ISOT Member account</p>
@@ -73,6 +76,9 @@
   <script src="js/isot.js"></script>
   <script>
     (async () => {
+    const lm = document.getElementById('loginMosaic');
+    if (lm) lm.innerHTML = renderMosaicHtml('ISOT-welcome', 8);
+
       const form    = document.getElementById('form');
       const alertEl = document.getElementById('alert');
       const submit  = document.getElementById('submit');

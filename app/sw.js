@@ -3,7 +3,7 @@
  * Supabase calls are NEVER cached to ensure real-time RLS security.
  */
 
-const CACHE = 'isot-shell-v7';
+const CACHE = 'isot-shell-v8';
 
 const SHELL = [
   './',

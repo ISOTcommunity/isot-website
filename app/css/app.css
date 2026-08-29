@@ -1,43 +1,87 @@
-/* ISOT Member App — Apple-Grade Design System
- * Inspired by Apple Wallet, Things 3, and iOS Settings.
- * Restrained dark surfaces, translucent glass materials, single pink accent (#EE0979).
+/* ISOT Member App — design system
+ * Built from the ISOT identity artwork: black ground, flat palette colour, and a
+ * grid of circles and half-circles. The wordmark itself is made of them — the "i"
+ * dot is a quarter, the S two halves, the O a circle, the T a bar and a quarter.
+ * So the geometry is the identity, and it is used here structurally rather than
+ * as decoration: avatars are split circles, the spinner is a half, cards carry a
+ * single arc corner, section marks are half-discs.
  */
 
 :root {
-  /* Surface Tokens */
-  --bg-dark:        #0F172A;
-  --bg-card:        #1E293B;
-  --bg-darker:      #0B1120;
-  --surface-glass:  rgba(30, 41, 59, 0.75);
-  --nav-glass:      rgba(15, 23, 42, 0.85);
+  /* ══════════════════════════════════════════════════════════════════
+     ISOT — built from the identity artwork, not from a UI kit.
+     Black ground, flat palette colour, circles and half-circles.
 
-  /* Accent Tokens — Pink is THE primary action accent */
-  --pink:           #EE0979;
-  --pink-glow:      rgba(238, 9, 121, 0.35);
-  --navy:           #243673;
-  --orange:         #FF6A00;
-  --gold:           #D4AF50;
-  --green:          #10B981;
-  --red:            #EF4444;
+     Colours are the confirmed system (ISOT-Colour-System.pdf, Aug 2026):
+     11 values in three hue arcs, plus the proposed greens and neutrals.
+     Nothing here is off-palette. The old #EE0979 pink never was on it.
+     ══════════════════════════════════════════════════════════════════ */
 
-  /* ISOT Identity Palette (Circles & Geometry) */
-  --id-steel-blue:  #7397B1;
-  --id-teal:        #3E6B7E;
-  --id-amber:       #EBC17F;
-  --id-deep-orange: #DE8E28;
-  --id-terracotta:  #B64226;
-  --id-mauve:       #A0689A;
+  /* ── Ground ──────────────────────────────────────────────────────
+     Pure black, as in the artwork. Slate #0F172A muddied every hue
+     sitting on it; on black the palette reads at full strength. */
+  --bg-dark:        #000000;
+  --bg-card:        #0E0E13;
+  --bg-darker:      #000000;
+  --bg-raised:      #16161D;
+  --surface-glass:  rgba(16, 16, 21, 0.72);
+  --nav-glass:      rgba(0, 0, 0, 0.80);
+
+  /* ── The confirmed palette ───────────────────────────────────── */
+  --c-deep-blue:    #1B4CAD;
+  --c-sky-blue:     #5787EA;
+  --c-slate-blue:   #628DA1;
+  --c-powder-blue:  #7AA4C2;
+
+  --c-deep-magenta: #9E02B6;
+  --c-orchid:       #D45AE8;
+  --c-mauve:        #A8689E;
+
+  --c-brick:        #AA2709;
+  --c-dark-amber:   #C9801A;
+  --c-amber:        #E69321;
+  --c-coral:        #F36C51;
+
+  --c-deep-green:   #109352;
+  --c-bright-green: #43DB8F;
+  --c-muted-green:  #60A482;
+
+  /* In the artwork and the older illustration set. Kept because the
+     wordmark grid needs a pale cool tile and nothing else provides one. */
+  --c-lavender:     #BBC1F9;
+
+  /* ── Accent ──────────────────────────────────────────────────────
+     Bright Orchid. --pink is kept as an alias only because ~200 rules
+     and templates reference it; the name is historical, the value is not. */
+  --orchid:         #D45AE8;
+  --pink:           #D45AE8;
+  --pink-glow:      rgba(212, 90, 232, 0.30);
+  --border-glow:    rgba(212, 90, 232, 0.42);
+
+  --navy:           #1B4CAD;
+  --orange:         #E69321;
+  --gold:           #C9801A;
+  /* Coral, not Brick Red: #AA2709 is L35 and disappears against black. */
+  --red:            #F36C51;
+  --green:          #43DB8F;
+
+  /* ── Identity tokens (geometry, avatars, category marks) ─────── */
+  --id-steel-blue:  #7AA4C2;
+  --id-teal:        #628DA1;
+  --id-amber:       #E69321;
+  --id-deep-orange: #C9801A;
+  --id-terracotta:  #AA2709;
+  --id-mauve:       #A8689E;
   --id-lavender:    #BBC1F9;
-  --id-indigo:      #3F35A0;
+  --id-indigo:      #1B4CAD;
 
-  /* Typography & Borders */
-  --text-main:      #F8FAFC;
-  --text-muted:     #CBD5E1;
-  --text-dim:       #94A3B8;
-  --text-dark:      #64748B;
-  --border-light:   rgba(255, 255, 255, 0.12);
-  --border-strong:  rgba(255, 255, 255, 0.22);
-  --border-glow:    rgba(238, 9, 121, 0.4);
+  /* ── Text — the system's neutrals, lifted for a black ground ─── */
+  --text-main:      #F6F7F9;
+  --text-muted:     #B9BFCB;
+  --text-dim:       #8C93A3;
+  --text-dark:      #6A7181;
+  --border-light:   rgba(255, 255, 255, 0.10);
+  --border-strong:  rgba(255, 255, 255, 0.20);
 
   --font-display:   'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body:      'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -47,6 +91,9 @@
   --radius-md:      20px;
   --radius-lg:      32px;
   --radius-full:    9999px;
+  /* The half-circle. A corner at this radius on a standard card reads as
+     one of the artwork's tiles rather than as a rounded rectangle. */
+  --radius-arc:     46px;
 
   --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-spring: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -287,6 +334,17 @@ h3 {
 }
 .muted { color: var(--text-muted); }
 .dim   { color: var(--text-dim); font-size: 0.875rem; }
+/* The section mark is a half-disc, flat on its baseline — the smallest possible
+   piece of the identity, used where a bullet or an icon would otherwise go. */
+.eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 9px; height: 4.5px;
+  margin-right: 8px;
+  vertical-align: 1.5px;
+  background: var(--orchid);
+  border-radius: 9px 9px 0 0;
+}
 .eyebrow {
   color: var(--pink);
   font-size: 0.75rem;
@@ -295,11 +353,15 @@ h3 {
   text-transform: uppercase;
 }
 
-/* ---------- Apple Glass Cards ---------- */
+/* ---------- Cards ----------
+   One corner opened to a full arc. In the artwork every tile is a square with a
+   circle or half-circle inside it; a card with a single large quarter-circle
+   corner is the same move at interface scale, and it reads as ISOT rather than
+   as a generic rounded rectangle. Kept to ONE corner: four would just be a pill. */
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-md) var(--radius-md) var(--radius-arc) var(--radius-md);
   padding: 22px;
   position: relative;
   overflow: hidden;
@@ -313,7 +375,7 @@ h3 {
 }
 .card-glow {
   border-color: var(--border-glow);
-  box-shadow: 0 0 30px rgba(238, 9, 121, 0.12);
+  box-shadow: 0 0 34px rgba(212, 90, 232, 0.14);
 }
 
 /* ---------- Primary Actions (Pink Restraint) ---------- */
@@ -343,7 +405,7 @@ h3 {
   box-shadow: 0 4px 18px var(--pink-glow);
 }
 .btn-pink:hover:not(:disabled) {
-  background: #FF1A8B;
+  background: #DE7BEE;   /* Orchid lifted ~8% — same hue, no second accent */
   transform: translateY(-1px);
 }
 .btn-outline {
@@ -398,8 +460,10 @@ h3 {
   font-size: 0.9rem;
   margin-bottom: 16px;
 }
-.alert-error   { background: rgba(239, 68, 68, 0.15);  border: 1px solid rgba(239, 68, 68, 0.4);  color: #FCA5A5; }
-.alert-success { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #6EE7B7; }
+/* Semantic states come from the palette too. Coral for error rather than a
+   generic red: Brick Red #AA2709 is L35 and vanishes against black. */
+.alert-error   { background: rgba(243, 108, 81, 0.13);  border: 1px solid rgba(243, 108, 81, 0.38);  color: #F8A18E; }
+.alert-success { background: rgba(67, 219, 143, 0.12);  border: 1px solid rgba(67, 219, 143, 0.36);  color: #7DE7B4; }
 .alert-info    { background: rgba(238, 9, 121, 0.12);  border: 1px solid var(--border-glow);       color: var(--text-muted); }
 [hidden] { display: none !important; }
 
@@ -427,7 +491,10 @@ h3 {
 
 
 
-/* ---------- Deterministic Geometry & Initials Avatars ---------- */
+/* ---------- Avatars ----------
+   A circle split flat across the middle into two palette colours — exactly the
+   tiles in the identity artwork. The split is hard, never a gradient: a blend
+   would read as a UI effect, and the artwork has none. */
 .geo-avatar {
   border-radius: 50%;
   overflow: hidden;
@@ -440,6 +507,36 @@ h3 {
   flex-shrink: 0;
   text-align: center;
 }
+
+/* ---------- Identity mosaic ----------
+   A run of the artwork's tiles: full circles, half-discs and quarter-arcs in flat
+   palette colour on black. Used where a page would otherwise open on nothing —
+   a hero band, an empty state — so a blank screen still looks like ISOT.
+   Generated deterministically in js/isot.js so it is stable per page, not random
+   noise that changes on every render. */
+.mosaic {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0;
+  overflow: hidden;
+  border-radius: var(--radius-md) var(--radius-md) var(--radius-arc) var(--radius-md);
+  background: #000;
+}
+.mosaic .tile { aspect-ratio: 1; position: relative; }
+.mosaic .tile i {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.t-circle  i { border-radius: 50%; }
+.t-top     i { border-radius: 100% 100% 0 0; bottom: 50%; }
+.t-bottom  i { border-radius: 0 0 100% 100%; top: 50%; }
+.t-left    i { border-radius: 100% 0 0 100%; right: 50%; }
+.t-right   i { border-radius: 0 100% 100% 0; left: 50%; }
+.t-quarter i { border-radius: 100% 0 0 0; }
+/* A circle split flat across the middle, the artwork's most common tile. */
+.t-split   i { border-radius: 50%; }
 
 /* ---------- SVG Category Character Badges ---------- */
 .cat-badge {
@@ -455,14 +552,26 @@ h3 {
 }
 .cat-badge img { width: 100%; height: 100%; object-fit: cover; }
 
-/* ---------- PWA Gate Spinner ---------- */
+/* ---------- Spinner ----------
+   A rotating half-disc rather than a ring: the same shape the whole identity is
+   built from, and it reads as ISOT at a glance while the app is still loading. */
 .spinner {
   width: 20px;
   height: 20px;
-  border: 2.5px solid rgba(255,255,255,0.2);
-  border-top-color: #FFF;
   border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+  background: conic-gradient(from 0deg, var(--orchid) 0deg 180deg, transparent 180deg 360deg);
+  -webkit-mask: radial-gradient(circle, transparent 42%, #000 43%);
+  mask: radial-gradient(circle, transparent 42%, #000 43%);
+  animation: spin 0.75s linear infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+/* A solid half-disc, for the gate where a heavier mark suits the pause. */
+.spinner-solid {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--orchid) 0deg 180deg, transparent 180deg 360deg);
+  animation: spin 0.9s linear infinite;
+  display: inline-block;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 

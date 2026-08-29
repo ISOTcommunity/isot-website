@@ -84,7 +84,7 @@
             <input type="checkbox" id="cPhotos" required />
             <label for="cPhotos">I agree that ISOT may publish photos from events I appear in, on the website and on Instagram. You can withdraw this at any time by writing to us.</label>
           </div>
-          <p id="photoWarn" class="dim" style="font-size:0.8rem;color:#FCA5A5;margin:-4px 0 0 30px" hidden>
+          <p id="photoWarn" class="dim" style="font-size:0.8rem;color:#F8A18E;margin:-4px 0 0 30px" hidden>
             You need to agree to this to finish setting up your account.
           </p>
 
@@ -162,7 +162,7 @@
       }
       const ok = pwEl.value === cfEl.value;
       matchEl.textContent = ok ? 'Passwords match.' : "Passwords don't match.";
-      matchEl.style.color = ok ? 'var(--green)' : '#FCA5A5';
+      matchEl.style.color = ok ? 'var(--green)' : '#F8A18E';
       matchEl.hidden = !cfEl.value;
       return ok;
     }

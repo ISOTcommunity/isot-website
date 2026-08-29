@@ -38,15 +38,23 @@ const db = isConfigured() && window.supabase
 /* ---------------------------------------------------------------
  * Identity Palette for Deterministic Geometry Avatars
  * ------------------------------------------------------------- */
+/* The confirmed ISOT palette (ISOT-Colour-System.pdf, Aug 2026). The previous list
+ * was the older illustration set, and several of its values were near-misses rather
+ * than matches — #A8689E against Dusty Mauve #A8689E, #AA2709 against Brick Red
+ * #AA2709. Close enough to look like typos, far enough to be different colours. */
 const IDENTITY_PALETTE = [
-  '#7397B1', // Steel blue
-  '#3E6B7E', // Teal
-  '#EBC17F', // Warm amber
-  '#DE8E28', // Deep orange
-  '#B64226', // Terracotta
-  '#A0689A', // Mauve
-  '#BBC1F9', // Lavender
-  '#3F35A0', // Deep indigo
+  '#1B4CAD', // Deep Blue
+  '#5787EA', // Sky Blue
+  '#628DA1', // Slate Blue
+  '#7AA4C2', // Powder Blue
+  '#9E02B6', // Deep Magenta
+  '#D45AE8', // Bright Orchid
+  '#A8689E', // Dusty Mauve
+  '#AA2709', // Brick Red
+  '#C9801A', // Dark Amber
+  '#E69321', // Amber
+  '#F36C51', // Coral
+  '#BBC1F9', // Lavender — in the artwork, and the only pale cool tile
 ];
 
 /**
@@ -74,11 +82,56 @@ function renderUserAvatarHtml(profile, size = 44) {
 
   const fontSize = Math.max(12, Math.round(s * 0.42));
 
+  // A hard split across the middle, not a 135deg blend. Every tile in the ISOT
+  // artwork is flat colour meeting flat colour on a straight edge; a gradient
+  // reads as a UI effect and the identity has none.
+  const split = `linear-gradient(to bottom, ${color1} 0 50%, ${color2} 50% 100%)`;
+
   return `
-    <div class="geo-avatar" style="width:${s}px;height:${s}px;border-radius:50%;background:linear-gradient(135deg, ${color1}, ${color2});display:inline-flex;align-items:center;justify-content:center;color:#FFF;font-weight:700;font-size:${fontSize}px;border:1.5px solid rgba(255,255,255,0.25);box-shadow:0 4px 12px rgba(0,0,0,0.3);flex-shrink:0;user-select:none;text-transform:uppercase;">
+    <div class="geo-avatar" style="width:${s}px;height:${s}px;border-radius:50%;background:${split};display:inline-flex;align-items:center;justify-content:center;color:#FFF;font-weight:700;font-size:${fontSize}px;border:1px solid rgba(255,255,255,0.16);flex-shrink:0;user-select:none;text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,0.45);">
       ${initial}
     </div>
   `;
+}
+
+/* ---------------------------------------------------------------
+ * Identity mosaic
+ *
+ * A run of the artwork's tiles — full circles, half-discs, quarter-arcs — in flat
+ * palette colour on black. Used where a screen would otherwise open on nothing, so
+ * an empty state still looks like ISOT rather than like a failure.
+ *
+ * Deterministic from the seed: the same page draws the same mosaic every time.
+ * Random tiles would flicker on each render and turn the identity into noise.
+ * ------------------------------------------------------------- */
+const TILE_SHAPES = ['t-circle', 't-top', 't-bottom', 't-left', 't-right', 't-quarter', 't-split'];
+
+function renderMosaicHtml(seed = 'ISOT', count = 7) {
+  // xorshift from the seed — small, stable, and no dependency.
+  let h = 2166136261;
+  for (let i = 0; i < seed.length; i++) {
+    h ^= seed.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  const next = () => {
+    h ^= h << 13; h ^= h >>> 17; h ^= h << 5;
+    return Math.abs(h) / 2147483647;
+  };
+
+  let html = '<div class="mosaic" aria-hidden="true">';
+  for (let i = 0; i < count; i++) {
+    const shape = TILE_SHAPES[Math.floor(next() * TILE_SHAPES.length)];
+    const a = IDENTITY_PALETTE[Math.floor(next() * IDENTITY_PALETTE.length)];
+    let b = IDENTITY_PALETTE[Math.floor(next() * IDENTITY_PALETTE.length)];
+    if (b === a) b = IDENTITY_PALETTE[(IDENTITY_PALETTE.indexOf(a) + 5) % IDENTITY_PALETTE.length];
+
+    const fill = shape === 't-split'
+      ? `linear-gradient(to bottom, ${a} 0 50%, ${b} 50% 100%)`
+      : a;
+
+    html += `<div class="tile ${shape}"><i style="background:${fill}"></i></div>`;
+  }
+  return html + '</div>';
 }
 
 function renderGeoAvatar(memberCode, size = 44) {
@@ -559,7 +612,7 @@ function initBurgerMenu(profile) {
     </div>
 
     <div class="drawer-footer">
-      <button type="button" class="btn btn-outline" id="drawerSignOutBtn" style="width:100%;color:#FCA5A5;border-color:rgba(239,68,68,0.3)">
+      <button type="button" class="btn btn-outline" id="drawerSignOutBtn" style="width:100%;color:#F8A18E;border-color:rgba(243,108,81,0.3)">
         <i class="fa-solid fa-right-from-bracket" style="margin-right:8px"></i> Sign Out
       </button>
     </div>
@@ -715,6 +768,9 @@ async function sendPasswordReset(email) {
   return error ? { ok: false, error: error.message } : { ok: true };
 }
 
+// The four hex values in the G mark below are Google's own brand colours and are
+// deliberately NOT on the ISOT palette — altering another company's logo is not a
+// theming decision.
 function googleButtonHtml(label = 'Continue with Google') {
   return `
     <div style="display:flex;align-items:center;gap:12px;margin:18px 0">
@@ -724,8 +780,8 @@ function googleButtonHtml(label = 'Continue with Google') {
     </div>
     <button type="button" class="btn btn-outline" id="googleBtn">
       <svg width="17" height="17" viewBox="0 0 48 48" aria-hidden="true">
-        <path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.0 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.9z"/>
-        <path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.0 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+        <path fill="#E69321" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.0 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.9z"/>
+        <path fill="#F36C51" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.0 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
         <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.3 0-9.7-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/>
         <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.6l6.2 5.2C39.1 35.7 44 30.6 44 24c0-1.3-.1-2.6-.4-3.9z"/>
       </svg>
@@ -971,11 +1027,11 @@ function initCookieConsentBanner() {
     background: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(238, 9, 121, 0.4);
+    border: 1px solid rgba(212, 90, 232, 0.4);
     border-radius: 20px;
     padding: 18px 20px;
     box-shadow: 0 12px 40px rgba(0,0,0,0.6);
-    color: #F8FAFC;
+    color: #F6F7F9;
     font-family: var(--font-body, sans-serif);
     font-size: 0.85rem;
     line-height: 1.5;
@@ -986,12 +1042,12 @@ function initCookieConsentBanner() {
       <span style="font-size:1.4rem">🛡️</span>
       <div>
         <div style="font-weight:700;color:#FFF;font-size:0.92rem;margin-bottom:2px">Privacy &amp; Cookie Preferences</div>
-        <div style="color:#CBD5E1">We use essential session storage and anonymized cookieless analytics to secure your profile and improve student integration.</div>
+        <div style="color:#B9BFCB">We use essential session storage and anonymized cookieless analytics to secure your profile and improve student integration.</div>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:10px;justify-content:flex-end">
-      <a href="/privacy.html" target="_blank" style="color:#EE0979;font-weight:600;font-size:0.8rem;text-decoration:none;padding:6px 10px;">Privacy Policy ➔</a>
-      <button type="button" id="acceptCookieBtn" style="background:#EE0979;color:#FFF;border:none;border-radius:9999px;padding:8px 18px;font-weight:600;font-size:0.82rem;cursor:pointer;box-shadow:0 4px 12px rgba(238,9,121,0.4)">
+      <a href="/privacy.html" target="_blank" style="color:#D45AE8;font-weight:600;font-size:0.8rem;text-decoration:none;padding:6px 10px;">Privacy Policy ➔</a>
+      <button type="button" id="acceptCookieBtn" style="background:#D45AE8;color:#FFF;border:none;border-radius:9999px;padding:8px 18px;font-weight:600;font-size:0.82rem;cursor:pointer;box-shadow:0 4px 12px rgba(212,90,232,0.4)">
         Got It / Accept
       </button>
     </div>

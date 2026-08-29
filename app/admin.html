@@ -16,7 +16,7 @@
     .stat { background:var(--bg-card); border:1px solid var(--border-light); border-radius:14px; padding:14px 16px; }
     .stat .n { font-size:1.8rem; font-weight:700; color:#FFF; line-height:1; font-variant-numeric:tabular-nums; }
     .stat .l { font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.07em; margin-top:6px; }
-    .stat.bad  .n { color:#FCA5A5; }
+    .stat.bad  .n { color:#F8A18E; }
     .stat.good .n { color:var(--green); }
 
     .row { display:flex; gap:12px; padding:11px 0; border-bottom:1px solid var(--border-light); align-items:center; }
@@ -30,9 +30,9 @@
     .tag.gold { background:rgba(212,175,80,0.18); color:var(--gold); }
 
     .prob { display:flex; gap:12px; padding:13px 14px; border-radius:12px; margin-bottom:8px; align-items:flex-start; }
-    .prob.critical { background:rgba(239,68,68,0.10); border-left:3px solid #EF4444; }
+    .prob.critical { background:rgba(243,108,81,0.10); border-left:3px solid #F36C51; }
     .prob.warning  { background:rgba(212,175,80,0.10); border-left:3px solid var(--gold); }
-    .prob.ok       { background:rgba(16,185,129,0.09); border-left:3px solid var(--green); }
+    .prob.ok       { background:rgba(67,219,143,0.09); border-left:3px solid var(--green); }
 
     /* Section nav — horizontally scrollable on a phone rather than wrapping to
        three ragged lines. */
@@ -56,7 +56,7 @@
       text-align:center; cursor:pointer; background:var(--bg-darker);
       transition:border-color .15s ease, background .15s ease;
     }
-    .drop:hover, .drop.over { border-color:var(--pink); background:rgba(238,9,121,0.06); }
+    .drop:hover, .drop.over { border-color:var(--pink); background:rgba(212,90,232,0.06); }
     .drop i { font-size:1.5rem; color:var(--text-dim); margin-bottom:8px; display:block; }
     .drop .hint { font-size:0.78rem; color:var(--text-dim); }
     .drop img { max-width:190px; width:100%; border-radius:10px; display:block; margin:0 auto 10px; }
@@ -150,7 +150,7 @@
   }
 
   function fail(msg) {
-    return `<div class="prob critical"><i class="fa-solid fa-triangle-exclamation" style="color:#FCA5A5;margin-top:3px"></i>
+    return `<div class="prob critical"><i class="fa-solid fa-triangle-exclamation" style="color:#F8A18E;margin-top:3px"></i>
             <div><b style="color:#FFF">Could not load this</b>
             <div class="dim" style="font-size:0.82rem">${escapeHtml(msg)}</div></div></div>`;
   }
@@ -189,7 +189,7 @@
       html += probs.data.map(p => `
         <div class="prob ${escapeHtml(p.severity)}">
           <i class="fa-solid ${p.severity === 'critical' ? 'fa-triangle-exclamation' : 'fa-circle-exclamation'}"
-             style="margin-top:3px;color:${p.severity === 'critical' ? '#FCA5A5' : 'var(--gold)'}"></i>
+             style="margin-top:3px;color:${p.severity === 'critical' ? '#F8A18E' : 'var(--gold)'}"></i>
           <div><b style="color:#FFF">${escapeHtml(p.problem)}</b>
           <div class="dim" style="font-size:0.82rem">${escapeHtml(p.detail || '')}</div></div>
         </div>`).join('');
@@ -340,7 +340,7 @@
       if (feedView === 'signups') return `
         <div class="row"><div class="when">${escapeHtml(ago(r.at))}</div>
         <div class="grow"><b>${escapeHtml(r.email || '—')}</b> · ${escapeHtml(r.outcome)}
-        ${r.detail ? `<div style="color:#FCA5A5;font-size:0.78rem">${escapeHtml(r.detail)}</div>` : ''}</div>
+        ${r.detail ? `<div style="color:#F8A18E;font-size:0.78rem">${escapeHtml(r.detail)}</div>` : ''}</div>
         <span class="tag${r.outcome === 'failed' ? '' : ''}">${escapeHtml(r.source)}</span></div>`;
 
       return `

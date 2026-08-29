@@ -25,7 +25,7 @@
   <meta name="apple-mobile-web-app-title" content="ISOT" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#0B0F19" />
+  <meta name="theme-color" content="#000000" />
   <!-- Vercel Web Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
 
@@ -38,13 +38,13 @@
 
   <style>
     .hero-event-card {
-      background: linear-gradient(135deg, #1E293B, #0F172A);
+      background: linear-gradient(135deg, #0E0E13, #000000);
       border: 1px solid var(--border-glow);
       border-radius: 24px;
       padding: 24px;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 12px 30px rgba(238, 9, 121, 0.12);
+      box-shadow: 0 12px 30px rgba(212, 90, 232, 0.12);
       margin-bottom: 24px;
     }
     .hero-event-card img.event-bg {
@@ -126,8 +126,8 @@
       align-items: center;
       gap: 10px;
       padding: 12px 20px;
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid rgba(16, 185, 129, 0.4);
+      background: rgba(67, 219, 143, 0.15);
+      border: 1px solid rgba(67, 219, 143, 0.4);
       border-radius: var(--radius-md);
       margin: 16px 0;
     }
@@ -167,7 +167,7 @@
       margin-left: -8px;
       overflow: hidden;
       flex-shrink: 0;
-      background: #1E293B;
+      background: #0E0E13;
     }
     .avatar-stack-item-box:first-child {
       margin-left: 0;
@@ -199,10 +199,10 @@
       color: #FFF;
     }
     .btn-rsvp.going {
-      background: rgba(16, 185, 129, 0.16);
-      border-color: #10B981;
-      color: #10B981;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+      background: rgba(67, 219, 143, 0.16);
+      border-color: #43DB8F;
+      color: #43DB8F;
+      box-shadow: 0 0 12px rgba(67, 219, 143, 0.25);
     }
 
     /* Modal Sheet for Attendees Profile Cards */
@@ -269,8 +269,8 @@
 
     /* ── Featured one-off night. Revealed by script only while the night is on. ── */
     .featured-night-card {
-      background: linear-gradient(135deg, rgba(238, 9, 121, 0.14) 0%, rgba(36, 54, 115, 0.4) 100%);
-      border: 1px solid rgba(238, 9, 121, 0.45);
+      background: linear-gradient(135deg, rgba(212, 90, 232, 0.14) 0%, rgba(36, 54, 115, 0.4) 100%);
+      border: 1px solid rgba(212, 90, 232, 0.45);
       border-radius: 24px;
       overflow: hidden;
       margin-bottom: 24px;
@@ -297,7 +297,7 @@
       width: 30px; height: 30px; flex-shrink: 0; border-radius: 9px;
       display: inline-flex; align-items: center; justify-content: center;
       line-height: 1; margin: 0; padding: 0;
-      background: rgba(238, 9, 121, 0.15); color: var(--pink); font-size: 0.82rem;
+      background: rgba(212, 90, 232, 0.15); color: var(--pink); font-size: 0.82rem;
     }
   </style>
 </head>
@@ -343,7 +343,7 @@
 
         <!-- Live Headcount Counter -->
         <div class="headcount-badge">
-          <i class="fa-solid fa-users-viewfinder" style="font-size: 1.4rem; color: #10B981;"></i>
+          <i class="fa-solid fa-users-viewfinder" style="font-size: 1.4rem; color: #43DB8F;"></i>
           <div style="text-align: left;">
             <div style="font-size: 1.4rem; font-weight: 800; color: #FFF; line-height: 1;" id="headcountNum">–</div>
             <div style="font-size: 0.75rem; color: var(--text-muted);">Checked in tonight</div>
@@ -366,7 +366,11 @@
 
     <!-- MEMBER / COMMUNITY ORDINARY HOME VIEW -->
     <div id="memberHomeView">
-      
+
+      <!-- Identity band. Deterministic per member, so it is *their* mosaic and it
+           does not reshuffle on every visit. -->
+      <div id="homeMosaic" style="margin-bottom:18px"></div>
+
       <!-- 5 Categories Character Strip -->
       <div style="margin-bottom: 8px;">
         <div class="eyebrow" style="margin-bottom: 8px;">Explore ISOT Life</div>
@@ -382,7 +386,7 @@
           </div>
 
           <div class="cat-pill-item" onclick="filterCategory('party')">
-            <div class="cat-pill-img" style="position:relative; background:#1E293B;"><img src="../assets/characters/char_dancer_1.png" alt="Party & Nightlife" style="object-fit:contain; padding:4px;" /></div>
+            <div class="cat-pill-img" style="position:relative; background:#0E0E13;"><img src="../assets/characters/char_dancer_1.png" alt="Party & Nightlife" style="object-fit:contain; padding:4px;" /></div>
             <span class="cat-pill-label">Party &amp; Nightlife</span>
           </div>
 
@@ -392,12 +396,12 @@
           </div>
 
           <div class="cat-pill-item" onclick="filterCategory('sports')">
-            <div class="cat-pill-img" style="position:relative; background:#1E293B;"><img src="../assets/characters/char_cat_wizards.png" alt="Sports & Trips" style="object-fit:contain; padding:2px;" /></div>
+            <div class="cat-pill-img" style="position:relative; background:#0E0E13;"><img src="../assets/characters/char_cat_wizards.png" alt="Sports & Trips" style="object-fit:contain; padding:2px;" /></div>
             <span class="cat-pill-label">Sports &amp; Trips</span>
           </div>
 
           <div class="cat-pill-item" onclick="filterCategory('karaoke')">
-            <div class="cat-pill-img" style="position:relative; background:#1E293B;"><img src="../assets/characters/char_karaoke_singer.png" alt="Karaoke Night" style="object-fit:contain; padding:4px;" /></div>
+            <div class="cat-pill-img" style="position:relative; background:#0E0E13;"><img src="../assets/characters/char_karaoke_singer.png" alt="Karaoke Night" style="object-fit:contain; padding:4px;" /></div>
             <span class="cat-pill-label">Karaoke Night</span>
           </div>
         </div>
@@ -450,7 +454,7 @@
       <div class="action-grid">
         <a href="profile.html" class="action-tile">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="cat-badge" style="background: rgba(238, 9, 121, 0.15); border-color: var(--pink); color: var(--pink);">
+            <div class="cat-badge" style="background: rgba(212, 90, 232, 0.15); border-color: var(--pink); color: var(--pink);">
               <i class="fa-solid fa-qrcode" style="font-size: 1.2rem;"></i>
             </div>
             <div>
@@ -624,6 +628,9 @@
         // actually something on tonight — a role is not a shift.
         const memberView = document.getElementById('memberHomeView');
         if (memberView) memberView.style.display = 'block';
+
+        const hm = document.getElementById('homeMosaic');
+        if (hm) hm.innerHTML = renderMosaicHtml(meProfile?.member_code || 'ISOT', 8);
 
         const isStaff = meProfile &&
           (meProfile.staff_role === 'volunteer' || meProfile.staff_role === 'board');
@@ -810,7 +817,7 @@
         const activeImg = window.event.currentTarget.querySelector('.cat-pill-img');
         if (activeImg) {
           activeImg.style.borderColor = 'var(--pink)';
-          activeImg.style.boxShadow = '0 0 16px rgba(238, 9, 121, 0.5)';
+          activeImg.style.boxShadow = '0 0 16px rgba(212, 90, 232, 0.5)';
         }
       }
 
@@ -877,7 +884,7 @@
       if (error) {
         numEl.textContent = '–';
         if (listEl) listEl.innerHTML =
-          `<div class="dim" style="font-size:0.82rem;padding:8px 0;color:#FCA5A5">Could not load check-ins: ${escapeHtml(error.message)}</div>`;
+          `<div class="dim" style="font-size:0.82rem;padding:8px 0;color:#F8A18E">Could not load check-ins: ${escapeHtml(error.message)}</div>`;
         return;
       }
 

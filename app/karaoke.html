@@ -25,7 +25,7 @@
   <meta name="apple-mobile-web-app-title" content="ISOT" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#0B0F19" />
+  <meta name="theme-color" content="#000000" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -35,7 +35,7 @@
 
   <style>
     .position-hero-badge {
-      background: linear-gradient(135deg, rgba(238, 9, 121, 0.2), rgba(255, 106, 0, 0.2));
+      background: linear-gradient(135deg, rgba(212, 90, 232, 0.2), rgba(255, 106, 0, 0.2));
       border: 1px solid var(--border-glow);
       border-radius: 20px;
       padding: 22px;
@@ -45,13 +45,13 @@
       overflow: hidden;
     }
     .position-hero-badge.on-mic {
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(238, 9, 121, 0.25));
-      border-color: #10B981;
+      background: linear-gradient(135deg, rgba(67, 219, 143, 0.25), rgba(212, 90, 232, 0.25));
+      border-color: #43DB8F;
       animation: pulseBorder 2s infinite;
     }
     @keyframes pulseBorder {
-      0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
-      50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.6); }
+      0%, 100% { box-shadow: 0 0 15px rgba(67, 219, 143, 0.3); }
+      50% { box-shadow: 0 0 30px rgba(67, 219, 143, 0.6); }
     }
 
     .queue-row {
@@ -66,12 +66,12 @@
       transition: var(--transition-fast);
     }
     .queue-row.playing {
-      border-color: #10B981;
-      background: rgba(16, 185, 129, 0.12);
+      border-color: #43DB8F;
+      background: rgba(67, 219, 143, 0.12);
     }
     .queue-row.my-row {
       border-color: var(--pink);
-      background: rgba(238, 9, 121, 0.12);
+      background: rgba(212, 90, 232, 0.12);
     }
   </style>
 </head>
@@ -149,7 +149,7 @@
     <div class="card card-glass" id="myActiveCard" style="display: none; margin-bottom: 24px; border-color: var(--pink);">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
         <span class="badge badge-socio"><i class="fa-solid fa-user"></i> YOUR QUEUED SONG</span>
-        <button type="button" class="btn btn-ghost" onclick="cancelMySong()" style="color: #FCA5A5; padding: 4px 8px; font-size: 0.8rem;">
+        <button type="button" class="btn btn-ghost" onclick="cancelMySong()" style="color: #F8A18E; padding: 4px 8px; font-size: 0.8rem;">
           <i class="fa-solid fa-trash"></i> Cancel Song
         </button>
       </div>

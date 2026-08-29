@@ -25,7 +25,7 @@
   <meta name="apple-mobile-web-app-title" content="ISOT" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#0B0F19" />
+  <meta name="theme-color" content="#000000" />
   <!-- Vercel Web Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
 
@@ -64,7 +64,7 @@
     .view-btn.active {
       background: var(--pink);
       color: #FFF;
-      box-shadow: 0 4px 12px rgba(238, 9, 121, 0.3);
+      box-shadow: 0 4px 12px rgba(212, 90, 232, 0.3);
     }
 
     /* Month Navigation Controls */
@@ -142,13 +142,13 @@
       pointer-events: none;
     }
     .cal-matrix-day.has-event {
-      border-color: rgba(238, 9, 121, 0.4);
-      background: rgba(238, 9, 121, 0.12);
+      border-color: rgba(212, 90, 232, 0.4);
+      background: rgba(212, 90, 232, 0.12);
     }
     .cal-matrix-day.selected {
       border-color: var(--pink);
-      background: rgba(238, 9, 121, 0.28);
-      box-shadow: 0 0 14px rgba(238, 9, 121, 0.4);
+      background: rgba(212, 90, 232, 0.28);
+      box-shadow: 0 0 14px rgba(212, 90, 232, 0.4);
     }
     .cal-day-num {
       font-size: 0.88rem;
@@ -165,8 +165,8 @@
       border-radius: 50%;
       background: var(--pink);
     }
-    .cal-dot.party { background: #FF6A00; }
-    .cal-dot.karaoke { background: #EBC17F; }
+    .cal-dot.party { background: #E69321; }
+    .cal-dot.karaoke { background: #E69321; }
 
     /* List Event Cards */
     .event-card-item {
@@ -191,7 +191,7 @@
     .event-date-box {
       width: 58px;
       height: 64px;
-      background: rgba(238, 9, 121, 0.12);
+      background: rgba(212, 90, 232, 0.12);
       border: 1px solid var(--border-glow);
       border-radius: 14px;
       display: flex;
@@ -243,7 +243,7 @@
       margin-left: -8px;
       overflow: hidden;
       flex-shrink: 0;
-      background: #1E293B;
+      background: #0E0E13;
     }
     .avatar-stack-item-box:first-child {
       margin-left: 0;
@@ -275,10 +275,10 @@
       color: #FFF;
     }
     .btn-rsvp.going {
-      background: rgba(16, 185, 129, 0.16);
-      border-color: #10B981;
-      color: #10B981;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+      background: rgba(67, 219, 143, 0.16);
+      border-color: #43DB8F;
+      color: #43DB8F;
+      box-shadow: 0 0 12px rgba(67, 219, 143, 0.25);
     }
 
     /* Modal Sheet for Attendees Profile Cards */
@@ -926,9 +926,10 @@
       const upcoming = EVENTS_DATA.filter(e => e.date >= today);
 
       if (!upcoming.length) {
+        // An empty calendar still looks like ISOT rather than like a broken page.
         return `
-          <div class="dim" style="text-align:center;padding:48px 20px">
-            <i class="fa-solid fa-calendar-xmark" style="font-size:2rem;opacity:0.35;display:block;margin-bottom:14px"></i>
+          <div style="padding:20px 0 8px">${renderMosaicHtml('ISOT-empty-calendar', 6)}</div>
+          <div class="dim" style="text-align:center;padding:22px 20px 40px">
             Nothing scheduled yet.<br />
             <span style="font-size:0.85rem">New nights appear here as soon as the board adds them.</span>
           </div>`;

@@ -28,13 +28,13 @@
 
   <style>
     .kj-hero-card {
-      background: linear-gradient(135deg, #1E293B, #0F172A);
+      background: linear-gradient(135deg, #0E0E13, #000000);
       border: 2px solid var(--pink);
       border-radius: 24px;
       padding: 24px;
       text-align: center;
       margin-bottom: 24px;
-      box-shadow: 0 12px 30px rgba(238, 9, 121, 0.2);
+      box-shadow: 0 12px 30px rgba(212, 90, 232, 0.2);
     }
     .kj-song-card {
       background: var(--bg-card);
@@ -49,8 +49,8 @@
       transition: var(--transition-fast);
     }
     .kj-song-card.now-playing {
-      border-color: #10B981;
-      background: rgba(16, 185, 129, 0.12);
+      border-color: #43DB8F;
+      background: rgba(67, 219, 143, 0.12);
     }
     .big-tap-btn {
       min-height: 52px;
@@ -297,10 +297,10 @@
             <div class="dim" style="font-size:0.85rem">Artist: ${escapeHtml(item.artist_name || 'Original Artist')} • Performed by ${escapeHtml(item.singer_name || 'Member')}</div>
           </div>
           <div style="display:flex;gap:6px">
-            <button type="button" onclick="playNow('${item.id}')" class="btn btn-outline" style="width:auto;padding:8px 12px;font-size:0.8rem;color:var(--green);border-color:rgba(16,185,129,0.4)">
+            <button type="button" onclick="playNow('${item.id}')" class="btn btn-outline" style="width:auto;padding:8px 12px;font-size:0.8rem;color:var(--green);border-color:rgba(67,219,143,0.4)">
               <i class="fa-solid fa-play"></i> Play
             </button>
-            <button type="button" onclick="removeSlot('${item.id}')" class="btn btn-outline" style="width:auto;padding:8px 12px;font-size:0.8rem;color:#FCA5A5;border-color:rgba(239,68,68,0.4)">
+            <button type="button" onclick="removeSlot('${item.id}')" class="btn btn-outline" style="width:auto;padding:8px 12px;font-size:0.8rem;color:#F8A18E;border-color:rgba(243,108,81,0.4)">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>
