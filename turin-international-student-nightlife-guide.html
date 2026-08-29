@@ -749,7 +749,7 @@
       document.getElementById('articleHeroImg').src = heroSrc;
 
       try {
-        const res = await fetch('assets/wp_exported_data.json');
+        const res = await fetch('/assets/wp_exported_data.json');
         const data = await res.json();
         const posts = data.posts || [];
         
@@ -846,9 +846,11 @@
           document.head.appendChild(ldScript);
         }
       } catch (err) {
-        console.log('Fetching local json, rendering fallback title for slug:', slug);
-        document.getElementById('articleTitle').innerText = slug.replace(/-/g, ' ').toUpperCase();
-        document.getElementById('articleBody').innerHTML = '<p>This comprehensive guide provides key instructions for international students living and studying in Turin. Check back for full PDF downloadable versions.</p>';
+        console.log('Error or pre-rendered page loaded for slug:', slug, err);
+        const bodyEl = document.getElementById('articleBody');
+        if (bodyEl && (bodyEl.innerHTML.includes('Loading full article content...') || !bodyEl.innerHTML.trim())) {
+          bodyEl.innerHTML = '<p>Guide content is currently being loaded. Please join ISOT community chat for instant guidance.</p>';
+        }
       }
     }
 
