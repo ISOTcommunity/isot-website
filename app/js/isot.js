@@ -36,6 +36,78 @@ const db = isConfigured() && window.supabase
 })();
 
 /* ---------------------------------------------------------------
+ * Member accent
+ *
+ * Seven options, all from the confirmed ISOT palette — a picker is not a licence
+ * to go off-palette.
+ *
+ * Each carries its own text colour, because white does not survive on most of them.
+ * White on Bright Green #43DB8F measures 1.8:1 and on Amber #E69321 2.4:1, against
+ * the 4.5:1 that button text at this size needs. Shipping one hardcoded #FFF would
+ * have made five of the seven choices unreadable, so `on` is computed from the
+ * accent's luminance, not chosen by eye.
+ * ------------------------------------------------------------- */
+const ACCENTS = {
+  orchid:  { name: 'Bright Orchid', hex: '#D45AE8', hover: '#DE7BEE', on: '#0B0B0F' },
+  magenta: { name: 'Deep Magenta',  hex: '#9E02B6', hover: '#B913D2', on: '#FFFFFF' },
+  blue:    { name: 'Deep Blue',     hex: '#1B4CAD', hover: '#2A61C9', on: '#FFFFFF' },
+  sky:     { name: 'Sky Blue',      hex: '#5787EA', hover: '#7BA1F0', on: '#0B0B0F' },
+  amber:   { name: 'Amber',         hex: '#E69321', hover: '#EFA745', on: '#0B0B0F' },
+  coral:   { name: 'Coral',         hex: '#F36C51', hover: '#F68871', on: '#0B0B0F' },
+  green:   { name: 'Bright Green',  hex: '#43DB8F', hover: '#66E4A5', on: '#0B0B0F' },
+};
+
+const DEFAULT_ACCENT = 'orchid';
+const ACCENT_KEY = 'isot_accent';
+
+function rgbaFrom(hex, alpha) {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
+}
+
+/** Paint an accent. Only keys in ACCENTS are honoured — the value lands in a CSS
+ *  custom property, so an unchecked string would reach the renderer. */
+function applyAccent(key) {
+  const a = ACCENTS[key] || ACCENTS[DEFAULT_ACCENT];
+  const r = document.documentElement.style;
+  r.setProperty('--orchid', a.hex);
+  r.setProperty('--pink', a.hex);              // historical alias, ~200 rules use it
+  r.setProperty('--accent-hover', a.hover);
+  r.setProperty('--on-accent', a.on);
+  r.setProperty('--pink-glow', rgbaFrom(a.hex, 0.30));
+  r.setProperty('--border-glow', rgbaFrom(a.hex, 0.42));
+  return a;
+}
+
+/** Applied before first paint, straight from localStorage. Waiting for auth would
+ *  flash the default colour on every page load. */
+(function initAccent() {
+  let saved = null;
+  try { saved = localStorage.getItem(ACCENT_KEY); } catch (e) { /* private mode */ }
+  applyAccent(saved && ACCENTS[saved] ? saved : DEFAULT_ACCENT);
+})();
+
+/** Save the member's choice. Writes through to the profile so it follows them to
+ *  another device, and caches locally so the next page load paints it immediately. */
+async function saveAccent(key) {
+  if (!ACCENTS[key]) return { ok: false, error: 'Unknown colour' };
+
+  applyAccent(key);
+  try { localStorage.setItem(ACCENT_KEY, key); } catch (e) { /* private mode */ }
+
+  const id = window.__isotProfileId;
+  if (!db || !id) return { ok: true, synced: false };
+
+  const { error } = await db.from('profiles').update({ accent: key }).eq('id', id);
+  if (error) {
+    // The local choice still stands; say plainly that it did not sync.
+    console.warn('accent did not sync:', error.message);
+    return { ok: true, synced: false, error: error.message };
+  }
+  return { ok: true, synced: true };
+}
+
+/* ---------------------------------------------------------------
  * Identity Palette for Deterministic Geometry Avatars
  * ------------------------------------------------------------- */
 /* The confirmed ISOT palette (ISOT-Colour-System.pdf, Aug 2026). The previous list
@@ -391,6 +463,13 @@ async function requireAuth(opts = {}) {
 
   // Remembered so sendNotification can stamp actor_id without re-fetching.
   window.__isotProfileId = profile.id;
+
+  // The profile wins over the local cache — that is what makes the choice follow
+  // someone to a second device. Ignored silently if 020 has not been run.
+  if (profile.accent && ACCENTS[profile.accent]) {
+    applyAccent(profile.accent);
+    try { localStorage.setItem(ACCENT_KEY, profile.accent); } catch (e) { /* private mode */ }
+  }
 
   const isBoard = profile.staff_role === 'board';
   const isStaff = isBoard || profile.staff_role === 'volunteer';

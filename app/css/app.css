@@ -95,6 +95,11 @@
      one of the artwork's tiles rather than as a rounded rectangle. */
   --radius-arc:     46px;
 
+  /* Overwritten at runtime by applyAccent(). These are the defaults, so the
+     stylesheet is complete on its own if the script never runs. */
+  --accent-hover:   #DE7BEE;
+  --on-accent:      #0B0B0F;
+
   --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-spring: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -399,13 +404,16 @@ h3 {
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn:active:not(:disabled) { transform: scale(0.98); }
 
+/* Text colour comes from the accent, never a hardcoded #FFF. White measures 1.8:1
+   on Bright Green and 2.4:1 on Amber — five of the seven accents would have shipped
+   with unreadable button labels. */
 .btn-pink {
   background: var(--pink);
-  color: #FFF;
+  color: var(--on-accent);
   box-shadow: 0 4px 18px var(--pink-glow);
 }
 .btn-pink:hover:not(:disabled) {
-  background: #DE7BEE;   /* Orchid lifted ~8% — same hue, no second accent */
+  background: var(--accent-hover);
   transform: translateY(-1px);
 }
 .btn-outline {
