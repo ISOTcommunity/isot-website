@@ -385,21 +385,53 @@
         <a href="blog.html" class="back-btn">← Back to All Guides</a>
         <br />
         <span class="post-category-tag" id="articleCat"><i class="fa-solid fa-book-open"></i> Student Guide</span>
-        <h1 class="post-main-title" id="articleTitle">Loading Guide Title...</h1>
+        <h1 class="post-main-title" id="articleTitle">ISOT Creative Art & Egg Painting Workshops: Culture, Connection & Student Fun in Turin</h1>
         <div class="post-author-bar">
           <span><i class="fa-solid fa-user-pen"></i> ISOT Editorial Team</span>
           <span>•</span>
-          <span id="articleDate"><i class="fa-regular fa-calendar"></i> Published in Turin</span>
+          <span id="articleDate"><i class="fa-regular fa-calendar"></i> 2026-08-26 • ISOT Turin Guide</span>
         </div>
       </div>
 
       <!-- Featured Hero Banner Image -->
       <div class="post-hero-image-box" id="heroImageBox">
-        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT Student Guide Turin" />
+        <img id="articleHeroImg" src="assets/optimized/isot_painting_workshop_crowd.jpg" alt="ISOT Creative Art & Egg Painting Workshops: Culture, Connection & Student Fun in Turin" />
       </div>
 
       <div class="post-content-body" id="articleBody">
-        <p>Loading full article content...</p>
+        <div class="seo-guide-container">
+  <p>At <strong>ISOT Community</strong>, integration is about more than administrative paperwork—it is about creating memorable experiences where international students connect, express their creativity, and build lifelong friendships in Turin.</p>
+
+  <h2>Hands-On Cultural Art & Painting Evenings</h2>
+  <p>Our regular creative workshops bring together students from over 40 countries to paint, design, and share cultural traditions. From seasonal egg painting workshops to superhero and floral canvas designs, our events offer a cozy, welcoming atmosphere where everyone can unleash their inner artist.</p>
+
+  <div style="margin: 24px 0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+    <img src="assets/optimized/isot_painting_workshop_crowd.jpg" alt="ISOT International Students Painting Together at Long Table" style="width:100%; display:block;" />
+    <p style="font-size:0.85rem; color:var(--text-dim); text-align:center; padding:8px; background:rgba(0,0,0,0.4);">ISOT Community Art Workshop: Students painting together at Rough, San Salvario.</p>
+  </div>
+
+  <h2>Custom Egg Painting & Creative Themes</h2>
+  <p>During our special cultural craft nights, members painted custom miniature eggs featuring Spider-Man logos, traditional floral patterns, vibrant geometric shapes, and regional flags.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:24px 0;">
+    <div style="border-radius:12px; overflow:hidden;">
+      <img src="assets/optimized/isot_easter_egg_workshop_banner.jpg" alt="ISOT Members with Roll-up Banner" style="width:100%; height:240px; object-fit:cover;" />
+    </div>
+    <div style="border-radius:12px; overflow:hidden;">
+      <img src="assets/optimized/isot_painted_eggs_art.jpg" alt="Spider-Man and Floral Painted Eggs Artwork" style="width:100%; height:240px; object-fit:cover;" />
+    </div>
+  </div>
+
+  <h2>Why Attend ISOT Creative Workshops?</h2>
+  <ul>
+    <li><strong>Zero Experience Needed</strong>: Paints, brushes, canvases, and materials are provided for all participants.</li>
+    <li><strong>Great Icebreaker</strong>: Painting side-by-side makes it easy to meet fellow PoliTo, UniTo, and exchange students.</li>
+    <li><strong>Take Home Your Art</strong>: Keep your custom artwork as a souvenir of your student years in Turin!</li>
+  </ul>
+
+  <h2>How to Join the Next Creative Workshop</h2>
+  <p>Check our <a href="events.html" style="color:var(--pink);">Weekly Events Calendar</a> or join our verified <a href="social.html" style="color:var(--pink);">Telegram & WhatsApp Student Chat Groups</a> to sign up for upcoming art nights!</p>
+</div>
       </div>
     </main>
 
@@ -567,7 +599,8 @@
     // Load article data from exported JSON
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
-      const pathSlug = location.pathname.split('/').pop().replace(/\.html$/, '');
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      const pathSlug = (pathParts[pathParts.length - 1] || '').replace(/\.html$/, '');
       const slug = params.get('slug') || (pathSlug && pathSlug !== 'blog-post' ? pathSlug : '') || 'a-complete-guide-to-living-in-turin-for-international-students';
 
       const heroSrc = HERO_IMAGES[slug] || 'assets/optimized/social_group_1.jpg';

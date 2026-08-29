@@ -385,21 +385,54 @@
         <a href="blog.html" class="back-btn">← Back to All Guides</a>
         <br />
         <span class="post-category-tag" id="articleCat"><i class="fa-solid fa-book-open"></i> Student Guide</span>
-        <h1 class="post-main-title" id="articleTitle">Loading Guide Title...</h1>
+        <h1 class="post-main-title" id="articleTitle">How to Get a Codice Fiscale in Turin: Step-by-Step Guide for International Students</h1>
         <div class="post-author-bar">
           <span><i class="fa-solid fa-user-pen"></i> ISOT Editorial Team</span>
           <span>•</span>
-          <span id="articleDate"><i class="fa-regular fa-calendar"></i> Published in Turin</span>
+          <span id="articleDate"><i class="fa-regular fa-calendar"></i> 2026-08-22 • ISOT Turin Guide</span>
         </div>
       </div>
 
       <!-- Featured Hero Banner Image -->
       <div class="post-hero-image-box" id="heroImageBox">
-        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT Student Guide Turin" />
+        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="How to Get a Codice Fiscale in Turin: Step-by-Step Guide for International Students" />
       </div>
 
       <div class="post-content-body" id="articleBody">
-        <p>Loading full article content...</p>
+        <div class="seo-guide-container">
+  <p>Obtaining a <strong>Codice Fiscale</strong> (Italian Tax Code) is the single most important first step for any international student arriving in Turin. Without a Codice Fiscale, you cannot sign a house rental contract, open an Italian bank account, purchase an annual GTT student bus pass, get an Italian mobile SIM card, or complete your enrollment at <strong>Politecnico di Torino</strong> or the <strong>University of Turin</strong>.</p>
+  
+  <h2>What is a Codice Fiscale?</h2>
+  <p>The Codice Fiscale is an alphanumeric code of 16 characters generated based on your full name, gender, date of birth, and country of birth. It is issued free of charge by the <em>Agenzia delle Entrate</em> (Italian Revenue Agency).</p>
+
+  <h2>Required Documents Checklist</h2>
+  <ul>
+    <li><strong>Valid Passport or EU National ID Card</strong> (Original + 2 printed photocopies of the photo page).</li>
+    <li><strong>Valid Student Visa</strong> (for non-EU students) with entry stamp + photocopy of the visa page.</li>
+    <li><strong>Proof of Student Status</strong>: Admission letter, enrollment certificate from Universitaly, UniTo, or PoliTo.</li>
+    <li><strong>Completed Form AA4/8</strong> (Domanda di attribuzione codice fiscale) available at the Agenzia delle Entrate office or downloadable online.</li>
+  </ul>
+
+  <h2>Agenzia delle Entrate Offices in Turin</h2>
+  <p>You can apply at any local branch of the Agenzia delle Entrate in Turin:</p>
+  <ul>
+    <li><strong>Ufficio Territoriale Torino 1 (City Center / Station)</strong>: Corso Bolzano 30 (very close to Porta Susa railway station).</li>
+    <li><strong>Ufficio Territoriale Torino 2</strong>: Via Rosa 15.</li>
+    <li><strong>Ufficio Territoriale Torino 3</strong>: Corso Cosenza 25/A.</li>
+  </ul>
+
+  <h2>How to Apply (2 Methods)</h2>
+  <h3>Method A: In-Person Appointment in Turin</h3>
+  <p>1. Book an appointment online using the <em>Agenzia delle Entrate</em> website or app (select "Prenotazione Appuntamenti").<br>
+  2. Arrive 10 minutes before your scheduled slot with your printed documents.<br>
+  3. The officer will verify your documents and print your official paper Codice Fiscale certificate on the spot.</p>
+
+  <h3>Method B: Via the Italian Embassy/Consulate Before Arrival</h3>
+  <p>If you have not yet arrived in Italy, you can request your Codice Fiscale directly through the Italian Embassy or Consulate in your home country during your student visa application process.</p>
+
+  <h2>Need Community Support?</h2>
+  <p>If you run into issues or need help filling out Form AA4/8, join the <strong>ISOT Community Telegram group</strong> or visit us at our weekly student meetups in Turin!</p>
+</div>
       </div>
     </main>
 
@@ -567,7 +600,8 @@
     // Load article data from exported JSON
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
-      const pathSlug = location.pathname.split('/').pop().replace(/\.html$/, '');
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      const pathSlug = (pathParts[pathParts.length - 1] || '').replace(/\.html$/, '');
       const slug = params.get('slug') || (pathSlug && pathSlug !== 'blog-post' ? pathSlug : '') || 'a-complete-guide-to-living-in-turin-for-international-students';
 
       const heroSrc = HERO_IMAGES[slug] || 'assets/optimized/social_group_1.jpg';

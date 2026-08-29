@@ -385,21 +385,31 @@
         <a href="blog.html" class="back-btn">← Back to All Guides</a>
         <br />
         <span class="post-category-tag" id="articleCat"><i class="fa-solid fa-book-open"></i> Student Guide</span>
-        <h1 class="post-main-title" id="articleTitle">Loading Guide Title...</h1>
+        <h1 class="post-main-title" id="articleTitle">FINAL DATA ON COVERAGE AND PAYMENT OF FIRST INSTALLMENTS OF EDISU</h1>
         <div class="post-author-bar">
           <span><i class="fa-solid fa-user-pen"></i> ISOT Editorial Team</span>
           <span>•</span>
-          <span id="articleDate"><i class="fa-regular fa-calendar"></i> Published in Turin</span>
+          <span id="articleDate"><i class="fa-regular fa-calendar"></i> 2024-12-11 • ISOT Turin Guide</span>
         </div>
       </div>
 
       <!-- Featured Hero Banner Image -->
       <div class="post-hero-image-box" id="heroImageBox">
-        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT Student Guide Turin" />
+        <img id="articleHeroImg" src="assets/optimized/career_workshop_2.jpg" alt="FINAL DATA ON COVERAGE AND PAYMENT OF FIRST INSTALLMENTS OF EDISU" />
       </div>
 
       <div class="post-content-body" id="articleBody">
-        <p>Loading full article content...</p>
+        		<div data-elementor-type="wp-post" data-elementor-id="213" class="elementor elementor-213" data-elementor-post-type="post">
+				<div class="elementor-element elementor-element-9d877c7 e-flex e-con-boxed e-con e-parent" data-id="9d877c7" data-element_type="container">
+					<div class="e-con-inner">
+				<div class="elementor-element elementor-element-75b29c3 elementor-widget elementor-widget-text-editor" data-id="75b29c3" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p class="p1">✅ Translated and supported by ISOT: NO SCHOLARSHIPS IN DECEMBER</p><p class="p1">🚨 The Right to Study in Crisis in Piedmont 🚨</p><p class="p1">📅 Assembly for a Guaranteed Right to Study</p><p class="p1">🗓️ December 13, 5:30 p.m.</p><p class="p1">📍 Mensa Olimpia</p><p class="p1">The situation for 2024/25 scholarships is critical:</p><p class="p1">🔴 Insufficient Funds: Only €88M allocated vs. €115M needed. About 23% of eligible students will be left as eligible non-beneficiaries in December rankings. Missing €27M won&#8217;t be available until late January/early February.</p><p class="p1">🔴 Delays in Payments: No first installments until February due to liquidity issues, despite the Ministry&#8217;s request to anticipate payments.</p><p class="p1">This mismanagement leaves students unsupported during the semester, worsening academic and financial pressures.</p><p class="p1">💬 Join us on Dec 13 to discuss solutions and demand action!</p><p class="p1">@alterpolis</p><p class="p1">CollettivaMente</p><p class="p1">Independent Students</p><hr /><p><strong>UPDATE: DEC 11th</strong></p><p><strong>FINAL DATA ON COVERAGE AND PAYMENT OF FIRST INSTALLMENTS OF EDISU</strong></p><p>Following the Board of Directors meeting on December 10th, we are posting this update with more precise information regarding the coverage and disbursement of the first installments we mentioned in our previous post.</p><p><strong>COVERAGE:</strong> As of 5:00 PM on 10/12, there are 18,572 students who meet the requirements to win the scholarship, and 80 applications are still being evaluated. The total need amounts to approximately €102 million. In addition to this figure, €1 million must be added for doctoral scholarships, as well as the need for funds to cover 1,700 suspended students who will be evaluated in the April rankings.</p><p>In total, EDISU currently has €88.8 million. Yesterday, EDISU received a formal commitment letter for €27 million from President of the Region Cirio, Vice President Chiorino, and Budget Assessor Tronzano. However, this letter may not mean much unless the Regional Council or the Regional Government approve the 2025 budget with the allocation for EDISU. Therefore, as of now, EDISU cannot rely on these funds.</p><p><strong>IMPORTANT:</strong> After more precise calculations, €6 million of the €88.8 million must be deducted (to cover Graduation Awards, Part-Time Collaborations, etc.), along with another €6.4 million that was already allocated for the November rankings for first-year undergraduate and single-cycle master’s students. Thus, approximately 25% of eligible students will not receive the funds. It’s important to note that in the fund distribution, only 15% is reserved for first-year students, so it’s likely that the percentage of eligible students will be higher in the first years compared to later years.</p><p><strong>FIRST INSTALLMENT PAYMENTS:</strong> We raised the issue in the Board of Directors regarding EDISU’s cash flow and the payment of the first installments. The offices informed us that the current cash flow will only allow for the payment of the first installment to the first-year students who won the November rankings (those who received the 20% advance on their first installment at the end of November and will receive the remaining 30% balance in December). We also inquired about the monetization of the accommodation spots for the Universiade, and were told that the offices are working to disburse the monetization starting next week (pending resolution of some accounting issues and payment application bugs). It is not guaranteed that the monetizations will be paid by December, but we will request updates.</p><p>Lastly, we confirmed that all second installments have been paid and that cash flow issues have not affected their payment. We were assured that all payments have been processed and that everyone should have received the second installment for the 2023/24 academic year. If this is not the case for you, please open a support ticket to investigate your specific situation.</p><p>To build a collective movement in support of our <strong>RIGHT TO EDUCATION</strong> and to discuss the current situation at EDISU, we remind you of the Assembly on Friday, December 13th at 5:30 PM at the Olimpia canteen.</p><p>@alterpolis<br />CollettivaMente<br />Studenti Indipendenti</p>								</div>
+				</div>
+					</div>
+				</div>
+				</div>
+		
       </div>
     </main>
 
@@ -567,7 +577,8 @@
     // Load article data from exported JSON
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
-      const pathSlug = location.pathname.split('/').pop().replace(/\.html$/, '');
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      const pathSlug = (pathParts[pathParts.length - 1] || '').replace(/\.html$/, '');
       const slug = params.get('slug') || (pathSlug && pathSlug !== 'blog-post' ? pathSlug : '') || 'a-complete-guide-to-living-in-turin-for-international-students';
 
       const heroSrc = HERO_IMAGES[slug] || 'assets/optimized/social_group_1.jpg';

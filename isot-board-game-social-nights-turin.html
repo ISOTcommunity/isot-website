@@ -385,21 +385,41 @@
         <a href="blog.html" class="back-btn">← Back to All Guides</a>
         <br />
         <span class="post-category-tag" id="articleCat"><i class="fa-solid fa-book-open"></i> Student Guide</span>
-        <h1 class="post-main-title" id="articleTitle">Loading Guide Title...</h1>
+        <h1 class="post-main-title" id="articleTitle">ISOT Board Game & Card Game Social Evenings for International Students in Turin</h1>
         <div class="post-author-bar">
           <span><i class="fa-solid fa-user-pen"></i> ISOT Editorial Team</span>
           <span>•</span>
-          <span id="articleDate"><i class="fa-regular fa-calendar"></i> Published in Turin</span>
+          <span id="articleDate"><i class="fa-regular fa-calendar"></i> 2026-08-26 • ISOT Turin Guide</span>
         </div>
       </div>
 
       <!-- Featured Hero Banner Image -->
       <div class="post-hero-image-box" id="heroImageBox">
-        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT Student Guide Turin" />
+        <img id="articleHeroImg" src="assets/optimized/isot_boardgames_social_night.jpg" alt="ISOT Board Game & Card Game Social Evenings for International Students in Turin" />
       </div>
 
       <div class="post-content-body" id="articleBody">
-        <p>Loading full article content...</p>
+        <div class="seo-guide-container">
+  <p>Looking for a fun, relaxed way to meet international students in Turin without the noise of a nightclub? <strong>ISOT Community's Board Game & Card Game Nights</strong> offer the perfect cozy setting to make friends, practice languages, and enjoy strategic fun.</p>
+
+  <h2>Uno, Catan, Chess & International Card Games</h2>
+  <p>Our members bring a wide variety of card games and board games from around the world. Whether you are a fan of fast-paced <strong>Uno showdowns</strong>, strategic <em>Settlers of Catan</em>, chess, or party trivia games, there is always a table open for you.</p>
+
+  <div style="margin: 24px 0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+    <img src="assets/optimized/isot_boardgames_social_night.jpg" alt="ISOT International Students Playing Uno Card Games Together at Night" style="width:100%; display:block;" />
+    <p style="font-size:0.85rem; color:var(--text-dim); text-align:center; padding:8px; background:rgba(0,0,0,0.4);">ISOT Board Game Night: Students enjoying Uno and card games at Capodoglio Murazzi.</p>
+  </div>
+
+  <h2>Why Attend ISOT Board Game Evenings?</h2>
+  <ul>
+    <li><strong>Relaxed & Low-Pressure Environment</strong>: Easy to chat, laugh, and introduce yourself to fellow UniTo and PoliTo students.</li>
+    <li><strong>All Games Provided</strong>: You can bring your own favorite card or board games from home, or play with games provided by ISOT.</li>
+    <li><strong>Venue Discounts for Members</strong>: Enjoy member discounts on teas, craft beers, and aperitivo snacks with your ISOT Web App card.</li>
+  </ul>
+
+  <h2>How to Join the Next Game Night</h2>
+  <p>Check out our <a href="events.html" style="color:var(--pink);">Weekly Events Schedule</a> or join our verified <a href="social.html" style="color:var(--pink);">Telegram & WhatsApp Student Chat Groups</a> to see this week's game night location!</p>
+</div>
       </div>
     </main>
 
@@ -567,7 +587,8 @@
     // Load article data from exported JSON
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
-      const pathSlug = location.pathname.split('/').pop().replace(/\.html$/, '');
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      const pathSlug = (pathParts[pathParts.length - 1] || '').replace(/\.html$/, '');
       const slug = params.get('slug') || (pathSlug && pathSlug !== 'blog-post' ? pathSlug : '') || 'a-complete-guide-to-living-in-turin-for-international-students';
 
       const heroSrc = HERO_IMAGES[slug] || 'assets/optimized/social_group_1.jpg';

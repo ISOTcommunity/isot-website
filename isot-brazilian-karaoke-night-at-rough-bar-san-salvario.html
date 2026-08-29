@@ -385,21 +385,113 @@
         <a href="blog.html" class="back-btn">← Back to All Guides</a>
         <br />
         <span class="post-category-tag" id="articleCat"><i class="fa-solid fa-book-open"></i> Student Guide</span>
-        <h1 class="post-main-title" id="articleTitle">Loading Guide Title...</h1>
+        <h1 class="post-main-title" id="articleTitle">ISOT Brazilian Karaoke Night at Rough Bar San Salvario</h1>
         <div class="post-author-bar">
           <span><i class="fa-solid fa-user-pen"></i> ISOT Editorial Team</span>
           <span>•</span>
-          <span id="articleDate"><i class="fa-regular fa-calendar"></i> Published in Turin</span>
+          <span id="articleDate"><i class="fa-regular fa-calendar"></i> 2025-04-13 • ISOT Turin Guide</span>
         </div>
       </div>
 
       <!-- Featured Hero Banner Image -->
       <div class="post-hero-image-box" id="heroImageBox">
-        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT Student Guide Turin" />
+        <img id="articleHeroImg" src="assets/optimized/karaoke_night_1.jpg" alt="ISOT Brazilian Karaoke Night at Rough Bar San Salvario" />
       </div>
 
       <div class="post-content-body" id="articleBody">
-        <p>Loading full article content...</p>
+        		<div data-elementor-type="wp-post" data-elementor-id="363" class="elementor elementor-363" data-elementor-post-type="post">
+				<div class="elementor-element elementor-element-20dc27e3 e-flex e-con-boxed e-con e-parent" data-id="20dc27e3" data-element_type="container">
+					<div class="e-con-inner">
+				<div class="elementor-element elementor-element-754cbc55 elementor-widget elementor-widget-text-editor" data-id="754cbc55" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									
+<p class="wp-block-paragraph">Looking for a fun and vibrant way to kick off your week? Join us this <strong>Monday, April 14th</strong>, for a <strong>Brazilian-themed Karaoke Night</strong> at <em>Rough San Salvario</em>, right in the heart of Torino!</p>
+
+
+
+<h3 class="wp-block-heading"> Sing, Dance, and Celebrate Brazilian Style</h3>
+
+
+
+<p class="wp-block-paragraph">Whether you&#8217;re a karaoke pro or just looking for a fun night out with friends, this event is all about good vibes, tropical rhythms, and unforgettable memories. From samba beats to bossa nova classics and modern Brazilian hits, our playlist is packed with energy and soul.</p>
+
+
+
+<p class="wp-block-paragraph">But it’s not just about the music—our Brazilian-themed night brings you the full experience with <strong>dancing</strong>, <strong>tropical drinks</strong>, and a festive atmosphere that will transport you straight to Rio.</p>
+
+
+
+<h3 class="wp-block-heading">Special Promo – 19:00 to 22:00</h3>
+
+
+
+<p class="wp-block-paragraph">We’ve got some delicious deals to spice up your evening:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Pizza + Long Drink</strong> for only <strong>10€</strong></li>
+
+
+
+<li><strong>Caipirinha</strong> (Brazil’s most iconic cocktail) for just <strong>5€</strong></li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Come early to enjoy the promo and settle in before the stage lights up!</p>
+
+
+
+<p class="wp-block-paragraph"></p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h3 class="wp-block-heading"> Event Details</h3>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Where:</strong> Rough San Salvario, Via Principe Tommaso 3, Torino</li>
+
+
+
+<li><strong>When:</strong> Monday, April 15th</li>
+
+
+
+<li><strong>Time:</strong> From 7 PM until late</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph"></p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<p class="wp-block-paragraph">Don’t miss this chance to let loose, connect with the community, and show off your karaoke skills. Whether you&#8217;re belting out classics or dancing to Brazilian beats, this Monday is all about celebration.</p>
+
+
+
+<p class="wp-block-paragraph">✨ <em>Samba into the spotlight and experience a night like no other!</em> ✨</p>
+
+
+
+<p class="wp-block-paragraph"></p>
+								</div>
+				</div>
+					</div>
+				</div>
+				</div>
+		
       </div>
     </main>
 
@@ -567,7 +659,8 @@
     // Load article data from exported JSON
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
-      const pathSlug = location.pathname.split('/').pop().replace(/\.html$/, '');
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      const pathSlug = (pathParts[pathParts.length - 1] || '').replace(/\.html$/, '');
       const slug = params.get('slug') || (pathSlug && pathSlug !== 'blog-post' ? pathSlug : '') || 'a-complete-guide-to-living-in-turin-for-international-students';
 
       const heroSrc = HERO_IMAGES[slug] || 'assets/optimized/social_group_1.jpg';

@@ -385,21 +385,48 @@
         <a href="blog.html" class="back-btn">← Back to All Guides</a>
         <br />
         <span class="post-category-tag" id="articleCat"><i class="fa-solid fa-book-open"></i> Student Guide</span>
-        <h1 class="post-main-title" id="articleTitle">Loading Guide Title...</h1>
+        <h1 class="post-main-title" id="articleTitle">Student Sports & Bouldering in Turin: ISOT Indoor Rock Climbing Group</h1>
         <div class="post-author-bar">
           <span><i class="fa-solid fa-user-pen"></i> ISOT Editorial Team</span>
           <span>•</span>
-          <span id="articleDate"><i class="fa-regular fa-calendar"></i> Published in Turin</span>
+          <span id="articleDate"><i class="fa-regular fa-calendar"></i> 2026-08-26 • ISOT Turin Guide</span>
         </div>
       </div>
 
       <!-- Featured Hero Banner Image -->
       <div class="post-hero-image-box" id="heroImageBox">
-        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT Student Guide Turin" />
+        <img id="articleHeroImg" src="assets/optimized/isot_bouldering_climbing_group.jpg" alt="Student Sports & Bouldering in Turin: ISOT Indoor Rock Climbing Group" />
       </div>
 
       <div class="post-content-body" id="articleBody">
-        <p>Loading full article content...</p>
+        <div class="seo-guide-container">
+  <p>Turin is located right at the foot of the Italian Alps, making it one of Europe's top capitals for mountain sports, outdoor adventures, and indoor bouldering. For international students studying at PoliTo or UniTo, staying active with <strong>ISOT Community's Bouldering & Sports Group</strong> is a great way to stay fit and build long-lasting friendships.</p>
+
+  <h2>Indoor Bouldering & Rock Climbing Gyms in Turin</h2>
+  <p>Indoor bouldering has exploded in popularity among Turin university students because it requires minimal equipment—just climbing shoes and chalk—and offers a fun, problem-solving social workout.</p>
+
+  <div style="margin: 24px 0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+    <img src="assets/optimized/isot_bouldering_climbing_group.jpg" alt="ISOT Student Bouldering & Indoor Rock Climbing Group in Turin Gym" style="width:100%; display:block;" />
+    <p style="font-size:0.85rem; color:var(--text-dim); text-align:center; padding:8px; background:rgba(0,0,0,0.4);">ISOT Sports Group: Indoor bouldering session at B-Side / Block-Out climbing gym in Turin.</p>
+  </div>
+
+  <h2>Top Climbing Gyms Popular with Students</h2>
+  <ul>
+    <li><strong>B-Side Climbing Park</strong> (Via Ravina 28): One of Turin's largest and most famous bouldering halls with student discounts.</li>
+    <li><strong>Block-Out Bouldering Gym</strong> (Corso Cosenza): Modern walls with routes ranging from beginner (V0) to expert levels.</li>
+    <li><strong>Escape Climbing Garden</strong> (Via G. Bruno 191): Great community vibe with strength training zones.</li>
+  </ul>
+
+  <h2>Other ISOT Sports & Outdoor Activities</h2>
+  <ul>
+    <li><strong>Weekend Alpine Hikes</strong>: Day trips to Val di Susa, Sacra di San Michele, and Gran Paradiso National Park.</li>
+    <li><strong>Weekly Football & Volleyball Matches</strong>: Recreational matches organized via our Telegram sports subgroup.</li>
+    <li><strong>Running & Riverside Jogging</strong>: Group runs along Parco del Valentino and the Po River banks.</li>
+  </ul>
+
+  <h2>How to Join the ISOT Sports Group</h2>
+  <p>Join our verified <a href="social.html" style="color:var(--pink);">Telegram & WhatsApp Student Chat Groups</a> and ask for the Sports & Bouldering subgroup link!</p>
+</div>
       </div>
     </main>
 
@@ -567,7 +594,8 @@
     // Load article data from exported JSON
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
-      const pathSlug = location.pathname.split('/').pop().replace(/\.html$/, '');
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      const pathSlug = (pathParts[pathParts.length - 1] || '').replace(/\.html$/, '');
       const slug = params.get('slug') || (pathSlug && pathSlug !== 'blog-post' ? pathSlug : '') || 'a-complete-guide-to-living-in-turin-for-international-students';
 
       const heroSrc = HERO_IMAGES[slug] || 'assets/optimized/social_group_1.jpg';

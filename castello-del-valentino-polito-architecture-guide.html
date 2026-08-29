@@ -385,21 +385,42 @@
         <a href="blog.html" class="back-btn">← Back to All Guides</a>
         <br />
         <span class="post-category-tag" id="articleCat"><i class="fa-solid fa-book-open"></i> Student Guide</span>
-        <h1 class="post-main-title" id="articleTitle">Loading Guide Title...</h1>
+        <h1 class="post-main-title" id="articleTitle">Castello del Valentino & Parco del Valentino: Student Guide to PoliTo Architecture Campus</h1>
         <div class="post-author-bar">
           <span><i class="fa-solid fa-user-pen"></i> ISOT Editorial Team</span>
           <span>•</span>
-          <span id="articleDate"><i class="fa-regular fa-calendar"></i> Published in Turin</span>
+          <span id="articleDate"><i class="fa-regular fa-calendar"></i> 2026-08-25 • ISOT Turin Guide</span>
         </div>
       </div>
 
       <!-- Featured Hero Banner Image -->
       <div class="post-hero-image-box" id="heroImageBox">
-        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT Student Guide Turin" />
+        <img id="articleHeroImg" src="assets/optimized/castello_del_valentino_turin.jpg" alt="Castello del Valentino & Parco del Valentino: Student Guide to PoliTo Architecture Campus" />
       </div>
 
       <div class="post-content-body" id="articleBody">
-        <p>Loading full article content...</p>
+        <div class="seo-guide-container">
+  <p>Standing majestically on the banks of the Po River, <strong>Castello del Valentino</strong> is one of Turin's most iconic landmarks and the official campus of <strong>Politecnico di Torino's Department of Architecture and Design (DAD)</strong>.</p>
+
+  <h2>A UNESCO World Heritage Student Campus</h2>
+  <p>Originally a royal residence of the House of Savoy built in the 17th century, Castello del Valentino was transformed in 1859 into the Royal School of Application for Engineers—the historical predecessor of Politecnico di Torino. Today, international students attend lectures, studio labs, and exhibitions inside this UNESCO-listed castle.</p>
+
+  <h2>Student Life at Parco del Valentino</h2>
+  <p>Surrounding the castle is <strong>Parco del Valentino</strong>, Turin's famous riverside park. It is a central hub for student life in Turin:</p>
+  <ul>
+    <li><strong>Studying & Outdoor Reading</strong>: Shaded lawns and benches right outside lecture halls along the river.</li>
+    <li><strong>Borgo Medievale</strong>: The nearby recreated 15th-century medieval village and fortress.</li>
+    <li><strong>Jogging & Cycling</strong>: Paved riverside paths connecting Valentino park to San Salvario and Murazzi.</li>
+    <li><strong>ISOT Community Gatherings</strong>: Sunset student picnics and weekend gatherings hosted by ISOT Community.</li>
+  </ul>
+
+  <h2>How to Reach Castello del Valentino</h2>
+  <ul>
+    <li><strong>Metro</strong>: Get off at <em>Marconi</em> or <em>Nizza</em> station (Line 1) and walk 5 minutes toward the river.</li>
+    <li><strong>Tram & Bus</strong>: GTT Tram lines 9, 16 CD, and 16 CS stop right at Parco del Valentino.</li>
+    <li><strong>Address</strong>: Viale Pier Andrea Mattioli 39, 10125 Torino TO.</li>
+  </ul>
+</div>
       </div>
     </main>
 
@@ -567,7 +588,8 @@
     // Load article data from exported JSON
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
-      const pathSlug = location.pathname.split('/').pop().replace(/\.html$/, '');
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      const pathSlug = (pathParts[pathParts.length - 1] || '').replace(/\.html$/, '');
       const slug = params.get('slug') || (pathSlug && pathSlug !== 'blog-post' ? pathSlug : '') || 'a-complete-guide-to-living-in-turin-for-international-students';
 
       const heroSrc = HERO_IMAGES[slug] || 'assets/optimized/social_group_1.jpg';

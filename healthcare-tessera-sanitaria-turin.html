@@ -385,21 +385,55 @@
         <a href="blog.html" class="back-btn">← Back to All Guides</a>
         <br />
         <span class="post-category-tag" id="articleCat"><i class="fa-solid fa-book-open"></i> Student Guide</span>
-        <h1 class="post-main-title" id="articleTitle">Loading Guide Title...</h1>
+        <h1 class="post-main-title" id="articleTitle">Healthcare & Tessera Sanitaria in Turin: ASL Registration for International Students</h1>
         <div class="post-author-bar">
           <span><i class="fa-solid fa-user-pen"></i> ISOT Editorial Team</span>
           <span>•</span>
-          <span id="articleDate"><i class="fa-regular fa-calendar"></i> Published in Turin</span>
+          <span id="articleDate"><i class="fa-regular fa-calendar"></i> 2026-08-22 • ISOT Turin Guide</span>
         </div>
       </div>
 
       <!-- Featured Hero Banner Image -->
       <div class="post-hero-image-box" id="heroImageBox">
-        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT Student Guide Turin" />
+        <img id="articleHeroImg" src="assets/optimized/social_hub_1.jpg" alt="Healthcare & Tessera Sanitaria in Turin: ASL Registration for International Students" />
       </div>
 
       <div class="post-content-body" id="articleBody">
-        <p>Loading full article content...</p>
+        <div class="seo-guide-container">
+  <p>Accessing reliable healthcare is vital during your studies in Italy. International students in Turin can register with the Italian National Health Service (<em>Servizio Sanitario Nazionale - SSN</em>) to receive a <strong>Tessera Sanitaria</strong> (Health Insurance Card) and get assigned a personal general practitioner (<em>Medico di Base</em>).</p>
+
+  <h2>EU vs Non-EU Students Healthcare</h2>
+  <h3>EU / EEA Students</h3>
+  <p>Students from the European Union holding a valid <strong>EHIC (European Health Insurance Card)</strong> or S1 form are covered for medically necessary treatment in public hospitals and clinics in Turin without extra payment.</p>
+
+  <h3>Non-EU Students (Voluntary SSN Registration)</h3>
+  <p>Non-EU students can register voluntarily with the SSN for full healthcare rights equivalent to Italian citizens. The voluntary subscription fee covers one calendar year (January 1st to December 31st).</p>
+
+  <h2>How to Register with ASL in Turin</h2>
+  <p>1. <strong>Payment via F24 Slip</strong>: Pay the voluntary student contribution fee at any post office or bank using an F24 form (Code 8846 - Region 12 Piemonte).<br>
+  2. <strong>Visit your local ASL Office (ASL Città di Torino)</strong>:<br>
+  - <em>ASL Central/Porta Nuova area</em>: Via Vittorio Emanuele II 91<br>
+  - <em>ASL San Salvario / Nizza area</em>: Via San Secondo 29<br>
+  - <em>ASL Northern Turin</em>: Corso Toscana 108</p>
+
+  <h2>Required Documents for ASL Registration</h2>
+  <ul>
+    <li>Valid Passport & Student Visa</li>
+    <li>Codice Fiscale</li>
+    <li>Permesso di Soggiorno card or official post office receipt (Ricevuta)</li>
+    <li>Proof of enrollment at UniTo, PoliTo, SAA, or ESCP</li>
+    <li>F24 payment receipt</li>
+    <li>Proof of residence (Rental agreement or declaration of hospitality)</li>
+  </ul>
+
+  <h2>Emergency Care & Hospitals in Turin</h2>
+  <p>In case of medical emergencies, dial <strong>112</strong> (Single European Emergency Number). Major public hospitals with 24/7 Emergency Rooms (<em>Pronto Soccorso</em>) in Turin include:</p>
+  <ul>
+    <li><strong>Ospedale Molinette</strong> (Corso Bramante 88)</li>
+    <li><strong>Ospedale Mauriziano</strong> (Largo Filippo Turati 62)</li>
+    <li><strong>Ospedale San Giovanni Bosco</strong> (Piazza del Donatore di Sangue 3)</li>
+  </ul>
+</div>
       </div>
     </main>
 
@@ -567,7 +601,8 @@
     // Load article data from exported JSON
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
-      const pathSlug = location.pathname.split('/').pop().replace(/\.html$/, '');
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      const pathSlug = (pathParts[pathParts.length - 1] || '').replace(/\.html$/, '');
       const slug = params.get('slug') || (pathSlug && pathSlug !== 'blog-post' ? pathSlug : '') || 'a-complete-guide-to-living-in-turin-for-international-students';
 
       const heroSrc = HERO_IMAGES[slug] || 'assets/optimized/social_group_1.jpg';

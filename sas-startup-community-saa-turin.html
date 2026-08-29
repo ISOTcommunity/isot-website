@@ -385,21 +385,58 @@
         <a href="blog.html" class="back-btn">← Back to All Guides</a>
         <br />
         <span class="post-category-tag" id="articleCat"><i class="fa-solid fa-book-open"></i> Student Guide</span>
-        <h1 class="post-main-title" id="articleTitle">Loading Guide Title...</h1>
+        <h1 class="post-main-title" id="articleTitle">SAS Startup Lab: From Problem to Pitch @ SAA School of Management</h1>
         <div class="post-author-bar">
           <span><i class="fa-solid fa-user-pen"></i> ISOT Editorial Team</span>
           <span>•</span>
-          <span id="articleDate"><i class="fa-regular fa-calendar"></i> Published in Turin</span>
+          <span id="articleDate"><i class="fa-regular fa-calendar"></i> 2026-08-26 • ISOT Turin Guide</span>
         </div>
       </div>
 
       <!-- Featured Hero Banner Image -->
       <div class="post-hero-image-box" id="heroImageBox">
-        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT Student Guide Turin" />
+        <img id="articleHeroImg" src="assets/optimized/saa_horizon_pitch_2025.jpg" alt="SAS Startup Lab: From Problem to Pitch @ SAA School of Management" />
       </div>
 
       <div class="post-content-body" id="articleBody">
-        <p>Loading full article content...</p>
+        <div class="seo-guide-container">
+  <p>Looking to launch a business, validate an idea, or meet cofounders in Turin? <strong>SAS Startup Community</strong> runs the <strong>SAS Startup Lab: From Problem to Pitch</strong>—a 5-week hands-on startup program held <strong>every Wednesday at 17:30</strong> at <strong>SAA School of Management</strong>.</p>
+
+  <h2>What is SAS Startup Lab?</h2>
+  <p>SAS Startup Lab is an intensive 5-week incubator designed for students across Turin (UniTo, PoliTo, SAA, ESCP, and international exchange students). It guides teams step-by-step from raw problem discovery to pitching live on stage in front of startup mentors and investors.</p>
+
+  <div style="margin: 24px 0; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+    <img src="assets/optimized/saa_horizon_pitch_2025.jpg" alt="SAS Startup Lab Pitch Session at SAA School of Management Auditorium" style="width:100%; display:block;" />
+    <p style="font-size:0.85rem; color:var(--text-dim); text-align:center; padding:8px; background:rgba(0,0,0,0.4);">SAS Startup Lab: Live pitch session inside SAA School of Management auditorium with ISOT Community banner on stage.</p>
+  </div>
+
+  <h2>The 5-Week Curriculum</h2>
+  <ul>
+    <li><strong>Session 01 — Problem Discovery</strong>: Team formation and falling in love with the problem.</li>
+    <li><strong>Session 02 — Validation Strategy</strong>: Customer interviews, market research, and testing hypotheses.</li>
+    <li><strong>Session 03 — MVP & Product Building</strong>: Prototyping minimum viable products without complex code.</li>
+    <li><strong>Session 04 — Pitch Deck & Storytelling</strong>: Crafting compelling investor pitch decks and financial models.</li>
+    <li><strong>Session 05 — Live Demo Day</strong>: Final pitch presentations on stage in front of mentors and guests.</li>
+  </ul>
+
+  <h2>Location & Schedule Details</h2>
+  <ul>
+    <li><strong>When</strong>: Every Wednesday at 17:30 CET</li>
+    <li><strong>Where</strong>: SAA School of Management, Via Ventimiglia 115, 10126 Turin, Italy</li>
+    <li><strong>Cost</strong>: 100% Free for everyone</li>
+    <li><strong>Official Website</strong>: <a href="https://saastartup.it" target="_blank" rel="noopener" style="color:var(--pink);">saastartup.it</a></li>
+  </ul>
+
+  <div style="margin-top: 24px; padding: 22px; background: #1E293B; border: 2px solid #E1306C; border-radius: 16px; text-align: center; box-shadow: 0 10px 25px rgba(225,48,108,0.25);">
+    <h4 style="font-size: 1.15rem; color: #FFFFFF !important; margin-bottom: 8px; font-weight: 800;">Follow SAS Startup Community on Instagram</h4>
+    <p style="font-size: 0.9rem; color: #CBD5E1 !important; margin-bottom: 16px; line-height: 1.5;">Stay updated on weekly Wednesday pitch agendas, guest speakers, and cofounder networking sessions.</p>
+    <a href="https://www.instagram.com/sas_startup_community/" target="_blank" rel="noopener" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 28px; border-radius: 9999px; font-weight: 800; color: #FFFFFF !important; font-size: 0.95rem; text-decoration: none; box-shadow: 0 6px 18px rgba(0,0,0,0.4);">
+      <i class="fa-brands fa-instagram" style="font-size: 1.1rem; color: #FFFFFF !important;"></i>
+      <span style="color: #FFFFFF !important;">Follow @sas_startup_community</span>
+      <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.8rem; color: #FFFFFF !important;"></i>
+    </a>
+  </div>
+</div>
       </div>
     </main>
 
@@ -567,7 +604,8 @@
     // Load article data from exported JSON
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
-      const pathSlug = location.pathname.split('/').pop().replace(/\.html$/, '');
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      const pathSlug = (pathParts[pathParts.length - 1] || '').replace(/\.html$/, '');
       const slug = params.get('slug') || (pathSlug && pathSlug !== 'blog-post' ? pathSlug : '') || 'a-complete-guide-to-living-in-turin-for-international-students';
 
       const heroSrc = HERO_IMAGES[slug] || 'assets/optimized/social_group_1.jpg';

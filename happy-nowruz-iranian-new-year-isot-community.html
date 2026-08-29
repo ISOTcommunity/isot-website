@@ -385,21 +385,31 @@
         <a href="blog.html" class="back-btn">← Back to All Guides</a>
         <br />
         <span class="post-category-tag" id="articleCat"><i class="fa-solid fa-book-open"></i> Student Guide</span>
-        <h1 class="post-main-title" id="articleTitle">Loading Guide Title...</h1>
+        <h1 class="post-main-title" id="articleTitle">Happy Nowruz, Iranian New Year: ISOT Community</h1>
         <div class="post-author-bar">
           <span><i class="fa-solid fa-user-pen"></i> ISOT Editorial Team</span>
           <span>•</span>
-          <span id="articleDate"><i class="fa-regular fa-calendar"></i> Published in Turin</span>
+          <span id="articleDate"><i class="fa-regular fa-calendar"></i> 2025-03-20 • ISOT Turin Guide</span>
         </div>
       </div>
 
       <!-- Featured Hero Banner Image -->
       <div class="post-hero-image-box" id="heroImageBox">
-        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT Student Guide Turin" />
+        <img id="articleHeroImg" src="assets/optimized/cultural_event_1.jpg" alt="Happy Nowruz, Iranian New Year: ISOT Community" />
       </div>
 
       <div class="post-content-body" id="articleBody">
-        <p>Loading full article content...</p>
+        		<div data-elementor-type="wp-post" data-elementor-id="346" class="elementor elementor-346" data-elementor-post-type="post">
+				<div class="elementor-element elementor-element-0055e72 e-flex e-con-boxed e-con e-parent" data-id="0055e72" data-element_type="container">
+					<div class="e-con-inner">
+				<div class="elementor-element elementor-element-5c51c6d elementor-widget elementor-widget-text-editor" data-id="5c51c6d" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p data-start="114" data-end="457">As the arrival of spring marks the beginning of a new year, ISOT Community extends its warmest wishes to all celebrating <strong data-start="235" data-end="245">Nowruz</strong>—the ancient Persian festival of renewal, hope, and togetherness. This joyous occasion, which has been celebrated for over <strong data-start="368" data-end="383">3,000 years</strong>, symbolizes <strong data-start="396" data-end="454">rebirth, unity, and the triumph of light over darkness</strong>.</p><h3 data-start="459" data-end="488">The Spirit of Nowruz</h3><p data-start="489" data-end="743">Nowruz, meaning <strong data-start="505" data-end="518">&#8220;New Day&#8221;</strong> in Persian, is more than just a calendar event. It is a time for <strong data-start="584" data-end="629">reflection, gratitude, and new beginnings</strong>. It reminds us to embrace <strong data-start="656" data-end="701">growth, positivity, and cultural heritage</strong>, strengthening the bonds that unite us.</p><p data-start="745" data-end="895">At the heart of Nowruz is the <strong data-start="775" data-end="794">Haft-Seen table</strong>, a traditional display of seven symbolic items, each representing prosperity, health, and renewal:</p><p data-start="897" data-end="1268">✔ <strong data-start="899" data-end="909">Sabzeh</strong> (sprouted greens) – Rebirth and growth<br data-start="948" data-end="951" />✔ <strong data-start="953" data-end="963">Samanu</strong> (sweet pudding) – Strength and patience<br data-start="1003" data-end="1006" />✔ <strong data-start="1008" data-end="1018">Senjed</strong> (dried lotus fruit) – Love and wisdom<br data-start="1056" data-end="1059" />✔ <strong data-start="1061" data-end="1069">Seer</strong> (garlic) – Protection and health<br data-start="1102" data-end="1105" />✔ <strong data-start="1107" data-end="1115">Seeb</strong> (apple) – Beauty and vitality<br data-start="1145" data-end="1148" />✔ <strong data-start="1150" data-end="1159">Somāq</strong> (sumac) – The color of sunrise, symbolizing a new beginning<br data-start="1219" data-end="1222" />✔ <strong data-start="1224" data-end="1234">Serkeh</strong> (vinegar) – Patience and wisdom</p><h3 data-start="1270" data-end="1312">🔥 Traditions That Bring Us Together</h3><p data-start="1313" data-end="1587">Before Nowruz, families gather for <strong data-start="1348" data-end="1369">Chaharshanbe Suri</strong>, a fire-jumping festival symbolizing purification and letting go of negativity. As we leap over the flames, we say, <em data-start="1486" data-end="1530">&#8220;Zardi-ye man az to, sorkhi-ye to az man!&#8221;</em> (May my weakness be yours, and your strength be mine).</p><p data-start="1589" data-end="1772">Another cherished tradition is <strong data-start="1620" data-end="1636">Sizdah Bedar</strong>, celebrated on the 13th day of Nowruz, where people head outdoors for a picnic, embracing nature and wishing for a bright year ahead.</p><h3 data-start="1774" data-end="1801">💙 A Message of Unity</h3><p data-start="1802" data-end="2093">As an international student community, ISOT takes pride in celebrating diverse cultures and traditions. <strong data-start="1906" data-end="2001">Nowruz is a time to strengthen friendships, embrace new opportunities, and spread kindness.</strong> No matter where we are, this festival reminds us that renewal and hope transcend borders.</p><p> </p><p data-start="2095" data-end="2254">May this <strong data-start="2104" data-end="2150">Nowruz bring peace, success, and happiness</strong> to you and your loved ones. Let&#8217;s welcome the new year with open hearts and a spirit of togetherness!</p><p data-start="2095" data-end="2254">Happy Nowurz and New YEAR</p><p data-start="2095" data-end="2254"> </p><p data-start="2095" data-end="2254">ISOT Community Board Members</p>								</div>
+				</div>
+					</div>
+				</div>
+				</div>
+		
       </div>
     </main>
 
@@ -567,7 +577,8 @@
     // Load article data from exported JSON
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
-      const pathSlug = location.pathname.split('/').pop().replace(/\.html$/, '');
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      const pathSlug = (pathParts[pathParts.length - 1] || '').replace(/\.html$/, '');
       const slug = params.get('slug') || (pathSlug && pathSlug !== 'blog-post' ? pathSlug : '') || 'a-complete-guide-to-living-in-turin-for-international-students';
 
       const heroSrc = HERO_IMAGES[slug] || 'assets/optimized/social_group_1.jpg';

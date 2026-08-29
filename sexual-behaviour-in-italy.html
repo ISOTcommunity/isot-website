@@ -385,21 +385,39 @@
         <a href="blog.html" class="back-btn">← Back to All Guides</a>
         <br />
         <span class="post-category-tag" id="articleCat"><i class="fa-solid fa-book-open"></i> Student Guide</span>
-        <h1 class="post-main-title" id="articleTitle">Loading Guide Title...</h1>
+        <h1 class="post-main-title" id="articleTitle">Sexual Behaviour in Italy</h1>
         <div class="post-author-bar">
           <span><i class="fa-solid fa-user-pen"></i> ISOT Editorial Team</span>
           <span>•</span>
-          <span id="articleDate"><i class="fa-regular fa-calendar"></i> Published in Turin</span>
+          <span id="articleDate"><i class="fa-regular fa-calendar"></i> 2024-12-03 • ISOT Turin Guide</span>
         </div>
       </div>
 
       <!-- Featured Hero Banner Image -->
       <div class="post-hero-image-box" id="heroImageBox">
-        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT Student Guide Turin" />
+        <img id="articleHeroImg" src="assets/optimized/social_hub_dsc_1829.jpg" alt="Sexual Behaviour in Italy" />
       </div>
 
       <div class="post-content-body" id="articleBody">
-        <p>Loading full article content...</p>
+        		<div data-elementor-type="wp-post" data-elementor-id="201" class="elementor elementor-201" data-elementor-post-type="post">
+				<div class="elementor-element elementor-element-d3aa77b e-flex e-con-boxed e-con e-parent" data-id="d3aa77b" data-element_type="container">
+					<div class="e-con-inner">
+				<div class="elementor-element elementor-element-def439e elementor-widget elementor-widget-text-editor" data-id="def439e" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>Sexual Education and Its Importance</p><p>Sexual education is a vital part of personal awareness, helping individuals build safe, healthy, and informed relationships. It covers topics such as understanding the body, preventing sexually transmitted diseases, hygiene, emotional relationships, and the importance of consent. This knowledge supports both physical and mental well-being.</p><p>Education in this area promotes growth, improves quality of life, and prevents potential risks.</p><p>A) The Concept of Consent</p><p>Consent in sexual relationships means an informed, voluntary, and mutual agreement to engage in any sexual activity. Consent must be clear, specific, and reversible. If one party feels uncomfortable or says &#8220;no,&#8221; the other party must respect this decision. Informed Consent: Both parties fully understand the situation, and the decision is based on complete information.</p><p>Voluntary Consent: There should be no coercion, threat, or psychological pressure influencing the decision.</p><p>B) Healthy Relationships</p><p>Healthy relationships are based on mutual respect, trust, and honest communication. In</p><p>such relationships:</p><p>Both parties care about each other&#8217;s needs and feelings. Problems are solved through respectful communication, not violence or disrespect. Emotional and psychological support is present.</p><p>C) Types of Sexual Orientation Sexual orientation refers to the emotional or sexual attraction a person has toward a specific gender or genders. These include:</p><p>Heterosexual: Attraction to the opposite gender.</p><p>Homosexual: Attraction to the same gender.</p><p>Bisexual: Attraction to both genders.</p><p>Asexual: Lack of sexual or romantic attraction.</p><p>Respecting others&#8217; sexual orientations and accepting differences are essential principles in a healthy society.</p>								</div>
+				</div>
+					</div>
+				</div>
+		<div class="elementor-element elementor-element-a3b73d0 e-flex e-con-boxed e-con e-parent" data-id="a3b73d0" data-element_type="container">
+					<div class="e-con-inner">
+				<div class="elementor-element elementor-element-5c4ba79 elementor-widget elementor-widget-text-editor" data-id="5c4ba79" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p><span style="caret-color: rgb(110, 65, 129); color: rgb(110, 65, 129);">For reading the complete instructions please subscribe to our&nbsp;</span><a href="http://t.me/isotcommunity">Telegram</a><span style="caret-color: rgb(110, 65, 129); color: rgb(110, 65, 129);">&nbsp;Channel</span><br></p>								</div>
+				</div>
+					</div>
+				</div>
+				</div>
+		
       </div>
     </main>
 
@@ -567,7 +585,8 @@
     // Load article data from exported JSON
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
-      const pathSlug = location.pathname.split('/').pop().replace(/\.html$/, '');
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      const pathSlug = (pathParts[pathParts.length - 1] || '').replace(/\.html$/, '');
       const slug = params.get('slug') || (pathSlug && pathSlug !== 'blog-post' ? pathSlug : '') || 'a-complete-guide-to-living-in-turin-for-international-students';
 
       const heroSrc = HERO_IMAGES[slug] || 'assets/optimized/social_group_1.jpg';

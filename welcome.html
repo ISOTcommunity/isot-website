@@ -385,21 +385,35 @@
         <a href="blog.html" class="back-btn">← Back to All Guides</a>
         <br />
         <span class="post-category-tag" id="articleCat"><i class="fa-solid fa-book-open"></i> Student Guide</span>
-        <h1 class="post-main-title" id="articleTitle">Loading Guide Title...</h1>
+        <h1 class="post-main-title" id="articleTitle">WELCOME TO ISOT WORD</h1>
         <div class="post-author-bar">
           <span><i class="fa-solid fa-user-pen"></i> ISOT Editorial Team</span>
           <span>•</span>
-          <span id="articleDate"><i class="fa-regular fa-calendar"></i> Published in Turin</span>
+          <span id="articleDate"><i class="fa-regular fa-calendar"></i> 2024-11-28 • ISOT Turin Guide</span>
         </div>
       </div>
 
       <!-- Featured Hero Banner Image -->
       <div class="post-hero-image-box" id="heroImageBox">
-        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT Student Guide Turin" />
+        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="WELCOME TO ISOT WORD" />
       </div>
 
       <div class="post-content-body" id="articleBody">
-        <p>Loading full article content...</p>
+        <h2>WELCOME TO ISOT WORLD&#8230;</h2>
+<p><strong>Welcome to the ISOT Community Website!</strong></p>
+<p>We are thrilled to open our virtual doors to international students in Turin and beyond. At ISOT, our mission is to create a vibrant community where cultural exchange thrives, lifelong friendships form, and students feel truly at home in Italy.</p>
+<p>From networking events to city tours, career workshops to language exchanges, ISOT offers countless opportunities to connect, learn, and grow. Join us as we celebrate diversity and build a supportive space for every member.</p>
+<p><strong>What We Offer:</strong></p>
+<ul>
+<li><strong>Community Events</strong>: From cultural celebrations to professional workshops, there’s something for everyone.</li>
+<li><strong>Support Network</strong>: Practical resources for navigating life in Turin, from academics to local tips.</li>
+<li><strong>Cultural Exchange</strong>: A platform to share traditions, stories, and experiences.</li>
+<li><strong>Opportunities for Growth</strong>: Leadership roles, volunteering, and more.</li>
+</ul>
+<p>Whether you&#8217;re here to make friends, explore opportunities, or stay updated, ISOT Community is your go-to hub. Let’s shape an unforgettable chapter together!</p>
+<p><strong>Stay Connected!</strong>&nbsp;Follow us here and on our social media to join the conversation.</p>
+<p>Together, let’s make unforgettable memories! Welcome to your new family in Turin. 🌍✨</p>
+
       </div>
     </main>
 
@@ -567,7 +581,8 @@
     // Load article data from exported JSON
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
-      const pathSlug = location.pathname.split('/').pop().replace(/\.html$/, '');
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      const pathSlug = (pathParts[pathParts.length - 1] || '').replace(/\.html$/, '');
       const slug = params.get('slug') || (pathSlug && pathSlug !== 'blog-post' ? pathSlug : '') || 'a-complete-guide-to-living-in-turin-for-international-students';
 
       const heroSrc = HERO_IMAGES[slug] || 'assets/optimized/social_group_1.jpg';

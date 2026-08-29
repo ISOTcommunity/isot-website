@@ -385,21 +385,31 @@
         <a href="blog.html" class="back-btn">← Back to All Guides</a>
         <br />
         <span class="post-category-tag" id="articleCat"><i class="fa-solid fa-book-open"></i> Student Guide</span>
-        <h1 class="post-main-title" id="articleTitle">Loading Guide Title...</h1>
+        <h1 class="post-main-title" id="articleTitle">Celebrating Migration: A Journey of Resilience and Opportunity</h1>
         <div class="post-author-bar">
           <span><i class="fa-solid fa-user-pen"></i> ISOT Editorial Team</span>
           <span>•</span>
-          <span id="articleDate"><i class="fa-regular fa-calendar"></i> Published in Turin</span>
+          <span id="articleDate"><i class="fa-regular fa-calendar"></i> 2024-12-21 • ISOT Turin Guide</span>
         </div>
       </div>
 
       <!-- Featured Hero Banner Image -->
       <div class="post-hero-image-box" id="heroImageBox">
-        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT Student Guide Turin" />
+        <img id="articleHeroImg" src="assets/optimized/social_group_5.jpg" alt="Celebrating Migration: A Journey of Resilience and Opportunity" />
       </div>
 
       <div class="post-content-body" id="articleBody">
-        <p>Loading full article content...</p>
+        		<div data-elementor-type="wp-post" data-elementor-id="224" class="elementor elementor-224" data-elementor-post-type="post">
+				<div class="elementor-element elementor-element-aadde1f e-flex e-con-boxed e-con e-parent" data-id="aadde1f" data-element_type="container">
+					<div class="e-con-inner">
+				<div class="elementor-element elementor-element-b8e9354 elementor-widget elementor-widget-text-editor" data-id="b8e9354" data-element_type="widget" data-widget_type="text-editor.default">
+				<div class="elementor-widget-container">
+									<p>As the world observes International Migrants Day on December 18, I find myself reflecting on the profound impact of migration—not just globally, but also in my own life and the stories I’ve encountered. Migration is not just about movement; it’s about people’s courage, their ability to adapt, and the opportunities they create. For me, and for ISOT, an organization built on fostering inclusivity and celebrating diversity, this day is deeply personal and profoundly meaningful.</p><p>Migration has been part of humanity’s story since the beginning of time. Across centuries, people have moved in search of safety, opportunity, and better lives. Whether driven by conflict, economic hardship, or the innate desire to explore, every migrant’s journey is one of courage and transformation. These stories resonate with me because they are about hope, resilience, and the universal dreams we all share.</p><p>Today, migration continues to shape societies in powerful ways. It brings vibrancy to our communities, enriches cultures, and fosters innovation. Recent developments in the Middle East, particularly the ongoing struggles in Syria, highlight not just the challenges faced by migrants but also their hope and determination. The traffic of migrants returning from Turkey to Syria, for example, underscores a growing desire to rebuild their lives in their homeland despite ongoing challenges. This sentiment reminds us all of our shared responsibility to create a safer, more stable world. Safety, dignity, and opportunity should never be luxuries—they should be fundamental rights for everyone.</p><p>Here in Europe, local organizations like ISOT play a vital role in creating inclusive and diverse communities. These organizations don’t just support migrants—they provide pathways for integration and help unlock the potential of newcomers. For instance, they often guide international students and professionals through challenges like adapting to local hiring processes or navigating complex legal regulations. Many migrants face barriers such as a lack of knowledge about rules and workplace expectations, which can hinder their ability to fully participate in the economy. By addressing these issues, organizations like ISOT ensure that migration is not a burden but a tremendous opportunity. This inclusivity enriches Europe by leveraging diverse skills and perspectives, ultimately driving social cohesion and economic growth.</p><p>I’ve often thought about how local organizations can also be tools for European entities to create opportunities that are more equitable for non-native citizens. When migrants are empowered to participate fully in the economy, they bring fresh ideas and new energy that can spark innovation. This process isn’t just about helping migrants—it’s about recognizing their contributions and using their talents to drive meaningful change in our societies. Migration, when embraced with openness, can be a source of creativity and transformation for developed countries.</p><p>I’m constantly inspired by the resilience of migrants who adapt to new environments while holding onto their cultural roots. It’s a delicate balance—blending the past with the present—that showcases incredible strength and adaptability. But this journey isn’t without its challenges: language barriers, cultural misunderstandings, and the sense of being caught between two worlds. That’s why creating inclusive spaces where migrants feel valued and supported is so important.</p><p>One area that fascinates me is the process of cultural adaptation, especially for those from multicultural backgrounds. It’s a journey that reveals the beauty and complexity of living between worlds. Through my research, I’ve come to understand how migrants don’t just adapt—they contribute. They spark global conversations about diversity, inclusivity, and the richness of human experience. Their stories offer lessons on how we can build societies that celebrate differences instead of fearing them.</p><p>On this International Migrants Day, I believe we all have a responsibility to reflect on how we can do better. Are we giving migrants a voice? Are we creating spaces where they feel included? Are we fully recognizing and appreciating their contributions? These questions matter because they challenge us to ensure migration remains a story of hope and opportunity—for everyone.</p><p>In celebrating this day, let’s honor the courage of those who embark on these life-changing journeys. Let’s also commit to building a world where everyone—regardless of their origin—can thrive. Together, with organizations like ISOT leading the way, we can turn migration into a transformative force for good, one that brings innovation, equity, and hope to the world.</p>								</div>
+				</div>
+					</div>
+				</div>
+				</div>
+		
       </div>
     </main>
 
@@ -567,7 +577,8 @@
     // Load article data from exported JSON
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
-      const pathSlug = location.pathname.split('/').pop().replace(/\.html$/, '');
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      const pathSlug = (pathParts[pathParts.length - 1] || '').replace(/\.html$/, '');
       const slug = params.get('slug') || (pathSlug && pathSlug !== 'blog-post' ? pathSlug : '') || 'a-complete-guide-to-living-in-turin-for-international-students';
 
       const heroSrc = HERO_IMAGES[slug] || 'assets/optimized/social_group_1.jpg';

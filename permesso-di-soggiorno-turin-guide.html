@@ -385,21 +385,52 @@
         <a href="blog.html" class="back-btn">← Back to All Guides</a>
         <br />
         <span class="post-category-tag" id="articleCat"><i class="fa-solid fa-book-open"></i> Student Guide</span>
-        <h1 class="post-main-title" id="articleTitle">Loading Guide Title...</h1>
+        <h1 class="post-main-title" id="articleTitle">Permesso di Soggiorno in Turin: Complete Student Residence Permit Guide</h1>
         <div class="post-author-bar">
           <span><i class="fa-solid fa-user-pen"></i> ISOT Editorial Team</span>
           <span>•</span>
-          <span id="articleDate"><i class="fa-regular fa-calendar"></i> Published in Turin</span>
+          <span id="articleDate"><i class="fa-regular fa-calendar"></i> 2026-08-22 • ISOT Turin Guide</span>
         </div>
       </div>
 
       <!-- Featured Hero Banner Image -->
       <div class="post-hero-image-box" id="heroImageBox">
-        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT Student Guide Turin" />
+        <img id="articleHeroImg" src="assets/optimized/social_group_3.jpg" alt="Permesso di Soggiorno in Turin: Complete Student Residence Permit Guide" />
       </div>
 
       <div class="post-content-body" id="articleBody">
-        <p>Loading full article content...</p>
+        <div class="seo-guide-container">
+  <p>All non-EU international students staying in Italy for more than 90 days must apply for a <strong>Permesso di Soggiorno per Motivi di Studio</strong> (Residence Permit for Study Purposes) within <strong>8 working days</strong> of entering the Schengen area.</p>
+
+  <h2>Step 1: Pick up the "Kit Giallo" (Postal Kit)</h2>
+  <p>Go to a main branch of <strong>Poste Italiane</strong> that has a <em>Sportello Amico</em> window (such as the branch near Porta Susa station or Piazza XVIII Dicembre) and ask for a free <strong>Kit per il Permesso di Soggiorno</strong> (often called the <em>Kit Giallo</em> or Yellow Kit envelope).</p>
+
+  <h2>Step 2: Required Documents Checklist</h2>
+  <ul>
+    <li><strong>Modulo 1</strong> (Form 1) completed in black ink.</li>
+    <li><strong>Photocopy of Passport</strong> (All pages containing stamps, personal details, and student visa).</li>
+    <li><strong>Proof of Enrollment / Acceptance Letter</strong> from Politecnico di Torino, Università di Torino, ESCP, or SAA.</li>
+    <li><strong>Proof of Financial Resources</strong> (Bank statement showing min. ~€6,000/year or official scholarship letter from EDISU Piemonte).</li>
+    <li><strong>Proof of Health Insurance</strong> (Receipt of voluntary enrollment in SSN Tessera Sanitaria or private insurance policy like W.A.I.).</li>
+    <li><strong>Marca da Bollo</strong> (€16.00 duty stamp purchased at any local <em>Tabacchi</em> shop).</li>
+  </ul>
+
+  <h2>Step 3: Post Office Payment & Submission</h2>
+  <p>Bring the unsealed envelope and your original passport to a <em>Sportello Amico</em> window at Poste Italiane:</p>
+  <ul>
+    <li><strong>Permesso di Soggiorno Electronic Card Fee</strong>: €70.46</li>
+    <li><strong>Postal Service Fee</strong>: €30.00</li>
+    <li><strong>Registered Mail (Raccomandata)</strong>: Paid at the counter.</li>
+  </ul>
+  <p><strong>CRITICAL:</strong> Keep the post office receipt (<em>Ricevuta Poste Italiane</em>) safe! This receipt, along with your passport, legally permits you to stay and travel within Italy while waiting for your appointment.</p>
+
+  <h2>Step 4: Questura Appointment in Turin</h2>
+  <p>The post office will issue an appointment slip (<em>Lettera d'Appuntamento</em>) specifying the date, time, and location for your fingerprinting session (<em>fotosegnalamento</em>) at the <strong>Questura di Torino</strong> (located at Corso Verona 4 or Via Santa Chiara).</p>
+  <p>On your appointment day, bring 4 identical passport-sized photos, original documents, and your post office receipt.</p>
+
+  <h2>Tracking Status</h2>
+  <p>You can track your card status on the official portal: <code>questure.poliziadistato.it/stranieri/</code> using your 12-digit file number or postal receipt code.</p>
+</div>
       </div>
     </main>
 
@@ -567,7 +598,8 @@
     // Load article data from exported JSON
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
-      const pathSlug = location.pathname.split('/').pop().replace(/\.html$/, '');
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      const pathSlug = (pathParts[pathParts.length - 1] || '').replace(/\.html$/, '');
       const slug = params.get('slug') || (pathSlug && pathSlug !== 'blog-post' ? pathSlug : '') || 'a-complete-guide-to-living-in-turin-for-international-students';
 
       const heroSrc = HERO_IMAGES[slug] || 'assets/optimized/social_group_1.jpg';

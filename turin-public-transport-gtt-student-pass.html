@@ -385,21 +385,55 @@
         <a href="blog.html" class="back-btn">← Back to All Guides</a>
         <br />
         <span class="post-category-tag" id="articleCat"><i class="fa-solid fa-book-open"></i> Student Guide</span>
-        <h1 class="post-main-title" id="articleTitle">Loading Guide Title...</h1>
+        <h1 class="post-main-title" id="articleTitle">Turin Public Transport Guide: GTT Student Pass, Metro & Bikesharing</h1>
         <div class="post-author-bar">
           <span><i class="fa-solid fa-user-pen"></i> ISOT Editorial Team</span>
           <span>•</span>
-          <span id="articleDate"><i class="fa-regular fa-calendar"></i> Published in Turin</span>
+          <span id="articleDate"><i class="fa-regular fa-calendar"></i> 2026-08-22 • ISOT Turin Guide</span>
         </div>
       </div>
 
       <!-- Featured Hero Banner Image -->
       <div class="post-hero-image-box" id="heroImageBox">
-        <img id="articleHeroImg" src="assets/optimized/social_group_1.jpg" alt="ISOT Student Guide Turin" />
+        <img id="articleHeroImg" src="assets/optimized/social_group_4.jpg" alt="Turin Public Transport Guide: GTT Student Pass, Metro & Bikesharing" />
       </div>
 
       <div class="post-content-body" id="articleBody">
-        <p>Loading full article content...</p>
+        <div class="seo-guide-container">
+  <p>Turin features an efficient public transportation network operated by <strong>GTT (Gruppo Torinese Trasporti)</strong>, consisting of an automated underground Metro line, extensive tram and bus routes, and suburban train connections.</p>
+
+  <h2>1. FREE Transit Pass for University Students Under 26 (Piemove)</h2>
+  <div style="padding: 16px 20px; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4); border-radius: 12px; margin-bottom: 20px;">
+    <h3 style="color: #10B981; font-size: 1.2rem; font-weight: 800; margin-bottom: 6px;">🎉 FREE Annual Pass via Piemove</h3>
+    <p style="font-size: 0.95rem; color: var(--text-main); line-height: 1.5;">
+      University students under 26 years old enrolled at <strong>Politecnico di Torino (PoliTo)</strong>, <strong>Università di Torino (UniTo)</strong>, or affiliated institutes with an ISEE under €85,000 can request a <strong>100% FREE annual transit subscription</strong> valid on all GTT buses, trams, and Metro!
+    </p>
+    <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 8px;">
+      <strong>How to Apply</strong>: Submit your application online via the official portal <a href="https://bip.piemonte.it" target="_blank" rel="noopener" style="color: #10B981; font-weight: 700;">bip.piemonte.it</a> using SPID or CIE.
+    </p>
+  </div>
+
+  <h2>2. GTT Annual Student Pass Rates (Standard Under 26 / 28)</h2>
+  <p>For students who do not qualify for the Piemove free bonus:</p>
+  <ul>
+    <li><strong>Standard Under 26 Annual Pass</strong>: €258.00 / year (unlimited trips on all urban buses, trams, and Metro).</li>
+    <li><strong>ISEE Income Tier Reductions</strong>: Turin residents with low ISEE scores get reduced rates (down to €158.00 / year).</li>
+    <li><strong>Under 26 Monthly Pass</strong>: €25.00 / month.</li>
+  </ul>
+
+  <h2>3. How to Obtain & Activate Your BIP Card</h2>
+  <p>1. <strong>BIP Smart Card</strong>: Request online via <a href="https://bip.piemonte.it" target="_blank" rel="noopener" style="color:var(--pink);">bip.piemonte.it</a> or through your university portal.<br>
+  2. <strong>Validation</strong>: Tap your BIP card against yellow validators upon entering Metro turnstiles or boarding buses/trams.</p>
+
+  <h2>4. Night Buster (Weekend Night Buses)</h2>
+  <p>GTT operates <strong>Night Buster</strong> weekend night buses every Friday, Saturday, and eve of holidays from 00:30 to 05:00. All routes converge at <strong>Piazza Vittorio Veneto</strong>, connecting student nightlife hubs in San Salvario, Vanchiglia, and Santa Giulia.</p>
+
+  <h2>5. Shared Mobility & Bike Sharing</h2>
+  <ul>
+    <li><strong>RideMovi / ToBike</strong>: Electric and classic bike sharing across Turin.</li>
+    <li><strong>E-Scooters & Car Sharing</strong>: Lime, Dott, Voi, and Enjoy / ShareNow.</li>
+  </ul>
+</div>
       </div>
     </main>
 
@@ -567,7 +601,8 @@
     // Load article data from exported JSON
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
-      const pathSlug = location.pathname.split('/').pop().replace(/\.html$/, '');
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      const pathSlug = (pathParts[pathParts.length - 1] || '').replace(/\.html$/, '');
       const slug = params.get('slug') || (pathSlug && pathSlug !== 'blog-post' ? pathSlug : '') || 'a-complete-guide-to-living-in-turin-for-international-students';
 
       const heroSrc = HERO_IMAGES[slug] || 'assets/optimized/social_group_1.jpg';
