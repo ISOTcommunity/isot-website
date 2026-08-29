@@ -375,13 +375,13 @@
 
     <!-- View Mode Switcher (List | Weekly | Monthly) -->
     <div class="view-toggle-bar">
-      <button type="button" class="view-btn active" id="btnListView" onclick="setViewMode('list')">
+      <button type="button" class="view-btn" id="btnListView" onclick="setViewMode('list')">
         <i class="fa-solid fa-list-ul"></i> List
       </button>
       <button type="button" class="view-btn" id="btnWeeklyView" onclick="setViewMode('weekly')">
         <i class="fa-solid fa-calendar-week"></i> Weekly
       </button>
-      <button type="button" class="view-btn" id="btnMonthlyView" onclick="setViewMode('monthly')">
+      <button type="button" class="view-btn active" id="btnMonthlyView" onclick="setViewMode('monthly')">
         <i class="fa-solid fa-calendar-days"></i> Monthly
       </button>
       <button type="button" class="view-btn" id="btnGoingView" onclick="setViewMode('going')">
@@ -529,7 +529,7 @@
       return m;
     }
 
-    let currentView = 'list';
+    let currentView = 'monthly';   // the grid reads as a calendar; the list is the fallback
 
     // These were three frozen literals: currYear = 2026, currWeekStart pinned to
     // 24 Aug 2026, and currMonthIdx = Math.max(7, thisMonth) — a clamp that would show
@@ -736,9 +736,22 @@
     }
 
     function changeMonth(delta) {
+      // Clamped to Aug–Dec and never rolled the year, so December was a dead end and
+      // January 2027 was unreachable. With the monthly grid as the default view this
+      // is the first control anyone touches.
       currMonthIdx += delta;
-      if (currMonthIdx < 7) currMonthIdx = 7; // Aug 2026
-      if (currMonthIdx > 11) currMonthIdx = 11; // Dec 2026
+      if (currMonthIdx > 11) { currMonthIdx = 0;  currYear += 1; }
+      if (currMonthIdx < 0)  { currMonthIdx = 11; currYear -= 1; }
+
+      // loadCalendar() fetches one month back to six months ahead, so paging past that
+      // would show empty months that do have events. Stop at the edges of what we hold.
+      const now = new Date();
+      const first = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const last  = new Date(now.getFullYear(), now.getMonth() + 6, 1);
+      const here  = new Date(currYear, currMonthIdx, 1);
+      if (here < first) { currYear = first.getFullYear(); currMonthIdx = first.getMonth(); }
+      if (here > last)  { currYear = last.getFullYear();  currMonthIdx = last.getMonth(); }
+
       selectedDateStr = null;
       renderMainView();
     }
