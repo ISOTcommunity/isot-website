@@ -141,6 +141,7 @@
           <input type="text" id="performerName" required placeholder="Your Name" />
         </div>
 
+        <p id="limitNote" class="dim" style="font-size:0.8rem;margin:-4px 0 12px" hidden></p>
         <button type="submit" class="btn btn-pink" id="addBtn"><i class="fa-solid fa-paper-plane"></i> Submit Song to Karaoke Queue 🎤</button>
       </form>
     </div>
@@ -252,10 +253,12 @@
     async function loadQueue() {
       if (!tonight?.open) return;
 
-      const [{ data, error }, ns] = await Promise.all([
+      const [{ data, error }, ns, ms] = await Promise.all([
         db.rpc('karaoke_queue', { p_instance: tonight.instance_id }),
         db.rpc('karaoke_night_state', { p_instance: tonight.instance_id }),
+        db.rpc('my_karaoke_status', { p_instance: tonight.instance_id }),
       ]);
+      if (!ms.error) renderLimit(ms.data);
 
       if (error) {
         console.error('Could not load the queue:', error.message);
@@ -288,6 +291,43 @@
       if (mins <= 1)  return ` · you're next, ${hedge} now`;
       if (mins < 60)  return ` · ${hedge} ${mins} min away, around ${clock}`;
       return ` · ${hedge} around ${clock}`;
+    }
+
+    /* Says where you stand before you type. Without it the only way to learn you are
+       blocked is to write out a song title and have it rejected — which reads as the
+       app being broken rather than as a rule. */
+    function renderLimit(st) {
+      const note = document.getElementById('limitNote');
+      const btn  = document.getElementById('addBtn');
+      if (!note || !btn || !st || !st.signed_in) return;
+
+      // Ignored silently if 021 has not been applied yet.
+      if (typeof st.remaining !== 'number') { note.hidden = true; btn.disabled = false; return; }
+
+      if (st.remaining <= 0) {
+        note.hidden = false;
+        note.textContent = `That's your ${st.max} songs for tonight.`;
+        btn.disabled = true;
+        return;
+      }
+
+      if (st.next_allowed_at) {
+        const t = new Date(st.next_allowed_at);
+        const mins = Math.max(1, Math.round((t - Date.now()) / 60000));
+        note.hidden = false;
+        note.textContent =
+          `One song every ${st.gap_minutes} minutes. Your next from ` +
+          t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) +
+          ` — about ${mins} min.`;
+        btn.disabled = true;
+        return;
+      }
+
+      note.hidden = false;
+      note.textContent = st.used > 0
+        ? `${st.used} of ${st.max} tonight — ${st.remaining} left.`
+        : `Up to ${st.max} songs a night, ${st.gap_minutes} minutes apart.`;
+      btn.disabled = false;
     }
 
     function renderQueueUI(slots) {
@@ -431,11 +471,16 @@
       if (!myActiveSlot) return;
       const alertEl = document.getElementById('alertBox');
 
-      // Delete rather than mark skipped: 'skipped' is the KJ's word for "we moved past
-      // them", and it would still count against the one-song-each rule. Withdrawing
-      // should let you put a different song in. karaoke_self_delete allows this while
-      // the slot is still queued.
-      const { error } = await db.from('karaoke_slots').delete().eq('id', myActiveSlot.id);
+      // Recorded as 'withdrawn', not deleted. Deleting the row erased the request, and
+      // with a 45-minute gap measured from your last request that was a way to reset
+      // your own clock. A withdrawal still frees the song slot — it just does not
+      // pretend the request never happened.
+      const { data: res, error } = await db.rpc('withdraw_my_song', { p_slot: myActiveSlot.id });
+      if (!error && res && res.ok === false) {
+        setAlert(alertEl, res.reason, 'error');
+        await loadQueue();
+        return;
+      }
 
       if (error) {
         // The old code swallowed this in an empty catch, so a failed cancel looked
