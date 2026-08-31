@@ -64,6 +64,63 @@
     .isot-pin.party { background: #E69321; box-shadow: 0 0 16px rgba(255, 106, 0, 0.7); }
     .isot-pin.edu { background: #5787EA; box-shadow: 0 0 16px rgba(87, 135, 234, 0.65); }  /* Sky Blue */
 
+    /* A venue with something on tonight. Two states, not one: "live" is reserved for
+       an event that has actually started, so the map never claims a night is running
+       at three in the afternoon. */
+    .isot-pin.tonight {
+      background: var(--pink);
+      box-shadow: 0 0 0 3px rgba(212, 90, 232, 0.35), 0 0 20px rgba(212, 90, 232, 0.8);
+    }
+    .isot-pin.live {
+      background: var(--pink);
+      animation: pinPulse 1.6s ease-out infinite;
+    }
+    @keyframes pinPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(212, 90, 232, 0.85), 0 0 20px rgba(212, 90, 232, 0.9); }
+      70%  { box-shadow: 0 0 0 18px rgba(212, 90, 232, 0),  0 0 20px rgba(212, 90, 232, 0.9); }
+      100% { box-shadow: 0 0 0 0 rgba(212, 90, 232, 0),     0 0 20px rgba(212, 90, 232, 0.9); }
+    }
+    /* Someone at a bar should not have to tap a pin to find out a night is on. */
+    .pin-label {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 36px;
+      white-space: nowrap;
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--pink);
+      color: var(--on-accent, #0B0B0F);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+    }
+    .pin-label .dot {
+      display: inline-block;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: currentColor;
+      margin-right: 5px;
+      vertical-align: 1px;
+      animation: dotBlink 1.2s steps(1, end) infinite;
+    }
+    @keyframes dotBlink { 50% { opacity: 0.15; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .isot-pin.live, .pin-label .dot { animation: none; }
+    }
+
+    /* Banner above the map, for the same reason the label exists. */
+    .live-banner {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--pink-glow);
+      border: 1px solid var(--border-glow);
+      border-radius: 14px 14px 34px 14px;
+      padding: 12px 15px;
+      margin-bottom: 14px;
+      font-size: 0.9rem;
+    }
+
     .venue-card-actions {
       display: flex;
       gap: 10px;
@@ -115,6 +172,7 @@
     </div>
 
     <!-- Retina HD Dark Map -->
+    <div id="liveBanner" hidden></div>
     <div id="mapContainer"></div>
 
     <!-- 1. Rough San Salvario -->
@@ -256,9 +314,9 @@
         maxZoom: 19,
       }).addTo(map);
 
-      const icon = (glyph, cls = '') => L.divIcon({
+      const icon = (glyph, cls = '', label = '') => L.divIcon({
         className: 'isot-pin-wrapper',
-        html: `<div class="isot-pin ${cls}"><i class="fa-solid ${glyph}"></i></div>`,
+        html: `<div class="isot-pin ${cls}"><i class="fa-solid ${glyph}"></i></div>` + label,
         iconSize: [32, 32],
         iconAnchor: [16, 16],
       });
@@ -266,10 +324,42 @@
       // Pins come from the venues table. They used to be three hardcoded literals —
       // Capodoglio sat 160m west of its real address, in the middle of a street rather
       // than on Murazzi del Po, and adding a venue meant editing this file.
-      const { data: venues, error } = await db
-        .from('venue_public')
-        .select('name, address, neighbourhood, lat, lng, member_discount, active')
-        .eq('active', true);
+      // Tonight's events, so a venue with something on can say so. Uses the 06:00
+       // ISOT day, the same boundary as check-in and karaoke, so a Monday night
+       // still reads as Monday at 01:00.
+      const isotToday = () => {
+        const d = new Date(Date.now() - 6 * 3600 * 1000);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      };
+      const today = isotToday();
+
+      const [{ data: venues, error }, cal] = await Promise.all([
+        db.from('venue_public')
+          .select('name, address, neighbourhood, lat, lng, member_discount, active')
+          .eq('active', true),
+        db.rpc('calendar_between', { p_from: today, p_to: today }),
+      ]);
+
+      // Keyed by venue name — calendar_between returns venue_name, venue_public returns
+      // name, and there is no shared id between them.
+      const tonightByVenue = {};
+      if (!cal.error) {
+        (cal.data || []).forEach(e => {
+          const startsAt = new Date(`${e.event_date}T${(e.start_time || '00:00:00')}`);
+          // "Live" only once it has actually started (with a 30-minute run-up for
+          // people arriving early). Anything else tonight is "Tonight", not live —
+          // the map must not claim a night is running at three in the afternoon.
+          const live = Date.now() >= startsAt.getTime() - 30 * 60 * 1000;
+          const prev = tonightByVenue[e.venue_name];
+          if (!prev || (live && !prev.live)) {
+            tonightByVenue[e.venue_name] = {
+              title: e.title,
+              time: (e.start_time || '').slice(0, 5),
+              live,
+            };
+          }
+        });
+      }
 
       if (error) {
         console.error('Could not load venues:', error.message);
@@ -288,18 +378,57 @@
 
       located.forEach(v => {
         const isClub = /club|zenit/i.test(v.name);
-        L.marker([v.lat, v.lng], { icon: icon(isClub ? 'fa-compact-disc' : 'fa-martini-glass', isClub ? 'party' : '') })
+        const on = tonightByVenue[v.name];
+
+        const cls = on ? (on.live ? 'live' : 'tonight') : (isClub ? 'party' : '');
+        const label = on
+          ? `<div class="pin-label">${on.live
+               ? `<span class="dot"></span>LIVE · ${escapeHtml(on.title)}`
+               : `${escapeHtml(on.title)} · ${escapeHtml(on.time)}`}</div>`
+          : '';
+
+        L.marker([v.lat, v.lng], {
+          icon: icon(isClub ? 'fa-compact-disc' : 'fa-martini-glass', cls, label),
+          zIndexOffset: on ? 1000 : 0,   // a live venue sits above the others
+        })
           .addTo(map)
           .bindPopup(
             `<b>${escapeHtml(v.name)}</b><br>` +
+            (on ? `<b>${on.live ? 'Happening now' : 'Tonight'}: ${escapeHtml(on.title)}` +
+                  `${on.time ? ' · ' + escapeHtml(on.time) : ''}</b><br>` : '') +
             `${escapeHtml(v.address || v.neighbourhood || '')}` +
             (v.member_discount ? `<br>${escapeHtml(v.member_discount)}` : '')
           );
       });
 
+      renderLiveBanner(tonightByVenue);
+
       // Fit every pin rather than centring on a guessed midpoint — with one venue
       // off-screen it looked like the map was wrong.
       map.fitBounds(located.map(v => [v.lat, v.lng]), { padding: [40, 40], maxZoom: 16 });
+    }
+
+    /* Above the map as well as on it: someone opening this page at a bar should not
+       have to find the right pin to learn a night is running. */
+    function renderLiveBanner(byVenue) {
+      const el = document.getElementById('liveBanner');
+      if (!el) return;
+
+      const entries = Object.entries(byVenue);
+      if (!entries.length) { el.hidden = true; return; }
+
+      entries.sort((a, b) => Number(b[1].live) - Number(a[1].live));
+      const [venue, ev] = entries[0];
+
+      el.hidden = false;
+      el.className = 'live-banner';
+      el.innerHTML = ev.live
+        ? `<i class="fa-solid fa-tower-broadcast" style="color:var(--pink)"></i>
+           <div><b style="color:#FFF">Live now — ${escapeHtml(ev.title)}</b>
+           <div class="dim" style="font-size:0.8rem">${escapeHtml(venue)}${ev.time ? ' · started ' + escapeHtml(ev.time) : ''}</div></div>`
+        : `<i class="fa-solid fa-calendar-day" style="color:var(--pink)"></i>
+           <div><b style="color:#FFF">Tonight — ${escapeHtml(ev.title)}</b>
+           <div class="dim" style="font-size:0.8rem">${escapeHtml(venue)}${ev.time ? ' · from ' + escapeHtml(ev.time) : ''}</div></div>`;
     }
 
     document.addEventListener('DOMContentLoaded', initPartnerMap);
