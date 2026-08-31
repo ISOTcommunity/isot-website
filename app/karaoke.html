@@ -475,7 +475,17 @@
       // with a 45-minute gap measured from your last request that was a way to reset
       // your own clock. A withdrawal still frees the song slot — it just does not
       // pretend the request never happened.
-      const { data: res, error } = await db.rpc('withdraw_my_song', { p_slot: myActiveSlot.id });
+      let { data: res, error } = await db.rpc('withdraw_my_song', { p_slot: myActiveSlot.id });
+
+      // Fall back to a delete if the RPC is not deployed yet. Withdrawing has to work
+      // during a live night even when the migration behind it is only half applied —
+      // the worst case is that this one withdrawal does not hold the 45-minute clock.
+      if (error && (error.code === 'PGRST202' || /Could not find the function/i.test(error.message || ''))) {
+        console.warn('withdraw_my_song missing — deleting instead');
+        ({ error } = await db.from('karaoke_slots').delete().eq('id', myActiveSlot.id));
+        res = null;
+      }
+
       if (!error && res && res.ok === false) {
         setAlert(alertEl, res.reason, 'error');
         await loadQueue();
