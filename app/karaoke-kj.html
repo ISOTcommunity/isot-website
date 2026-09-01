@@ -113,6 +113,12 @@
       <h1 style="font-size: 2.1rem; color: #FFF; margin-top: 6px; line-height: 1.2;" id="nowPlayingTitle">No song playing</h1>
       <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 6px;" id="nowPlayingSinger">Singer: Stage Empty</p>
 
+      <!-- On stage for HOW LONG. On the first night the queue sat for 58 minutes because
+           nobody tapped Next — not because a song ran long. Nothing on screen showed
+           that anything was stale, so there was nothing to notice. -->
+      <div id="onStageClock" style="margin-top:12px;font-variant-numeric:tabular-nums;font-size:2rem;font-weight:700;color:var(--pink);line-height:1" hidden>0:00</div>
+      <div id="staleNudge" style="margin-top:10px;padding:10px 14px;border-radius:12px;background:rgba(230,147,33,0.13);border:1px solid rgba(230,147,33,0.4);color:#F0C078;font-size:0.86rem" hidden></div>
+
       <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: center;">
         <button type="button" onclick="markDoneAndNext()" class="btn btn-pink big-tap-btn" id="nextBtn" style="flex: 1;">
           <i class="fa-solid fa-circle-check"></i> Mark Sung &amp; Next Singer →
@@ -264,10 +270,52 @@
       await fetchQueue();
     }
 
+    // Ticks every second so the number is live, rather than jumping in 5-second steps
+    // with the queue poll. A clock that only moves when something else refreshes does
+    // not read as a clock.
+    let onStageSince = null;
+    setInterval(tickOnStage, 1000);
+
+    function tickOnStage() {
+      const clock = document.getElementById('onStageClock');
+      const nudge = document.getElementById('staleNudge');
+      if (!clock || !nudge) return;
+
+      if (!onStageSince) { clock.hidden = true; nudge.hidden = true; return; }
+
+      const secs = Math.max(0, Math.floor((Date.now() - onStageSince) / 1000));
+      clock.hidden = false;
+      clock.textContent = Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0');
+
+      // Twice the measured pace, floored at 10 minutes. Long enough not to nag during
+      // a genuine long song or an encore, short enough that a forgotten tap does not
+      // cost the queue an hour.
+      const pace = (night && night.slot_seconds) ? night.slot_seconds : 300;
+      const limit = Math.max(600, pace * 2);
+
+      if (secs > limit) {
+        nudge.hidden = false;
+        nudge.innerHTML = '<b>Still on stage after ' + Math.floor(secs / 60) + ' minutes.</b>' +
+          '<br />If they have finished, tap <b>Mark Sung &amp; Next Singer</b> — everyone waiting ' +
+          'is being told a time that assumes the queue is moving.';
+        clock.style.color = '#F0C078';
+      } else {
+        nudge.hidden = true;
+        clock.style.color = 'var(--pink)';
+      }
+    }
+
     function renderKjUI() {
       renderNightBar();
       const playingSlot = kjQueue.find(s => s.status === 'playing');
       const pendingSlots = kjQueue.filter(s => s.status === 'pending');
+
+      // began_at is stamped when karaoke_next() promotes someone, so it is the real
+      // moment they went up.
+      onStageSince = playingSlot && playingSlot.began_at
+        ? new Date(playingSlot.began_at).getTime()
+        : null;
+      tickOnStage();
 
       // Hero
       if (playingSlot) {
