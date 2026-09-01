@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="robots" content="noindex" />
+  <title>Songbook · ISOT App</title>
+
+  <link rel="icon" href="logo.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .song {
+      display: flex; align-items: center; gap: 13px;
+      padding: 12px 0; border-bottom: 1px solid var(--border-light);
+    }
+    .song:last-child { border-bottom: none; }
+
+    /* Rank in a half-disc — the identity's tile at list scale. */
+    .rank {
+      width: 34px; height: 34px; flex-shrink: 0;
+      border-radius: 50% 50% 50% 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.82rem;
+      background: rgba(255,255,255,0.06); color: var(--text-dim);
+      font-variant-numeric: tabular-nums;
+    }
+    .rank.top { background: var(--pink); color: var(--on-accent, #0B0B0F); }
+
+    .song-main { flex: 1; min-width: 0; }
+    .song-title {
+      color: #FFF; font-weight: 600; font-size: 0.95rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .song-meta { font-size: 0.76rem; color: var(--text-dim); margin-top: 2px; }
+
+    .like {
+      background: transparent; border: 1px solid var(--border-light);
+      border-radius: 999px; padding: 6px 12px; cursor: pointer;
+      color: var(--text-dim); font-family: inherit; font-size: 0.8rem;
+      display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
+    .like.on { border-color: var(--pink); color: var(--pink); }
+    .like:disabled { opacity: 0.5; }
+
+    .sortbar { display: flex; gap: 6px; margin: 16px 0 10px; flex-wrap: wrap; }
+    .sortbtn {
+      padding: 6px 13px; border-radius: 18px; font-size: 0.8rem; cursor: pointer;
+      background: transparent; border: 1px solid var(--border-light);
+      color: var(--text-muted); font-family: inherit;
+    }
+    .sortbtn.on { background: var(--pink); border-color: var(--pink); color: var(--on-accent, #0B0B0F); font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <header class="topbar">
+    <a href="karaoke.html" class="topbar-title">Songbook</a>
+    <button type="button" id="burgerBtn" aria-label="Account menu"
+            style="background:transparent;border:none;color:#FFF;font-size:1.3rem;cursor:pointer;padding:6px">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </header>
+
+  <main class="shell" style="max-width:560px">
+
+    <div class="eyebrow">Every song ever asked for</div>
+    <h1 style="font-size:1.7rem;margin-top:2px">ISOT Songbook</h1>
+    <p class="dim" style="font-size:0.86rem;margin-top:6px">
+      Sung at Rough on Monday nights. Tap the heart on the ones you want to hear again.
+    </p>
+
+    <div class="sortbar">
+      <button type="button" class="sortbtn on" data-sort="plays"    onclick="setSort('plays')">Most sung</button>
+      <button type="button" class="sortbtn"    data-sort="likes"    onclick="setSort('likes')">Most liked</button>
+      <button type="button" class="sortbtn"    data-sort="requests" onclick="setSort('requests')">Most requested</button>
+      <button type="button" class="sortbtn"    data-sort="recent"   onclick="setSort('recent')">Latest</button>
+    </div>
+
+    <div class="card card-glass" style="padding:6px 16px">
+      <div id="list"><div class="spinner" style="margin:28px auto"></div></div>
+    </div>
+
+    <p class="dim" style="font-size:0.76rem;margin-top:14px" id="foot"></p>
+  </main>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+  <script>
+  let songs = [];
+  let sort = 'plays';
+
+  (async () => {
+    await requireAuth();
+    await load();
+  })();
+
+  async function load() {
+    const { data, error } = await db.rpc('karaoke_songbook', { p_limit: 300 });
+    const el = document.getElementById('list');
+
+    if (error) {
+      el.innerHTML = `<p class="dim" style="padding:24px 0;font-size:0.86rem">Could not load the songbook: ${escapeHtml(error.message)}</p>`;
+      return;
+    }
+    songs = data || [];
+    render();
+  }
+
+  function setSort(s) {
+    sort = s;
+    document.querySelectorAll('.sortbtn').forEach(b => b.classList.toggle('on', b.dataset.sort === s));
+    render();
+  }
+
+  function render() {
+    const el = document.getElementById('list');
+
+    if (!songs.length) {
+      // No invented placeholder list — an empty songbook says it is empty.
+      el.innerHTML = `
+        <div style="padding:18px 0">${renderMosaicHtml('ISOT-songbook', 6)}</div>
+        <p class="dim" style="text-align:center;font-size:0.86rem;padding:0 0 24px">
+          Nothing sung yet. The songbook fills itself from Monday nights.
+        </p>`;
+      document.getElementById('foot').textContent = '';
+      return;
+    }
+
+    const rows = [...songs].sort((a, b) => {
+      if (sort === 'likes')    return b.likes - a.likes || b.plays - a.plays;
+      if (sort === 'requests') return b.requests - a.requests || b.plays - a.plays;
+      if (sort === 'recent')   return new Date(b.last_sung || 0) - new Date(a.last_sung || 0);
+      return b.plays - a.plays || b.likes - a.likes;
+    });
+
+    el.innerHTML = rows.map((s, i) => {
+      // Requests and plays differ whenever the queue outran the night — on 31 Aug 44
+      // were asked for and 16 played. Saying only "played 1" would hide that.
+      const bits = [];
+      bits.push(s.plays > 0 ? `sung ${s.plays}×` : 'not sung yet');
+      if (s.requests > s.plays) bits.push(`${s.requests} asked`);
+      if (s.singers > 1) bits.push(`${s.singers} singers`);
+
+      return `
+      <div class="song">
+        <div class="rank ${i < 3 && s.plays > 0 ? 'top' : ''}">${i + 1}</div>
+        <div class="song-main">
+          <div class="song-title">${escapeHtml(s.title)}</div>
+          <div class="song-meta">${s.artist ? escapeHtml(s.artist) + ' · ' : ''}${bits.join(' · ')}</div>
+        </div>
+        <button type="button" class="like ${s.liked_by_me ? 'on' : ''}"
+                id="like_${escapeHtml(s.song_key).replace(/[^a-z0-9]/gi, '_')}"
+                onclick="toggleLike('${escapeHtml(s.song_key).replace(/'/g, "&#39;")}', this)">
+          <i class="fa-${s.liked_by_me ? 'solid' : 'regular'} fa-heart"></i> ${s.likes}
+        </button>
+      </div>`;
+    }).join('');
+
+    const totalPlays = songs.reduce((n, s) => n + Number(s.plays), 0);
+    document.getElementById('foot').textContent =
+      `${songs.length} songs · ${totalPlays} performances`;
+  }
+
+  async function toggleLike(key, btn) {
+    btn.disabled = true;
+    const { data, error } = await db.rpc('toggle_song_like', { p_song_key: key });
+    btn.disabled = false;
+
+    if (error) { alert('Could not save that: ' + error.message); return; }
+
+    // Update in place rather than reloading — a re-sort under the thumb would move the
+    // row you just tapped out from under it.
+    const s = songs.find(x => x.song_key === key);
+    if (s) { s.liked_by_me = data.liked; s.likes = data.likes; }
+    btn.classList.toggle('on', data.liked);
+    btn.innerHTML = `<i class="fa-${data.liked ? 'solid' : 'regular'} fa-heart"></i> ${data.likes}`;
+  }
+  </script>
+</body>
+</html>

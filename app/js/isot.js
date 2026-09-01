@@ -662,6 +662,10 @@ function initBurgerMenu(profile) {
         <i class="fa-solid fa-microphone"></i>
         <span>Karaoke Queue</span>
       </a>
+      <a href="songbook.html" class="drawer-item">
+        <i class="fa-solid fa-heart text-pink"></i>
+        <span>Songbook</span>
+      </a>
       <a href="partner.html" class="drawer-item">
         <i class="fa-solid fa-store"></i>
         <span>Partner Venues &amp; Map</span>
