@@ -281,7 +281,13 @@
     function etaSuffix(slot) {
       if (!night || !night.started) return ' · the KJ has not opened the night yet';
       if (night.paused)             return ' · paused right now';
-      if (!slot.eta_at)             return '';
+
+      // A stalled queue is not a slow one. On 31 Aug the queue sat empty for 58
+      // minutes and the old estimate kept counting down as though a song were in
+      // progress — it would have said "about 20 minutes" for an hour. Say what is
+      // actually true instead.
+      if (slot.eta_state === 'stalled') return ' · between songs, waiting for the KJ';
+      if (!slot.eta_at)                 return '';
 
       const d = new Date(slot.eta_at);
       const mins = Math.max(0, Math.round((d - Date.now()) / 60000));
@@ -400,7 +406,7 @@
         // A clock time next to each row, so anyone can see how the line is moving
         // without doing the arithmetic themselves.
         let etaHtml = '';
-        if (!isPlaying && night && night.started && !night.paused && s.eta_at) {
+        if (!isPlaying && night && night.started && !night.paused && s.eta_at && s.eta_state === 'ok') {
           const t = new Date(s.eta_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
           etaHtml = `<div class="dim" style="font-size:0.72rem;text-align:right;margin-top:2px">~${escapeHtml(t)}</div>`;
         }
