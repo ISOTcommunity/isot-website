@@ -93,7 +93,7 @@
           <div class="dim" style="font-size:0.8rem" id="nightPace">Pace: 5 min a song (estimated)</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button type="button" id="btnOpenNight" class="btn btn-pink" style="width:auto;padding:8px 16px;font-size:0.85rem" onclick="openNight()">
+          <button type="button" id="btnOpenNight" class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:0.85rem" onclick="openNight()">
             <i class="fa-solid fa-play"></i> Start the night
           </button>
           <button type="button" id="btnPauseNight" class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:0.85rem" onclick="togglePause()" hidden>
@@ -226,7 +226,9 @@
       // without that distinction reads as fact when it is an assumption.
       pace.textContent = night.measured
         ? `Pace: about ${mins} min a song, measured tonight · ${night.sung} sung, ${night.waiting} waiting`
-        : `Pace: about ${mins} min a song (estimate until a few songs are in) · ${night.waiting} waiting`;
+        : (night.started
+            ? `Pace: about ${mins} min a song (estimate until a few songs are in) · ${night.waiting} waiting`
+            : `${night.waiting} waiting · tap Next when your first singer goes up`);
 
       if (night.ended) {
         status.textContent = 'Night closed';
@@ -235,7 +237,10 @@
         return;
       }
       if (!night.started) {
-        status.textContent = 'Not started';
+        // Optional since 023: the first "Mark Sung & Next" opens the night on its own.
+        // Tapping it early is still worth it — people queueing during the aperitivo get
+        // estimates before anyone has sung.
+        status.textContent = 'Starts with the first song';
         open.hidden = false; pause.hidden = true; close.hidden = true;
         return;
       }
