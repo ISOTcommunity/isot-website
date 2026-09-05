@@ -490,6 +490,11 @@
           cat: e.category || 'social',
           logo: CATEGORY_LOGO[e.category] || CATEGORY_LOGO.social,
           goingCount: Number(e.going_count) || 0,
+          // Per-occurrence, from event_instances (025). Tonight's poster is not next
+          // Saturday's, so these never come from the recurring event.
+          headline: e.headline || null,
+          notes: e.notes || null,
+          poster: e.poster_url || null,
           link: e.has_karaoke ? 'karaoke.html' : null,
           membersOnly: e.members_only,
           special: e.description || null,
@@ -991,8 +996,31 @@
         stackHtml += `<div class="avatar-stack-item-box" title="You (${meProfile.full_name})">${renderUserAvatarHtml(meProfile, 26)}</div>`;
       }
 
+      // A featured night leads with its poster. The image is the point of a poster —
+      // burying it under the same row every other Saturday gets would waste it.
+      const featured = item.poster
+        ? `<a href="${escapeHtml(item.poster)}" target="_blank" rel="noopener" style="display:block">
+             <img src="${escapeHtml(item.poster)}" alt="${escapeHtml(item.title)} poster"
+                  loading="lazy"
+                  style="width:100%;display:block;border-radius:var(--radius-md) var(--radius-md) 0 0" />
+           </a>`
+        : '';
+
+      const headline = item.headline
+        ? `<div class="eyebrow" style="margin:12px 0 0;color:var(--pink)">${escapeHtml(item.headline)}</div>`
+        : '';
+
+      // Whitespace preserved: the programme is written as lines and reads as a list.
+      const notes = item.notes
+        ? `<div style="margin:10px 0 0;padding:12px 14px;background:rgba(255,255,255,0.04);
+                       border-radius:12px 12px 26px 12px;font-size:0.86rem;color:var(--text-muted);
+                       white-space:pre-line;line-height:1.55">${escapeHtml(item.notes)}</div>`
+        : '';
+
       return `
         <div class="event-card-item">
+          ${featured}
+          ${headline}
           <div class="event-card-top">
             <div class="event-date-box">
               <span class="day-num">${item.dayNum}</span>
@@ -1016,6 +1044,7 @@
                   <i class="fa-solid fa-paper-plane text-pink"></i> Invite Friends
                 </button>
               </div>
+              ${notes}
             </div>
           </div>
 
