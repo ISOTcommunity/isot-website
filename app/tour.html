@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-N2S3FL84RT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-N2S3FL84RT');
+</script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>One Day in Turin · ISOT</title>
+
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="../assets/favicon.png" sizes="48x48" type="image/png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-title" content="ISOT" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#000000" />
+  <script defer src="/_vercel/insights/script.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="vendor/leaflet.css" />
+  <link rel="stylesheet" href="css/app.css" />
+
+  <style>
+    #tourMap { height: 46vh; min-height: 300px; width: 100%; background: #111; }
+    .leaflet-control-attribution {
+      background: rgba(0,0,0,0.5) !important; color: var(--text-dim) !important;
+      font-size: 0.6rem !important;
+    }
+    .leaflet-control-attribution a { color: var(--text-dim) !important; text-decoration: none; }
+
+    /* Numbered map markers. A location mark, not a gem — the number is the point,
+       because the whole game is that the stops come in order. */
+    .stop-pin { display:flex; align-items:center; justify-content:center;
+      width:30px; height:30px; border-radius:50% 50% 50% 4px; transform: rotate(-45deg);
+      font-weight:800; font-size:0.82rem; border:2px solid rgba(0,0,0,0.55);
+      box-shadow:0 3px 10px rgba(0,0,0,0.6); }
+    .stop-pin > span { transform: rotate(45deg); }
+    .stop-pin.todo    { background:#1A1A22; color:var(--text-muted); border-color:rgba(255,255,255,0.28); }
+    .stop-pin.done    { background:var(--green,#4ED88A); color:#07120C; }
+    .stop-pin.current { background:var(--pink); color:var(--on-accent);
+                        animation: stopPulse 1.9s ease-in-out infinite; }
+    @keyframes stopPulse {
+      0%,100% { box-shadow:0 3px 10px rgba(0,0,0,0.6), 0 0 0 0 var(--pink-glow); }
+      50%     { box-shadow:0 3px 10px rgba(0,0,0,0.6), 0 0 0 13px rgba(212,90,232,0); }
+    }
+
+    .stop { display:flex; gap:14px; padding:16px 0; border-bottom:1px solid var(--border-light); }
+    .stop:last-child { border-bottom:none; }
+    .stop-num { flex-shrink:0; width:30px; height:30px; border-radius:50%; display:flex;
+      align-items:center; justify-content:center; font-weight:800; font-size:0.82rem;
+      background:#1A1A22; color:var(--text-muted); border:1px solid var(--border-light); }
+    .stop.done .stop-num    { background:var(--green,#4ED88A); color:#07120C; border-color:transparent; }
+    .stop.current .stop-num { background:var(--pink); color:var(--on-accent); border-color:transparent; }
+    .stop.todo  .stop-name  { color:var(--text-muted); }
+    .stop-name  { font-weight:600; font-size:1rem; margin-bottom:3px; }
+    .stop-hint  { font-size:0.86rem; color:var(--text-muted); line-height:1.5; }
+    .stop-reveal { font-size:0.84rem; color:var(--text-dim); line-height:1.5; margin-top:7px;
+      padding-left:11px; border-left:2px solid var(--green,#4ED88A); }
+
+    .prog-track { height:6px; border-radius:3px; background:rgba(255,255,255,0.10); overflow:hidden; }
+    .prog-fill  { height:100%; background:var(--pink); border-radius:3px; transition:width .5s ease; }
+
+    .goldchip { display:inline-flex; align-items:center; gap:5px; font-size:0.7rem;
+      font-weight:700; text-transform:uppercase; letter-spacing:0.05em;
+      color:#FFC978; background:rgba(255,201,120,0.12); padding:3px 9px; border-radius:999px; }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display:flex;align-items:center;gap:8px">
+      <i class="fa-solid fa-route text-pink"></i>
+      <span>One Day in Turin</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:12px">
+      <a href="partner.html" style="color:#FFF;font-size:1.15rem;padding:4px" title="Map"><i class="fa-solid fa-map-location-dot"></i></a>
+      <div id="headerAvatar" style="cursor:pointer" data-open-drawer></div>
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background:transparent;border:none;color:#FFF;font-size:1.3rem;cursor:pointer;padding:6px">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <div id="tourMap"></div>
+
+  <main class="shell" style="padding-top:18px;padding-bottom:96px">
+    <div id="tourHead"></div>
+    <div class="card card-glass" style="margin-top:16px">
+      <div id="stopList"></div>
+    </div>
+  </main>
+
+  <nav class="tabbar">
+    <a href="home.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 011-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </a>
+    <a href="events.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Calendar
+    </a>
+    <a href="partner.html" class="tab-item active">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+      Map
+    </a>
+    <a href="network.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+      Network
+    </a>
+  </nav>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="vendor/leaflet.js"></script>
+  <script src="js/isot.js"></script>
+  <script>
+  (async () => {
+    const me = await requireAuth();
+    const av = document.getElementById('headerAvatar');
+    if (av) av.innerHTML = renderUserAvatarHtml(me, 36);
+    if (typeof ensureNav === 'function') ensureNav();
+
+    // The trail is picked by id when one is passed, otherwise the first active trail.
+    // There is one today; the page does not assume there will only ever be one.
+    const wanted = new URLSearchParams(location.search).get('t');
+    let trailId = wanted;
+    if (!trailId) {
+      const { data: list } = await db.rpc('trails_list');
+      if (!list || !list.length) {
+        document.getElementById('tourHead').innerHTML =
+          '<p class="muted">No walk is running at the moment.</p>';
+        return;
+      }
+      trailId = list[0].id;
+    }
+
+    let T = null;
+    let map = null, roadLine = null, markerLayer = null;
+
+    async function load() {
+      const { data, error } = await db.rpc('trail_detail', { p_trail: trailId });
+      if (error || !data || !data.ok) {
+        document.getElementById('tourHead').innerHTML =
+          '<p class="muted">Could not load the walk.</p>';
+        return;
+      }
+      T = data;
+      T.stops.sort((a, b) => a.position - b.position);
+      drawHead();
+      drawMap();
+      drawStops();
+    }
+
+    function drawHead() {
+      const pct = T.total ? Math.round((T.done / T.total) * 100) : 0;
+      document.getElementById('tourHead').innerHTML = `
+        <p class="eyebrow" style="margin-bottom:6px">Walking tour</p>
+        <h1 style="font-size:1.6rem;margin-bottom:8px">${escapeHtml(T.name)}</h1>
+        <p class="muted" style="font-size:0.9rem;line-height:1.6">${escapeHtml(T.blurb || '')}</p>
+
+        <div style="display:flex;gap:18px;flex-wrap:wrap;margin:16px 0 10px;font-size:0.82rem">
+          <span class="dim"><i class="fa-solid fa-route"></i> ${T.distance_km} km</span>
+          <span class="dim"><i class="fa-solid fa-location-dot"></i> ${T.total} stops</span>
+          <span class="dim"><i class="fa-solid fa-sun"></i> Sunset ${escapeHtml(T.sunset_local || '—')}</span>
+          <span class="dim"><i class="fa-solid fa-star"></i> +${T.bonus_points} to finish</span>
+        </div>
+
+        <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
+        <p class="dim" style="font-size:0.78rem;margin-top:7px">
+          ${T.completed
+            ? 'Finished. You walked the whole thing.'
+            : `${T.done} of ${T.total} stops done.`}
+        </p>`;
+    }
+
+    function drawMap() {
+      // Null lat/lng becomes 0 through Number(), which draws the route out into the
+      // Atlantic rather than failing. Refuse instead.
+      if (T.stops.some(s => s.lat == null || s.lng == null)) {
+        document.getElementById('tourMap').innerHTML =
+          '<p class="muted" style="padding:24px;text-align:center">Route unavailable.</p>';
+        console.warn('trail: stop coordinates missing — is migration 031 applied?');
+        return;
+      }
+      const pts = T.stops.map(s => [Number(s.lat), Number(s.lng)]);
+
+      if (!map) {
+        map = L.map('tourMap', { zoomControl: false, attributionControl: false });
+        L.control.attribution({ prefix: false, position: 'bottomright' })
+          .addAttribution('&copy; OSM').addTo(map);
+        L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
+          { maxZoom: 19 }).addTo(map);
+        markerLayer = L.layerGroup().addTo(map);
+      }
+
+      // The road. Drawn twice: a wide dark casing underneath so the bright line reads
+      // against pale buildings and dark parks alike, then the line itself on top.
+      if (roadLine) roadLine.remove();
+      roadLine = L.layerGroup([
+        L.polyline(pts, { color: '#000', weight: 11, opacity: 0.55, lineJoin: 'round' }),
+        L.polyline(pts, { color: '#D45AE8', weight: 5, opacity: 0.95, lineJoin: 'round' }),
+      ]).addTo(map);
+
+      markerLayer.clearLayers();
+      T.stops.forEach(s => {
+        const cls = s.done ? 'done' : (s.current ? 'current' : 'todo');
+        L.marker([Number(s.lat), Number(s.lng)], {
+          icon: L.divIcon({
+            className: 'stop-pin-wrap',
+            html: `<div class="stop-pin ${cls}"><span>${s.position}</span></div>`,
+            iconSize: [30, 30], iconAnchor: [15, 30],
+          }),
+          zIndexOffset: s.current ? 1000 : 0,
+        }).addTo(markerLayer)
+          .on('click', () => {
+            const el = document.getElementById('stop-' + s.position);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          });
+      });
+
+      map.fitBounds(L.latLngBounds(pts), { padding: [38, 38] });
+    }
+
+    function drawStops() {
+      document.getElementById('stopList').innerHTML = T.stops.map(s => {
+        const cls = s.done ? 'done' : (s.current ? 'current' : 'todo');
+        return `
+        <div class="stop ${cls}" id="stop-${s.position}">
+          <div class="stop-num">${s.done ? '<i class="fa-solid fa-check"></i>' : s.position}</div>
+          <div style="flex:1;min-width:0">
+            <div class="stop-name">${escapeHtml(s.name)}
+              ${s.golden_hour ? '<span class="goldchip" style="margin-left:7px"><i class="fa-solid fa-sun"></i> Sunset</span>' : ''}
+            </div>
+            <div class="stop-hint">${escapeHtml(s.hint || '')}</div>
+            ${s.reveal ? `<div class="stop-reveal">${escapeHtml(s.reveal)}</div>` : ''}
+            ${s.current ? `
+              <div id="claimAlert" style="margin-top:11px" hidden></div>
+              <input type="file" id="stopFile" accept="image/*" capture="environment"
+                     style="display:none" onchange="onStopPhoto(event)" />
+              <button type="button" class="btn btn-pink" style="margin-top:11px"
+                      onclick="document.getElementById('stopFile').click()">
+                <i class="fa-solid fa-camera"></i> I'm here — take the photo
+              </button>
+              <p class="dim" style="font-size:0.76rem;margin-top:8px">
+                Within ${s.radius_m}m of the spot. ${s.points} points.
+              </p>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function say(msg, kind) {
+      const el = document.getElementById('claimAlert');
+      if (!el) return;
+      el.hidden = false;
+      el.className = 'alert alert-' + (kind || 'error');
+      el.textContent = msg;
+    }
+
+    // Same shape as the gem claim on the map page: location checked before anything is
+    // uploaded, so a failed claim leaves no orphan photo in storage.
+    window.onStopPhoto = async function (ev) {
+      const file = ev.target.files && ev.target.files[0];
+      if (!file) return;
+      const s = T.stops.find(x => x.current);
+      if (!s) return;
+
+      const btn = document.querySelector('.stop.current .btn-pink');
+      const restore = btn ? busy(btn, 'Checking where you are…') : () => {};
+
+      let pos;
+      try {
+        pos = await new Promise((res, rej) =>
+          navigator.geolocation.getCurrentPosition(res, rej,
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }));
+      } catch (e) {
+        restore();
+        say(e && e.code === 1
+          ? 'ISOT needs your location to check you are here. Allow it in your browser settings and try again.'
+          : 'Could not get your location. Step out from under the arcades and try again.');
+        return;
+      }
+
+      if (btn) btn.innerHTML = '<span class="spinner"></span> Preparing photo…';
+      let blob;
+      try { blob = await shrinkImage(file); }
+      catch (e) { restore(); say(e.message || 'Could not read that photo.'); return; }
+
+      if (btn) btn.innerHTML = '<span class="spinner"></span> Uploading…';
+      const path = `${s.id}/${Date.now()}.jpg`;
+      const { error: upErr } = await db.storage.from('gem-photos')
+        .upload(path, blob, { contentType: 'image/jpeg', upsert: false });
+      if (upErr) { restore(); say('Photo upload failed — ' + upErr.message); return; }
+
+      const { data, error } = await db.rpc('claim_gem', {
+        p_gem_id: s.id,
+        p_lat: pos.coords.latitude,
+        p_lng: pos.coords.longitude,
+        p_accuracy: pos.coords.accuracy,
+        p_photo_path: path,
+      });
+
+      restore();
+      if (error)    { say(error.message); return; }
+      if (!data.ok) { say(data.reason); return; }
+
+      say(data.bonus
+        ? `That's the whole walk — ${data.points} points, plus ${data.bonus} for finishing.`
+        : `Stop ${s.position} done — ${data.points} points.`, 'success');
+
+      // Reload the trail rather than the page: the road, the pins and the list all
+      // move forward together, and the map keeps its position.
+      setTimeout(load, 1100);
+    };
+
+    await load();
+  })();
+  </script>
+</body>
+</html>

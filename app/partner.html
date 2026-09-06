@@ -172,6 +172,38 @@
       backdrop-filter: blur(4px);
     }
     .leaflet-control-attribution a { color: var(--text-dark) !important; text-decoration: none; }
+
+    /* Tour stops are location marks with a number, deliberately unlike the gem pins —
+       a stop is a place on a route, a gem is a thing hidden somewhere. */
+    .stop-pin { display:flex; align-items:center; justify-content:center;
+      width:30px; height:30px; border-radius:50% 50% 50% 4px; transform:rotate(-45deg);
+      font-weight:800; font-size:0.82rem; border:2px solid rgba(0,0,0,0.55);
+      box-shadow:0 3px 10px rgba(0,0,0,0.6); }
+    .stop-pin > span { transform:rotate(45deg); }
+    .stop-pin.todo    { background:#1A1A22; color:var(--text-muted); border-color:rgba(255,255,255,0.28); }
+    .stop-pin.done    { background:var(--green,#4ED88A); color:#07120C; }
+    .stop-pin.current { background:var(--pink); color:var(--on-accent); }
+
+    #tourBanner { display:flex; align-items:center; gap:13px; text-decoration:none;
+      padding:14px 16px; margin-bottom:14px;
+      border:1px solid var(--border-light); background:rgba(212,90,232,0.07);
+      border-radius:var(--radius-md) var(--radius-md) var(--radius-arc) var(--radius-md); }
+    #tourBanner .tb-ico { font-size:1.3rem; color:var(--pink); }
+    #tourBanner .tb-name { font-weight:700; font-size:0.98rem; color:var(--text); }
+    #tourBanner .tb-sub  { font-size:0.78rem; color:var(--text-muted); margin-top:2px; }
+
+    /* Reference pins: smaller and quieter than anything of ISOT's own, because they
+       are context, not content. */
+    .ref-pin { display:flex; align-items:center; justify-content:center;
+      width:24px; height:24px; border-radius:50%; font-size:0.68rem;
+      border:1.5px solid rgba(0,0,0,0.5); box-shadow:0 2px 6px rgba(0,0,0,0.5); }
+    .ref-pin.campus { background:#2A3348; color:#9DB4E8; }
+    .ref-pin.mensa  { background:#3A2E1C; color:#F5C67A; }
+
+    #mensaHint { font-size:0.78rem; color:var(--text-muted); line-height:1.55;
+      padding:12px 14px; margin-bottom:14px; border:1px solid var(--border-light);
+      background:rgba(245,198,122,0.06);
+      border-radius:var(--radius-md) var(--radius-md) var(--radius-arc) var(--radius-md); }
   </style>
 </head>
 <body>
@@ -210,7 +242,25 @@
     <div class="layers" id="layerBar"></div>
 
     <div id="gemScore" hidden></div>
+
+    <!-- Populated by loadTour(); hidden until a trail actually exists, so the page
+         never advertises a walk that is not running. -->
+    <a id="tourBanner" href="tour.html" hidden>
+      <i class="fa-solid fa-route tb-ico"></i>
+      <div style="flex:1;min-width:0">
+        <div class="tb-name"></div>
+        <div class="tb-sub"></div>
+      </div>
+      <i class="fa-solid fa-chevron-right dim"></i>
+    </a>
     <div id="liveBanner" hidden></div>
+    <p id="mensaHint" hidden>
+      <i class="fa-solid fa-circle-info" style="color:#F5C67A"></i>
+      No canteen takes cash. You pay through the <strong>Campus Piemonte ID Meal</strong> app,
+      at the rate band EDISU assigns you — set it up before your first meal, not in the queue.
+      Exchange and visiting students have their own access route on the EDISU site.
+    </p>
+
     <div id="mapContainer"></div>
 
     <!-- Venue cards render from venue_public, the same source as the pins above.
@@ -255,6 +305,9 @@
     const LAYER = {
       partners: { label: 'Partners', icon: 'fa-martini-glass', group: null, count: 0 },
       gems:     { label: 'Gems',     icon: 'fa-gem',           group: null, count: 0 },
+      tour:     { label: 'Tour',     icon: 'fa-route',         group: null, count: 0 },
+      campus:   { label: 'Campus',   icon: 'fa-graduation-cap', group: null, count: 0, zoomed: true },
+      mensa:    { label: 'Mensa',    icon: 'fa-utensils',      group: null, count: 0, zoomed: true },
     };
     let activeLayer = 'all';
     let mapRef = null;
@@ -284,9 +337,15 @@
 
     function applyLayers() {
       if (!mapRef) return;
+      const z = mapRef.getZoom();
       Object.entries(LAYER).forEach(([k, l]) => {
         if (!l.group) return;
-        const show = activeLayer === 'all' || activeLayer === k;
+        // Campuses and mensas are reference data — 28 pins spread over the whole city.
+        // At city zoom they bury the three partner venues this page is actually about,
+        // so in the "All" view they wait until you have zoomed in far enough for them
+        // to mean something. Choosing the layer by name shows them at any zoom.
+        const show = activeLayer === k
+          || (activeLayer === 'all' && (!l.zoomed || z >= 14));
         if (show) mapRef.addLayer(l.group); else mapRef.removeLayer(l.group);
       });
 
@@ -297,6 +356,14 @@
       if (cards) cards.hidden = !(activeLayer === 'all' || activeLayer === 'partners');
       if (score && !score.hidden) {
         score.style.display = (activeLayer === 'all' || activeLayer === 'gems') ? '' : 'none';
+      }
+      const tb = document.getElementById('tourBanner');
+      if (tb && !tb.hidden) {
+        tb.style.display = (activeLayer === 'all' || activeLayer === 'tour') ? '' : 'none';
+      }
+      const mh = document.getElementById('mensaHint');
+      if (mh && !mh.hidden) {
+        mh.style.display = (activeLayer === 'mensa') ? '' : 'none';
       }
     }
 
@@ -310,6 +377,9 @@
       // stays. It is styled down in CSS rather than removed.
       LAYER.partners.group = L.layerGroup();
       LAYER.gems.group     = L.layerGroup();
+      LAYER.tour.group     = L.layerGroup();
+      LAYER.campus.group   = L.layerGroup();
+      LAYER.mensa.group    = L.layerGroup();
 
       const map = L.map('mapContainer', {
         zoomControl: false,
@@ -435,11 +505,14 @@
       renderVenueCards(venues || [], tonightByVenue, wk.error ? todayEvents : (wk.data || []));
 
       await loadGems(map);
+      await loadTour(map);
+      await loadCityPlaces(map);
       watchNearby(venues || [], tonightByVenue);
 
       // Fit every pin rather than centring on a guessed midpoint — with one venue
       // off-screen it looked like the map was wrong.
       mapRef = map;
+      map.on('zoomend', () => { if (activeLayer === 'all') applyLayers(); });
       LAYER.partners.count = located.length;
       applyLayers();
       renderLayerBar();
@@ -518,6 +591,109 @@
      * ------------------------------------------------------------------- */
     let gems = [];
     let claiming = null;   // the gem whose sheet is open
+
+    /* Campuses and canteens. Read straight from city_places — nothing here is ISOT's,
+       we only point at it, so there is no claiming and no state. The mensa note is the
+       opening hours as EDISU publishes them, which is the whole reason a pin is worth
+       tapping: the walk is short, the closed door is not. */
+    async function loadCityPlaces(map) {
+      const { data: places, error } = await db.from('city_places')
+        .select('id,kind,name,operator,address,lat,lng,note,url')
+        .eq('active', true);
+      if (error || !places) return;
+
+      places.forEach(p => {
+        const isMensa = p.kind === 'mensa';
+        const group = isMensa ? LAYER.mensa.group : LAYER.campus.group;
+        if (!group) return;
+
+        group.addLayer(
+          L.marker([Number(p.lat), Number(p.lng)], {
+            icon: L.divIcon({
+              className: 'isot-pin-wrapper',
+              html: `<div class="ref-pin ${p.kind}"><i class="fa-solid ${isMensa ? 'fa-utensils' : 'fa-graduation-cap'}"></i></div>`,
+              iconSize: [24, 24], iconAnchor: [12, 12],
+            }),
+            zIndexOffset: 100,   // under partners, gems and the tour
+          }).bindPopup(`
+            <div style="min-width:190px">
+              <div style="font-weight:700;font-size:0.95rem">${escapeHtml(p.name)}</div>
+              ${p.operator ? `<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:#D45AE8;margin-top:2px">${escapeHtml(p.operator)}</div>` : ''}
+              ${p.address ? `<div style="font-size:0.8rem;margin-top:6px;opacity:0.75">${escapeHtml(p.address)}</div>` : ''}
+              ${p.note ? `<div style="font-size:0.8rem;margin-top:7px;line-height:1.5">${escapeHtml(p.note)}</div>` : ''}
+              <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}"
+                 target="_blank" rel="noopener"
+                 style="display:inline-block;margin-top:9px;font-size:0.8rem;color:#D45AE8;text-decoration:none">
+                Directions &rarr;</a>
+            </div>`));
+      });
+
+      LAYER.campus.count = places.filter(p => p.kind === 'campus').length;
+      LAYER.mensa.count  = places.filter(p => p.kind === 'mensa').length;
+
+      // Payment catches people out every year: there is no cash desk in any EDISU
+      // canteen, it is the Campus Piemonte ID Meal app or nothing.
+      const hint = document.getElementById('mensaHint');
+      if (hint) hint.hidden = false;
+
+      applyLayers();
+      renderLayerBar();
+    }
+
+    /* The walking tour. It is a road, not a scatter of pins: the whole point is the
+       order you walk it in, and nine gem icons could not say that. Drawn as a bold
+       line with numbered location marks, and tapping any of them opens the tour page
+       where the hints and the camera live. */
+    async function loadTour(map) {
+      const { data: trails } = await db.rpc('trails_list');
+      if (!trails || !trails.length) return;
+      const t = trails[0];
+
+      const { data: T } = await db.rpc('trail_detail', { p_trail: t.id });
+      if (!T || !T.ok || !T.stops || !T.stops.length) return;
+
+      const stops = T.stops.slice().sort((a, b) => a.position - b.position);
+      // Every stop needs real coordinates before a road can be drawn. Null lat/lng
+      // becomes 0 through Number(), which would run the route out into the Atlantic
+      // rather than fail — so refuse to draw instead of drawing something wrong.
+      if (stops.some(s => s.lat == null || s.lng == null)) {
+        console.warn('trail: stop coordinates missing — is migration 031 applied?');
+        return;
+      }
+      const pts = stops.map(s => [Number(s.lat), Number(s.lng)]);
+
+      // Dark casing under the bright line so the route reads over pale piazze and
+      // dark parks alike.
+      LAYER.tour.group.addLayer(L.polyline(pts, { color: '#000', weight: 11, opacity: 0.5, lineJoin: 'round' }));
+      LAYER.tour.group.addLayer(L.polyline(pts, { color: '#D45AE8', weight: 5, opacity: 0.95, lineJoin: 'round' }));
+
+      stops.forEach(s => {
+        const cls = s.done ? 'done' : (s.current ? 'current' : 'todo');
+        LAYER.tour.group.addLayer(
+          L.marker([Number(s.lat), Number(s.lng)], {
+            icon: L.divIcon({
+              className: 'isot-pin-wrapper',
+              html: `<div class="stop-pin ${cls}"><span>${s.position}</span></div>`,
+              iconSize: [30, 30], iconAnchor: [15, 30],
+            }),
+            zIndexOffset: 300,
+          }).on('click', () => { location.href = 'tour.html?t=' + t.id; }));
+      });
+
+      LAYER.tour.count = stops.length;
+      applyLayers();
+      renderLayerBar();
+
+      const banner = document.getElementById('tourBanner');
+      if (banner) {
+        banner.hidden = false;
+        banner.href = 'tour.html?t=' + t.id;
+        banner.querySelector('.tb-sub').textContent =
+          T.completed ? 'You walked the whole thing.'
+                      : `${T.done} of ${T.total} stops · ${T.distance_km} km · sunset ${T.sunset_local}`;
+        banner.querySelector('.tb-name').textContent = T.name;
+      }
+    }
 
     async function loadGems(map) {
       const [{ data, error }, score] = await Promise.all([
