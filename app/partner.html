@@ -290,6 +290,9 @@
 
       // Keyed by venue name — calendar_between returns venue_name, venue_public returns
       // name, and there is no shared id between them.
+      // Today only, for the live/tonight state.
+      const todayEvents = cal.error ? [] : (cal.data || []);
+
       const tonightByVenue = {};
       if (!cal.error) {
         (cal.data || []).forEach(e => {
@@ -350,7 +353,15 @@
       });
 
       renderLiveBanner(tonightByVenue);
-      renderVenueCards(venues || [], tonightByVenue, events);
+
+      // A separate, wider read for the cards: they list each venue's weekly nights, and
+      // today's query cannot show a Saturday on a Tuesday.
+      const wk = await db.rpc('calendar_between', {
+        p_from: today,
+        p_to: new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10),
+      });
+      renderVenueCards(venues || [], tonightByVenue, wk.error ? todayEvents : (wk.data || []));
+
       await loadGems(map);
 
       // Fit every pin rather than centring on a guessed midpoint — with one venue
