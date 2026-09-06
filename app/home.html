@@ -373,7 +373,6 @@
            fallback for when nothing is featured — a home screen should never be empty,
            but a real poster beats a generated pattern every time. -->
       <div id="featuredNight" hidden style="margin-bottom:18px"></div>
-      <div id="homeMosaic" style="margin-bottom:18px"></div>
 
       <!-- 5 Categories Character Strip -->
       <div style="margin-bottom: 8px;">
@@ -640,14 +639,6 @@
         renderFeaturedNight();
 
         // Only draw the mosaic when there is no poster to lead with.
-        // The mosaic is now only for a genuinely empty calendar — with three nights
-        // listed there is nothing for it to fill.
-        const hm = document.getElementById('homeMosaic');
-        const hasEvents = !document.getElementById('featuredNight').hidden;
-        if (hm) {
-          hm.hidden = hasEvents;
-          if (!hasEvents) hm.innerHTML = renderMosaicHtml(meProfile?.member_code || 'ISOT', 8);
-        }
 
         const isStaff = meProfile &&
           (meProfile.staff_role === 'volunteer' || meProfile.staff_role === 'board');

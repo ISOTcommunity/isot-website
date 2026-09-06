@@ -166,45 +166,18 @@ function renderUserAvatarHtml(profile, size = 44) {
   `;
 }
 
-/* ---------------------------------------------------------------
- * Identity mosaic
+/* The identity mosaic lived here — a generated run of circles and half-discs on the
+ * login page, the home screen and the empty states.
  *
- * A run of the artwork's tiles — full circles, half-discs, quarter-arcs — in flat
- * palette colour on black. Used where a screen would otherwise open on nothing, so
- * an empty state still looks like ISOT rather than like a failure.
+ * Removed on the president's judgement, and he was right: a random arrangement of the
+ * artwork's shapes carries no information. It looked like the identity without saying
+ * anything, which is decoration pretending to be design. The home screen now opens on
+ * real posters and real events, and an empty calendar says it is empty.
  *
- * Deterministic from the seed: the same page draws the same mosaic every time.
- * Random tiles would flicker on each render and turn the identity into noise.
- * ------------------------------------------------------------- */
-const TILE_SHAPES = ['t-circle', 't-top', 't-bottom', 't-left', 't-right', 't-quarter', 't-split'];
-
-function renderMosaicHtml(seed = 'ISOT', count = 7) {
-  // xorshift from the seed — small, stable, and no dependency.
-  let h = 2166136261;
-  for (let i = 0; i < seed.length; i++) {
-    h ^= seed.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  const next = () => {
-    h ^= h << 13; h ^= h >>> 17; h ^= h << 5;
-    return Math.abs(h) / 2147483647;
-  };
-
-  let html = '<div class="mosaic" aria-hidden="true">';
-  for (let i = 0; i < count; i++) {
-    const shape = TILE_SHAPES[Math.floor(next() * TILE_SHAPES.length)];
-    const a = IDENTITY_PALETTE[Math.floor(next() * IDENTITY_PALETTE.length)];
-    let b = IDENTITY_PALETTE[Math.floor(next() * IDENTITY_PALETTE.length)];
-    if (b === a) b = IDENTITY_PALETTE[(IDENTITY_PALETTE.indexOf(a) + 5) % IDENTITY_PALETTE.length];
-
-    const fill = shape === 't-split'
-      ? `linear-gradient(to bottom, ${a} 0 50%, ${b} 50% 100%)`
-      : a;
-
-    html += `<div class="tile ${shape}"><i style="background:${fill}"></i></div>`;
-  }
-  return html + '</div>';
-}
+ * The .mosaic and .t-* rules stay in app.css. If a use ever comes up that MEANS
+ * something — one tile per upcoming night, coloured by category, say — the CSS is
+ * there and the generator is in git history.
+ */
 
 function renderGeoAvatar(memberCode, size = 44) {
   return renderUserAvatarHtml({ member_code: memberCode, full_name: 'Member' }, size);
