@@ -369,6 +369,10 @@
 
       <!-- Identity band. Deterministic per member, so it is *their* mosaic and it
            does not reshuffle on every visit. -->
+      <!-- The next night with a poster, at the top of the app. The mosaic below is the
+           fallback for when nothing is featured — a home screen should never be empty,
+           but a real poster beats a generated pattern every time. -->
+      <div id="featuredNight" hidden style="margin-bottom:18px"></div>
       <div id="homeMosaic" style="margin-bottom:18px"></div>
 
       <!-- 5 Categories Character Strip -->
@@ -594,6 +598,10 @@
           goingCount: Number(e.going_count) || 0,
           link: e.has_karaoke ? 'karaoke.html' : null,
           special: e.description || null,
+          venueName: e.venue_name,
+          headline: e.headline || null,
+          notes: e.notes || null,
+          poster: e.poster_url || null,
         };
       });
 
@@ -629,8 +637,15 @@
         const memberView = document.getElementById('memberHomeView');
         if (memberView) memberView.style.display = 'block';
 
+        renderFeaturedNight();
+
+        // Only draw the mosaic when there is no poster to lead with.
         const hm = document.getElementById('homeMosaic');
-        if (hm) hm.innerHTML = renderMosaicHtml(meProfile?.member_code || 'ISOT', 8);
+        const featured = !document.getElementById('featuredNight').hidden;
+        if (hm) {
+          hm.hidden = featured;
+          if (!featured) hm.innerHTML = renderMosaicHtml(meProfile?.member_code || 'ISOT', 8);
+        }
 
         const isStaff = meProfile &&
           (meProfile.staff_role === 'volunteer' || meProfile.staff_role === 'board');
@@ -641,6 +656,55 @@
         const gate = document.getElementById('gate');
         if (gate) gate.remove();
       }
+    }
+
+    /* The soonest night that has a poster. Not simply the next event — most Mondays
+       are the same Monday, and giving every one of them a hero would train people to
+       scroll past it. A poster means somebody decided this night was worth announcing. */
+    function renderFeaturedNight() {
+      const el = document.getElementById('featuredNight');
+      if (!el) return;
+
+      const today = isotToday();
+      const next = EVENTS_DATA
+        .filter(e => e.poster && e.date >= today)
+        .sort((a, b) => a.date.localeCompare(b.date))[0];
+
+      if (!next) { el.hidden = true; return; }
+
+      const d = new Date(next.date + 'T00:00:00');
+      const when = d.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' });
+      const isTonight = next.date === today;
+
+      el.hidden = false;
+      el.innerHTML = `
+        <div class="card card-glass card-glow" style="padding:0;overflow:hidden">
+          <a href="events.html" style="display:block">
+            <img src="${escapeHtml(next.poster)}" alt="${escapeHtml(next.title)} poster"
+                 style="width:100%;display:block" />
+          </a>
+          <div style="padding:16px 18px 18px">
+            <div class="eyebrow" style="color:var(--pink)">
+              ${isTonight ? 'Tonight' : escapeHtml(when)}${next.headline ? ' · ' + escapeHtml(next.headline) : ''}
+            </div>
+            <h2 style="font-size:1.25rem;color:#FFF;margin:4px 0 2px">${escapeHtml(next.title)}</h2>
+            <div class="dim" style="font-size:0.82rem">
+              ${escapeHtml(next.time)} · ${escapeHtml(next.venueName || '')}
+            </div>
+            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+              <button type="button" class="btn ${userRsvps[next.id] ? 'btn-outline' : 'btn-pink'}"
+                      style="width:auto;padding:8px 16px;font-size:0.84rem"
+                      onclick="toggleFeaturedRsvp('${next.id}')">
+                <i class="fa-solid ${userRsvps[next.id] ? 'fa-circle-check text-green' : 'fa-calendar-plus'}"></i>
+                ${userRsvps[next.id] ? "You're going" : "I'm going"}
+              </button>
+              <a href="events.html" class="btn btn-outline"
+                 style="width:auto;padding:8px 16px;font-size:0.84rem;display:inline-flex">
+                Full programme
+              </a>
+            </div>
+          </div>
+        </div>`;
     }
 
     function getNextUpcomingEvent() {
@@ -687,6 +751,28 @@
     let currentHeroEventId = null;   // `${event_id}|${date}` once an event is loaded
     let userRsvps = {};   // filled by loadUpcoming() from the database
     let meProfile = null;
+
+    /* The featured card has its own RSVP rather than reusing toggleHeroRsvp, which
+       reads currentHeroEventId — a module variable owned by the hero. Two cards
+       writing the same variable is how one of them silently RSVPs to the other's
+       night. */
+    async function toggleFeaturedRsvp(occId) {
+      if (!occId || !occId.includes('|')) return;
+      const [eventId, date] = occId.split('|');
+
+      const { data, error } = await db.rpc('toggle_rsvp', { p_event_id: eventId, p_date: date });
+      if (error) { alert('Could not update your RSVP: ' + error.message); return; }
+
+      if (data.going) userRsvps[occId] = true;
+      else delete userRsvps[occId];
+
+      const occ = EVENTS_DATA.find(e => e.id === occId);
+      if (occ) { occ.goingCount = data.going_count; occ.instanceId = data.instance_id; }
+
+      renderFeaturedNight();
+      // The hero may be the same night; keep it in step.
+      if (currentHeroEventId) updateHeroRsvpUI(currentHeroEventId);
+    }
 
     async function toggleHeroRsvp() {
       if (!currentHeroEventId || !currentHeroEventId.includes('|')) return;
