@@ -37,27 +37,7 @@
   <link rel="stylesheet" href="css/app.css" />
 
   <style>
-    .hero-event-card {
-      background: linear-gradient(135deg, #0E0E13, #000000);
-      border: 1px solid var(--border-glow);
-      border-radius: 24px;
-      padding: 24px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 12px 30px rgba(212, 90, 232, 0.12);
-      margin-bottom: 24px;
-    }
-    .hero-event-card img.event-bg {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0.22;
-      filter: grayscale(40%);
-      pointer-events: none;
-    }
-
+        
     /* 5 Categories Character Strip */
     .categories-strip {
       display: flex;
@@ -367,11 +347,7 @@
     <!-- MEMBER / COMMUNITY ORDINARY HOME VIEW -->
     <div id="memberHomeView">
 
-      <!-- Identity band. Deterministic per member, so it is *their* mosaic and it
-           does not reshuffle on every visit. -->
-      <!-- The next night with a poster, at the top of the app. The mosaic below is the
-           fallback for when nothing is featured — a home screen should never be empty,
-           but a real poster beats a generated pattern every time. -->
+      <!-- The next three nights. The first with its poster, the other two compact. -->
       <div id="featuredNight" hidden style="margin-bottom:18px"></div>
 
       <!-- 5 Categories Character Strip -->
@@ -410,31 +386,6 @@
             <span class="cat-pill-label">Sports &amp; Trips</span>
           </div>
         </div>
-        </div>
-      </div>
-
-      <!-- Dynamic Upcoming Hero Event Card -->
-      <div class="hero-event-card">
-        <img src="../assets/optimized/karaoke_night_1.jpg" alt="Upcoming Event" class="event-bg" />
-        <div style="position: relative; z-index: 2;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-            <div id="categoryIconBadge"></div>
-            <span id="heroEventBadge" class="badge badge-socio"></span>
-          </div>
-          
-          <h1 style="font-size: 1.8rem; margin-bottom: 6px;" id="heroEventName">&nbsp;</h1>
-          <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 16px;" id="heroEventSub">
-            <!-- Filled by updateHeroEvent(). Empty rather than a placeholder: the old
-                 text named a date and a venue that were simply whatever was true in
-                 August, and it showed until the real event loaded. -->
-          </p>
-
-          <div style="display: flex; gap: 10px;" id="heroEventActions">
-            <a href="profile.html" class="btn btn-pink" style="width: auto; padding: 10px 20px; font-size: 0.88rem;">Show Member Card <i class="fa-solid fa-qrcode"></i></a>
-            <a href="events.html" class="btn btn-outline" style="width: auto; padding: 10px 18px; font-size: 0.88rem;">View Calendar</a>
-          </div>
-
-          <div class="rsvp-row" id="heroRsvpRow"></div>
         </div>
       </div>
 
@@ -481,17 +432,6 @@
             </div>
           </div>
         </a>
-      </div>
-
-      <!-- Real Member Photography Community Highlight -->
-      <div class="card card-glass">
-        <h2 style="font-size: 1.1rem; margin-bottom: 12px;"><i class="fa-solid fa-camera-retro text-gold" style="margin-right: 8px;"></i> Real ISOT Family Nights</h2>
-        <div style="border-radius: 16px; overflow: hidden; height: 180px; margin-bottom: 12px; border: 1px solid var(--border-light);">
-          <img src="../assets/optimized/social_group_2.jpg" alt="ISOT Community" style="width: 100%; height: 100%; object-fit: cover;" />
-        </div>
-        <p style="font-size: 0.88rem; color: var(--text-muted);">
-          "Connecting cultures, building friendships, and making every student feel at home in Turin."
-        </p>
       </div>
 
     </div>
@@ -615,8 +555,6 @@
         }
 
         await loadUpcoming();
-        const nextEvent = getNextUpcomingEvent();
-        if (nextEvent) updateHeroEvent(nextEvent);
 
         // The member home is always shown. Staff tools sit above it when there is
         // actually something on tonight — a role is not a shift.
@@ -744,55 +682,7 @@
       if (rows.length) rows[rows.length - 1].style.borderBottom = 'none';
     }
 
-    function getNextUpcomingEvent() {
-      const todayStr = new Date().toISOString().split('T')[0];
-      return EVENTS_DATA.find(e => e.date >= todayStr) || EVENTS_DATA[0];
-    }
-
-    function updateHeroEvent(eventObj) {
-      if (!eventObj) return;
-
-      const todayStr = new Date().toISOString().split('T')[0];
-      const isToday = eventObj.date === todayStr;
-
-      document.getElementById('categoryIconBadge').innerHTML = getCategoryBadgeHtml(eventObj.cat, 44);
-      document.getElementById('heroEventName').textContent = eventObj.title;
-      document.getElementById('heroEventSub').innerHTML = `<i class="fa-solid fa-location-dot text-pink"></i> ${escapeHtml(eventObj.venue)} • Member Venue Perks`;
-
-      const badgeEl = document.getElementById('heroEventBadge');
-      if (isToday) {
-        badgeEl.className = 'badge badge-live';
-        badgeEl.innerHTML = `<i class="fa-solid fa-circle"></i> TONIGHT ${eventObj.time}`;
-      } else {
-        badgeEl.className = 'badge badge-socio';
-        badgeEl.innerHTML = `<i class="fa-solid fa-calendar"></i> ${eventObj.dayName} ${eventObj.dayNum} ${eventObj.monthName} • ${eventObj.time}`;
-      }
-
-      const actionsEl = document.getElementById('heroEventActions');
-      if (eventObj.cat === 'karaoke' || eventObj.link) {
-        actionsEl.innerHTML = `
-          <a href="karaoke.html" class="btn btn-pink" style="width: auto; padding: 10px 20px; font-size: 0.88rem;">Join Song Queue <i class="fa-solid fa-music"></i></a>
-          <a href="profile.html" class="btn btn-outline" style="width: auto; padding: 10px 18px; font-size: 0.88rem;">Show Card</a>
-        `;
-      } else {
-        actionsEl.innerHTML = `
-          <a href="profile.html" class="btn btn-pink" style="width: auto; padding: 10px 20px; font-size: 0.88rem;">Show Member Card <i class="fa-solid fa-qrcode"></i></a>
-          <a href="events.html" class="btn btn-outline" style="width: auto; padding: 10px 18px; font-size: 0.88rem;">View Calendar</a>
-        `;
-      }
-
-      currentHeroEventId = eventObj.id || null;
-      updateHeroRsvpUI(currentHeroEventId);
-    }
-
-    let currentHeroEventId = null;   // `${event_id}|${date}` once an event is loaded
-    let userRsvps = {};   // filled by loadUpcoming() from the database
-    let meProfile = null;
-
-    /* The featured card has its own RSVP rather than reusing toggleHeroRsvp, which
-       reads currentHeroEventId — a module variable owned by the hero. Two cards
-       writing the same variable is how one of them silently RSVPs to the other's
-       night. */
+    /* RSVP from any of the three cards on the home screen. */
     async function toggleFeaturedRsvp(occId) {
       if (!occId || !occId.includes('|')) return;
       const [eventId, date] = occId.split('|');
@@ -807,24 +697,6 @@
       if (occ) { occ.goingCount = data.going_count; occ.instanceId = data.instance_id; }
 
       renderFeaturedNight();
-      // The hero may be the same night; keep it in step.
-      if (currentHeroEventId) updateHeroRsvpUI(currentHeroEventId);
-    }
-
-    async function toggleHeroRsvp() {
-      if (!currentHeroEventId || !currentHeroEventId.includes('|')) return;
-      const [eventId, date] = currentHeroEventId.split('|');
-
-      const { data, error } = await db.rpc('toggle_rsvp', { p_event_id: eventId, p_date: date });
-      if (error) { alert('Could not update your RSVP: ' + error.message); return; }
-
-      if (data.going) userRsvps[currentHeroEventId] = true;
-      else delete userRsvps[currentHeroEventId];
-
-      const occ = EVENTS_DATA.find(e => e.id === currentHeroEventId);
-      if (occ) { occ.goingCount = data.going_count; occ.instanceId = data.instance_id; }
-
-      updateHeroRsvpUI(currentHeroEventId);
     }
 
     async function openAttendeesModal(eventTitle, eventId) {
@@ -846,7 +718,8 @@
         }
       }
 
-      const title = eventTitle || document.getElementById('heroEventName').textContent;
+      // heroEventName is gone with the hero card; the caller always passes a title.
+      const title = eventTitle || 'Who\'s going';
       document.getElementById('modalEventTitle').textContent = title;
       document.getElementById('attendeesListContainer').innerHTML = html;
       document.getElementById('attendeesModal').classList.add('active');
@@ -856,28 +729,6 @@
       document.getElementById('attendeesModal').classList.remove('active');
     }
 
-    function updateHeroRsvpUI(eventId) {
-      const isGoing = !!userRsvps[eventId];
-
-      let stackHtml = '';
-      if (isGoing && meProfile) {
-        stackHtml += `<div class="avatar-stack-item-box" title="You (${meProfile.full_name})">${renderGeoAvatar(meProfile.member_code, 26)}</div>`;
-      }
-
-      const rowEl = document.getElementById('heroRsvpRow');
-      if (rowEl) {
-        rowEl.innerHTML = `
-          <div class="avatar-stack-wrapper" onclick="openAttendeesModal('', '${eventId}')">
-            ${isGoing ? `<div class="avatar-stack">${stackHtml}</div><span class="avatar-stack-count"><strong>1 Member Going</strong> • You <i class="fa-solid fa-chevron-right text-pink" style="font-size:0.7rem;margin-left:4px"></i></span>` : `<span class="avatar-stack-count">Be the first to RSVP <i class="fa-solid fa-chevron-right text-pink" style="font-size:0.7rem;margin-left:4px"></i></span>`}
-          </div>
-
-          <button type="button" onclick="toggleHeroRsvp()" class="btn-rsvp ${isGoing ? 'going' : ''}">
-            <i class="${isGoing ? 'fa-solid fa-circle-check' : 'fa-regular fa-calendar-plus'}"></i>
-            <span>${isGoing ? "I'm Going!" : "I'm Going"}</span>
-          </button>
-        `;
-      }
-    }
 
 
     function hideShift() {
