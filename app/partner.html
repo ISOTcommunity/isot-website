@@ -363,12 +363,18 @@
     const LAYER = {
       partners: { label: 'Partners', icon: 'fa-martini-glass', group: null, count: 0 },
       gems:     { label: 'Gems',     icon: 'fa-gem',           group: null, count: 0 },
-      tour:     { label: 'Tour',     icon: 'fa-route',         group: null, count: 0 },
+      // optIn: the road is drawn only when Tour is chosen. It crosses half the city
+      // and, left on by default, it reads as a route you are already walking rather
+      // than one on offer — and it cuts across every other pin on the way.
+      tour:     { label: 'Tour',     icon: 'fa-route',         group: null, count: 0, optIn: true },
       campus:   { label: 'Campus',   icon: 'fa-graduation-cap', group: null, count: 0, zoomed: true },
       mensa:    { label: 'Mensa',    icon: 'fa-utensils',      group: null, count: 0, zoomed: true },
     };
     let activeLayer = 'all';
     let mapRef = null;
+    // Held so switching layers re-renders the list from memory rather than refetching.
+    let cityPlaces = [];
+    let trailData = null;
 
     function renderLayerBar() {
       const bar = document.getElementById('layerBar');
@@ -403,7 +409,7 @@
         // so in the "All" view they wait until you have zoomed in far enough for them
         // to mean something. Choosing the layer by name shows them at any zoom.
         const show = activeLayer === k
-          || (activeLayer === 'all' && (!l.zoomed || z >= 14));
+          || (activeLayer === 'all' && !l.optIn && (!l.zoomed || z >= 14));
         if (show) mapRef.addLayer(l.group); else mapRef.removeLayer(l.group);
       });
 
@@ -721,6 +727,7 @@
             </div>`));
       });
 
+      cityPlaces = places;
       LAYER.campus.count = places.filter(p => p.kind === 'campus').length;
       LAYER.mensa.count  = places.filter(p => p.kind === 'mensa').length;
 
@@ -782,6 +789,7 @@
           }).on('click', () => { location.href = 'tour.html?t=' + t.id; }));
       });
 
+      trailData = { id: t.id, T, stops };
       LAYER.tour.count = stops.length;
       applyLayers();
       renderLayerBar();
@@ -832,6 +840,7 @@
 
       // gems_for_map() resolves after the first paint, so the count is only known now.
       LAYER.gems.count = gems.length;
+      renderLayerCards();
       applyLayers();
       renderLayerBar();
     }

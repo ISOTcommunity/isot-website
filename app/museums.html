@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-N2S3FL84RT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-N2S3FL84RT');
+</script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Turin Museums & Student Guide · ISOT Community</title>
+
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="../assets/favicon.png" sizes="48x48" type="image/png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-title" content="ISOT" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#000000" />
+  <script defer src="/_vercel/insights/script.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="vendor/leaflet.css" />
+  <link rel="stylesheet" href="css/app.css" />
+
+  <style>
+    #museumMap {
+      height: 340px;
+      width: 100%;
+      border-radius: 20px;
+      border: 1px solid var(--border-glow);
+      box-shadow: 0 12px 32px rgba(238, 9, 121, 0.2);
+      margin-bottom: 20px;
+    }
+    
+    .leaflet-control-attribution {
+      background: rgba(11, 15, 25, 0.6) !important;
+      color: var(--text-dim) !important;
+      font-size: 0.65rem !important;
+      border-radius: 6px 0 0 0;
+    }
+    .leaflet-control-attribution a { color: var(--text-dim) !important; }
+
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+
+    .filter-btn {
+      flex-shrink: 0;
+      padding: 9px 16px;
+      border-radius: 9999px;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid var(--border-light);
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .filter-btn.active {
+      background: linear-gradient(135deg, #EE0979, #FF6A00);
+      border-color: transparent;
+      color: #FFF;
+      box-shadow: 0 6px 18px rgba(238, 9, 121, 0.4);
+    }
+
+    .museum-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .museum-card:hover {
+      border-color: rgba(238, 9, 121, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .price-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: rgba(34, 197, 94, 0.15);
+      color: #22C55E;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+    .price-chip.discount {
+      background: rgba(238, 9, 121, 0.15);
+      color: var(--pink);
+      border-color: rgba(238, 9, 121, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display:flex;align-items:center;gap:8px">
+      <i class="fa-solid fa-landmark text-pink"></i>
+      <span>Turin Museums Guide</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:12px">
+      <a href="partner.html" style="color:#FFF;font-size:1.15rem;padding:4px" title="Map"><i class="fa-solid fa-map-location-dot"></i></a>
+      <div id="headerAvatar" style="cursor:pointer" data-open-drawer></div>
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background:transparent;border:none;color:#FFF;font-size:1.3rem;cursor:pointer;padding:6px">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="shell" style="padding-top:18px;padding-bottom:96px">
+
+    <div style="margin-bottom: 16px;">
+      <div class="eyebrow"><i class="fa-solid fa-[#FF6A00] fa-ticket"></i> Student Culture &amp; Heritage</div>
+      <h1 style="font-size: 1.8rem; margin-top: 4px;">Turin Museums &amp; Student Discounts</h1>
+      <p style="color: var(--text-dim); font-size: 0.88rem; margin-top: 4px;">Explore world-class culture, €2 student rates, and free admission days.</p>
+    </div>
+
+    <!-- Category Filter Bar -->
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterMuseums('all', this)"><i class="fa-solid fa-layer-group"></i> All (8)</button>
+      <button class="filter-btn" onclick="filterMuseums('top', this)"><i class="fa-solid fa-star"></i> Must-See Top 3</button>
+      <button class="filter-btn" onclick="filterMuseums('student-deal', this)"><i class="fa-solid fa-piggy-bank"></i> €2 Student Rate</button>
+      <button class="filter-btn" onclick="filterMuseums('art-cinema', this)"><i class="fa-solid fa-film"></i> Cinema &amp; Art</button>
+      <button class="filter-btn" onclick="filterMuseums('cars', this)"><i class="fa-solid fa-car"></i> Cars &amp; Design</button>
+    </div>
+
+    <!-- Interactive Museum Map -->
+    <div id="museumMap"></div>
+
+    <!-- Museum Cards Container -->
+    <div id="museumList"></div>
+
+  </main>
+
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="tabbar">
+    <a href="home.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 011-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </a>
+    <a href="events.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Calendar
+    </a>
+    <a href="partner.html" class="tab-item active">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+      Map
+    </a>
+    <a href="network.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+      Network
+    </a>
+  </nav>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="vendor/leaflet.js"></script>
+  <script src="js/isot.js"></script>
+
+  <script>
+    const MUSEUMS = [
+      {
+        id: "egizio",
+        name: "Museo Egizio (Egyptian Museum)",
+        category: "top",
+        address: "Via Accademia delle Scienze 6, 10123 Torino",
+        coords: [45.0684, 7.6843],
+        studentRate: "€15 (Reduced)",
+        dealBadge: "Must-See #1 World Class",
+        isStudentDeal: false,
+        isArtCinema: false,
+        isCars: false,
+        desc: "The world's second largest Egyptian museum after Cairo, housing over 30,000 ancient artifacts, mummies, and royal statues."
+      },
+      {
+        id: "cinema",
+        name: "National Museum of Cinema (Mole Antonelliana)",
+        category: "top art-cinema",
+        address: "Via Montebello 20, 10124 Torino",
+        coords: [45.0689, 7.6931],
+        studentRate: "€10 Student / Lift Combo €17",
+        dealBadge: "Panoramic View + Cinema",
+        isStudentDeal: false,
+        isArtCinema: true,
+        isCars: false,
+        desc: "Located inside the iconic Mole Antonelliana tower. Spiral cinema exhibitions + panoramic glass elevator overlooking Turin & the Alps."
+      },
+      {
+        id: "palazzo-reale",
+        name: "Musei Reali (Royal Palace of Turin)",
+        category: "top student-deal",
+        address: "Piazzetta Reale 1, 10122 Torino",
+        coords: [45.0726, 7.6861],
+        studentRate: "€2.00 (EU Students 18–25)",
+        dealBadge: "€2 EU Student Ticket 🔥",
+        isStudentDeal: true,
+        isArtCinema: false,
+        isCars: false,
+        desc: "Historic Royal Residence of the House of Savoy, featuring the Royal Armory (Armeria Reale), Galleria Sabauda, and free Royal Gardens."
+      },
+      {
+        id: "mauto",
+        name: "MAUTO - National Automobile Museum",
+        category: "cars",
+        address: "Corso Unità d'Italia 40, 10126 Torino",
+        coords: [45.0315, 7.6742],
+        studentRate: "€12 Student Rate",
+        dealBadge: "Fiat & Ferrari Legacy",
+        isStudentDeal: false,
+        isArtCinema: false,
+        isCars: true,
+        desc: "World-famous car museum showcasing over 200 rare automobiles from vintage 1890 models to iconic Italian Ferraris, Alfa Romeos & Fiat concepts."
+      },
+      {
+        id: "gam",
+        name: "GAM - Civic Gallery of Modern & Contemporary Art",
+        category: "art-cinema student-deal",
+        address: "Via Magenta 31, 10128 Torino",
+        coords: [45.0642, 7.6685],
+        studentRate: "€8 Student / Free 1st Tuesday",
+        dealBadge: "Free 1st Tuesday of Month",
+        isStudentDeal: true,
+        isArtCinema: true,
+        isCars: false,
+        desc: "Over 45,000 works of 19th & 20th century modern art, featuring paintings, sculptures, installations, and contemporary video art."
+      },
+      {
+        id: "mao",
+        name: "MAO - Museum of Eastern Art",
+        category: "art-cinema",
+        address: "Via San Domenico 28, 10122 Torino",
+        coords: [45.0745, 7.6790],
+        studentRate: "€8 Student Rate",
+        dealBadge: "Asian Art & Culture",
+        isStudentDeal: false,
+        isArtCinema: true,
+        isCars: false,
+        desc: "Stunning collections of Asian art, featuring Japanese samurai armor, ancient Gandhara Buddhas, Chinese ceramics, and Islamic calligraphy."
+      },
+      {
+        id: "palazzo-madama",
+        name: "Palazzo Madama (Museum of Ancient Art)",
+        category: "student-deal",
+        address: "Piazza Castello, 10122 Torino",
+        coords: [45.0710, 7.6853],
+        studentRate: "€2.00 (EU Students 18–25)",
+        dealBadge: "UNESCO Castle in Center",
+        isStudentDeal: true,
+        isArtCinema: false,
+        isCars: false,
+        desc: "Historic castle in Piazza Castello spanning Roman gates, medieval towers, and Baroque palace architecture with panoramic tower views."
+      },
+      {
+        id: "pista500",
+        name: "Pinacoteca Agnelli & Pista 500 (Lingotto)",
+        category: "cars art-cinema",
+        address: "Via Nizza 230, 10126 Torino",
+        coords: [45.0322, 7.6655],
+        studentRate: "€10 Student Rate",
+        dealBadge: "Fiat Rooftop Test Track",
+        isStudentDeal: false,
+        isArtCinema: true,
+        isCars: true,
+        desc: "Exquisite private art collection on the roof of the former Lingotto Fiat factory, featuring an outdoor sculpture park along the historic rooftop race track."
+      }
+    ];
+
+    let map = null;
+    let markers = [];
+
+    async function initMuseumsPage() {
+      const me = await requireAuth();
+      document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(me, 36);
+
+      // Initialize Leaflet Map
+      map = L.map('museumMap', { zoomControl: false, attributionControl: false }).setView([45.0684, 7.6843], 13);
+      L.control.attribution({ prefix: false, position: 'bottomright' }).addAttribution('&copy; OSM').addTo(map);
+
+      L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
+        maxZoom: 19
+      }).addTo(map);
+
+      renderMuseums(MUSEUMS);
+    }
+
+    function renderMuseums(list) {
+      // Clear Map Markers
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+
+      const listContainer = document.getElementById('museumList');
+      listContainer.innerHTML = list.map(m => `
+        <div class="museum-card">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <span class="price-chip ${m.isStudentDeal ? 'discount' : ''}"><i class="fa-solid fa-tag"></i> ${m.studentRate}</span>
+            <span style="font-size:0.75rem; color:var(--text-dim); font-weight:700;">${m.dealBadge}</span>
+          </div>
+          <h3 style="font-size:1.2rem; color:#FFF; margin-bottom:4px;">${m.name}</h3>
+          <p style="font-size:0.82rem; color:var(--pink); margin-bottom:8px;"><i class="fa-solid fa-location-dot"></i> ${m.address}</p>
+          <p style="color:var(--text-dim); font-size:0.86rem; line-height:1.5; margin-bottom:14px;">${m.desc}</p>
+          <div style="display:flex; gap:10px;">
+            <a href="https://maps.google.com/?q=${m.coords[0]},${m.coords[1]}" target="_blank" rel="noopener" class="btn btn-pink" style="flex:1; justify-content:center; padding:9px;">
+              <i class="fa-solid fa-location-arrow"></i> Navigate
+            </a>
+          </div>
+        </div>
+      `).join('');
+
+      // Add Pins to Map
+      const bounds = L.latLngBounds();
+      list.forEach(m => {
+        const pinHtml = `<div class="isot-pin ${m.isStudentDeal ? 'live' : ''}" style="background:${m.isStudentDeal ? '#22C55E' : 'var(--pink)'};"><i class="fa-solid fa-landmark"></i></div>`;
+        const customPin = L.divIcon({
+          className: 'isot-pin-wrapper',
+          html: pinHtml,
+          iconSize: [32, 32], iconAnchor: [16, 16]
+        });
+
+        const marker = L.marker(m.coords, { icon: customPin }).addTo(map).bindPopup(`<b>${m.name}</b><br>${m.studentRate}`);
+        markers.push(marker);
+        bounds.extend(m.coords);
+      });
+
+      if (list.length > 0) {
+        map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
+      }
+    }
+
+    function filterMuseums(cat, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      let filtered = MUSEUMS;
+      if (cat === 'top') filtered = MUSEUMS.filter(m => m.category.includes('top'));
+      if (cat === 'student-deal') filtered = MUSEUMS.filter(m => m.isStudentDeal);
+      if (cat === 'art-cinema') filtered = MUSEUMS.filter(m => m.isArtCinema);
+      if (cat === 'cars') filtered = MUSEUMS.filter(m => m.isCars);
+
+      renderMuseums(filtered);
+    }
+
+    document.addEventListener('DOMContentLoaded', initMuseumsPage);
+  </script>
+</body>
+</html>
