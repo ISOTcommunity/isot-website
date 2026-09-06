@@ -626,6 +626,10 @@ function initBurgerMenu(profile) {
         <i class="fa-solid fa-house"></i>
         <span>App Hub</span>
       </a>
+      <a href="explore.html" class="drawer-item">
+        <i class="fa-solid fa-compass"></i>
+        <span>Explore</span>
+      </a>
       ${isBoard ? `
       <a href="admin.html" class="drawer-item">
         <i class="fa-solid fa-sliders text-pink"></i>

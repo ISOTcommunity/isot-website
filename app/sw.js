@@ -3,12 +3,13 @@
  * Supabase calls are NEVER cached to ensure real-time RLS security.
  */
 
-const CACHE = 'isot-shell-v10';
+const CACHE = 'isot-shell-v11';
 
 const SHELL = [
   './',
   'index.html',
   'home.html',
+  'explore.html',
   'login.html',
   'signup.html',
   'profile.html',

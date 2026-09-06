@@ -373,6 +373,15 @@
       <h1 style="font-size: 1.8rem; margin-top: 4px;">ISOT Calendar</h1>
     </div>
 
+    <div id="catFilterBar" hidden style="display:flex;align-items:center;gap:10px;
+         background:var(--pink-glow);border:1px solid var(--border-glow);
+         border-radius:14px 14px 30px 14px;padding:10px 14px;margin-bottom:14px;font-size:0.86rem">
+      <i class="fa-solid fa-filter" style="color:var(--pink)"></i>
+      <span style="flex:1" id="catFilterLabel"></span>
+      <button type="button" class="btn btn-outline" style="width:auto;padding:4px 12px;font-size:0.76rem"
+              onclick="clearCategory()">Show all</button>
+    </div>
+
     <!-- View Mode Switcher (List | Weekly | Monthly) -->
     <div class="view-toggle-bar">
       <button type="button" class="view-btn" id="btnListView" onclick="setViewMode('list')">
@@ -535,6 +544,14 @@
     }
 
     let currentView = 'monthly';   // the grid reads as a calendar; the list is the fallback
+
+    // Set by ?cat= from the Explore page and the home strip. Those used to open a
+    // hardcoded panel; now they land here on the real thing.
+    let categoryFilter = new URLSearchParams(location.search).get('cat') || null;
+    const CATEGORY_NAMES = {
+      karaoke: 'Karaoke Night', social: 'Together & Social', party: 'Party & Nightlife',
+      career: 'Career & Workshops', sports: 'Sports & Trips', drinks: 'Drinks & Aperitivo',
+    };
 
     // These were three frozen literals: currYear = 2026, currWeekStart pinned to
     // 24 Aug 2026, and currMonthIdx = Math.max(7, thisMonth) — a clamp that would show
@@ -730,6 +747,23 @@
       }
     }
 
+    function renderCategoryBar() {
+      const bar = document.getElementById('catFilterBar');
+      if (!bar) return;
+      bar.hidden = !categoryFilter;
+      if (categoryFilter) {
+        document.getElementById('catFilterLabel').textContent =
+          'Showing ' + (CATEGORY_NAMES[categoryFilter] || categoryFilter) + ' only';
+      }
+    }
+
+    function clearCategory() {
+      categoryFilter = null;
+      history.replaceState({}, '', location.pathname);
+      renderCategoryBar();
+      renderMainView();
+    }
+
     function setViewMode(mode) {
       currentView = mode;
       document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
@@ -767,6 +801,7 @@
     }
 
     function renderMainView() {
+      renderCategoryBar();
       const container = document.getElementById('calendarViewContainer');
 
       // Keep the count on the tab current whichever view is showing.
@@ -830,7 +865,7 @@
         // check-ins, RSVPs and karaoke slots are untouched in the database — but every
         // view in the app shows the future.
         const isPast = dateStr < isotToday();
-        const dayEvents = isPast ? [] : EVENTS_DATA.filter(e => e.date === dateStr);
+        const dayEvents = isPast ? [] : EVENTS_DATA.filter(e => e.date === dateStr && inFilter(e));
         const hasEvents = dayEvents.length > 0;
         const isSelected = selectedDateStr === dateStr;
 
@@ -850,7 +885,7 @@
       html += `</div>`;
 
       if (selectedDateStr) {
-        const selectedEvents = EVENTS_DATA.filter(e => e.date === selectedDateStr && e.date >= isotToday());
+        const selectedEvents = EVENTS_DATA.filter(e => e.date === selectedDateStr && e.date >= isotToday() && inFilter(e));
         html += `
           <div class="card card-glass" style="margin-top:16px">
             <h3 style="margin-bottom:12px;font-size:1rem;color:var(--pink)">
@@ -860,7 +895,7 @@
           </div>
         `;
       } else {
-        const monthEvents = EVENTS_DATA.filter(e => e.monthIdx === currMonthIdx && e.date >= isotToday());
+        const monthEvents = EVENTS_DATA.filter(e => e.monthIdx === currMonthIdx && e.date >= isotToday() && inFilter(e));
         html += `
           <div style="margin-top:16px">
             <div class="eyebrow" style="margin-bottom:10px">${MONTH_NAMES[currMonthIdx]} Schedule Feed</div>
@@ -912,7 +947,7 @@
 
         const dayEvents = dateStr < isotToday()
           ? []
-          : EVENTS_DATA.filter(e => e.date === dateStr);
+          : EVENTS_DATA.filter(e => e.date === dateStr && inFilter(e));
         if (dayEvents.length) {
           weekEventsFound += dayEvents.length;
           html += `
@@ -936,12 +971,18 @@
     /* -------------------------------------------------------------
      * 3. LIST FEED VIEW
      * ------------------------------------------------------------- */
+    /* One place decides what the category filter lets through, so the list, the month
+       grid and the week view cannot disagree about it. */
+    function inFilter(e) {
+      return !categoryFilter || (e.cat || 'social') === categoryFilter;
+    }
+
     function renderListView() {
       // loadCalendar() fetches from one month back so the month and week views can page
       // without refetching. The list is "what's on", though — opening it on events that
       // already happened is just noise. The rows stay in the database; nothing displays them.
       const today = isotToday();
-      const upcoming = EVENTS_DATA.filter(e => e.date >= today);
+      const upcoming = EVENTS_DATA.filter(e => e.date >= today && inFilter(e));
 
       if (!upcoming.length) {
         // An empty calendar still looks like ISOT rather than like a broken page.
