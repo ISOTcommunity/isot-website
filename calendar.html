@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#000000" />
+  <title>ISOT Calendar — Events for international students in Turin</title>
+  <meta name="description" content="Every ISOT event in Turin: karaoke, social nights, parties and workshops for international students. Always current." />
+
+  <link rel="canonical" href="https://isotcommunity.com/calendar" />
+  <meta property="og:title" content="ISOT Calendar — Turin" />
+  <meta property="og:description" content="Every ISOT event in Turin for international students. Always current." />
+  <meta property="og:url" content="https://isotcommunity.com/calendar" />
+  <meta property="og:type" content="website" />
+
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #000000; --bg-card: #0E0E13; --bg-raised: #16161D;
+      --pink: #D45AE8; --pink-glow: rgba(212,90,232,0.30);
+      --amber: #E69321; --green: #43DB8F; --blue: #5787EA; --mauve: #A8689E;
+      --text-main: #F6F7F9; --text-muted: #B9BFCB; --text-dim: #8C93A3; --text-dark: #6A7181;
+      --border-light: rgba(255,255,255,0.10);
+      --radius-md: 20px; --radius-arc: 46px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-dark); color: var(--text-main);
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased; line-height: 1.6;
+    }
+    a { color: inherit; }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 40px 18px 80px; }
+
+    .eyebrow {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.18em;
+      color: var(--pink); font-weight: 700;
+    }
+    h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); line-height: 1.05; margin: 8px 0 10px; }
+    .lede { color: var(--text-muted); max-width: 54ch; }
+
+    /* ── Month grid — the same shape as the app's calendar ── */
+    .cal { margin-top: 26px; }
+    .cal-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; margin-bottom: 14px;
+    }
+    .cal-nav h2 { font-size: 1.15rem; font-weight: 700; }
+    .navbtn {
+      background: transparent; border: 1px solid var(--border-light); color: var(--text-muted);
+      border-radius: 999px; padding: 7px 14px; cursor: pointer; font-family: inherit; font-size: 0.82rem;
+    }
+    .navbtn:hover:not(:disabled) { border-color: var(--pink); color: #FFF; }
+    .navbtn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .dow {
+      text-align: center; font-size: 0.66rem; color: var(--text-dark);
+      text-transform: uppercase; letter-spacing: 0.08em; padding-bottom: 6px; font-weight: 700;
+    }
+    .day {
+      aspect-ratio: 1; border-radius: 10px; border: 1px solid transparent;
+      background: var(--bg-card); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 3px;
+      font-size: 0.82rem; color: var(--text-dim);
+      cursor: default; font-family: inherit; padding: 0;
+    }
+    .day.blank { background: transparent; }
+    .day.past  { opacity: 0.3; }
+    .day.today { border-color: var(--text-dim); }
+    .day.has   { color: #FFF; font-weight: 600; cursor: pointer; background: var(--bg-raised); }
+    .day.has:hover, .day.sel { border-color: var(--pink); }
+    .day.sel   { background: var(--pink); color: #0B0B0F; }
+    .dots { display: flex; gap: 3px; }
+    .dot { width: 5px; height: 5px; border-radius: 50%; }
+    .c-karaoke { background: var(--pink); }
+    .c-social  { background: var(--green); }
+    .c-party   { background: var(--amber); }
+    .c-career  { background: var(--blue); }
+    .c-sports  { background: var(--mauve); }
+
+    /* ── Event list ── */
+    .ev {
+      display: flex; gap: 14px; padding: 14px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .ev:last-child { border-bottom: none; }
+    .ev-date {
+      flex-shrink: 0; width: 48px; text-align: center;
+      border-radius: 10px 10px 18px 10px; background: var(--bg-raised); padding: 7px 0;
+    }
+    .ev-date .d { font-size: 1.15rem; font-weight: 700; color: #FFF; line-height: 1; }
+    .ev-date .m { font-size: 0.62rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+    .ev-body { flex: 1; min-width: 0; }
+    .ev-title { color: #FFF; font-weight: 600; }
+    .ev-meta { font-size: 0.82rem; color: var(--text-dim); margin-top: 2px; }
+    .ev-tag {
+      display: inline-block; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.07em;
+      padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,0.07);
+      color: var(--text-dim); margin-top: 6px;
+    }
+    .ev-link {
+      display: inline-block; margin-top: 8px; font-size: 0.8rem; font-weight: 600;
+      color: var(--pink); text-decoration: none;
+    }
+
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border-light);
+      border-radius: var(--radius-md) var(--radius-md) var(--radius-arc) var(--radius-md);
+      padding: 20px; margin-top: 26px;
+    }
+    .card h3 { font-size: 1rem; margin-bottom: 6px; }
+    .card p { font-size: 0.88rem; color: var(--text-muted); }
+    .feed {
+      display: block; margin-top: 12px; padding: 10px 12px;
+      background: rgba(255,255,255,0.05); border-radius: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.78rem; color: var(--text-muted); word-break: break-all;
+      text-decoration: none;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; margin-top: 12px;
+      background: var(--pink); color: #0B0B0F; font-weight: 600;
+      padding: 9px 18px; border-radius: 999px; text-decoration: none; font-size: 0.86rem;
+      border: none; cursor: pointer; font-family: inherit;
+    }
+    footer { margin-top: 44px; font-size: 0.82rem; color: var(--text-dark); }
+    footer a { color: var(--pink); text-decoration: none; }
+
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">International Students of Turin</div>
+    <h1>ISOT Calendar</h1>
+    <p class="lede">
+      Every ISOT night in Turin — karaoke, social hubs, parties. Free to attend unless a
+      night says otherwise. This page reads the live calendar, so it is never out of date.
+    </p>
+
+    <div class="cal">
+      <div class="cal-nav">
+        <button type="button" class="navbtn" id="prev">← Prev</button>
+        <h2 id="monthLabel">…</h2>
+        <button type="button" class="navbtn" id="next">Next →</button>
+      </div>
+      <div class="grid" id="dows"></div>
+      <div class="grid" id="days" style="margin-top:4px"></div>
+    </div>
+
+    <div id="list" style="margin-top:26px"></div>
+
+    <div class="card">
+      <h3>Add ISOT to your calendar</h3>
+      <p>
+        Subscribe once and every ISOT night appears in your own calendar, updating by
+        itself when something changes. Works with Google Calendar, Apple Calendar and Outlook.
+      </p>
+      <a class="feed" id="feedUrl" href="/api/calendar.ics">https://isotcommunity.com/api/calendar.ics</a>
+      <button type="button" class="btn" id="copyFeed">Copy feed link</button>
+    </div>
+
+    <footer>
+      Run by <a href="https://isotcommunity.com">ISOT Community</a>, a non-profit association
+      for international students in Turin. Questions: <a href="mailto:info@isotcommunity.com">info@isotcommunity.com</a>
+    </footer>
+  </div>
+
+  <script src="/app/vendor/supabase.js"></script>
+  <script>
+  const SUPABASE_URL = 'https://ywmdaekblhabyajzusfm.supabase.co';
+  const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3bWRhZWtibGhhYnlhanp1c2ZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNDM2NDYsImV4cCI6MjEwMjcxOTY0Nn0.PyMpTzffZ12j1HoheuRQMYH8d0WvfYkLXGfd1wJXTWw';
+  const db = window.supabase.createClient(SUPABASE_URL, ANON);
+
+  const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const MONTHS = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+
+  let events = [];
+  let cursor = new Date();
+  let selected = null;
+  let range = { min: null, max: null };
+
+  const esc = (t) => String(t == null ? '' : t)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+  // A night belongs to the day it started, so the boundary is 06:00 — the same rule the
+  // app uses, so a Monday karaoke still reads as Monday at 01:00.
+  const isotToday = () => {
+    const d = new Date(Date.now() - 6 * 3600 * 1000);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  };
+  const key = (y, m, d) => `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+
+  (async () => {
+    const iso = (d) => d.toISOString().slice(0,10);
+    const from = new Date(); from.setMonth(from.getMonth() - 1);
+    const to   = new Date(); to.setMonth(to.getMonth() + 6);
+    range = { min: new Date(from.getFullYear(), from.getMonth(), 1),
+              max: new Date(to.getFullYear(), to.getMonth(), 1) };
+
+    const { data, error } = await db.rpc('calendar_between', { p_from: iso(from), p_to: iso(to) });
+    if (error) {
+      document.getElementById('list').innerHTML =
+        `<p style="color:#F8A18E">Could not load the calendar. Try again shortly.</p>`;
+      return;
+    }
+    events = data || [];
+
+    document.getElementById('dows').innerHTML = DOW.map(d => `<div class="dow">${d}</div>`).join('');
+    document.getElementById('prev').onclick = () => shift(-1);
+    document.getElementById('next').onclick = () => shift(1);
+    document.getElementById('copyFeed').onclick = copyFeed;
+    render();
+  })();
+
+  function shift(n) {
+    const c = new Date(cursor.getFullYear(), cursor.getMonth() + n, 1);
+    if (c < range.min || c > range.max) return;
+    cursor = c; selected = null; render();
+  }
+
+  function render() {
+    const y = cursor.getFullYear(), m = cursor.getMonth();
+    document.getElementById('monthLabel').textContent = `${MONTHS[m]} ${y}`;
+
+    const cur = new Date(y, m, 1);
+    document.getElementById('prev').disabled = cur <= range.min;
+    document.getElementById('next').disabled = cur >= range.max;
+
+    const today = isotToday();
+    const first = new Date(y, m, 1);
+    // Monday-first, matching how a week is read in Italy.
+    const lead = (first.getDay() + 6) % 7;
+    const total = new Date(y, m + 1, 0).getDate();
+
+    let cells = '';
+    for (let i = 0; i < lead; i++) cells += '<div class="day blank"></div>';
+
+    for (let d = 1; d <= total; d++) {
+      const k = key(y, m, d);
+      const on = events.filter(e => e.event_date === k);
+      const past = k < today;
+      const cls = ['day'];
+      if (past) cls.push('past');
+      if (k === today) cls.push('today');
+      if (on.length) cls.push('has');
+      if (k === selected) cls.push('sel');
+
+      const dots = on.slice(0, 3)
+        .map(e => `<span class="dot c-${esc(e.category || 'social')}"></span>`).join('');
+
+      cells += on.length
+        ? `<button type="button" class="${cls.join(' ')}" data-day="${k}">${d}<span class="dots">${dots}</span></button>`
+        : `<div class="${cls.join(' ')}">${d}</div>`;
+    }
+
+    const grid = document.getElementById('days');
+    grid.innerHTML = cells;
+    grid.querySelectorAll('[data-day]').forEach(b => {
+      b.onclick = () => { selected = (selected === b.dataset.day) ? null : b.dataset.day; render(); };
+    });
+
+    renderList(y, m, today);
+  }
+
+  function renderList(y, m, today) {
+    // A selected day narrows the list; otherwise the whole month, past days dropped so
+    // the page opens on what is still ahead.
+    const monthKey = `${y}-${String(m+1).padStart(2,'0')}`;
+    let shown = selected
+      ? events.filter(e => e.event_date === selected)
+      : events.filter(e => e.event_date.startsWith(monthKey) && e.event_date >= today);
+
+    const el = document.getElementById('list');
+    if (!shown.length) {
+      el.innerHTML = `<p style="color:var(--text-dim);font-size:0.9rem">
+        ${selected ? 'Nothing on that day.' : 'Nothing left this month — try the next one.'}
+      </p>`;
+      return;
+    }
+
+    el.innerHTML = shown.map(e => {
+      const d = new Date(e.event_date + 'T00:00:00');
+      return `
+      <div class="ev">
+        <div class="ev-date">
+          <div class="d">${d.getDate()}</div>
+          <div class="m">${MONTHS[d.getMonth()].slice(0,3)}</div>
+        </div>
+        <div class="ev-body">
+          <div class="ev-title">${esc(e.title)}</div>
+          <div class="ev-meta">
+            ${esc((e.start_time || '').slice(0,5))} · ${esc(e.venue_name || '')}${e.venue_address ? ' · ' + esc(e.venue_address) : ''}
+          </div>
+          ${e.headline ? `<div class="ev-meta" style="color:var(--pink)">${esc(e.headline)}</div>` : ''}
+          <span class="ev-tag">${esc(e.category || 'social')}</span>
+          ${e.register_url
+            ? `<div><a class="ev-link" href="${esc(e.register_url)}" target="_blank" rel="noopener noreferrer">
+                 ${esc(e.register_label || 'Register')} →</a></div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  async function copyFeed() {
+    const btn = document.getElementById('copyFeed');
+    const url = 'https://isotcommunity.com/api/calendar.ics';
+    try {
+      await navigator.clipboard.writeText(url);
+      btn.textContent = 'Copied';
+    } catch {
+      // Clipboard is blocked in some in-app browsers — the link above is selectable.
+      btn.textContent = 'Select the link above';
+    }
+    setTimeout(() => { btn.textContent = 'Copy feed link'; }, 1800);
+  }
+  </script>
+</body>
+</html>
