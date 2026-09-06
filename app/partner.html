@@ -38,13 +38,26 @@
   <link rel="stylesheet" href="css/app.css" />
 
   <style>
+    .map-wrap { position: relative; margin-bottom: 24px; }
     #mapContainer {
-      height: 320px;
-      border-radius: 20px;
+      /* Was a fixed 320px, which left a map page mostly not showing a map. A viewport
+         fraction with a floor keeps it generous on a phone without collapsing on a
+         short window. The arc on one corner is the same identity move as .card. */
+      height: 58vh;
+      min-height: 340px;
+      max-height: 620px;
+      border-radius: 20px 20px var(--radius-arc) 20px;
       overflow: hidden;
       border: 1px solid var(--border-glow);
-      margin-bottom: 24px;
       box-shadow: 0 8px 24px rgba(212, 90, 232, 0.15);
+    }
+
+    /* The filter bar sits on the map rather than above it: it belongs to the map, and
+       stacking it above cost a row of vertical space on the one screen that needs it
+       most. Uses the existing .card-glass blur values rather than a new treatment —
+       the app already has a glass idiom and does not need a second one. */
+    .layers-float {
+      position: absolute; top: 12px; left: 12px; right: 12px; z-index: 900;   /* above every Leaflet pane: marker 600, popup 700, control 800 */
     }
     
     /* Custom Glowing Map Pin Markers */
@@ -123,7 +136,13 @@
     #gemSheet .modal-sheet { max-width: 420px; }
     #gemPhotoPreview { width: 100%; border-radius: 14px; display: block; margin-bottom: 12px; }
 
-    .layers { display:flex; gap:6px; margin-bottom:12px; overflow-x:auto; padding-bottom:2px; }
+    .layers {
+      display:flex; gap:6px; overflow-x:auto; padding:7px; border-radius:999px;
+      background:rgba(12,12,16,0.72);
+      backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+      border:1px solid rgba(255,255,255,0.09);
+      box-shadow:0 4px 18px rgba(0,0,0,0.45);
+    }
     .layers::-webkit-scrollbar { display:none; }
     .lbtn {
       flex-shrink:0; padding:6px 14px; border-radius:999px; cursor:pointer;
@@ -239,7 +258,6 @@
     <!-- Layers rather than one merged pile of pins. Venues and gems answer different
          questions — "where do I get a discount" and "where should I go on Sunday" —
          and a map showing both at once serves neither. -->
-    <div class="layers" id="layerBar"></div>
 
     <div id="gemScore" hidden></div>
 
@@ -261,7 +279,10 @@
       Exchange and visiting students have their own access route on the EDISU site.
     </p>
 
-    <div id="mapContainer"></div>
+    <div class="map-wrap">
+      <div id="mapContainer"></div>
+      <div class="layers-float"><div class="layers" id="layerBar"></div></div>
+    </div>
 
     <!-- Venue cards render from venue_public, the same source as the pins above.
          They used to be three hardcoded blocks: names, addresses, discounts and event
@@ -660,17 +681,26 @@
         console.warn('trail: stop coordinates missing — is migration 031 applied?');
         return;
       }
-      const pts = stops.map(s => [Number(s.lat), Number(s.lng)]);
+      const marks = stops.map(s => [Number(s.lat), Number(s.lng)]);
+
+      // Real pavement from migration 033, falling back to the straight line if the
+      // geometry has not been applied yet.
+      let pts = marks;
+      if (Array.isArray(T.route) && T.route.length > 1) {
+        pts = T.route.map(c => [Number(c[0]), Number(c[1])]);
+      } else {
+        console.warn('trail: no street geometry — is migration 033 applied?');
+      }
 
       // Dark casing under the bright line so the route reads over pale piazze and
       // dark parks alike.
-      LAYER.tour.group.addLayer(L.polyline(pts, { color: '#000', weight: 11, opacity: 0.5, lineJoin: 'round' }));
-      LAYER.tour.group.addLayer(L.polyline(pts, { color: '#D45AE8', weight: 5, opacity: 0.95, lineJoin: 'round' }));
+      LAYER.tour.group.addLayer(L.polyline(pts, { color: '#000', weight: 11, opacity: 0.5, lineJoin: 'round', lineCap: 'round' }));
+      LAYER.tour.group.addLayer(L.polyline(pts, { color: '#D45AE8', weight: 5, opacity: 0.95, lineJoin: 'round', lineCap: 'round' }));
 
-      stops.forEach(s => {
+      stops.forEach((s, i) => {
         const cls = s.done ? 'done' : (s.current ? 'current' : 'todo');
         LAYER.tour.group.addLayer(
-          L.marker([Number(s.lat), Number(s.lng)], {
+          L.marker(marks[i], {
             icon: L.divIcon({
               className: 'isot-pin-wrapper',
               html: `<div class="stop-pin ${cls}"><span>${s.position}</span></div>`,
@@ -690,7 +720,7 @@
         banner.href = 'tour.html?t=' + t.id;
         banner.querySelector('.tb-sub').textContent =
           T.completed ? 'You walked the whole thing.'
-                      : `${T.done} of ${T.total} stops · ${T.distance_km} km · sunset ${T.sunset_local}`;
+                      : `${T.done} of ${T.total} stops · ${T.distance_km} km${T.walk_minutes ? ` · ${T.walk_minutes} min` : ''} · sunset ${T.sunset_local}`;
         banner.querySelector('.tb-name').textContent = T.name;
       }
     }

@@ -63,6 +63,7 @@
     .stop.todo  .stop-name  { color:var(--text-muted); }
     .stop-name  { font-weight:600; font-size:1rem; margin-bottom:3px; }
     .stop-hint  { font-size:0.86rem; color:var(--text-muted); line-height:1.5; }
+    .stop-leg   { font-size:0.74rem; color:var(--text-dim); margin:2px 0 6px; }
     .stop-reveal { font-size:0.84rem; color:var(--text-dim); line-height:1.5; margin-top:7px;
       padding-left:11px; border-left:2px solid var(--green,#4ED88A); }
 
@@ -145,7 +146,7 @@
     }
 
     let T = null;
-    let map = null, roadLine = null, markerLayer = null;
+    let map = null, roadLine = null, markerLayer = null, brightLine = null;
 
     async function load() {
       const { data, error } = await db.rpc('trail_detail', { p_trail: trailId });
@@ -169,7 +170,7 @@
         <p class="muted" style="font-size:0.9rem;line-height:1.6">${escapeHtml(T.blurb || '')}</p>
 
         <div style="display:flex;gap:18px;flex-wrap:wrap;margin:16px 0 10px;font-size:0.82rem">
-          <span class="dim"><i class="fa-solid fa-route"></i> ${T.distance_km} km</span>
+          <span class="dim"><i class="fa-solid fa-route"></i> ${T.distance_km} km${T.walk_minutes ? ` · ${T.walk_minutes} min walking` : ''}</span>
           <span class="dim"><i class="fa-solid fa-location-dot"></i> ${T.total} stops</span>
           <span class="dim"><i class="fa-solid fa-sun"></i> Sunset ${escapeHtml(T.sunset_local || '—')}</span>
           <span class="dim"><i class="fa-solid fa-star"></i> +${T.bonus_points} to finish</span>
@@ -192,7 +193,19 @@
         console.warn('trail: stop coordinates missing — is migration 031 applied?');
         return;
       }
-      const pts = T.stops.map(s => [Number(s.lat), Number(s.lng)]);
+      const marks = T.stops.map(s => [Number(s.lat), Number(s.lng)]);
+
+      // The road follows real pavement. T.route is 493 points of Valhalla pedestrian
+      // routing stored by migration 033; joining the stops directly would cut through
+      // the Palazzo Reale and across the Po. If it is missing we fall back to the
+      // straight line rather than showing no road at all — wrong shape beats nothing,
+      // and the console says which.
+      let pts = marks;
+      if (Array.isArray(T.route) && T.route.length > 1) {
+        pts = T.route.map(c => [Number(c[0]), Number(c[1])]);
+      } else {
+        console.warn('trail: no street geometry — is migration 033 applied?');
+      }
 
       if (!map) {
         map = L.map('tourMap', { zoomControl: false, attributionControl: false });
@@ -206,15 +219,14 @@
       // The road. Drawn twice: a wide dark casing underneath so the bright line reads
       // against pale buildings and dark parks alike, then the line itself on top.
       if (roadLine) roadLine.remove();
-      roadLine = L.layerGroup([
-        L.polyline(pts, { color: '#000', weight: 11, opacity: 0.55, lineJoin: 'round' }),
-        L.polyline(pts, { color: '#D45AE8', weight: 5, opacity: 0.95, lineJoin: 'round' }),
-      ]).addTo(map);
+      const casing = L.polyline(pts, { color: '#000', weight: 11, opacity: 0.55, lineJoin: 'round', lineCap: 'round' });
+      brightLine  = L.polyline(pts, { color: '#D45AE8', weight: 5, opacity: 0.95, lineJoin: 'round', lineCap: 'round' });
+      roadLine = L.layerGroup([casing, brightLine]).addTo(map);
 
       markerLayer.clearLayers();
-      T.stops.forEach(s => {
+      T.stops.forEach((s, i) => {
         const cls = s.done ? 'done' : (s.current ? 'current' : 'todo');
-        L.marker([Number(s.lat), Number(s.lng)], {
+        L.marker(marks[i], {
           icon: L.divIcon({
             className: 'stop-pin-wrap',
             html: `<div class="stop-pin ${cls}"><span>${s.position}</span></div>`,
@@ -229,6 +241,44 @@
       });
 
       map.fitBounds(L.latLngBounds(pts), { padding: [38, 38] });
+
+      drawRoad();
+    }
+
+    /* Draw the road on, rather than having it appear. Leaflet renders a polyline as
+       an SVG <path>, so the honest way to animate it is the path's own length: hide
+       the whole stroke with a dash gap, then close the gap. No library, no redraw per
+       frame, and the browser does it on the compositor.
+
+       Runs once per page load, not on every refresh after a claim — an animation you
+       cannot skip stops being a flourish and starts being a wait. */
+    let roadDrawn = false;
+    function drawRoad() {
+      if (!brightLine) return;
+      const path = brightLine.getElement && brightLine.getElement();
+      if (!path || !path.getTotalLength) return;
+
+      // Someone who has asked their system for less motion gets the finished road.
+      const still = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (roadDrawn || still) return;
+      roadDrawn = true;
+
+      const len = path.getTotalLength();
+      path.style.strokeDasharray  = len;
+      path.style.strokeDashoffset = len;
+      // Force a reflow so the browser registers the offset before the transition,
+      // otherwise both values land in the same frame and nothing animates.
+      void path.getBoundingClientRect();
+      path.style.transition = 'stroke-dashoffset 2.2s cubic-bezier(0.33, 0.9, 0.3, 1)';
+      requestAnimationFrame(() => { path.style.strokeDashoffset = '0'; });
+
+      // Clear the dash once it has arrived, so later redraws are plain solid strokes.
+      setTimeout(() => {
+        path.style.transition = '';
+        path.style.strokeDasharray = '';
+        path.style.strokeDashoffset = '';
+      }, 2400);
     }
 
     function drawStops() {
@@ -241,6 +291,7 @@
             <div class="stop-name">${escapeHtml(s.name)}
               ${s.golden_hour ? '<span class="goldchip" style="margin-left:7px"><i class="fa-solid fa-sun"></i> Sunset</span>' : ''}
             </div>
+            ${s.leg_m ? `<div class="stop-leg"><i class="fa-solid fa-person-walking"></i> ${s.leg_m} m from the last stop · about ${s.leg_minutes} min</div>` : ''}
             <div class="stop-hint">${escapeHtml(s.hint || '')}</div>
             ${s.reveal ? `<div class="stop-reveal">${escapeHtml(s.reveal)}</div>` : ''}
             ${s.current ? `

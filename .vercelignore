@@ -18,3 +18,6 @@ assets/whatsapp_features/
 __pycache__/
 venv/
 node_modules/
+
+_preview/
+.claude/
