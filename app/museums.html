@@ -300,9 +300,7 @@
       map = L.map('museumMap', { zoomControl: false, attributionControl: false }).setView([45.0684, 7.6843], 13);
       L.control.attribution({ prefix: false, position: 'bottomright' }).addAttribution('&copy; OSM').addTo(map);
 
-      L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
-        maxZoom: 19
-      }).addTo(map);
+      isotBasemap(map);
 
       renderMuseums(MUSEUMS);
     }
