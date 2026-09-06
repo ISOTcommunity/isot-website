@@ -181,7 +181,7 @@
             <span class="clock-dot"></span>
             <span id="liveTime">00:00:00</span>
             <span style="opacity: 0.4;">|</span>
-            <span id="todayDate">2026-08-22</span>
+            <span id="todayDate">—</span>
           </div>
         </div>
 
@@ -263,19 +263,39 @@
       document.getElementById('infoUni').textContent = me.university || 'Turin';
       document.getElementById('infoNation').textContent = me.nationality || 'International';
 
+      // Both of these were static markup that nothing ever wrote to: every card read
+      // "Member Since 2026" and a green "Active", including for someone who has never
+      // paid. A bartender reads this card.
+      const since = me.created_at ? new Date(me.created_at) : null;
+      document.getElementById('infoSince').textContent =
+        since ? since.getFullYear() : '—';
+
       const isSocio = me.tier === 'socio' || me.staff_role === 'board';
+
+      const statusEl = document.getElementById('infoStatus');
+      statusEl.textContent = isSocio ? 'Active' : 'Not a paid member';
+      statusEl.style.color = isSocio ? 'var(--green)' : 'var(--text-dim)';
 
       if (isSocio) {
         document.getElementById('cardTierBadge').innerHTML = '<span class="badge badge-socio"><i class="fa-solid fa-star"></i> OFFICIAL MEMBER</span>';
         document.getElementById('lockedOverlay').style.display = 'none';
         
-        // Issue daily QR token via RPC or generate member token
+        // The token comes from issue_qr_token() or it does not come at all.
+        //
+        // This used to fall back to `${member_code}.${date}.SECRET`, and on a thrown
+        // error to `${member_code}.DAILYTOKEN` — QR codes that look exactly like the
+        // real thing and cannot possibly validate, because the signature is invented.
+        // The member holds up a working-looking card, the scanner rejects it, and
+        // neither of them can tell why. An error they can read beats a code that lies.
         try {
           const { data, error } = await db.rpc('issue_qr_token');
-          const tokenStr = (data && data.token) ? data.token : `${me.member_code}.${new Date().toISOString().slice(0,10).replace(/-/g,'')}.SECRET`;
-          renderQrCode(tokenStr);
+          if (error || !data || !data.token) {
+            showQrProblem(error ? error.message : 'No token was issued.');
+          } else {
+            renderQrCode(data.token);
+          }
         } catch (e) {
-          renderQrCode(`${me.member_code}.DAILYTOKEN`);
+          showQrProblem(e && e.message ? e.message : String(e));
         }
       } else {
         document.getElementById('cardTierBadge').innerHTML = '<span class="badge badge-participant">COMMUNITY</span>';
@@ -286,6 +306,17 @@
       // Start anti-screenshot live clock tell
       updateClock();
       setInterval(updateClock, 1000);
+    }
+
+    /* Says what went wrong instead of drawing something that cannot work. */
+    function showQrProblem(reason) {
+      const container = document.getElementById('qrCode');
+      container.innerHTML = `
+        <div style="padding:22px 16px;text-align:center;max-width:180px">
+          <i class="fa-solid fa-triangle-exclamation" style="color:#F8A18E;font-size:1.6rem"></i>
+          <div style="color:#FFF;font-weight:600;font-size:0.86rem;margin-top:8px">Card not available</div>
+          <div class="dim" style="font-size:0.74rem;margin-top:4px">Reload, or show this to a volunteer:<br />${escapeHtml(reason)}</div>
+        </div>`;
     }
 
     function renderQrCode(text) {

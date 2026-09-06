@@ -175,89 +175,14 @@
     <div id="liveBanner" hidden></div>
     <div id="mapContainer"></div>
 
-    <!-- 1. Rough San Salvario -->
-    <div class="card card-glass" style="margin-bottom: 16px;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <img src="../assets/LOGOS/Drink.jpeg" alt="Drinks" style="width: 44px; height: 44px; border-radius: 12px; object-fit: cover;" />
-          <div>
-            <h2 style="font-size: 1.2rem; color: #FFF; margin: 0;">Rough San Salvario</h2>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">San Salvario • Via Principe Tommaso 3</p>
-          </div>
-        </div>
-        <span class="badge badge-socio">Perks</span>
-      </div>
-
-      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
-        <span class="badge badge-participant"><i class="fa-solid fa-microphone"></i> Monday Karaoke (21:00)</span>
-        <span class="badge badge-participant"><i class="fa-solid fa-glass-cheers"></i> Saturday Pre-Party (22:30)</span>
-      </div>
-
-      <div class="venue-card-actions">
-        <a href="https://maps.google.com/?q=Via+Principe+Tommaso+3+10126+Torino" target="_blank" rel="noopener" class="btn btn-pink" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">
-          <i class="fa-solid fa-diamond-turn-right"></i> Google Maps
-        </a>
-        <a href="https://maps.apple.com/?q=Via+Principe+Tommaso+3+10126+Torino" target="_blank" rel="noopener" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">
-          <i class="fa-solid fa-location-arrow"></i> Apple Maps
-        </a>
-      </div>
-    </div>
-
-    <!-- 2. Zenit Club -->
-    <div class="card card-glass" style="margin-bottom: 16px;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <img src="../assets/LOGOS/Party.jpeg" alt="Party" style="width: 44px; height: 44px; border-radius: 12px; object-fit: cover;" />
-          <div>
-            <h2 style="font-size: 1.2rem; color: #FFF; margin: 0;">Zenit Club</h2>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Piazza Vittorio Veneto 13/E</p>
-          </div>
-        </div>
-        <span class="badge badge-socio">Perks</span>
-      </div>
-
-      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
-        <span class="badge badge-participant"><i class="fa-solid fa-compact-disc"></i> Friday Zenit Club Nights (23:00)</span>
-        <span class="badge badge-live"><i class="fa-solid fa-ghost"></i> Halloween Party 🎃</span>
-      </div>
-
-      <div class="venue-card-actions">
-        <a href="https://maps.google.com/?q=Piazza+Vittorio+Veneto+13E+10124+Torino" target="_blank" rel="noopener" class="btn btn-pink" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">
-          <i class="fa-solid fa-diamond-turn-right"></i> Google Maps
-        </a>
-        <a href="https://maps.apple.com/?q=Piazza+Vittorio+Veneto+13E+10124+Torino" target="_blank" rel="noopener" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">
-          <i class="fa-solid fa-location-arrow"></i> Apple Maps
-        </a>
-      </div>
-    </div>
-
-    <!-- 3. Capodoglio -->
-    <div class="card card-glass">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <img src="../assets/LOGOS/Tog.jpeg" alt="Together & Social" style="width: 44px; height: 44px; border-radius: 12px; object-fit: cover;" />
-          <div>
-            <h2 style="font-size: 1.2rem; color: #FFF; margin: 0;">Capodoglio</h2>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Murazzi del Po 37</p>
-          </div>
-        </div>
-        <span class="badge badge-socio">Perks</span>
-      </div>
-
-      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
-        <span class="badge badge-participant"><i class="fa-solid fa-users"></i> Thursday Social Hub (20:00)</span>
-        <span class="badge badge-participant"><i class="fa-solid fa-wine-glass"></i> Aperitivo &amp; River View</span>
-      </div>
-
-      <div class="venue-card-actions">
-        <a href="https://maps.google.com/?q=Murazzi+del+Po+37+Torino" target="_blank" rel="noopener" class="btn btn-pink" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">
-          <i class="fa-solid fa-diamond-turn-right"></i> Google Maps
-        </a>
-        <a href="https://maps.apple.com/?q=Murazzi+del+Po+37+Torino" target="_blank" rel="noopener" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">
-          <i class="fa-solid fa-location-arrow"></i> Apple Maps
-        </a>
-      </div>
-    </div>
+    <!-- Venue cards render from venue_public, the same source as the pins above.
+         They used to be three hardcoded blocks: names, addresses, discounts and event
+         times written into the page. The map already read the database, so the two
+         halves of this screen could disagree — changing a discount in the admin panel
+         moved the pin's popup and left the card advertising the old offer. The times
+         were also simply stale: "Monday Karaoke (21:00)" and "Saturday Pre-Party
+         (22:30)" against a calendar that says 19:00 and 22:00. -->
+    <div id="venueCards"></div>
 
   </main>
 
@@ -402,10 +327,79 @@
       });
 
       renderLiveBanner(tonightByVenue);
+      renderVenueCards(venues || [], tonightByVenue, events);
 
       // Fit every pin rather than centring on a guessed midpoint — with one venue
       // off-screen it looked like the map was wrong.
       map.fitBounds(located.map(v => [v.lat, v.lng]), { padding: [40, 40], maxZoom: 16 });
+    }
+
+    /* One card per active venue, from the same rows that drew the pins. The weekly
+       nights come from the calendar rather than being typed in, so a time can only be
+       wrong here if it is wrong everywhere. */
+    function renderVenueCards(venues, tonightByVenue, allEvents) {
+      const host = document.getElementById('venueCards');
+      if (!host) return;
+
+      if (!venues.length) {
+        host.innerHTML = '<p class="dim" style="font-size:0.86rem;padding:18px 0">No partner venues yet.</p>';
+        return;
+      }
+
+      host.innerHTML = venues.map(v => {
+        const q = encodeURIComponent(`${v.address || v.name} Torino`);
+        const on = tonightByVenue[v.name];
+
+        // Distinct weekly nights at this venue, taken from the calendar.
+        const seen = new Set();
+        const nights = (allEvents || [])
+          .filter(e => e.venue_name === v.name)
+          .filter(e => { if (seen.has(e.title)) return false; seen.add(e.title); return true; })
+          .slice(0, 4);
+
+        return `
+        <div class="card card-glass" style="margin-bottom:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px">
+            <div style="min-width:0">
+              <h2 style="font-size:1.2rem;color:#FFF;margin:0">${escapeHtml(v.name)}</h2>
+              <p style="color:var(--text-muted);font-size:0.85rem;margin:0">
+                ${escapeHtml(v.neighbourhood ? v.neighbourhood + ' • ' : '')}${escapeHtml(v.address || '')}
+              </p>
+            </div>
+            ${v.member_discount ? '<span class="badge badge-socio" style="flex-shrink:0">Perks</span>' : ''}
+          </div>
+
+          ${v.member_discount
+            ? `<div class="dim" style="font-size:0.86rem;margin-bottom:10px">
+                 <i class="fa-solid fa-ticket text-pink"></i> ${escapeHtml(v.member_discount)}
+               </div>`
+            : ''}
+
+          ${nights.length ? `
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+              ${nights.map(n => `
+                <span class="badge badge-participant">
+                  ${escapeHtml(n.title)} (${escapeHtml((n.start_time || '').slice(0,5))})
+                </span>`).join('')}
+            </div>` : ''}
+
+          ${on ? `<div style="margin-top:10px;font-size:0.84rem;color:var(--pink)">
+                    <i class="fa-solid fa-tower-broadcast"></i>
+                    ${on.live ? 'Happening now' : 'On tonight'} — ${escapeHtml(on.title)}
+                  </div>` : ''}
+
+          <div class="venue-card-actions">
+            <a href="https://maps.google.com/?q=${q}" target="_blank" rel="noopener"
+               class="btn btn-pink" style="width:auto;padding:6px 14px;font-size:0.8rem">
+              <i class="fa-solid fa-diamond-turn-right"></i> Google Maps
+            </a>
+            <a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener"
+               class="btn btn-outline" style="width:auto;padding:6px 14px;font-size:0.8rem">
+              <i class="fa-solid fa-location-arrow"></i> Apple Maps
+            </a>
+          </div>
+        </div>`;
+      }).join('');
     }
 
     /* Above the map as well as on it: someone opening this page at a bar should not

@@ -123,10 +123,13 @@
 
   <!-- Result Overlay Card (Hidden until scan) -->
   <div class="scan-result-card result-neutral" id="resultOverlay" style="display: none;" onclick="resetScanner()">
-    <div id="resultIcon" style="font-size: 5rem; margin-bottom: 16px;"><i class="fa-solid fa-circle-check"></i></div>
-    <h1 style="font-size: 2.4rem; margin-bottom: 8px;" id="resultTitle">VALID MEMBER</h1>
-    <h2 style="font-size: 1.5rem; font-weight: 500; opacity: 0.9; margin-bottom: 12px;" id="resultName">Maria Silva</h2>
-    <p style="font-size: 1.1rem; max-width: 380px; opacity: 0.85;" id="resultMessage">Member Perks Granted</p>
+    <!-- Defaults are blank on purpose. This overlay is hidden and overwritten before
+       it is shown, but the previous defaults were a green tick, "VALID MEMBER" and a
+       person's name — so any failure to overwrite would have shown a bartender a pass. -->
+  <div id="resultIcon" style="font-size: 5rem; margin-bottom: 16px;"></div>
+    <h1 style="font-size: 2.4rem; margin-bottom: 8px;" id="resultTitle">&nbsp;</h1>
+    <h2 style="font-size: 1.5rem; font-weight: 500; opacity: 0.9; margin-bottom: 12px;" id="resultName">&nbsp;</h2>
+    <p style="font-size: 1.1rem; max-width: 380px; opacity: 0.85;" id="resultMessage">&nbsp;</p>
     <div style="margin-top: 24px; font-size: 0.8rem; opacity: 0.6;">Tap anywhere or auto-resuming in 3s...</div>
   </div>
 
