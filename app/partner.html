@@ -111,6 +111,28 @@
     }
 
     /* Banner above the map, for the same reason the label exists. */
+    /* A gem is a place, not a venue — a different mark so the two layers read apart. */
+    .gem-pin {
+      width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.05rem;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.7));
+    }
+    .gem-pin.found { opacity: 0.45; filter: grayscale(1) drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+
+    #gemSheet .modal-sheet { max-width: 420px; }
+    #gemPhotoPreview { width: 100%; border-radius: 14px; display: block; margin-bottom: 12px; }
+
+    .score-strip {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--bg-card); border: 1px solid var(--border-light);
+      border-radius: 14px 14px 30px 14px; padding: 12px 15px; margin-bottom: 14px;
+    }
+    .score-strip .n { font-size: 1.5rem; font-weight: 700; color: var(--pink); line-height: 1;
+                      font-variant-numeric: tabular-nums; }
+    .score-strip .l { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase;
+                      letter-spacing: 0.06em; margin-top: 3px; }
+
     .live-banner {
       display: flex; align-items: center; gap: 10px;
       background: var(--pink-glow);
@@ -172,6 +194,7 @@
     </div>
 
     <!-- Retina HD Dark Map -->
+    <div id="gemScore" hidden></div>
     <div id="liveBanner" hidden></div>
     <div id="mapContainer"></div>
 
@@ -197,8 +220,8 @@
       Calendar
     </a>
     <a href="partner.html" class="tab-item active">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V9a2 2 0 012-2h2a2 2 0 012 2v12"/></svg>
-      Partners
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+      Map
     </a>
     <a href="network.html" class="tab-item">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
@@ -328,10 +351,188 @@
 
       renderLiveBanner(tonightByVenue);
       renderVenueCards(venues || [], tonightByVenue, events);
+      await loadGems(map);
 
       // Fit every pin rather than centring on a guessed midpoint — with one venue
       // off-screen it looked like the map was wrong.
       map.fitBounds(located.map(v => [v.lat, v.lng]), { padding: [40, 40], maxZoom: 16 });
+    }
+
+    /* ── Gems ──────────────────────────────────────────────────────────────
+     * A point on the map with nothing physical at it. You go there, the app checks
+     * where you are, you leave a photo.
+     *
+     * The distance check is done by claim_gem() in the database. A check in this file
+     * would be bypassed by anyone who opens the console, and then the whole thing is
+     * theatre. Nothing here decides whether a claim succeeds.
+     * ------------------------------------------------------------------- */
+    let gems = [];
+    let claiming = null;   // the gem whose sheet is open
+
+    async function loadGems(map) {
+      const [{ data, error }, score] = await Promise.all([
+        db.rpc('gems_for_map'),
+        db.rpc('my_gem_score'),
+      ]);
+
+      // 028 may not be applied yet; the map should still work without gems.
+      if (error) { console.warn('gems:', error.message); return; }
+      gems = data || [];
+
+      if (!score.error && score.data && score.data.total > 0) {
+        const s = score.data;
+        document.getElementById('gemScore').hidden = false;
+        document.getElementById('gemScore').className = 'score-strip';
+        document.getElementById('gemScore').innerHTML = `
+          <div><div class="n">${s.points}</div><div class="l">points</div></div>
+          <div><div class="n">${s.found}/${s.total}</div><div class="l">gems found</div></div>
+          <div class="dim" style="flex:1;font-size:0.8rem;text-align:right">
+            Go to the place, take a photo there.
+          </div>`;
+      }
+
+      gems.forEach(g => {
+        const icon = L.divIcon({
+          className: 'isot-pin-wrapper',
+          html: `<div class="gem-pin ${g.found_by_me ? 'found' : ''}">${g.found_by_me ? '\u2713' : '\ud83d\udc8e'}</div>`,
+          iconSize: [30, 30], iconAnchor: [15, 15],
+        });
+        L.marker([g.lat, g.lng], { icon, zIndexOffset: 500 })
+          .addTo(map)
+          .on('click', () => openGem(g.id));
+      });
+    }
+
+    function openGem(id) {
+      const g = gems.find(x => x.id === id);
+      if (!g) return;
+      claiming = g;
+
+      let sheet = document.getElementById('gemSheet');
+      if (!sheet) {
+        sheet = document.createElement('div');
+        sheet.className = 'modal-backdrop';
+        sheet.id = 'gemSheet';
+        sheet.onclick = () => sheet.classList.remove('active');
+        sheet.innerHTML = `
+          <div class="modal-sheet" onclick="event.stopPropagation()">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+              <div><div class="eyebrow" id="gemPoints"></div>
+                   <h3 style="font-size:1.15rem;color:#FFF;margin-top:2px" id="gemName"></h3></div>
+              <button type="button" onclick="document.getElementById('gemSheet').classList.remove('active')"
+                      style="background:transparent;border:none;color:var(--text-muted);font-size:1.3rem;cursor:pointer">
+                <i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="gemBody" style="margin-top:12px"></div>
+          </div>`;
+        document.body.appendChild(sheet);
+      }
+
+      document.getElementById('gemPoints').textContent =
+        g.found_by_me ? 'Found' : g.points + ' points';
+      document.getElementById('gemName').textContent = g.name;
+
+      const body = document.getElementById('gemBody');
+
+      if (g.found_by_me) {
+        body.innerHTML = `
+          ${g.photo_path ? `<img src="${escapeHtml(photoUrl(g.photo_path))}" alt="Your photo" style="width:100%;border-radius:14px;display:block;margin-bottom:12px" />` : ''}
+          <p style="font-size:0.9rem;color:var(--text-muted)">${escapeHtml(g.reveal || 'You found this one.')}</p>
+          <p class="dim" style="font-size:0.78rem;margin-top:10px">
+            ${g.found_count} ${g.found_count === 1 ? 'person has' : 'people have'} found this.
+          </p>`;
+      } else {
+        body.innerHTML = `
+          <p style="font-size:0.9rem;color:var(--text-muted)">${escapeHtml(g.hint || 'Somewhere in Turin.')}</p>
+          <p class="dim" style="font-size:0.78rem;margin-top:10px">
+            Be within ${g.radius_m}m and take a photo there.
+            ${g.found_count ? g.found_count + ' found it so far.' : 'Nobody has found this one yet.'}
+          </p>
+          <div id="gemAlert" style="margin-top:12px" hidden></div>
+          <!-- capture="environment" opens the camera instead of the photo library, which
+               closes the "send me your picture" loophole. It is not unbypassable — some
+               Android browsers ignore it, and a desktop still shows a file dialog — so
+               the GPS check in claim_gem() remains the actual proof. -->
+          <input type="file" id="gemFile" accept="image/*" capture="environment" style="display:none"
+                 onchange="onGemPhoto(event)" />
+          <button type="button" class="btn btn-pink" style="margin-top:14px"
+                  onclick="document.getElementById('gemFile').click()">
+            <i class="fa-solid fa-camera"></i> I'm here — take the photo
+          </button>`;
+      }
+
+      sheet.classList.add('active');
+    }
+
+    function photoUrl(path) {
+      return db.storage.from('gem-photos').getPublicUrl(path).data.publicUrl;
+    }
+
+    function gemSay(msg, kind) {
+      const el = document.getElementById('gemAlert');
+      if (!el) return;
+      el.hidden = false;
+      el.className = 'alert alert-' + (kind || 'error');
+      el.textContent = msg;
+    }
+
+    async function onGemPhoto(ev) {
+      const file = ev.target.files && ev.target.files[0];
+      if (!file || !claiming) return;
+      const g = claiming;
+
+      const btn = document.querySelector('#gemBody .btn-pink');
+      const restore = btn ? busy(btn, 'Checking where you are…') : () => {};
+
+      // Location first. If they are not there, nothing is uploaded — no orphan photo
+      // in storage for a claim that was never going to succeed.
+      let pos;
+      try {
+        pos = await new Promise((res, rej) =>
+          navigator.geolocation.getCurrentPosition(res, rej,
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }));
+      } catch (e) {
+        restore();
+        gemSay(e && e.code === 1
+          ? 'ISOT needs your location to check you are here. Allow it in your browser settings and try again.'
+          : 'Could not get your location. Step outside and try again.');
+        return;
+      }
+
+      // Shrunk before it leaves the phone. A raw photo is 3–5 MB and the free tier
+      // gives 1 GB total; resized, the same claim costs about 300 KB. Re-encoding also
+      // drops EXIF, so a member's camera metadata does not travel with the upload.
+      if (btn) btn.innerHTML = '<span class="spinner"></span> Preparing photo…';
+      let blob;
+      try {
+        blob = await shrinkImage(file);
+      } catch (e) {
+        restore(); gemSay(e.message || 'Could not read that photo.'); return;
+      }
+
+      if (btn) btn.innerHTML = '<span class="spinner"></span> Uploading…';
+      const path = `${g.id}/${Date.now()}.jpg`;
+      const { error: upErr } = await db.storage.from('gem-photos')
+        .upload(path, blob, { contentType: 'image/jpeg', upsert: false });
+
+      if (upErr) { restore(); gemSay('Photo upload failed — ' + upErr.message); return; }
+
+      const { data, error } = await db.rpc('claim_gem', {
+        p_gem_id: g.id,
+        p_lat: pos.coords.latitude,
+        p_lng: pos.coords.longitude,
+        p_accuracy: pos.coords.accuracy,
+        p_photo_path: path,
+      });
+
+      restore();
+
+      if (error)        { gemSay(error.message); return; }
+      if (!data.ok)     { gemSay(data.reason); return; }
+
+      gemSay(`Found it — ${data.points} points.`, 'success');
+      // Reload so the pin, the score and the reveal all update together.
+      setTimeout(() => location.reload(), 1200);
     }
 
     /* One card per active venue, from the same rows that drew the pins. The weekly

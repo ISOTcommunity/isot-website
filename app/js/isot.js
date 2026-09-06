@@ -306,6 +306,35 @@ function getCategoryBadgeHtml(catKey, size = 40) {
 }
 
 /* ---------------------------------------------------------------
+ * Image shrink, shared by every upload in the app
+ *
+ * Longest side to 1200px, JPEG q0.82. A 4 MB phone photo lands around 150–300 KB.
+ *
+ * This is not a nicety. Supabase's free tier gives 1 GB of storage: 17 members
+ * claiming 10 gems at full phone resolution is roughly 600 MB, and 30 gems would
+ * exceed the tier outright. Resized, the same 30 gems cost about 150 MB. It also
+ * strips EXIF as a side effect of re-encoding, which means location metadata does
+ * not travel with a photo a member uploads.
+ * ------------------------------------------------------------- */
+function shrinkImage(file, max = 1200, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * scale);
+      c.height = Math.round(img.height * scale);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(img.src);
+      c.toBlob(b => b ? resolve(b) : reject(new Error('Could not encode that image')),
+               'image/jpeg', quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(img.src); reject(new Error('Not a readable image')); };
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+/* ---------------------------------------------------------------
  * Auth Guard
  * ------------------------------------------------------------- */
 async function requireAuth(opts = {}) {
@@ -646,8 +675,8 @@ function initBurgerMenu(profile) {
         <span>Songbook</span>
       </a>
       <a href="partner.html" class="drawer-item">
-        <i class="fa-solid fa-store"></i>
-        <span>Partner Venues &amp; Map</span>
+        <i class="fa-solid fa-map-location-dot"></i>
+        <span>Map</span>
       </a>
       <a href="../blog.html" class="drawer-item">
         <i class="fa-solid fa-book-open"></i>
