@@ -306,6 +306,9 @@
             tonightByVenue[e.venue_name] = {
               title: e.title,
               time: (e.start_time || '').slice(0, 5),
+              eventId: e.event_id,
+              date: e.event_date,
+              venue: e.venue_name,
               live,
             };
           }
@@ -346,7 +349,9 @@
           .bindPopup(
             `<b>${escapeHtml(v.name)}</b><br>` +
             (on ? `<b>${on.live ? 'Happening now' : 'Tonight'}: ${escapeHtml(on.title)}` +
-                  `${on.time ? ' · ' + escapeHtml(on.time) : ''}</b><br>` : '') +
+                  `${on.time ? ' · ' + escapeHtml(on.time) : ''}</b>` +
+                  (on.eventId ? ` <a href="event.html?e=${on.eventId}&d=${on.date}">details</a>` : '') +
+                  '<br>' : '') +
             `${escapeHtml(v.address || v.neighbourhood || '')}` +
             (v.member_discount ? `<br>${escapeHtml(v.member_discount)}` : '')
           );
@@ -363,10 +368,72 @@
       renderVenueCards(venues || [], tonightByVenue, wk.error ? todayEvents : (wk.data || []));
 
       await loadGems(map);
+      watchNearby(venues || [], tonightByVenue);
 
       // Fit every pin rather than centring on a guessed midpoint — with one venue
       // off-screen it looked like the map was wrong.
       map.fitBounds(located.map(v => [v.lat, v.lng]), { padding: [40, 40], maxZoom: 16 });
+    }
+
+    /* ── Near a venue with something on ─────────────────────────────────────
+     * If you are standing outside Rough on a Monday, the app should say so rather than
+     * make you find the pin.
+     *
+     * Location is requested ONCE and not watched: a continuous watch drains a phone at
+     * exactly the moment someone is out for the night, and the answer does not change
+     * while they stand still. Coordinates are compared and dropped — nothing is stored
+     * and nothing is sent anywhere.
+     *
+     * Only fires for a venue that HAS a night on. Being near a bar on a Tuesday is not
+     * news, and a notification that is usually noise gets dismissed reflexively.
+     * ------------------------------------------------------------------- */
+    function metresBetween(a, b, c, d) {
+      const R = 6371000, r = Math.PI / 180;
+      return 2 * R * Math.asin(Math.sqrt(
+        Math.sin((c - a) * r / 2) ** 2 +
+        Math.cos(a * r) * Math.cos(c * r) * Math.sin((d - b) * r / 2) ** 2));
+    }
+
+    function watchNearby(venues, tonightByVenue) {
+      const live = venues.filter(v => v.lat && v.lng && tonightByVenue[v.name]);
+      if (!live.length || !navigator.geolocation) return;
+
+      // Dismissed for the session, not forever — next time they open the app it is back.
+      if (sessionStorage.getItem('isot_near_dismissed')) return;
+
+      navigator.geolocation.getCurrentPosition((pos) => {
+        let best = null;
+        for (const v of live) {
+          const d = metresBetween(pos.coords.latitude, pos.coords.longitude, v.lat, v.lng);
+          if (d <= 300 && (!best || d < best.d)) best = { v, d };
+        }
+        if (!best) return;
+
+        const on = tonightByVenue[best.v.name];
+        const bar = document.createElement('div');
+        bar.className = 'live-banner';
+        bar.style.cssText += 'position:sticky;top:64px;z-index:60;margin-bottom:12px';
+        bar.innerHTML = `
+          <i class="fa-solid fa-location-crosshairs" style="color:var(--pink)"></i>
+          <div style="flex:1">
+            <b style="color:#FFF">You're ${Math.round(best.d)}m from ${escapeHtml(best.v.name)}</b>
+            <div class="dim" style="font-size:0.8rem">
+              ${on.live ? 'Happening now' : 'Tonight'} — ${escapeHtml(on.title)}${on.time ? ' · ' + escapeHtml(on.time) : ''}
+            </div>
+          </div>
+          ${on.eventId ? `<a href="event.html?e=${on.eventId}&d=${on.date}" class="btn btn-pink"
+             style="width:auto;padding:6px 14px;font-size:0.78rem;flex-shrink:0">Open</a>` : ''}
+          <button type="button" aria-label="Dismiss"
+                  style="background:transparent;border:none;color:var(--text-dim);font-size:1rem;cursor:pointer;padding:4px"
+                  onclick="sessionStorage.setItem('isot_near_dismissed','1');this.parentElement.remove()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>`;
+        const main = document.querySelector('main.shell');
+        main.insertBefore(bar, main.firstChild);
+      },
+      // Silent on refusal. Someone who declined location does not need to be told again
+      // every time they open the map.
+      () => {}, { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 });
     }
 
     /* ── Gems ──────────────────────────────────────────────────────────────
@@ -594,6 +661,29 @@
                   ${escapeHtml(n.title)} (${escapeHtml((n.start_time || '').slice(0,5))})
                 </span>`).join('')}
             </div>` : ''}
+
+          ${(() => {
+            // Posters for what is actually coming here. A venue card that shows the
+            // next three nights as artwork sells the place far better than a list of
+            // times — and the images already exist, they were just only on the calendar.
+            const upcoming = (allEvents || [])
+              .filter(e => e.venue_name === v.name && e.poster_url)
+              .slice(0, 3);
+            if (!upcoming.length) return '';
+            return `
+              <div style="display:flex;gap:8px;margin-top:12px;overflow-x:auto;padding-bottom:2px">
+                ${upcoming.map(e => `
+                  <a href="event.html?e=${e.event_id}&d=${e.event_date}"
+                     style="flex-shrink:0;width:96px;text-decoration:none">
+                    <img src="${escapeHtml(e.poster_url)}" alt="${escapeHtml(e.title)}" loading="lazy"
+                         style="width:96px;height:120px;object-fit:cover;border-radius:8px 8px 18px 8px;display:block" />
+                    <div class="dim" style="font-size:0.68rem;margin-top:4px;line-height:1.3">
+                      ${escapeHtml(new Date(e.event_date + 'T00:00:00')
+                        .toLocaleDateString([], { weekday:'short', day:'numeric', month:'short' }))}
+                    </div>
+                  </a>`).join('')}
+              </div>`;
+          })()}
 
           ${on ? `<div style="margin-top:10px;font-size:0.84rem;color:var(--pink)">
                     <i class="fa-solid fa-tower-broadcast"></i>

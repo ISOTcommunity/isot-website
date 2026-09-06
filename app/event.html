@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="robots" content="noindex" />
+  <title>Event · ISOT App</title>
+
+  <link rel="icon" href="logo.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .poster { width:100%; display:block; border-radius: var(--radius-md) var(--radius-md) 0 0; }
+    .fact { display:flex; gap:11px; align-items:flex-start; padding:9px 0; font-size:0.9rem; }
+    .fact i { color:var(--pink); width:18px; text-align:center; margin-top:3px; flex-shrink:0; }
+    .fact b { color:#FFF; font-weight:600; }
+    .programme {
+      white-space: pre-line; font-size:0.9rem; color:var(--text-muted); line-height:1.6;
+      background: rgba(255,255,255,0.04); padding:14px 16px;
+      border-radius: 12px 12px 26px 12px; margin-top:14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <header class="topbar">
+    <a href="events.html" class="topbar-title">Event</a>
+    <button type="button" id="burgerBtn" aria-label="Account menu"
+            style="background:transparent;border:none;color:#FFF;font-size:1.3rem;cursor:pointer;padding:6px">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </header>
+
+  <main class="shell" style="max-width:520px">
+    <div id="body"><div class="spinner" style="margin:44px auto"></div></div>
+  </main>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+  <script>
+  let me = null, ev = null, occId = null;
+
+  (async () => {
+    me = await requireAuth();
+
+    // ?e=<event_id>&d=<YYYY-MM-DD> — an occurrence, not just an event. A recurring
+    // Monday needs both halves or the page cannot say which Monday it is showing.
+    const p = new URLSearchParams(location.search);
+    const eventId = p.get('e');
+    const date = p.get('d');
+
+    if (!eventId || !date) { fail('No event was specified.'); return; }
+    occId = `${eventId}|${date}`;
+
+    const { data, error } = await db.rpc('calendar_between', { p_from: date, p_to: date });
+    if (error) { fail(error.message); return; }
+
+    ev = (data || []).find(x => x.event_id === eventId);
+    if (!ev) { fail('That event is not on this date any more. It may have been cancelled.'); return; }
+
+    render();
+  })();
+
+  function fail(msg) {
+    document.getElementById('body').innerHTML = `
+      <div class="card card-glass" style="text-align:center;padding:34px">
+        <i class="fa-solid fa-calendar-xmark text-pink" style="font-size:1.8rem"></i>
+        <h1 style="font-size:1.15rem;color:#FFF;margin:12px 0 6px">Not found</h1>
+        <p class="dim" style="font-size:0.86rem">${escapeHtml(msg)}</p>
+        <a href="events.html" class="btn btn-outline" style="margin-top:16px">Back to the calendar</a>
+      </div>`;
+  }
+
+  async function render() {
+    const d = new Date(ev.event_date + 'T00:00:00');
+    const when = d.toLocaleDateString([], { weekday:'long', day:'numeric', month:'long' });
+    const start = (ev.start_time || '').slice(0,5);
+    const going = await myRsvpState();
+    const maps = encodeURIComponent(`${ev.venue_address || ev.venue_name} Torino`);
+
+    document.title = `${ev.title} · ISOT`;
+
+    document.getElementById('body').innerHTML = `
+      <div class="card card-glass ${ev.poster_url ? 'card-glow' : ''}" style="padding:0;overflow:hidden">
+        ${ev.poster_url ? `<img class="poster" src="${escapeHtml(ev.poster_url)}" alt="${escapeHtml(ev.title)} poster" />` : ''}
+        <div style="padding:18px">
+          ${ev.headline ? `<div class="eyebrow" style="color:var(--pink)">${escapeHtml(ev.headline)}</div>` : ''}
+          <h1 style="font-size:1.5rem;color:#FFF;margin:4px 0 12px">${escapeHtml(ev.title)}</h1>
+
+          <div class="fact"><i class="fa-solid fa-calendar-day"></i><div><b>${escapeHtml(when)}</b></div></div>
+          <div class="fact"><i class="fa-solid fa-clock"></i><div><b>${escapeHtml(start)}</b>${ev.notes ? '' : ''}</div></div>
+          <div class="fact"><i class="fa-solid fa-location-dot"></i>
+            <div><b>${escapeHtml(ev.venue_name || '')}</b>
+              ${ev.venue_address ? `<div class="dim" style="font-size:0.82rem">${escapeHtml(ev.venue_address)}</div>` : ''}
+              <a href="https://maps.google.com/?q=${maps}" target="_blank" rel="noopener"
+                 style="font-size:0.8rem;color:var(--pink);text-decoration:none">Open in Maps →</a>
+            </div>
+          </div>
+          <div class="fact"><i class="fa-solid fa-users"></i>
+            <div><b>${ev.going_count}</b> going</div></div>
+
+          ${ev.notes ? `<div class="programme">${escapeHtml(ev.notes)}</div>`
+                     : (ev.description ? `<div class="programme">${escapeHtml(ev.description)}</div>` : '')}
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px">
+            <button type="button" id="rsvpBtn" class="btn ${going ? 'btn-outline' : 'btn-pink'}"
+                    style="width:auto;padding:9px 18px;font-size:0.86rem" onclick="toggle()">
+              <i class="fa-solid ${going ? 'fa-circle-check text-green' : 'fa-calendar-plus'}"></i>
+              ${going ? "You're going" : "I'm going"}
+            </button>
+            ${ev.register_url ? `
+              <a href="${escapeHtml(ev.register_url)}" target="_blank" rel="noopener noreferrer"
+                 class="btn btn-outline" style="width:auto;padding:9px 18px;font-size:0.86rem;display:inline-flex">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                ${escapeHtml(ev.register_label || 'Register')}
+              </a>` : ''}
+            ${ev.has_karaoke ? `
+              <a href="karaoke.html" class="btn btn-outline"
+                 style="width:auto;padding:9px 18px;font-size:0.86rem;display:inline-flex">
+                <i class="fa-solid fa-microphone"></i> Song queue
+              </a>` : ''}
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-glass" style="margin-top:12px">
+        <div class="eyebrow" style="margin-bottom:10px">Who's going</div>
+        <div id="attendees"><div class="spinner" style="margin:16px auto"></div></div>
+      </div>`;
+
+    loadAttendees();
+  }
+
+  async function myRsvpState() {
+    const { data } = await db.rpc('my_rsvps', { p_from: ev.event_date, p_to: ev.event_date });
+    return (data || []).some(r => r.event_id === ev.event_id);
+  }
+
+  async function toggle() {
+    const btn = document.getElementById('rsvpBtn');
+    const restore = busy(btn, '…');
+    const { data, error } = await db.rpc('toggle_rsvp',
+      { p_event_id: ev.event_id, p_date: ev.event_date });
+    restore();
+    if (error) { alert('Could not update your RSVP: ' + error.message); return; }
+    ev.going_count = data.going_count;
+    ev.instance_id = data.instance_id;
+    render();
+  }
+
+  async function loadAttendees() {
+    const el = document.getElementById('attendees');
+    if (!el) return;
+
+    // No instance means nobody has RSVPed yet — event_attendees() would be given a null.
+    if (!ev.instance_id) {
+      el.innerHTML = '<p class="dim" style="font-size:0.85rem">Nobody yet. Be the first.</p>';
+      return;
+    }
+    const { data, error } = await db.rpc('event_attendees', { p_instance: ev.instance_id });
+    if (error) { el.innerHTML = `<p class="dim" style="font-size:0.85rem">${escapeHtml(error.message)}</p>`; return; }
+    el.innerHTML = (data && data.length)
+      ? data.map(m => renderMemberCardHtml(m, m.id === me.id)).join('')
+      : '<p class="dim" style="font-size:0.85rem">Nobody yet. Be the first.</p>';
+  }
+  </script>
+</body>
+</html>

@@ -1074,7 +1074,9 @@
                 </div>
                 <span class="dim" style="font-size:0.75rem">${item.time}</span>
               </div>
-              <h2 style="font-size:1.05rem;color:#FFF;margin-bottom:4px">${escapeHtml(item.title)}</h2>
+              <a href="event.html?e=${item.eventId}&d=${item.date}" style="text-decoration:none">
+                <h2 style="font-size:1.05rem;color:#FFF;margin-bottom:4px">${escapeHtml(item.title)}</h2>
+              </a>
               <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
                 ${item.link ? `<a href="${item.link}" class="btn btn-pink" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Join Song Queue</a>` : `<a href="profile.html" class="btn btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Show Member Card</a>`}
                 ${item.registerUrl ? `

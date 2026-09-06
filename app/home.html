@@ -616,7 +616,7 @@
       el.innerHTML = `
         <div class="card card-glass ${lead.poster ? 'card-glow' : ''}" style="padding:0;overflow:hidden">
           ${lead.poster ? `
-            <a href="events.html" style="display:block">
+            <a href="event.html?e=${lead.eventId}&d=${lead.date}" style="display:block">
               <img src="${escapeHtml(lead.poster)}" alt="${escapeHtml(lead.title)} poster"
                    style="width:100%;display:block" />
             </a>` : ''}
@@ -624,7 +624,9 @@
             <div class="eyebrow" style="color:var(--pink)">
               ${escapeHtml(label(lead))}${lead.headline ? ' · ' + escapeHtml(lead.headline) : ''}
             </div>
-            <h2 style="font-size:1.25rem;color:#FFF;margin:4px 0 2px">${escapeHtml(lead.title)}</h2>
+            <a href="event.html?e=${lead.eventId}&d=${lead.date}" style="text-decoration:none">
+              <h2 style="font-size:1.25rem;color:#FFF;margin:4px 0 2px">${escapeHtml(lead.title)}</h2>
+            </a>
             <div class="dim" style="font-size:0.82rem">
               ${escapeHtml(lead.time)} · ${escapeHtml(lead.venueName || '')}
               ${lead.goingCount ? ' · ' + lead.goingCount + ' going' : ''}
@@ -654,7 +656,8 @@
         <div class="card card-glass" style="margin-top:10px;padding:4px 16px">
           ${rest.map(e => `
             <div style="display:flex;align-items:center;gap:12px;padding:11px 0;
-                        border-bottom:1px solid var(--border-light)">
+                        border-bottom:1px solid var(--border-light);cursor:pointer"
+                 onclick="if(!event.target.closest('button')) location.href='event.html?e=${e.eventId}&d=${e.date}'">
               ${e.poster
                 ? `<img src="${escapeHtml(e.poster)}" alt="" loading="lazy"
                         style="width:34px;height:44px;object-fit:cover;border-radius:6px 6px 12px 6px;flex-shrink:0" />`
