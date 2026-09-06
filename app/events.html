@@ -827,8 +827,8 @@
         const dateStr = `${currYear}-${mStr}-${dStr}`;
 
         // A night that has been and gone is not "what's on". It stays in the record —
-        // check-ins, RSVPs and karaoke slots are untouched, and Going -> Been still lists
-        // it — but the calendar shows the future.
+        // check-ins, RSVPs and karaoke slots are untouched in the database — but every
+        // view in the app shows the future.
         const isPast = dateStr < isotToday();
         const dayEvents = isPast ? [] : EVENTS_DATA.filter(e => e.date === dateStr);
         const hasEvents = dayEvents.length > 0;
@@ -939,7 +939,7 @@
     function renderListView() {
       // loadCalendar() fetches from one month back so the month and week views can page
       // without refetching. The list is "what's on", though — opening it on events that
-      // already happened is just noise. Past nights stay reachable under Going → Been.
+      // already happened is just noise. The rows stay in the database; nothing displays them.
       const today = isotToday();
       const upcoming = EVENTS_DATA.filter(e => e.date >= today);
 
@@ -956,34 +956,29 @@
 
     /** The nights you have said you are coming to. There was previously nowhere to see
      *  this — you could mark yourself going and then have no way to find it again. */
+    /* What you are still going to. A night that has happened drops off on its own —
+     * this is a plan, not a diary, and a list of nights already spent pushes the one
+     * you still have to think about further down the screen every week.
+     *
+     * The RSVP row is NOT deleted. It stays in the database as the record of who said
+     * they were coming, which is what the going counts and the board's numbers are
+     * built from. Only this list stops showing it. */
     function renderGoingView() {
       const todayStr = isotToday();
-      const mine = EVENTS_DATA
-        .filter(e => userRsvps[e.id])
-        .sort((a, b) => a.date.localeCompare(b.date));
+      const upcoming = EVENTS_DATA
+        .filter(e => userRsvps[e.id] && e.date >= todayStr)
+        .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
 
-      const upcoming = mine.filter(e => e.date >= todayStr);
-      const past     = mine.filter(e => e.date <  todayStr).reverse();
-
-      if (!mine.length) {
+      if (!upcoming.length) {
         return `
           <div class="dim" style="text-align:center;padding:48px 20px">
             <i class="fa-solid fa-calendar-check" style="font-size:2rem;opacity:0.35;display:block;margin-bottom:14px"></i>
-            You haven't marked yourself going to anything yet.<br />
+            Nothing coming up.<br />
             <span style="font-size:0.85rem">Tap <strong>I'm Going</strong> on any event and it will show up here.</span>
           </div>`;
       }
 
-      let html = '';
-      if (upcoming.length) {
-        html += `<div class="dim" style="font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin:4px 0 10px">Coming up</div>`;
-        html += upcoming.map(renderEventCardHtml).join('');
-      }
-      if (past.length) {
-        html += `<div class="dim" style="font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin:22px 0 10px">Been</div>`;
-        html += `<div style="opacity:0.55">${past.map(renderEventCardHtml).join('')}</div>`;
-      }
-      return html;
+      return upcoming.map(renderEventCardHtml).join('');
     }
 
     function renderEventCardHtml(item) {
