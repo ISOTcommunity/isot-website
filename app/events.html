@@ -504,6 +504,8 @@
           headline: e.headline || null,
           notes: e.notes || null,
           poster: e.poster_url || null,
+          registerUrl: e.register_url || null,
+          registerLabel: e.register_label || null,
           link: e.has_karaoke ? 'karaoke.html' : null,
           membersOnly: e.members_only,
           special: e.description || null,
@@ -1075,6 +1077,12 @@
               <h2 style="font-size:1.05rem;color:#FFF;margin-bottom:4px">${escapeHtml(item.title)}</h2>
               <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
                 ${item.link ? `<a href="${item.link}" class="btn btn-pink" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Join Song Queue</a>` : `<a href="profile.html" class="btn btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Show Member Card</a>`}
+                ${item.registerUrl ? `
+                  <a href="${escapeHtml(item.registerUrl)}" target="_blank" rel="noopener noreferrer"
+                     class="btn btn-pink" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    ${escapeHtml(item.registerLabel || 'Register')}
+                  </a>` : ''}
                 <button type="button" class="btn btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex" onclick="openInviteModal('${escapeHtml(item.title)}', '${item.eventId}', '${item.date}')">
                   <i class="fa-solid fa-paper-plane text-pink"></i> Invite Friends
                 </button>

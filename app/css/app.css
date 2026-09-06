@@ -119,11 +119,22 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
-input[type="text"], input[type="password"], input[type="email"],
-input[type="date"], input[type="time"], input[type="number"],
-select, textarea {
+/* Form fields opt OUT of touch-action: manipulation.
+ *
+ * The universal rule above sets it on *, which on iOS suppresses the double-tap and
+ * long-press that Safari uses to raise the selection callout — the only way to paste
+ * on a phone. It was applied here a second time explicitly, so text fields across the
+ * whole app could not be pasted into. touch-action: auto restores the native gestures;
+ * double-tap zoom is already prevented by the viewport meta and the handler in
+ * js/isot.js, which exempts form fields.
+ *
+ * font-size 16px is separate and must stay: anything smaller makes iOS zoom the page
+ * when a field is focused. */
+input, select, textarea, [contenteditable] {
   font-size: 16px !important;
-  touch-action: manipulation;
+  touch-action: auto;
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 /* ---------- Mobile Bottom Tab Bar (Apple Material) ---------- */

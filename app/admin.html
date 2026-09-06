@@ -503,6 +503,20 @@
         </div>
 
         <div class="field">
+          <label for="fRegUrl">Registration link <span class="dim" style="font-weight:400">— optional</span></label>
+          <input id="fRegUrl" type="url" inputmode="url" placeholder="https://forms.gle/..." value="${val(e.register_url)}" />
+          <p class="dim" style="font-size:0.74rem;margin-top:4px">
+            A Google Form, ticket page or sign-up sheet. Leave empty for the weekly nights,
+            which need no booking. Must start with http:// or https://.
+          </p>
+        </div>
+
+        <div class="field">
+          <label for="fRegLabel">Button text <span class="dim" style="font-weight:400">— optional</span></label>
+          <input id="fRegLabel" type="text" placeholder="Book a place" value="${val(e.register_label)}" />
+        </div>
+
+        <div class="field">
           <label>Poster</label>
           <div class="drop" id="drop" tabindex="0" role="button"
                aria-label="Choose a poster image">
@@ -640,6 +654,9 @@
         category:    document.getElementById('fCat').value,
         start_time:  start,
         doors_time:  doors || null,
+        // Empty string is not "no link" — it would fail the http(s) CHECK constraint.
+        register_url:   document.getElementById('fRegUrl').value.trim() || null,
+        register_label: document.getElementById('fRegLabel').value.trim() || null,
       };
       if (dateEl) {
         row.one_off_date = date;

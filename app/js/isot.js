@@ -26,10 +26,12 @@ const db = isConfigured() && window.supabase
   document.addEventListener('touchend', (e) => {
     const now = Date.now();
     if (now - lastTouch <= 300) {
-      const tag = e.target ? e.target.tagName : '';
-      if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
-        e.preventDefault();
-      }
+      // closest(), not tagName: a double tap inside a field can resolve to a wrapper,
+      // and preventDefault there still kills the selection callout — which is how you
+      // paste on a phone.
+      const inField = e.target && e.target.closest &&
+        e.target.closest('input, textarea, select, [contenteditable], .no-tap-guard');
+      if (!inField) e.preventDefault();
     }
     lastTouch = now;
   }, { passive: false });
