@@ -1164,3 +1164,39 @@ if (document.readyState === 'loading') {
   initPasswordToggles();
   initCookieConsentBanner();
 }
+
+/* ── Basemap ──────────────────────────────────────────────────────────────
+ * One place, so all five maps agree and a provider change is one edit.
+ *
+ * We were on CARTO's dark_all with no key. Their tiles are correct, but the
+ * keyless tier is rate-limited and the app now has five map pages pulling from
+ * it — past the limit CARTO serves a watermark tile instead of the map, which
+ * is what "api is required" all over the map was.
+ *
+ * OpenStreetMap's own tiles need no key and no account. They are light, so the
+ * tile pane alone is inverted to sit on ISOT's black ground; markers, the route
+ * line and popups live in other panes and are untouched.
+ *
+ * CARTO stays as a fallback: if OSM fails to serve, we swap rather than show a
+ * grey rectangle.
+ */
+function isotBasemap(map) {
+  const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    crossOrigin: true,
+  });
+
+  let swapped = false;
+  osm.on('tileerror', () => {
+    if (swapped) return;
+    swapped = true;
+    map.removeLayer(osm);
+    document.body.classList.remove('map-dark');
+    L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
+      { maxZoom: 19 }).addTo(map);
+  });
+
+  document.body.classList.add('map-dark');
+  osm.addTo(map);
+  return osm;
+}

@@ -329,6 +329,7 @@
          were also simply stale: "Monday Karaoke (21:00)" and "Saturday Pre-Party
          (22:30)" against a calendar that says 19:00 and 22:00. -->
     <div id="venueCards"></div>
+    <div id="layerCards" hidden></div>
 
   </main>
 
@@ -395,7 +396,10 @@
           .map(([k, l]) => btn(k, l.label, l.icon, l.count)).join('');
 
       bar.querySelectorAll('[data-layer]').forEach(b => {
-        b.onclick = () => { activeLayer = b.dataset.layer; applyLayers(); renderLayerBar(); };
+        b.onclick = () => {
+          activeLayer = b.dataset.layer;
+          applyLayers(); renderLayerBar(); renderLayerCards();
+        };
       });
     }
 
@@ -495,9 +499,7 @@
       });
       map.addControl(new Compass());
 
-      L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-      }).addTo(map);
+      isotBasemap(map);
 
       const icon = (glyph, cls = '', label = '') => L.divIcon({
         className: 'isot-pin-wrapper',
@@ -738,6 +740,7 @@
 
       applyLayers();
       renderLayerBar();
+      renderLayerCards();
     }
 
     /* The walking tour. It is a road, not a scatter of pins: the whole point is the
@@ -793,6 +796,7 @@
       LAYER.tour.count = stops.length;
       applyLayers();
       renderLayerBar();
+      renderLayerCards();
 
       const banner = document.getElementById('tourBanner');
       if (banner) {
@@ -980,6 +984,118 @@
     /* One card per active venue, from the same rows that drew the pins. The weekly
        nights come from the calendar rather than being typed in, so a time can only be
        wrong here if it is wrong everywhere. */
+
+    /* Every layer gets a list under the map, the way Partners always had one. A pin
+       tells you where a thing is; the list tells you what it is, and on a phone the
+       list is what people actually read. Rendered from rows already in memory, so
+       switching layers costs nothing. */
+    function renderLayerCards() {
+      const host = document.getElementById('layerCards');
+      if (!host) return;
+
+      const shell = (title, count, body) => `
+        <p class="eyebrow" style="margin:22px 0 10px">${escapeHtml(title)}
+          <span class="dim" style="font-weight:400">· ${count}</span></p>${body}`;
+
+      let html = '';
+
+      if (activeLayer === 'gems') {
+        html = shell('Gems', gems.length, gems.length ? gems.map(g => `
+          <div class="card card-glass" style="margin-bottom:12px;cursor:pointer"
+               onclick="openGem('${g.id}')">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:1.2rem">${g.found_by_me ? '\u2713' : '\ud83d\udc8e'}</span>
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:700;font-size:1rem">${escapeHtml(g.name)}</div>
+                <div style="color:var(--text-muted);font-size:0.84rem;line-height:1.45;margin-top:2px">
+                  ${escapeHtml(g.found_by_me ? (g.reveal || '') : (g.hint || 'Somewhere in Turin.'))}
+                </div>
+              </div>
+              <span class="badge badge-participant" style="flex-shrink:0">${g.points} pts</span>
+            </div>
+            <div class="dim" style="font-size:0.74rem;margin-top:8px">
+              ${g.found_by_me ? 'Found by you.'
+                : (g.found_count ? g.found_count + ' found it so far.' : 'Nobody has found this one yet.')}
+            </div>
+          </div>`).join('')
+          : '<p class="dim" style="font-size:0.86rem">No gems live right now.</p>');
+      }
+
+      else if (activeLayer === 'tour' && trailData) {
+        const T = trailData.T;
+        html = shell('The walk', `${T.done} of ${T.total} stops`, `
+          <div class="card card-glass">
+            <h2 style="font-size:1.15rem;margin:0 0 6px">${escapeHtml(T.name)}</h2>
+            <p style="color:var(--text-muted);font-size:0.86rem;line-height:1.55;margin:0 0 12px">
+              ${escapeHtml(T.blurb || '')}
+            </p>
+            <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:0.78rem;margin-bottom:14px">
+              <span class="dim"><i class="fa-solid fa-route"></i> ${T.distance_km} km</span>
+              ${T.walk_minutes ? `<span class="dim"><i class="fa-solid fa-person-walking"></i> ${T.walk_minutes} min</span>` : ''}
+              <span class="dim"><i class="fa-solid fa-sun"></i> Sunset ${escapeHtml(T.sunset_local || '—')}</span>
+            </div>
+            ${trailData.stops.map(st => `
+              <div style="display:flex;gap:11px;align-items:baseline;padding:7px 0;border-top:1px solid var(--border-light)">
+                <span style="width:20px;flex-shrink:0;font-weight:700;font-size:0.8rem;
+                  color:${st.done ? 'var(--green,#43DB8F)' : (st.current ? 'var(--pink)' : 'var(--text-dim)')}">
+                  ${st.done ? '\u2713' : st.position}</span>
+                <span style="flex:1;font-size:0.9rem;${st.done ? 'color:var(--text-muted)' : ''}">
+                  ${escapeHtml(st.name)}</span>
+                ${st.leg_minutes ? `<span class="dim" style="font-size:0.72rem;white-space:nowrap">${st.leg_minutes} min</span>` : ''}
+              </div>`).join('')}
+            <a href="tour.html?t=${trailData.id}" class="btn btn-pink" style="margin-top:14px">
+              ${T.done ? 'Continue the walk' : 'Start the walk'} \u2192</a>
+          </div>`);
+      }
+
+      else if (activeLayer === 'campus' || activeLayer === 'mensa') {
+        const kind = activeLayer;
+        const rows = cityPlaces.filter(p => p.kind === kind);
+
+        if (kind === 'mensa') {
+          // Seven of them, and the hours are the whole reason to look — so each one
+          // gets a real card rather than a line in a list.
+          html = shell('Canteens', rows.length, rows.map(r => `
+            <div class="card card-glass" style="margin-bottom:12px">
+              <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline">
+                <div style="font-weight:700;font-size:1.02rem">${escapeHtml(r.name)}</div>
+                <span class="dim" style="font-size:0.72rem;white-space:nowrap">${escapeHtml(r.operator || '')}</span>
+              </div>
+              <div class="dim" style="font-size:0.8rem;margin-top:3px">${escapeHtml(r.address || '')}</div>
+              ${r.note ? `<div style="color:var(--text-muted);font-size:0.84rem;line-height:1.5;margin-top:8px">${escapeHtml(r.note)}</div>` : ''}
+              <div style="display:flex;gap:14px;margin-top:10px;font-size:0.8rem">
+                <a href="https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}"
+                   target="_blank" rel="noopener" style="color:var(--pink);text-decoration:none">Directions &rarr;</a>
+                ${r.url ? `<a href="${escapeHtml(r.url)}" target="_blank" rel="noopener"
+                   style="color:var(--text-dim);text-decoration:none">EDISU page &rarr;</a>` : ''}
+              </div>
+            </div>`).join(''));
+        } else {
+          // Twenty-one campuses. Big cards would be a wall, so they are compact rows
+          // grouped by institution — which is how a student thinks about them.
+          const byOp = {};
+          rows.forEach(r => { (byOp[r.operator || 'Other'] ||= []).push(r); });
+          const order = Object.keys(byOp).sort((a, b) => byOp[b].length - byOp[a].length);
+          html = shell('Campuses', rows.length, `
+            <div class="card card-glass">
+              ${order.map(op => `
+                <p class="eyebrow" style="margin:14px 0 6px;color:var(--text-dim)">${escapeHtml(op)}</p>
+                ${byOp[op].map(r => `
+                  <a href="https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}"
+                     target="_blank" rel="noopener"
+                     style="display:block;text-decoration:none;color:inherit;padding:9px 0;border-top:1px solid var(--border-light)">
+                    <div style="font-weight:600;font-size:0.94rem">${escapeHtml(r.name)}</div>
+                    <div class="dim" style="font-size:0.76rem;margin-top:1px">${escapeHtml(r.address || '')}</div>
+                    ${r.note ? `<div style="color:var(--text-muted);font-size:0.8rem;line-height:1.45;margin-top:3px">${escapeHtml(r.note)}</div>` : ''}
+                  </a>`).join('')}`).join('')}
+            </div>`);
+        }
+      }
+
+      host.innerHTML = html;
+      host.hidden = !html;
+    }
+
     function renderVenueCards(venues, tonightByVenue, allEvents) {
       const host = document.getElementById('venueCards');
       if (!host) return;

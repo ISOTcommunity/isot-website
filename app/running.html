@@ -844,9 +844,7 @@
       map = L.map('runMap', { zoomControl: false, attributionControl: false });
       L.control.attribution({ prefix: false, position: 'bottomright' }).addAttribution('&copy; OSM').addTo(map);
       
-      L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
-        maxZoom: 19
-      }).addTo(map);
+      isotBasemap(map);
 
       renderPills();
       selectRoute(0);
