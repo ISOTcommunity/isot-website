@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-N2S3FL84RT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-N2S3FL84RT');
+</script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Turin 5 Top Running Routes · ISOT Community</title>
+
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="../assets/favicon.png" sizes="48x48" type="image/png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-title" content="ISOT" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#000000" />
+  <script defer src="/_vercel/insights/script.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="vendor/leaflet.css" />
+  <link rel="stylesheet" href="css/app.css" />
+
+  <style>
+    #runMap {
+      height: 340px;
+      width: 100%;
+      border-radius: 20px;
+      border: 1px solid var(--border-glow);
+      box-shadow: 0 12px 32px rgba(238, 9, 121, 0.2);
+      margin-bottom: 20px;
+    }
+    
+    .leaflet-control-attribution {
+      background: rgba(11, 15, 25, 0.6) !important;
+      color: var(--text-dim) !important;
+      font-size: 0.65rem !important;
+      border-radius: 6px 0 0 0;
+    }
+    .leaflet-control-attribution a { color: var(--text-dim) !important; }
+
+    .route-selector {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .route-selector::-webkit-scrollbar { display: none; }
+    
+    .route-pill {
+      flex-shrink: 0;
+      padding: 10px 16px;
+      border-radius: 9999px;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid var(--border-light);
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .route-pill.active {
+      background: linear-gradient(135deg, #EE0979, #FF6A00);
+      border-color: transparent;
+      color: #FFF;
+      box-shadow: 0 6px 18px rgba(238, 9, 121, 0.4);
+    }
+
+    .route-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    }
+    .route-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 16px 0;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--border-light);
+    }
+    .stat-val { font-size: 1.25rem; font-weight: 800; color: var(--pink); line-height: 1; }
+    .stat-lbl { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; margin-top: 4px; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display:flex;align-items:center;gap:8px">
+      <i class="fa-solid fa-person-running text-pink"></i>
+      <span>Turin 5 Running Maps</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:12px">
+      <a href="partner.html" style="color:#FFF;font-size:1.15rem;padding:4px" title="Map"><i class="fa-solid fa-map-location-dot"></i></a>
+      <div id="headerAvatar" style="cursor:pointer" data-open-drawer></div>
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background:transparent;border:none;color:#FFF;font-size:1.3rem;cursor:pointer;padding:6px">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="shell" style="padding-top:18px;padding-bottom:96px">
+
+    <div style="margin-bottom: 16px;">
+      <div class="eyebrow"><i class="fa-solid fa-fire text-pink"></i> ISOT Athletics &amp; Outdoor</div>
+      <h1 style="font-size: 1.8rem; margin-top: 4px;">Top 5 Running Routes in Turin</h1>
+      <p style="color: var(--text-dim); font-size: 0.88rem; margin-top: 4px;">Curated scenic running tracks for international students in Turin.</p>
+    </div>
+
+    <!-- Route Selector Pills -->
+    <div class="route-selector" id="routePills"></div>
+
+    <!-- Interactive Route Map -->
+    <div id="runMap"></div>
+
+    <!-- Active Route Detail Card -->
+    <div class="route-card" id="routeCard"></div>
+
+  </main>
+
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="tabbar">
+    <a href="home.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </a>
+    <a href="events.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Calendar
+    </a>
+    <a href="partner.html" class="tab-item active">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+      Map
+    </a>
+    <a href="network.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+      Network
+    </a>
+  </nav>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="vendor/leaflet.js"></script>
+  <script src="js/isot.js"></script>
+
+  <script>
+    const ROUTES = [
+      {
+        id: "valentino-loop",
+        name: "1. Parco del Valentino & Po Loop",
+        shortName: "Valentino & Po Loop",
+        distance: "5.2 km",
+        elevation: "+20 m",
+        difficulty: "Easy / Flat",
+        surface: "Paved & Shaded Asphalt",
+        desc: "The iconic student running route from Piazza Vittorio & Murazzi, passing Fontana dei Dodici Mesi, Borgo Medievale castle, and crossing Ponte Isabella.",
+        points: [
+          [45.0645, 7.6912], // Piazza Vittorio
+          [45.0618, 7.6948], // Murazzi del Po
+          [45.0565, 7.6880], // Ponte Umberto I
+          [45.0520, 7.6845], // Borgo Medievale
+          [45.0465, 7.6820], // Ponte Isabella
+          [45.0470, 7.6860], // River East Bank
+          [45.0570, 7.6920], // Return Murazzi
+          [45.0645, 7.6912]  // Finish
+        ]
+      },
+      {
+        id: "po-moncalieri",
+        name: "2. Extended Po Riverbank Trail",
+        shortName: "Po Riverbank 10K",
+        distance: "9.8 km",
+        elevation: "+35 m",
+        difficulty: "Moderate",
+        surface: "Car-Free River Trail",
+        desc: "Continuous green belt run along the Po River from Murazzi del Po down to Parco delle Vallere and Moncalieri Bridge. Ideal for 10K training.",
+        points: [
+          [45.0645, 7.6912],
+          [45.0565, 7.6880],
+          [45.0465, 7.6820],
+          [45.0350, 7.6780], // Parco Vallere
+          [45.0080, 7.6750], // Moncalieri Bridge
+          [45.0350, 7.6780],
+          [45.0645, 7.6912]
+        ]
+      },
+      {
+        id: "pellerina",
+        name: "3. Parco della Pellerina Loop",
+        shortName: "Pellerina Green Track",
+        distance: "6.5 km",
+        elevation: "+15 m",
+        difficulty: "Easy / Joint-Friendly",
+        surface: "Fine Gravel & Grass Path",
+        desc: "Turin's largest urban green park along the Dora Riparia river. Features dedicated 5k running tracks with distance markers and duck ponds.",
+        points: [
+          [45.0880, 7.6350], // Corso Appio Claudio
+          [45.0920, 7.6420], // Dora River Bridge
+          [45.0890, 7.6520], // Pellerina East
+          [45.0830, 7.6450], // South Loop
+          [45.0850, 7.6330], // West Pond
+          [45.0880, 7.6350]
+        ]
+      },
+      {
+        id: "colletta-confluence",
+        name: "4. Parco Colletta & River Confluence",
+        shortName: "Colletta Po-Dora Trail",
+        distance: "7.2 km",
+        elevation: "+10 m",
+        difficulty: "Easy",
+        surface: "Dirt Path & Asphalt",
+        desc: "Scenic trail north of Vanchiglia leading to the natural confluence where the Dora Riparia river flows into the Po River.",
+        points: [
+          [45.0760, 7.7020], // Corso Regio Parco
+          [45.0810, 7.7100], // Parco Colletta
+          [45.0860, 7.7180], // Confluence Po/Dora
+          [45.0800, 7.7120],
+          [45.0760, 7.7020]
+        ]
+      },
+      {
+        id: "cappuccini-hill",
+        name: "5. Monte dei Cappuccini & Hill Climb",
+        shortName: "Cappuccini Hill Challenge",
+        distance: "4.2 km",
+        elevation: "+165 m",
+        difficulty: "Challenging / Hill Workout",
+        surface: "Paved Incline & Cobblestones",
+        desc: "High-intensity hill workout climbing Salita al Monte dei Cappuccini and Villa Genero, offering breathtaking sunset views over Turin & the Alps.",
+        points: [
+          [45.0645, 7.6912], // Piazza Vittorio
+          [45.0630, 7.6960], // Ponte Vittorio Emanuele
+          [45.0598, 7.6975], // Monte dei Cappuccini Viewpoint
+          [45.0560, 7.7020], // Villa Genero Park
+          [45.0645, 7.6912]  // Return Finish
+        ]
+      }
+    ];
+
+    let map = null;
+    let currentPolyline = null;
+    let currentMarkers = [];
+
+    async function initRunningPage() {
+      const me = await requireAuth();
+      document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(me, 36);
+
+      // Initialize Leaflet Map
+      map = L.map('runMap', { zoomControl: false, attributionControl: false });
+      L.control.attribution({ prefix: false, position: 'bottomright' }).addAttribution('&copy; OSM').addTo(map);
+      
+      L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
+        maxZoom: 19
+      }).addTo(map);
+
+      renderPills();
+      selectRoute(0);
+    }
+
+    function renderPills() {
+      const container = document.getElementById('routePills');
+      container.innerHTML = ROUTES.map((r, idx) => `
+        <button class="route-pill ${idx === 0 ? 'active' : ''}" onclick="selectRoute(${idx})">
+          <i class="fa-solid fa-person-running"></i> ${r.shortName}
+        </button>
+      `).join('');
+    }
+
+    function selectRoute(idx) {
+      const route = ROUTES[idx];
+
+      // Update pills UI
+      document.querySelectorAll('.route-pill').forEach((btn, i) => {
+        btn.classList.toggle('active', i === idx);
+      });
+
+      // Update Details Card
+      document.getElementById('routeCard').innerHTML = `
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 8px;">
+          <span class="badge badge-socio" style="background:rgba(238,9,121,0.15); color:var(--pink);"><i class="fa-solid fa-location-dot"></i> Verified Route</span>
+          <span style="font-size:0.8rem; color:var(--text-dim); font-weight:600;"><i class="fa-solid fa-mountain"></i> ${route.difficulty}</span>
+        </div>
+        <h2 style="font-size:1.35rem; color:#FFF; margin-bottom:6px;">${route.name}</h2>
+        <p style="color:var(--text-dim); font-size:0.86rem; line-height:1.5; margin-bottom:12px;">${route.desc}</p>
+        
+        <div class="route-stats-grid">
+          <div>
+            <div class="stat-val">${route.distance}</div>
+            <div class="stat-lbl">Distance</div>
+          </div>
+          <div>
+            <div class="stat-val" style="color:var(--gold);">${route.elevation}</div>
+            <div class="stat-lbl">Elevation</div>
+          </div>
+          <div>
+            <div class="stat-val" style="color:#22C55E;" style="font-size:0.95rem;">${route.surface.split(' ')[0]}</div>
+            <div class="stat-lbl">Terrain</div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:14px;">
+          <a href="https://maps.google.com/?q=${route.points[0][0]},${route.points[0][1]}" target="_blank" rel="noopener" class="btn btn-pink" style="flex:1; justify-content:center; padding:10px;">
+            <i class="fa-solid fa-location-arrow"></i> Navigate to Start
+          </a>
+        </div>
+      `;
+
+      // Clear previous map elements
+      if (currentPolyline) map.removeLayer(currentPolyline);
+      currentMarkers.forEach(m => map.removeLayer(m));
+      currentMarkers = [];
+
+      // Draw polyline route
+      currentPolyline = L.polyline(route.points, {
+        color: '#EE0979',
+        weight: 5,
+        opacity: 0.9,
+        lineCap: 'round',
+        lineJoin: 'round'
+      }).addTo(map);
+
+      // Start Pin
+      const startPin = L.divIcon({
+        className: 'isot-pin-wrapper',
+        html: `<div class="isot-pin" style="background:#22C55E; box-shadow:0 0 16px rgba(34,197,94,0.8);"><i class="fa-solid fa-play"></i></div>`,
+        iconSize: [32, 32], iconAnchor: [16, 16]
+      });
+      const startMarker = L.marker(route.points[0], { icon: startPin }).addTo(map).bindPopup(`<b>Start Point</b><br>${route.name}`);
+      currentMarkers.push(startMarker);
+
+      // Finish Pin
+      const endPoint = route.points[route.points.length - 1];
+      const finishPin = L.divIcon({
+        className: 'isot-pin-wrapper',
+        html: `<div class="isot-pin" style="background:#EE0979;"><i class="fa-solid fa-flag-checkered"></i></div>`,
+        iconSize: [32, 32], iconAnchor: [16, 16]
+      });
+      const finishMarker = L.marker(endPoint, { icon: finishPin }).addTo(map);
+      currentMarkers.push(finishMarker);
+
+      // Fit map to route bounds
+      map.fitBounds(currentPolyline.getBounds(), { padding: [35, 35], maxZoom: 16 });
+    }
+
+    document.addEventListener('DOMContentLoaded', initRunningPage);
+  </script>
+</body>
+</html>
