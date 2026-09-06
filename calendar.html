@@ -57,7 +57,33 @@
     .navbtn:hover:not(:disabled) { border-color: var(--pink); color: #FFF; }
     .navbtn:disabled { opacity: 0.35; cursor: not-allowed; }
 
+    .viewtabs { display: flex; gap: 6px; margin-top: 24px; }
+    .vtab {
+      background: transparent; border: 1px solid var(--border-light); color: var(--text-muted);
+      border-radius: 999px; padding: 6px 16px; cursor: pointer; font-family: inherit; font-size: 0.82rem;
+    }
+    .vtab.on { background: var(--pink); border-color: var(--pink); color: #0B0B0F; font-weight: 600; }
+
     .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+
+    /* Week view: seven rows, one per day, so a night has room for its title rather
+       than a dot. On a phone a 7-column week is unreadable. */
+    .wk-day {
+      display: flex; gap: 12px; padding: 12px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .wk-day:last-child { border-bottom: none; }
+    .wk-day.empty { opacity: 0.4; }
+    .wk-when {
+      flex-shrink: 0; width: 62px; font-size: 0.78rem; color: var(--text-dim);
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .wk-when b { display: block; color: #FFF; font-size: 1.05rem; letter-spacing: 0; }
+    .wk-when.today b { color: var(--pink); }
+    .wk-items { flex: 1; min-width: 0; }
+    .wk-item { padding: 3px 0; }
+    .wk-item b { color: #FFF; font-weight: 600; }
+    .wk-item span { color: var(--text-dim); font-size: 0.84rem; }
     .dow {
       text-align: center; font-size: 0.66rem; color: var(--text-dark);
       text-transform: uppercase; letter-spacing: 0.08em; padding-bottom: 6px; font-weight: 700;
@@ -143,6 +169,11 @@
       night says otherwise. This page reads the live calendar, so it is never out of date.
     </p>
 
+    <div class="viewtabs">
+      <button type="button" class="vtab on" data-v="month" onclick="setView('month')">Month</button>
+      <button type="button" class="vtab"    data-v="week"  onclick="setView('week')">Week</button>
+    </div>
+
     <div class="cal">
       <div class="cal-nav">
         <button type="button" class="navbtn" id="prev">← Prev</button>
@@ -182,6 +213,9 @@
                   'July','August','September','October','November','December'];
 
   let events = [];
+  let view = 'month';
+  // Week view walks by week and month view by month, but both move the same cursor —
+  // so switching keeps you roughly where you were rather than jumping to today.
   let cursor = new Date();
   let selected = null;
   let range = { min: null, max: null };
@@ -213,20 +247,93 @@
     }
     events = data || [];
 
-    document.getElementById('dows').innerHTML = DOW.map(d => `<div class="dow">${d}</div>`).join('');
     document.getElementById('prev').onclick = () => shift(-1);
     document.getElementById('next').onclick = () => shift(1);
     document.getElementById('copyFeed').onclick = copyFeed;
     render();
   })();
 
+  function setView(v) {
+    view = v;
+    document.querySelectorAll('.vtab').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+    selected = null;
+    render();
+  }
+
+  function mondayOf(d) {
+    const m = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    m.setDate(m.getDate() - ((m.getDay() + 6) % 7));
+    return m;
+  }
+
   function shift(n) {
-    const c = new Date(cursor.getFullYear(), cursor.getMonth() + n, 1);
-    if (c < range.min || c > range.max) return;
+    const c = view === 'week'
+      ? new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() + n * 7)
+      : new Date(cursor.getFullYear(), cursor.getMonth() + n, 1);
+    // Clamp to the range actually loaded, so paging never lands on an empty stretch
+    // that in fact has events.
+    if (c < range.min || c > new Date(range.max.getFullYear(), range.max.getMonth() + 1, 0)) return;
     cursor = c; selected = null; render();
   }
 
   function render() {
+    const today = isotToday();
+    if (view === 'week') return renderWeek(today);
+    renderMonth(today);
+  }
+
+  function renderWeek(today) {
+    const start = mondayOf(cursor);
+    const end = new Date(start); end.setDate(end.getDate() + 6);
+
+    const fmt = (d) => `${d.getDate()} ${MONTHS[d.getMonth()].slice(0,3)}`;
+    document.getElementById('monthLabel').textContent =
+      `${fmt(start)} – ${fmt(end)} ${end.getFullYear()}`;
+
+    document.getElementById('prev').disabled = start <= range.min;
+    document.getElementById('next').disabled =
+      start >= new Date(range.max.getFullYear(), range.max.getMonth() + 1, 0);
+
+    // The day-of-week header and the month grid belong to the other view.
+    document.getElementById('dows').innerHTML = '';
+
+    let html = '';
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start); d.setDate(start.getDate() + i);
+      const k = key(d.getFullYear(), d.getMonth(), d.getDate());
+      const on = events.filter(e => e.event_date === k);
+      const isToday = k === today;
+
+      html += `
+        <div class="wk-day ${on.length ? '' : 'empty'}">
+          <div class="wk-when ${isToday ? 'today' : ''}">
+            ${DOW[i]}<b>${d.getDate()}</b>
+          </div>
+          <div class="wk-items">
+            ${on.length
+              ? on.map(e => `
+                  <div class="wk-item">
+                    <b>${esc(e.title)}</b>
+                    <span>· ${esc((e.start_time || '').slice(0,5))} · ${esc(e.venue_name || '')}</span>
+                    ${e.register_url
+                      ? `<div><a class="ev-link" href="${esc(e.register_url)}" target="_blank" rel="noopener noreferrer">
+                           ${esc(e.register_label || 'Register')} →</a></div>` : ''}
+                  </div>`).join('')
+              : '<span style="color:var(--text-dark);font-size:0.84rem">—</span>'}
+          </div>
+        </div>`;
+    }
+
+    document.getElementById('days').style.display = 'block';
+    document.getElementById('days').innerHTML = html;
+    // The list below duplicates the week, so it is hidden here.
+    document.getElementById('list').innerHTML = '';
+  }
+
+  function renderMonth(today) {
+    document.getElementById('dows').innerHTML = DOW.map(d => `<div class="dow">${d}</div>`).join('');
+    document.getElementById('days').style.display = 'grid';
+
     const y = cursor.getFullYear(), m = cursor.getMonth();
     document.getElementById('monthLabel').textContent = `${MONTHS[m]} ${y}`;
 
@@ -234,7 +341,6 @@
     document.getElementById('prev').disabled = cur <= range.min;
     document.getElementById('next').disabled = cur >= range.max;
 
-    const today = isotToday();
     const first = new Date(y, m, 1);
     // Monday-first, matching how a week is read in Italy.
     const lead = (first.getDay() + 6) % 7;
