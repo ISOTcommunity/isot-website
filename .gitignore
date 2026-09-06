@@ -8,3 +8,9 @@ ANTIGRAVITY_PROMPT.md
 # Raw asset archives (not used by site, too large for git)
 assets/Photos/
 assets/Instagram Posts/
+
+# Working directory for local tooling — never deploy, never commit.
+scratch/
+.DS_Store
+__pycache__/
+*.pyc

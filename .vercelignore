@@ -1,0 +1,20 @@
+# Nothing here is served. It was being uploaded on every deployment anyway, and
+# deployment storage is billed on the total across all deployments — 73 MB of it
+# was a Python virtualenv and three Chrome profiles' GPU caches.
+#
+# Excluding a path here does NOT delete it: it stays in git and on disk, it just
+# stops being copied into each build. Add nothing to this file that the site
+# actually fetches at runtime.
+
+scratch/
+
+# Source material kept for reference, not referenced by any page.
+assets/wp-media/
+assets/whatsapp_features/
+
+# Local tooling
+.DS_Store
+*.pyc
+__pycache__/
+venv/
+node_modules/
