@@ -192,6 +192,43 @@
     }
     .leaflet-control-attribution a { color: var(--text-dark) !important; text-decoration: none; }
 
+    /* ── Map toolbox ────────────────────────────────────────────────────
+       Three controls, each where a map reader expects it: scale bottom-left
+       (it measures the ground, so it sits on it), zoom bottom-right under the
+       thumb, compass above the zoom. Styled to the app rather than left as
+       Leaflet's white default, which reads as an unfinished embed. */
+    .leaflet-bar, .leaflet-control-zoom { border:none !important; box-shadow:none !important; }
+    .leaflet-control-zoom a {
+      width:34px; height:34px; line-height:32px;
+      background:rgba(10,10,14,.78) !important; color:var(--text) !important;
+      border:1px solid rgba(255,255,255,.11) !important;
+      backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+      font-size:1.15rem; font-weight:400;
+    }
+    .leaflet-control-zoom a:first-child { border-radius:10px 10px 0 0 !important; }
+    .leaflet-control-zoom a:last-child  { border-radius:0 0 10px 10px !important; border-top:none !important; }
+    .leaflet-control-zoom a:hover { background:rgba(212,90,232,.22) !important; }
+    .leaflet-control-zoom a.leaflet-disabled { opacity:.4; }
+
+    .leaflet-control-scale-line {
+      background:rgba(10,10,14,.72) !important; color:var(--text-muted) !important;
+      border:1px solid rgba(255,255,255,.14) !important; border-top:none !important;
+      border-radius:0 0 7px 7px; font-size:.66rem; padding:1px 6px;
+      backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+      font-variant-numeric:tabular-nums;
+    }
+
+    .compass-btn {
+      width:34px; height:34px; border-radius:50%; cursor:pointer; display:flex;
+      align-items:center; justify-content:center; margin-bottom:7px;
+      background:rgba(10,10,14,.78); border:1px solid rgba(255,255,255,.11);
+      backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    }
+    .compass-btn:hover { background:rgba(212,90,232,.22); }
+    .compass-btn svg { display:block; transition:transform .18s ease; }
+    @media (prefers-reduced-motion:reduce){ .compass-btn svg{ transition:none; } }
+
+
     /* Tour stops are location marks with a number, deliberately unlike the gem pins —
        a stop is a place on a route, a gem is a thing hidden somewhere. */
     .stop-pin { display:flex; align-items:center; justify-content:center;
@@ -416,6 +453,41 @@
       L.control.attribution({ prefix: false, position: 'bottomright' })
         .addAttribution('&copy; OSM')
         .addTo(map);
+
+      // Zoom bottom-right, under the thumb rather than up by the layer filters.
+      L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+      // Metric only. This is Italy; an imperial bar would be noise.
+      L.control.scale({ position: 'bottomleft', metric: true, imperial: false, maxWidth: 110 }).addTo(map);
+
+      /* A compass earns its place here because this map actually rotates — two-finger
+         rotate is enabled. The needle tracks the bearing and tapping it returns to
+         north, which is the way out of an accidental rotation. */
+      const Compass = L.Control.extend({
+        options: { position: 'bottomright' },
+        onAdd(m) {
+          const el = L.DomUtil.create('div', 'compass-btn');
+          el.innerHTML = '<svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 L15.6 12 L12 10.2 L8.4 12 Z" fill="#D45AE8"/><path d="M12 22 L8.4 12 L12 13.8 L15.6 12 Z" fill="#6E6E7C"/></svg>';
+          el.title = 'Face north';
+          el.setAttribute('role', 'button');
+          el.setAttribute('tabindex', '0');
+          el.setAttribute('aria-label', 'Face north');
+          const spin = () => {
+            const b = (typeof m.getBearing === 'function' ? m.getBearing() : 0) || 0;
+            el.firstChild.style.transform = 'rotate(' + (-b) + 'deg)';
+          };
+          const north = () => { if (typeof m.setBearing === 'function') m.setBearing(0); spin(); };
+          L.DomEvent.disableClickPropagation(el);
+          L.DomEvent.on(el, 'click', north);
+          L.DomEvent.on(el, 'keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { L.DomEvent.preventDefault(e); north(); }
+          });
+          m.on('rotate rotateend move zoomend', spin);
+          spin();
+          return el;
+        },
+      });
+      map.addControl(new Compass());
 
       L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
         maxZoom: 19,

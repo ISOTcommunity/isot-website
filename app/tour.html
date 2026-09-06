@@ -37,6 +37,43 @@
     }
     .leaflet-control-attribution a { color: var(--text-dim) !important; text-decoration: none; }
 
+    /* ── Map toolbox ────────────────────────────────────────────────────
+       Three controls, each where a map reader expects it: scale bottom-left
+       (it measures the ground, so it sits on it), zoom bottom-right under the
+       thumb, compass above the zoom. Styled to the app rather than left as
+       Leaflet's white default, which reads as an unfinished embed. */
+    .leaflet-bar, .leaflet-control-zoom { border:none !important; box-shadow:none !important; }
+    .leaflet-control-zoom a {
+      width:34px; height:34px; line-height:32px;
+      background:rgba(10,10,14,.78) !important; color:var(--text) !important;
+      border:1px solid rgba(255,255,255,.11) !important;
+      backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+      font-size:1.15rem; font-weight:400;
+    }
+    .leaflet-control-zoom a:first-child { border-radius:10px 10px 0 0 !important; }
+    .leaflet-control-zoom a:last-child  { border-radius:0 0 10px 10px !important; border-top:none !important; }
+    .leaflet-control-zoom a:hover { background:rgba(212,90,232,.22) !important; }
+    .leaflet-control-zoom a.leaflet-disabled { opacity:.4; }
+
+    .leaflet-control-scale-line {
+      background:rgba(10,10,14,.72) !important; color:var(--text-muted) !important;
+      border:1px solid rgba(255,255,255,.14) !important; border-top:none !important;
+      border-radius:0 0 7px 7px; font-size:.66rem; padding:1px 6px;
+      backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+      font-variant-numeric:tabular-nums;
+    }
+
+    .compass-btn {
+      width:34px; height:34px; border-radius:50%; cursor:pointer; display:flex;
+      align-items:center; justify-content:center; margin-bottom:7px;
+      background:rgba(10,10,14,.78); border:1px solid rgba(255,255,255,.11);
+      backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    }
+    .compass-btn:hover { background:rgba(212,90,232,.22); }
+    .compass-btn svg { display:block; transition:transform .18s ease; }
+    @media (prefers-reduced-motion:reduce){ .compass-btn svg{ transition:none; } }
+
+
     /* Numbered map markers. A location mark, not a gem — the number is the point,
        because the whole game is that the stops come in order. */
     .stop-pin { display:flex; align-items:center; justify-content:center;
@@ -213,7 +250,15 @@
           .addAttribution('&copy; OSM').addTo(map);
         L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
           { maxZoom: 19 }).addTo(map);
+
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+        // Scale matters more here than anywhere: the whole page is about how far
+        // apart these stops are.
+        L.control.scale({ position: 'bottomleft', metric: true, imperial: false, maxWidth: 110 }).addTo(map);
+        // No compass: this map does not rotate, so the needle would always point up
+        // and would be decoration claiming to be an instrument.
         markerLayer = L.layerGroup().addTo(map);
+        map.on('zoomstart movestart dragstart', finishRoad);
       }
 
       // The road. Drawn twice: a wide dark casing underneath so the bright line reads
@@ -274,11 +319,23 @@
       requestAnimationFrame(() => { path.style.strokeDashoffset = '0'; });
 
       // Clear the dash once it has arrived, so later redraws are plain solid strokes.
-      setTimeout(() => {
-        path.style.transition = '';
-        path.style.strokeDasharray = '';
-        path.style.strokeDashoffset = '';
-      }, 2400);
+      setTimeout(finishRoad, 2400);
+    }
+
+    /* The dash length is measured in the path's own units at one zoom level. Leaflet
+       rewrites the path's geometry on every zoom, so a dash still in place from the
+       old geometry no longer matches the new one and the road appears to slide,
+       reappear, or draw itself again as you zoom. Any map interaction therefore ends
+       the animation immediately and leaves a plain solid stroke.
+
+       It also makes the animation interruptible, which it should have been anyway —
+       someone reaching for the map wants the map, not to wait out a flourish. */
+    function finishRoad() {
+      const p = brightLine && brightLine.getElement && brightLine.getElement();
+      if (!p) return;
+      p.style.transition = '';
+      p.style.strokeDasharray = '';
+      p.style.strokeDashoffset = '';
     }
 
     function drawStops() {
