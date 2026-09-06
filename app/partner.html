@@ -123,6 +123,16 @@
     #gemSheet .modal-sheet { max-width: 420px; }
     #gemPhotoPreview { width: 100%; border-radius: 14px; display: block; margin-bottom: 12px; }
 
+    .layers { display:flex; gap:6px; margin-bottom:12px; overflow-x:auto; padding-bottom:2px; }
+    .layers::-webkit-scrollbar { display:none; }
+    .lbtn {
+      flex-shrink:0; padding:6px 14px; border-radius:999px; cursor:pointer;
+      background:transparent; border:1px solid var(--border-light); color:var(--text-muted);
+      font-family:inherit; font-size:0.8rem; display:inline-flex; align-items:center; gap:6px;
+    }
+    .lbtn.on { background:var(--pink); border-color:var(--pink); color:var(--on-accent,#0B0B0F); font-weight:600; }
+    .lbtn .n { font-variant-numeric:tabular-nums; opacity:0.75; }
+
     .score-strip {
       display: flex; align-items: center; gap: 14px;
       background: var(--bg-card); border: 1px solid var(--border-light);
@@ -194,6 +204,11 @@
     </div>
 
     <!-- Retina HD Dark Map -->
+    <!-- Layers rather than one merged pile of pins. Venues and gems answer different
+         questions — "where do I get a discount" and "where should I go on Sunday" —
+         and a map showing both at once serves neither. -->
+    <div class="layers" id="layerBar"></div>
+
     <div id="gemScore" hidden></div>
     <div id="liveBanner" hidden></div>
     <div id="mapContainer"></div>
@@ -235,6 +250,56 @@
   <script src="js/isot.js"></script>
 
   <script>
+    /* One entry per layer. Adding a third — trips, student services, wherever ISOT
+       goes next — means adding a line here and putting markers in its group. */
+    const LAYER = {
+      partners: { label: 'Partners', icon: 'fa-martini-glass', group: null, count: 0 },
+      gems:     { label: 'Gems',     icon: 'fa-gem',           group: null, count: 0 },
+    };
+    let activeLayer = 'all';
+    let mapRef = null;
+
+    function renderLayerBar() {
+      const bar = document.getElementById('layerBar');
+      if (!bar) return;
+
+      const total = Object.values(LAYER).reduce((n, l) => n + l.count, 0);
+      const btn = (k, label, icon, n) => `
+        <button type="button" class="lbtn ${activeLayer === k ? 'on' : ''}" data-layer="${k}">
+          ${icon ? `<i class="fa-solid ${icon}"></i>` : ''}${label}
+          <span class="n">${n}</span>
+        </button>`;
+
+      bar.innerHTML =
+        btn('all', 'All', '', total) +
+        // A layer with nothing in it is hidden rather than shown empty — tapping "Gems"
+        // and getting a blank map reads as broken, not as "none yet".
+        Object.entries(LAYER).filter(([, l]) => l.count > 0)
+          .map(([k, l]) => btn(k, l.label, l.icon, l.count)).join('');
+
+      bar.querySelectorAll('[data-layer]').forEach(b => {
+        b.onclick = () => { activeLayer = b.dataset.layer; applyLayers(); renderLayerBar(); };
+      });
+    }
+
+    function applyLayers() {
+      if (!mapRef) return;
+      Object.entries(LAYER).forEach(([k, l]) => {
+        if (!l.group) return;
+        const show = activeLayer === 'all' || activeLayer === k;
+        if (show) mapRef.addLayer(l.group); else mapRef.removeLayer(l.group);
+      });
+
+      // The cards below follow the map. Showing gem pins over a list of venues would
+      // make the page contradict itself.
+      const cards = document.getElementById('venueCards');
+      const score = document.getElementById('gemScore');
+      if (cards) cards.hidden = !(activeLayer === 'all' || activeLayer === 'partners');
+      if (score && !score.hidden) {
+        score.style.display = (activeLayer === 'all' || activeLayer === 'gems') ? '' : 'none';
+      }
+    }
+
     async function initPartnerMap() {
       const me = await requireAuth();
       document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(me, 36);
@@ -243,6 +308,9 @@
       // "Leaflet" link) — that part is optional. The OpenStreetMap and CARTO credit is
       // not: OSM data is ODbL-licensed and CARTO's tiles carry their own terms, so it
       // stays. It is styled down in CSS rather than removed.
+      LAYER.partners.group = L.layerGroup();
+      LAYER.gems.group     = L.layerGroup();
+
       const map = L.map('mapContainer', {
         zoomControl: false,
         attributionControl: false,
@@ -341,11 +409,10 @@
                : `${escapeHtml(on.title)} · ${escapeHtml(on.time)}`}</div>`
           : '';
 
-        L.marker([v.lat, v.lng], {
+        LAYER.partners.group.addLayer(L.marker([v.lat, v.lng], {
           icon: icon(isClub ? 'fa-compact-disc' : 'fa-martini-glass', cls, label),
           zIndexOffset: on ? 1000 : 0,   // a live venue sits above the others
         })
-          .addTo(map)
           .bindPopup(
             `<b>${escapeHtml(v.name)}</b><br>` +
             (on ? `<b>${on.live ? 'Happening now' : 'Tonight'}: ${escapeHtml(on.title)}` +
@@ -354,7 +421,7 @@
                   '<br>' : '') +
             `${escapeHtml(v.address || v.neighbourhood || '')}` +
             (v.member_discount ? `<br>${escapeHtml(v.member_discount)}` : '')
-          );
+          ));
       });
 
       renderLiveBanner(tonightByVenue);
@@ -372,6 +439,11 @@
 
       // Fit every pin rather than centring on a guessed midpoint — with one venue
       // off-screen it looked like the map was wrong.
+      mapRef = map;
+      LAYER.partners.count = located.length;
+      applyLayers();
+      renderLayerBar();
+
       map.fitBounds(located.map(v => [v.lat, v.lng]), { padding: [40, 40], maxZoom: 16 });
     }
 
@@ -475,10 +547,15 @@
           html: `<div class="gem-pin ${g.found_by_me ? 'found' : ''}">${g.found_by_me ? '\u2713' : '\ud83d\udc8e'}</div>`,
           iconSize: [30, 30], iconAnchor: [15, 15],
         });
-        L.marker([g.lat, g.lng], { icon, zIndexOffset: 500 })
-          .addTo(map)
-          .on('click', () => openGem(g.id));
+        LAYER.gems.group.addLayer(
+          L.marker([g.lat, g.lng], { icon, zIndexOffset: 500 })
+            .on('click', () => openGem(g.id)));
       });
+
+      // gems_for_map() resolves after the first paint, so the count is only known now.
+      LAYER.gems.count = gems.length;
+      applyLayers();
+      renderLayerBar();
     }
 
     function openGem(id) {
