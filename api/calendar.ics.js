@@ -12,14 +12,32 @@ const SUPABASE_URL = 'https://ywmdaekblhabyajzusfm.supabase.co';
 const ANON_KEY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3bWRhZWtibGhhYnlhanp1c2ZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNDM2NDYsImV4cCI6MjEwMjcxOTY0Nn0.PyMpTzffZ12j1HoheuRQMYH8d0WvfYkLXGfd1wJXTWw';
 
-// RFC 5545 wants CRLF, and lines folded at 75 octets. Calendar clients are strict about
-// both — Outlook in particular rejects a feed with long unfolded lines.
+// RFC 5545 folds at 75 OCTETS, not characters, and calendar clients are strict about
+// it — Outlook in particular rejects a feed with over-long lines.
+//
+// Counting characters is wrong the moment a description contains an em dash (3 bytes)
+// or an emoji (4). One ISOT event description is mostly emoji, and a 73-character line
+// of it measured 85 bytes.
+//
+// A fold must also never land inside a multi-byte character: the two halves would each
+// be invalid UTF-8. Continuation bytes are 10xxxxxx, so backing off while the next byte
+// matches that mask puts the split on a character boundary.
 function fold(line) {
-  const out = [];
-  let s = line;
-  while (s.length > 73) { out.push(s.slice(0, 73)); s = ' ' + s.slice(73); }
-  out.push(s);
-  return out.join('\r\n');
+  const bytes = Buffer.from(line, 'utf8');
+  if (bytes.length <= 75) return line;
+
+  const parts = [];
+  let start = 0;
+  while (start < bytes.length) {
+    // 75 on the first line; 74 after, because a continuation carries a leading space.
+    const budget = parts.length === 0 ? 75 : 74;
+    let end = Math.min(start + budget, bytes.length);
+    while (end > start + 1 && end < bytes.length && (bytes[end] & 0xC0) === 0x80) end--;
+    const chunk = bytes.slice(start, end).toString('utf8');
+    parts.push(parts.length === 0 ? chunk : ' ' + chunk);
+    start = end;
+  }
+  return parts.join('\r\n');
 }
 
 function esc(text) {
