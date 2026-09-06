@@ -640,11 +640,13 @@
         renderFeaturedNight();
 
         // Only draw the mosaic when there is no poster to lead with.
+        // The mosaic is now only for a genuinely empty calendar — with three nights
+        // listed there is nothing for it to fill.
         const hm = document.getElementById('homeMosaic');
-        const featured = !document.getElementById('featuredNight').hidden;
+        const hasEvents = !document.getElementById('featuredNight').hidden;
         if (hm) {
-          hm.hidden = featured;
-          if (!featured) hm.innerHTML = renderMosaicHtml(meProfile?.member_code || 'ISOT', 8);
+          hm.hidden = hasEvents;
+          if (!hasEvents) hm.innerHTML = renderMosaicHtml(meProfile?.member_code || 'ISOT', 8);
         }
 
         const isStaff = meProfile &&
@@ -661,50 +663,101 @@
     /* The soonest night that has a poster. Not simply the next event — most Mondays
        are the same Monday, and giving every one of them a hero would train people to
        scroll past it. A poster means somebody decided this night was worth announcing. */
+    /* The next three nights, not one.
+     *
+     * The first gets the poster and the room — it is the one people can still act on
+     * today. The two behind it are compact rows: enough to plan around, not enough to
+     * compete with the night that is actually next.
+     *
+     * A poster is used where there is one. It never falls back to a generated image:
+     * inventing a graphic for a night nobody has designed one for is the same mistake
+     * as inventing a headcount. */
     function renderFeaturedNight() {
       const el = document.getElementById('featuredNight');
       if (!el) return;
 
       const today = isotToday();
       const next = EVENTS_DATA
-        .filter(e => e.poster && e.date >= today)
-        .sort((a, b) => a.date.localeCompare(b.date))[0];
+        .filter(e => e.date >= today)
+        .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time))
+        .slice(0, 3);
 
-      if (!next) { el.hidden = true; return; }
+      if (!next.length) { el.hidden = true; return; }
 
-      const d = new Date(next.date + 'T00:00:00');
-      const when = d.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' });
-      const isTonight = next.date === today;
+      const label = (e) => {
+        const d = new Date(e.date + 'T00:00:00');
+        if (e.date === today) return 'Tonight';
+        const tm = new Date(Date.now() + 86400000);
+        const tomorrow = `${tm.getFullYear()}-${String(tm.getMonth() + 1).padStart(2, '0')}-${String(tm.getDate()).padStart(2, '0')}`;
+        if (e.date === tomorrow) return 'Tomorrow';
+        return d.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' });
+      };
+
+      const lead = next[0];
+      const rest = next.slice(1);
 
       el.hidden = false;
       el.innerHTML = `
-        <div class="card card-glass card-glow" style="padding:0;overflow:hidden">
-          <a href="events.html" style="display:block">
-            <img src="${escapeHtml(next.poster)}" alt="${escapeHtml(next.title)} poster"
-                 style="width:100%;display:block" />
-          </a>
+        <div class="card card-glass ${lead.poster ? 'card-glow' : ''}" style="padding:0;overflow:hidden">
+          ${lead.poster ? `
+            <a href="events.html" style="display:block">
+              <img src="${escapeHtml(lead.poster)}" alt="${escapeHtml(lead.title)} poster"
+                   style="width:100%;display:block" />
+            </a>` : ''}
           <div style="padding:16px 18px 18px">
             <div class="eyebrow" style="color:var(--pink)">
-              ${isTonight ? 'Tonight' : escapeHtml(when)}${next.headline ? ' · ' + escapeHtml(next.headline) : ''}
+              ${escapeHtml(label(lead))}${lead.headline ? ' · ' + escapeHtml(lead.headline) : ''}
             </div>
-            <h2 style="font-size:1.25rem;color:#FFF;margin:4px 0 2px">${escapeHtml(next.title)}</h2>
+            <h2 style="font-size:1.25rem;color:#FFF;margin:4px 0 2px">${escapeHtml(lead.title)}</h2>
             <div class="dim" style="font-size:0.82rem">
-              ${escapeHtml(next.time)} · ${escapeHtml(next.venueName || '')}
+              ${escapeHtml(lead.time)} · ${escapeHtml(lead.venueName || '')}
+              ${lead.goingCount ? ' · ' + lead.goingCount + ' going' : ''}
             </div>
             <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
-              <button type="button" class="btn ${userRsvps[next.id] ? 'btn-outline' : 'btn-pink'}"
+              <button type="button" class="btn ${userRsvps[lead.id] ? 'btn-outline' : 'btn-pink'}"
                       style="width:auto;padding:8px 16px;font-size:0.84rem"
-                      onclick="toggleFeaturedRsvp('${next.id}')">
-                <i class="fa-solid ${userRsvps[next.id] ? 'fa-circle-check text-green' : 'fa-calendar-plus'}"></i>
-                ${userRsvps[next.id] ? "You're going" : "I'm going"}
+                      onclick="toggleFeaturedRsvp('${lead.id}')">
+                <i class="fa-solid ${userRsvps[lead.id] ? 'fa-circle-check text-green' : 'fa-calendar-plus'}"></i>
+                ${userRsvps[lead.id] ? "You're going" : "I'm going"}
               </button>
               <a href="events.html" class="btn btn-outline"
                  style="width:auto;padding:8px 16px;font-size:0.84rem;display:inline-flex">
-                Full programme
+                All events
               </a>
             </div>
           </div>
-        </div>`;
+        </div>
+
+        ${rest.length ? `
+        <div class="card card-glass" style="margin-top:10px;padding:4px 16px">
+          ${rest.map(e => `
+            <div style="display:flex;align-items:center;gap:12px;padding:11px 0;
+                        border-bottom:1px solid var(--border-light)">
+              ${e.poster
+                ? `<img src="${escapeHtml(e.poster)}" alt="" loading="lazy"
+                        style="width:34px;height:44px;object-fit:cover;border-radius:6px 6px 12px 6px;flex-shrink:0" />`
+                : `<div style="width:34px;height:44px;border-radius:6px 6px 12px 6px;flex-shrink:0;
+                               background:rgba(255,255,255,0.06);display:flex;align-items:center;
+                               justify-content:center;color:var(--text-dark);font-size:0.7rem">
+                     ${escapeHtml(e.dayNum)}
+                   </div>`}
+              <div style="flex:1;min-width:0">
+                <div style="color:#FFF;font-weight:600;font-size:0.9rem">${escapeHtml(e.title)}</div>
+                <div class="dim" style="font-size:0.76rem">
+                  ${escapeHtml(label(e))} · ${escapeHtml(e.time)} · ${escapeHtml(e.venueName || '')}
+                </div>
+              </div>
+              <button type="button" class="btn ${userRsvps[e.id] ? 'btn-outline' : 'btn-pink'}"
+                      style="width:auto;padding:5px 12px;font-size:0.74rem;flex-shrink:0"
+                      onclick="toggleFeaturedRsvp('${e.id}')">
+                ${userRsvps[e.id] ? 'Going' : "I'm in"}
+              </button>
+            </div>`).join('')}
+        </div>` : ''}`;
+
+      // The last row's divider has nothing under it.
+      const rows = el.querySelectorAll('div[style*="border-bottom"]');
+      if (rows.length) rows[rows.length - 1].style.borderBottom = 'none';
     }
 
     function getNextUpcomingEvent() {
