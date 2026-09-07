@@ -44,6 +44,16 @@
       position: relative;
       overflow: hidden;
     }
+    /* Sits under your own status, so the banner answers both "where am I" and
+       "what is happening right now" without one hiding the other. */
+    .now-on-stage {
+      margin-top: 12px; padding-top: 11px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 0.84rem; color: var(--text-muted); line-height: 1.5;
+    }
+    .now-on-stage strong { color: #FFF; font-weight: 700; }
+    .now-on-stage i { color: var(--pink); margin-right: 5px; }
+
     .position-hero-badge.on-mic {
       background: linear-gradient(135deg, rgba(67, 219, 143, 0.25), rgba(212, 90, 232, 0.25));
       border-color: #43DB8F;
@@ -114,6 +124,7 @@
       <div class="eyebrow"><i class="fa-solid fa-music"></i> Live Stage Status</div>
       <h1 style="font-size: 2.1rem; color: #FFF; margin-top: 4px;" id="posText">Monday Karaoke @ Rough</h1>
       <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;" id="mySongSub">Queue opens every Monday at 21:00 (9 PM CET)!</p>
+      <p class="now-on-stage" id="nowOnStage" hidden></p>
       <div id="scheduleOverrideNotice" style="margin-top: 10px; display: none;">
         <button type="button" class="btn btn-outline" style="width: auto; padding: 4px 12px; font-size: 0.75rem; border-color: var(--gold); color: var(--gold);" onclick="toggleStaffOverride()">
           <i class="fa-solid fa-key"></i> Unlock Queue (Staff Testing Mode)
@@ -365,20 +376,29 @@
     }
 
     function renderQueueUI(slots) {
-      const playingSlot = slots.find(s => s.status === 'playing');
-      const pendingSlots = slots.filter(s => s.status === 'pending');
+      /* Status values come from karaoke_slots: queued / performing / done / skipped.
+         This function used to compare against 'playing' and 'pending', which the
+         database cannot hold — so playingSlot was always undefined and pendingSlots
+         always empty. Every path below fell through to the closing else, which is why
+         the stage banner only ever said "Monday Karaoke @ Rough" and the Now Playing
+         branch, written and correct, never ran once. The row mapper above renames
+         song_artist and singer_profile_id but left status alone. */
+      const playingSlot = slots.find(s => s.status === 'performing');
+      const pendingSlots = slots.filter(s => s.status === 'queued');
 
       myActiveSlot = slots.find(s => s.profile_id === me.id);
 
       const heroBadge = document.getElementById('heroBadge');
       const posText = document.getElementById('posText');
       const mySongSub = document.getElementById('mySongSub');
+      const nowLine = document.getElementById('nowOnStage');
+      nowLine.hidden = true;   // each branch below opts in
 
       if (playingSlot && playingSlot.profile_id === me.id) {
         heroBadge.className = 'position-hero-badge on-mic';
         posText.textContent = "YOU ARE ON MIC! 🎤";
         mySongSub.textContent = `Singing: "${escapeHtml(playingSlot.song_title)}" by ${escapeHtml(playingSlot.artist_name || 'Artist')}`;
-      } else if (myActiveSlot && myActiveSlot.status === 'pending') {
+      } else if (myActiveSlot && myActiveSlot.status === 'queued') {
         heroBadge.className = 'position-hero-badge';
         const index = pendingSlots.findIndex(s => s.id === myActiveSlot.id);
         const position = index >= 0 ? index + 1 : 1;
@@ -390,6 +410,18 @@
         mySongSub.textContent =
           `Your song: "${myActiveSlot.song_title}" by ${myActiveSlot.artist_name || 'Artist'}`
           + etaSuffix(myActiveSlot);
+
+        // What is on stage right now, alongside your own position. Waiting for your
+        // turn is exactly when you want to know who is up and what they are singing,
+        // and this branch used to say nothing about it.
+        nowLine.hidden = !playingSlot;
+        if (playingSlot) {
+          nowLine.innerHTML =
+            `<i class="fa-solid fa-microphone-lines"></i> On stage now: ` +
+            `<strong>${escapeHtml(playingSlot.song_title)}</strong>` +
+            (playingSlot.artist_name ? ` &middot; ${escapeHtml(playingSlot.artist_name)}` : '') +
+            (playingSlot.singer_name ? ` &mdash; ${escapeHtml(playingSlot.singer_name)}` : '');
+        }
       } else if (playingSlot) {
         heroBadge.className = 'position-hero-badge';
         posText.textContent = `Now Playing: ${escapeHtml(playingSlot.song_title)}`;
@@ -420,7 +452,7 @@
 
       queueList.innerHTML = slots.map((s, idx) => {
         const isMine = s.profile_id === me.id;
-        const isPlaying = s.status === 'playing';
+        const isPlaying = s.status === 'performing';
         let badgeHtml = '';
 
         if (isPlaying) {
