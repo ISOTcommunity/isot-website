@@ -1,5 +1,18 @@
 /* Turin running routes — the single source.
  *
+ * Each route carries its own colour. Drawn together on the map in one green they
+ * overlapped into a web around the Po and could not be told apart; the number pin
+ * alone does not help where two lines share a street. Colours are from the confirmed
+ * ISOT palette and deliberately none of them the orchid the walking tour uses — a run
+ * should never read as the walk.
+ *
+ * Picked by measurement, not by eye: the first attempt paired amber with coral, which
+ * are 63 apart in RGB and read as the same orange on a busy map. These five are at
+ * least 107 apart and every one clears 4.8:1 against the map's ground. The palette
+ * cannot offer five well-separated HUES once the orchid family is reserved, so
+ * lightness carries part of the load — bright green and deep green sit at 10.6:1 and
+ * 4.8:1 and are told apart by weight as much as colour.
+ *
  * Read by app/running.html (the guide) and app/partner.html (the map's Running layer).
  * It lived inline in running.html; a second copy on the map would have drifted the
  * first time a distance was corrected, which is exactly what these numbers already
@@ -15,6 +28,7 @@
 const RUNNING_ROUTES = [
   {
     id: "valentino-loop",
+    color: "#43DB8F",   // bright green
     name: "1. Parco del Valentino & Po Loop",
     shortName: "Valentino & Po Loop",
     distance: "6.21 km",
@@ -164,6 +178,7 @@ const RUNNING_ROUTES = [
   },
   {
     id: "po-moncalieri",
+    color: "#5787EA",   // sky blue
     name: "2. Po Riverbank, out to Moncalieri",
     shortName: "Po Riverbank long run",
     distance: "14.75 km",
@@ -364,6 +379,7 @@ const RUNNING_ROUTES = [
   },
   {
     id: "pellerina",
+    color: "#E69321",   // amber
     name: "3. Parco della Pellerina Loop",
     shortName: "Pellerina Green Track",
     distance: "4.94 km",
@@ -451,6 +467,7 @@ const RUNNING_ROUTES = [
   },
   {
     id: "colletta-confluence",
+    color: "#BBC1F9",   // lavender
     name: "4. Parco Colletta & the confluence",
     shortName: "Colletta Po-Dora",
     distance: "4.89 km",
@@ -523,6 +540,7 @@ const RUNNING_ROUTES = [
   },
   {
     id: "cappuccini-hill",
+    color: "#109352",   // deep green
     name: "5. Monte dei Cappuccini hill repeats",
     shortName: "Cappuccini Hill",
     distance: "6.13 km",

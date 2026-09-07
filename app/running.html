@@ -256,7 +256,10 @@
 
       // Draw polyline route
       currentPolyline = L.polyline(route.points, {
-        color: '#EE0979',
+        // The route's own colour, so this page and the map layer agree. It was
+        // '#EE0979' — the old pink that was never on the ISOT palette and which
+        // css/app.css records as retired.
+        color: route.color || '#43DB8F',
         weight: 5,
         opacity: 0.9,
         lineCap: 'round',
