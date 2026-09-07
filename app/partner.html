@@ -255,6 +255,10 @@
       border:1.5px solid rgba(0,0,0,0.5); box-shadow:0 2px 6px rgba(0,0,0,0.5); }
     .ref-pin.campus { background:#2A3348; color:#9DB4E8; }
     .ref-pin.mensa  { background:#3A2E1C; color:#F5C67A; }
+    /* Contracted places are lighter than a real canteen: same app, same rate band,
+       but it is a bar with a deal, not a mensa. */
+    .ref-pin.mensa_alt { background:#2A2418; color:#C9A46A; border-style:dashed; }
+    .ref-pin.museum { background:#2C2036; color:#C79BE0; }
 
     #mensaHint { font-size:0.78rem; color:var(--text-muted); line-height:1.55;
       padding:12px 14px; margin-bottom:14px; border:1px solid var(--border-light);
@@ -369,7 +373,11 @@
       // than one on offer — and it cuts across every other pin on the way.
       tour:     { label: 'Tour',     icon: 'fa-route',         group: null, count: 0, optIn: true },
       campus:   { label: 'Campus',   icon: 'fa-graduation-cap', group: null, count: 0, zoomed: true },
+      // Contracted places sit in the Mensa layer rather than getting their own. A
+      // student looking for lunch cares where the app pays, not which contract EDISU
+      // signed — they are just drawn lighter and labelled.
       mensa:    { label: 'Mensa',    icon: 'fa-utensils',      group: null, count: 0, zoomed: true },
+      museum:   { label: 'Museums',  icon: 'fa-landmark',      group: null, count: 0, zoomed: true },
     };
     let activeLayer = 'all';
     let mapRef = null;
@@ -448,6 +456,7 @@
       LAYER.tour.group     = L.layerGroup();
       LAYER.campus.group   = L.layerGroup();
       LAYER.mensa.group    = L.layerGroup();
+      LAYER.museum.group   = L.layerGroup();
 
       const map = L.map('mapContainer', {
         zoomControl: false,
@@ -703,16 +712,20 @@
         .eq('active', true);
       if (error || !places) return;
 
+      const ICON = { mensa: 'fa-utensils', mensa_alt: 'fa-mug-saucer',
+                     campus: 'fa-graduation-cap', museum: 'fa-landmark' };
+
       places.forEach(p => {
-        const isMensa = p.kind === 'mensa';
-        const group = isMensa ? LAYER.mensa.group : LAYER.campus.group;
+        const group = (p.kind === 'mensa' || p.kind === 'mensa_alt') ? LAYER.mensa.group
+                    : (p.kind === 'museum') ? LAYER.museum.group
+                    : LAYER.campus.group;
         if (!group) return;
 
         group.addLayer(
           L.marker([Number(p.lat), Number(p.lng)], {
             icon: L.divIcon({
               className: 'isot-pin-wrapper',
-              html: `<div class="ref-pin ${p.kind}"><i class="fa-solid ${isMensa ? 'fa-utensils' : 'fa-graduation-cap'}"></i></div>`,
+              html: `<div class="ref-pin ${p.kind}"><i class="fa-solid ${ICON[p.kind] || 'fa-location-dot'}"></i></div>`,
               iconSize: [24, 24], iconAnchor: [12, 12],
             }),
             zIndexOffset: 100,   // under partners, gems and the tour
@@ -731,7 +744,8 @@
 
       cityPlaces = places;
       LAYER.campus.count = places.filter(p => p.kind === 'campus').length;
-      LAYER.mensa.count  = places.filter(p => p.kind === 'mensa').length;
+      LAYER.mensa.count  = places.filter(p => p.kind === 'mensa' || p.kind === 'mensa_alt').length;
+      LAYER.museum.count = places.filter(p => p.kind === 'museum').length;
 
       // Payment catches people out every year: there is no cash desk in any EDISU
       // canteen, it is the Campus Piemonte ID Meal app or nothing.
@@ -1048,14 +1062,39 @@
           </div>`);
       }
 
+      else if (activeLayer === 'museum') {
+        const rows = cityPlaces.filter(p => p.kind === 'museum');
+        html = shell('Museums', rows.length, `
+          <p class="dim" style="font-size:0.78rem;line-height:1.55;margin:-2px 0 12px">
+            No prices here on purpose. They move with the season, the exhibition and
+            whether you hold an Abbonamento Musei — a price stored in the app would be
+            wrong by winter. Each museum links its own ticket page, which is not.
+          </p>` + rows.map(r => `
+            <div class="card card-glass" style="margin-bottom:12px">
+              <div style="font-weight:700;font-size:1.02rem">${escapeHtml(r.name)}</div>
+              <div class="dim" style="font-size:0.76rem;margin-top:2px">${escapeHtml(r.address || '')}</div>
+              ${r.note ? `<div style="color:var(--text-muted);font-size:0.84rem;line-height:1.5;margin-top:8px">${escapeHtml(r.note)}</div>` : ''}
+              <div style="display:flex;gap:14px;margin-top:10px;font-size:0.8rem">
+                ${r.url ? `<a href="${escapeHtml(r.url)}" target="_blank" rel="noopener"
+                   style="color:var(--pink);text-decoration:none">Tickets &amp; hours &rarr;</a>` : ''}
+                <a href="https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}"
+                   target="_blank" rel="noopener" style="color:var(--text-dim);text-decoration:none">Directions &rarr;</a>
+              </div>
+            </div>`).join(''));
+      }
+
       else if (activeLayer === 'campus' || activeLayer === 'mensa') {
         const kind = activeLayer;
-        const rows = cityPlaces.filter(p => p.kind === kind);
+        const rows = kind === 'mensa'
+          ? cityPlaces.filter(p => p.kind === 'mensa' || p.kind === 'mensa_alt')
+          : cityPlaces.filter(p => p.kind === kind);
 
         if (kind === 'mensa') {
           // Seven of them, and the hours are the whole reason to look — so each one
           // gets a real card rather than a line in a list.
-          html = shell('Canteens', rows.length, rows.map(r => `
+          const real = rows.filter(r => r.kind === 'mensa');
+          const alt  = rows.filter(r => r.kind === 'mensa_alt');
+          const card = (r) => `
             <div class="card card-glass" style="margin-bottom:12px">
               <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline">
                 <div style="font-weight:700;font-size:1.02rem">${escapeHtml(r.name)}</div>
@@ -1069,7 +1108,21 @@
                 ${r.url ? `<a href="${escapeHtml(r.url)}" target="_blank" rel="noopener"
                    style="color:var(--text-dim);text-decoration:none">EDISU page &rarr;</a>` : ''}
               </div>
-            </div>`).join(''));
+            </div>`;
+
+          html = shell('Canteens', rows.length,
+            `<p class="dim" style="font-size:0.78rem;line-height:1.55;margin:-2px 0 12px">
+               No canteen takes cash. Everything here runs on the
+               <strong>Campus Piemonte ID Meal</strong> app at the rate band EDISU assigns you.
+             </p>`
+            + real.map(card).join('')
+            + (alt.length ? `
+              <p class="eyebrow" style="margin:20px 0 8px;color:var(--text-dim)">
+                Contracted places <span style="font-weight:400;text-transform:none;letter-spacing:0">· ${alt.length}</span></p>
+              <p class="dim" style="font-size:0.78rem;line-height:1.55;margin:0 0 12px">
+                Not EDISU canteens — commercial places contracted for campuses with no
+                canteen nearby. Same app, same rate band.
+              </p>` + alt.map(card).join('') : ''));
         } else {
           // Twenty-one campuses. Big cards would be a wall, so they are compact rows
           // grouped by institution — which is how a student thinks about them.
