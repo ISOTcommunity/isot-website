@@ -686,7 +686,7 @@ function initBurgerMenu(profile) {
         <i class="fa-solid fa-check-to-slot"></i>
         <span>General Assembly &amp; Voting</span>
       </a>
-      <a href="https://chat.whatsapp.com/ISOTcommunity" target="_blank" rel="noopener" class="drawer-item">
+      <a href="https://chat.whatsapp.com/JauT1Q2DUNhEdDHCoVPX7I" target="_blank" rel="noopener" class="drawer-item">
         <i class="fa-brands fa-whatsapp" style="color:#25D366"></i>
         <span>WhatsApp group</span>
       </a>
@@ -1217,7 +1217,7 @@ function isotBasemap(map) {
  * Whichever way it is closed, the group stays in the burger menu, so this is a
  * nudge rather than the only route in.
  */
-const WHATSAPP_GROUP = 'https://chat.whatsapp.com/ISOTcommunity';
+const WHATSAPP_GROUP = 'https://chat.whatsapp.com/JauT1Q2DUNhEdDHCoVPX7I';
 
 function showWhatsAppPrompt() {
   let seen = null;
