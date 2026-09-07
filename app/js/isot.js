@@ -1216,12 +1216,19 @@ function isotBasemap(map) {
  *
  * Whichever way it is closed, the group stays in the burger menu, so this is a
  * nudge rather than the only route in.
+ *
+ * The key is versioned. It went out for about half an hour pointing at the old
+ * chat.whatsapp.com/ISOTcommunity link, which joins nothing — so everyone who saw it
+ * in that window tapped through, got a dead page, and had their answer recorded.
+ * Bumping the key to _v2 gives those people one more prompt, now that it works.
+ * Bump it again only for a reason this good; asking twice for nothing is how a prompt
+ * turns into an advert.
  */
 const WHATSAPP_GROUP = 'https://chat.whatsapp.com/JauT1Q2DUNhEdDHCoVPX7I';
 
 function showWhatsAppPrompt() {
   let seen = null;
-  try { seen = localStorage.getItem('isot_wa_prompt'); } catch (e) { seen = 'skip'; }
+  try { seen = localStorage.getItem('isot_wa_prompt_v2'); } catch (e) { seen = 'skip'; }
   if (seen) return;
 
   const wrap = document.createElement('div');
@@ -1240,7 +1247,7 @@ function showWhatsAppPrompt() {
     </div>`;
 
   const close = () => {
-    try { localStorage.setItem('isot_wa_prompt', '1'); } catch (e) {}
+    try { localStorage.setItem('isot_wa_prompt_v2', '1'); } catch (e) {}
     wrap.remove();
     document.removeEventListener('keydown', onKey);
   };
