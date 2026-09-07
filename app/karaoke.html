@@ -52,6 +52,25 @@
       font-size: 0.84rem; color: var(--text-muted); line-height: 1.5;
     }
     .now-on-stage strong { color: #FFF; font-weight: 700; }
+    .now-on-stage { display: flex; align-items: center; gap: 10px; justify-content: center;
+                    flex-wrap: wrap; }
+    .on-stage-text { flex: 1; min-width: 0; text-align: left; }
+
+    .like-chip {
+      display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
+      font-family: inherit; font-size: 0.82rem; font-weight: 700;
+      padding: 6px 12px; border-radius: 999px; cursor: pointer;
+      background: transparent; border: 1px solid var(--border-light);
+      color: var(--text-muted); transition: transform .12s ease, border-color .12s ease;
+    }
+    .like-chip:hover { border-color: var(--pink); transform: translateY(-1px); }
+    .like-chip:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
+    .like-chip.liked { border-color: var(--pink); color: var(--pink); }
+    .like-chip[disabled] { opacity: 0.55; cursor: default; transform: none; }
+    /* Your own song: the count still shows, there is just nothing to press. */
+    .like-chip.is-mine { cursor: default; opacity: 0.6; }
+    .like-chip .n { font-variant-numeric: tabular-nums; }
+    @media (prefers-reduced-motion: reduce) { .like-chip:hover { transform: none; } }
     .now-on-stage i { color: var(--pink); margin-right: 5px; }
 
     .position-hero-badge.on-mic {
@@ -375,6 +394,61 @@
       btn.disabled = false;
     }
 
+    /* The song on the mic, with a heart.
+     *
+     * Same like as the songbook: song_key is title-normalised in the database, so
+     * hearting a song from the stage tonight is the same row as hearting it in the
+     * songbook months later. It is a request to hear it again, not applause for the
+     * performance — which is why it survives the night and the singer.
+     *
+     * A singer cannot like their own song. Not a rule anyone asked for; it just keeps
+     * the songbook a record of what the room wants rather than who turned up. */
+    function likeButtonHtml(slot) {
+      if (!slot.song_key) return '';
+      const mine = slot.singer_profile_id === me.id;
+      const liked = !!slot.liked_by_me;
+      const n = Number(slot.likes || 0);
+      if (mine) {
+        return `<span class="like-chip is-mine" title="Your own song">
+                  <i class="fa-solid fa-heart"></i> ${n}
+                </span>`;
+      }
+      return `<button type="button" class="like-chip ${liked ? 'liked' : ''}"
+                 data-key="${escapeHtml(slot.song_key)}"
+                 aria-pressed="${liked}"
+                 aria-label="${liked ? 'Remove your like' : 'Like this song'}"
+                 onclick="likeOnStage(this)">
+                <i class="fa-${liked ? 'solid' : 'regular'} fa-heart"></i>
+                <span class="n">${n}</span>
+              </button>`;
+    }
+
+    function onStageHtml(slot) {
+      return `<span class="on-stage-text">
+                <i class="fa-solid fa-microphone-lines"></i> On stage now:
+                <strong>${escapeHtml(slot.song_title)}</strong>` +
+             (slot.artist_name ? ` &middot; ${escapeHtml(slot.artist_name)}` : '') +
+             (slot.singer_name ? ` &mdash; ${escapeHtml(slot.singer_name)}` : '') +
+             `</span>` + likeButtonHtml(slot);
+    }
+
+    /* Updates the button from what the database returns rather than assuming the flip
+       worked — a like that appears and then vanishes on the next refresh is worse than
+       one that takes a moment. */
+    window.likeOnStage = async function (btn) {
+      const key = btn.dataset.key;
+      if (!key || btn.disabled) return;
+      btn.disabled = true;
+      const { data, error } = await db.rpc('toggle_song_like', { p_song_key: key });
+      btn.disabled = false;
+      if (error) { console.error('like failed:', error.message); return; }
+      btn.classList.toggle('liked', !!data.liked);
+      btn.setAttribute('aria-pressed', String(!!data.liked));
+      btn.setAttribute('aria-label', data.liked ? 'Remove your like' : 'Like this song');
+      btn.querySelector('i').className = `fa-${data.liked ? 'solid' : 'regular'} fa-heart`;
+      btn.querySelector('.n').textContent = data.likes;
+    };
+
     function renderQueueUI(slots) {
       /* Status values come from karaoke_slots: queued / performing / done / skipped.
          This function used to compare against 'playing' and 'pending', which the
@@ -415,17 +489,13 @@
         // turn is exactly when you want to know who is up and what they are singing,
         // and this branch used to say nothing about it.
         nowLine.hidden = !playingSlot;
-        if (playingSlot) {
-          nowLine.innerHTML =
-            `<i class="fa-solid fa-microphone-lines"></i> On stage now: ` +
-            `<strong>${escapeHtml(playingSlot.song_title)}</strong>` +
-            (playingSlot.artist_name ? ` &middot; ${escapeHtml(playingSlot.artist_name)}` : '') +
-            (playingSlot.singer_name ? ` &mdash; ${escapeHtml(playingSlot.singer_name)}` : '');
-        }
+        if (playingSlot) nowLine.innerHTML = onStageHtml(playingSlot);
       } else if (playingSlot) {
         heroBadge.className = 'position-hero-badge';
         posText.textContent = `Now Playing: ${escapeHtml(playingSlot.song_title)}`;
         mySongSub.textContent = `Artist: ${escapeHtml(playingSlot.artist_name || 'Original Artist')} • Performed by ${escapeHtml(playingSlot.singer_name || 'Member')}`;
+        nowLine.hidden = false;
+        nowLine.innerHTML = likeButtonHtml(playingSlot);
       } else {
         heroBadge.className = 'position-hero-badge';
         posText.textContent = "Monday Karaoke @ Rough";
