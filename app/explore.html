@@ -38,6 +38,24 @@
     .cat-card:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
     .cat-card.empty { opacity: 0.55; }
 
+    /* Rows, not tiles. The categories above earn their artwork because each is a night
+       with a picture; these are references, and a row says "look something up" where a
+       tile would say "this is an event too". */
+    .guide-grid { display: flex; flex-direction: column; gap: 9px; }
+    .guide {
+      display: flex; gap: 14px; align-items: flex-start; text-decoration: none;
+      padding: 15px 16px; color: inherit;
+      background: var(--bg-card); border: 1px solid var(--border-light);
+      border-radius: var(--radius-md) var(--radius-md) var(--radius-arc) var(--radius-md);
+      transition: border-color .15s ease, transform .15s ease;
+    }
+    .guide:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+    .guide:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
+    .guide > i { color: var(--pink); font-size: 1.1rem; margin-top: 2px; width: 20px; text-align: center; }
+    .g-name { font-weight: 700; font-size: 0.98rem; }
+    .g-sub  { color: var(--text-muted); font-size: 0.82rem; line-height: 1.5; margin-top: 2px; }
+    @media (prefers-reduced-motion: reduce) { .guide:hover { transform: none; } }
+
     .cat-art {
       height: 96px;
       background: var(--bg-darker);
@@ -79,6 +97,47 @@
 
     <div class="cat-grid" id="grid">
       <div class="spinner" style="margin:36px auto"></div>
+    </div>
+
+    <!-- Guides, not events. They belong on this screen because it is where people come
+         to ask "what is there to do" — but they are not categories: filing them above
+         would show "no upcoming" against each one forever, since nothing is scheduled.
+         These four were live and reachable from nowhere. -->
+    <div class="eyebrow" style="margin-top:34px">In the city</div>
+    <h2 style="font-size:1.25rem;margin:2px 0 4px">Turin, when nothing is on</h2>
+    <p class="dim" style="font-size:0.84rem;margin:0 0 16px">
+      Not events — things that are simply there, whenever you want them.
+    </p>
+
+    <div class="guide-grid">
+      <a class="guide" href="tour.html">
+        <i class="fa-solid fa-route"></i>
+        <div>
+          <div class="g-name">One Day in Turin</div>
+          <div class="g-sub">A nine-stop walk from Porta Nuova to the best view in the city. Points as you go.</div>
+        </div>
+      </a>
+      <a class="guide" href="running.html">
+        <i class="fa-solid fa-person-running"></i>
+        <div>
+          <div class="g-name">Running routes</div>
+          <div class="g-sub">Five routes with real distances and climb, from a flat 4.9 km to the Cappuccini hill.</div>
+        </div>
+      </a>
+      <a class="guide" href="museums.html">
+        <i class="fa-solid fa-landmark"></i>
+        <div>
+          <div class="g-name">Museums</div>
+          <div class="g-sub">Eight of them, with the student concessions and where to check the current price.</div>
+        </div>
+      </a>
+      <a class="guide" href="partner.html">
+        <i class="fa-solid fa-map-location-dot"></i>
+        <div>
+          <div class="g-name">The map</div>
+          <div class="g-sub">Partner venues, hidden gems, campuses and every EDISU canteen.</div>
+        </div>
+      </a>
     </div>
   </main>
 
