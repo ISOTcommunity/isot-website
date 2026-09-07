@@ -99,6 +99,16 @@
 
   <main class="shell">
 
+    <!-- Shown once. The Songbook button sits in the top bar and is easy to miss, and
+         nobody discovers the heart until they are already inside. -->
+    <div class="hint-card" id="songbookHint" hidden>
+      <i class="fa-solid fa-heart"></i>
+      <p>Every song sung here is in the <a href="songbook.html">Songbook</a>.
+         Tap the heart on the ones you want to hear again — the KJ can see what the
+         room is asking for.</p>
+      <button type="button" id="songbookHintX" aria-label="Dismiss">&times;</button>
+    </div>
+
     <!-- Live Queue Status Hero Banner -->
     <div class="position-hero-badge" id="heroBadge">
       <div class="eyebrow"><i class="fa-solid fa-music"></i> Live Stage Status</div>
@@ -215,6 +225,20 @@
 
     async function initKaraoke() {
       me = await requireAuth();
+
+      // The hint is for people who have not opened the songbook; once they have, it
+      // has nothing left to tell them.
+      (() => {
+        let seen = '1';
+        try { seen = localStorage.getItem('isot_seen_songbook'); } catch (e) {}
+        const el = document.getElementById('songbookHint');
+        if (!el || seen) return;
+        el.hidden = false;
+        document.getElementById('songbookHintX').addEventListener('click', () => {
+          el.remove();
+          if (typeof markSeen === 'function') markSeen('songbook');
+        });
+      })();
       document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(me, 36);
 
       if (document.getElementById('performerName')) {

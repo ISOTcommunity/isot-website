@@ -841,3 +841,28 @@ body.map-dark .leaflet-tile-pane {
 .wa-card .wa-foot { font-size: 0.75rem; color: var(--text-dim); margin: 14px 0 0; }
 @keyframes waIn { from { opacity: 0 } to { opacity: 1 } }
 @media (prefers-reduced-motion: reduce) { .wa-backdrop { animation: none } }
+
+/* A dot, not a count. It says "you have not looked at this", and disappears for
+   good once you have — nothing here is a notification to be cleared. */
+.newdot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--pink);
+  margin-left: auto; flex-shrink: 0; box-shadow: 0 0 0 3px var(--pink-glow);
+}
+
+/* One-time hint, inline rather than over the page. Used where the tip is about
+   something on the screen you are already looking at. */
+.hint-card {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 13px 15px; margin-bottom: 16px;
+  background: rgba(212, 90, 232, 0.07);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius-md) var(--radius-md) var(--radius-arc) var(--radius-md);
+}
+.hint-card > i { color: var(--pink); font-size: 1rem; margin-top: 2px; }
+.hint-card p { margin: 0; font-size: 0.84rem; line-height: 1.55; color: var(--text-muted); }
+.hint-card a { color: var(--pink); text-decoration: none; font-weight: 600; }
+.hint-card button {
+  background: none; border: none; color: var(--text-dim); cursor: pointer;
+  font-size: 1rem; padding: 0 2px; line-height: 1; flex-shrink: 0;
+}
+.hint-card button:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }

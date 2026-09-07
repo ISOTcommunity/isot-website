@@ -670,7 +670,7 @@ function initBurgerMenu(profile) {
         <i class="fa-solid fa-microphone"></i>
         <span>Karaoke Queue</span>
       </a>
-      <a href="songbook.html" class="drawer-item">
+      <a href="songbook.html" class="drawer-item" data-newdot="songbook">
         <i class="fa-solid fa-heart text-pink"></i>
         <span>Songbook</span>
       </a>
@@ -715,6 +715,10 @@ function initBurgerMenu(profile) {
 
   document.body.appendChild(backdrop);
   document.body.appendChild(drawer);
+
+  // Dots go on after the drawer is in the DOM — applyNewDots queries for
+  // [data-newdot], so calling it any earlier finds nothing.
+  applyNewDots();
 
   function toggle(open) {
     backdrop.classList.toggle('open', open);
@@ -1260,4 +1264,31 @@ function showWhatsAppPrompt() {
   // Opening the group counts as answered — it must not ask again next visit.
   wrap.querySelector('#waGo').addEventListener('click', close);
   setTimeout(() => wrap.querySelector('#waGo').focus(), 60);
+}
+
+/* ── "Not seen yet" dots ──────────────────────────────────────────────────
+ * A small dot on a menu item until the page behind it has been opened once.
+ *
+ * The songbook has been in the menu for weeks and most members have never opened
+ * it, so nobody knows they can heart a song to ask for it again. A dot is the
+ * quietest thing that fixes that: it draws the eye once, and it is gone for good
+ * the moment the page is visited — unlike a badge with a number, which keeps
+ * shouting, or a popup, which interrupts.
+ *
+ * Per-viewer and disposable, so localStorage rather than a column.
+ */
+function markSeen(key) {
+  try { localStorage.setItem('isot_seen_' + key, '1'); } catch (e) {}
+}
+function applyNewDots() {
+  document.querySelectorAll('[data-newdot]').forEach((el) => {
+    let seen = '1';
+    try { seen = localStorage.getItem('isot_seen_' + el.dataset.newdot); } catch (e) {}
+    if (seen) return;
+    if (el.querySelector('.newdot')) return;
+    const d = document.createElement('span');
+    d.className = 'newdot';
+    d.setAttribute('aria-label', 'not opened yet');
+    el.appendChild(d);
+  });
 }

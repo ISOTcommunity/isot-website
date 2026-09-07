@@ -99,6 +99,8 @@
 
   (async () => {
     await requireAuth();
+    // Being here is the whole point of the dot and the hint, so retire both.
+    if (typeof markSeen === 'function') markSeen('songbook');
     await load();
   })();
 
