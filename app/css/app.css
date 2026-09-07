@@ -816,3 +816,28 @@ h3 {
 body.map-dark .leaflet-tile-pane {
   filter: invert(1) hue-rotate(180deg) brightness(0.94) contrast(0.92) saturate(0.85);
 }
+
+/* WhatsApp group prompt. Uses the app's card idiom and the ISOT arc corner; the
+   only borrowed colour is WhatsApp's own green on the mark, because that is the
+   thing being recognised. */
+.wa-backdrop {
+  position: fixed; inset: 0; z-index: 3000;
+  display: flex; align-items: center; justify-content: center; padding: 22px;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  animation: waIn 0.22s ease;
+}
+.wa-card {
+  width: 100%; max-width: 380px; text-align: center;
+  background: var(--bg-card); border: 1px solid var(--border-light);
+  border-radius: var(--radius-md) var(--radius-md) var(--radius-arc) var(--radius-md);
+  padding: 30px 24px 22px; box-shadow: 0 22px 60px rgba(0, 0, 0, 0.65);
+}
+.wa-card .wa-mark { font-size: 2.5rem; color: #25D366; }
+.wa-card h2 { font-size: 1.35rem; margin: 14px 0 8px; }
+.wa-card p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin: 0 0 20px; }
+.wa-card .btn { width: 100%; }
+.wa-card .btn-ghost { margin-top: 9px; }
+.wa-card .wa-foot { font-size: 0.75rem; color: var(--text-dim); margin: 14px 0 0; }
+@keyframes waIn { from { opacity: 0 } to { opacity: 1 } }
+@media (prefers-reduced-motion: reduce) { .wa-backdrop { animation: none } }

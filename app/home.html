@@ -563,6 +563,10 @@
 
         renderFeaturedNight();
 
+        // Once the page is actually showing something, never over a spinner.
+
+        if (typeof showWhatsAppPrompt === 'function') setTimeout(showWhatsAppPrompt, 900);
+
         // Only draw the mosaic when there is no poster to lead with.
 
         const isStaff = meProfile &&

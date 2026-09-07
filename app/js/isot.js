@@ -686,6 +686,10 @@ function initBurgerMenu(profile) {
         <i class="fa-solid fa-check-to-slot"></i>
         <span>General Assembly &amp; Voting</span>
       </a>
+      <a href="https://chat.whatsapp.com/ISOTcommunity" target="_blank" rel="noopener" class="drawer-item">
+        <i class="fa-brands fa-whatsapp" style="color:#25D366"></i>
+        <span>WhatsApp group</span>
+      </a>
 
       ${isStaff ? `
         <div class="drawer-section-title">Volunteer &amp; Board Staff</div>
@@ -1199,4 +1203,54 @@ function isotBasemap(map) {
   document.body.classList.add('map-dark');
   osm.addTo(map);
   return osm;
+}
+
+/* ── WhatsApp group prompt ────────────────────────────────────────────────
+ * Shown once, on the home screen, to somebody who has not dismissed it.
+ *
+ * Once, and dismissible, on purpose. A prompt that returns every visit is an
+ * advert, and people learn to close it without reading — which costs you the one
+ * moment it might actually have worked. Dismissal is remembered in localStorage:
+ * it is a per-viewer convenience, not data anyone needs back, and it does not
+ * justify a column or a round trip.
+ *
+ * Whichever way it is closed, the group stays in the burger menu, so this is a
+ * nudge rather than the only route in.
+ */
+const WHATSAPP_GROUP = 'https://chat.whatsapp.com/ISOTcommunity';
+
+function showWhatsAppPrompt() {
+  let seen = null;
+  try { seen = localStorage.getItem('isot_wa_prompt'); } catch (e) { seen = 'skip'; }
+  if (seen) return;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'wa-backdrop';
+  wrap.innerHTML = `
+    <div class="wa-card" role="dialog" aria-modal="true" aria-labelledby="waTitle">
+      <i class="fa-brands fa-whatsapp wa-mark"></i>
+      <h2 id="waTitle">Join the ISOT group</h2>
+      <p>Where the night actually gets organised — who is going, last-minute changes,
+         and everything that never makes it onto a poster.</p>
+      <a class="btn btn-pink" href="${WHATSAPP_GROUP}" target="_blank" rel="noopener" id="waGo">
+        Open WhatsApp
+      </a>
+      <button type="button" class="btn btn-ghost" id="waLater">Not now</button>
+      <p class="wa-foot">It stays in the menu if you change your mind.</p>
+    </div>`;
+
+  const close = () => {
+    try { localStorage.setItem('isot_wa_prompt', '1'); } catch (e) {}
+    wrap.remove();
+    document.removeEventListener('keydown', onKey);
+  };
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+
+  wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
+  document.addEventListener('keydown', onKey);
+  document.body.appendChild(wrap);
+  wrap.querySelector('#waLater').addEventListener('click', close);
+  // Opening the group counts as answered — it must not ask again next visit.
+  wrap.querySelector('#waGo').addEventListener('click', close);
+  setTimeout(() => wrap.querySelector('#waGo').focus(), 60);
 }
