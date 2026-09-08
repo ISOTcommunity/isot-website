@@ -105,10 +105,59 @@
       to { transform: scale(1); opacity: 1; }
     }
   </style>
+  <style>
+    .scan-mode { position:fixed; top:0; left:0; right:0; z-index:60; display:flex; gap:6px;
+      padding:10px 12px; background:rgba(0,0,0,.72);
+      backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
+    .smode { flex:1; padding:9px 10px; border-radius:999px; cursor:pointer;
+      font-family:inherit; font-size:.8rem; font-weight:600;
+      background:transparent; border:1px solid rgba(255,255,255,.18); color:var(--text-muted);
+      display:inline-flex; align-items:center; justify-content:center; gap:7px; }
+    .smode.on { background:var(--pink); border-color:var(--pink); color:var(--on-accent,#0B0B0F); }
+    .scan-event { position:fixed; top:56px; left:0; right:0; z-index:60;
+      display:flex; gap:10px; align-items:center; padding:8px 12px;
+      background:rgba(0,0,0,.62); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+    .scan-event select { flex:1; background:#111118; color:#FFF; font-family:inherit;
+      font-size:.82rem; border:1px solid rgba(255,255,255,.18); border-radius:10px; padding:7px 9px; }
+    .scan-count { font-size:.82rem; font-weight:700; color:var(--pink);
+      font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .scan-search { position:fixed; left:0; right:0; bottom:64px; z-index:60;
+      max-height:44vh; overflow-y:auto; background:rgba(10,10,14,.94);
+      backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+      border-top:1px solid rgba(255,255,255,.12); }
+    .sres { display:flex; gap:11px; align-items:center; width:100%; text-align:left;
+      padding:12px 14px; background:none; border:none; border-bottom:1px solid rgba(255,255,255,.07);
+      color:#FFF; font-family:inherit; font-size:.9rem; cursor:pointer; }
+    .sres:hover { background:rgba(255,255,255,.05); }
+    .sres .sub { display:block; font-size:.74rem; color:var(--text-dim); margin-top:2px; }
+    .sres .tag { margin-left:auto; font-size:.7rem; font-weight:700; padding:3px 9px;
+      border-radius:999px; white-space:nowrap; }
+    .sres .tag.in { background:rgba(67,219,143,.16); color:#43DB8F; }
+    .sres .tag.new { background:rgba(212,90,232,.16); color:var(--pink); }
+  </style>
 </head>
 <body>
 
   <div id="gate"><div class="spinner"></div></div>
+
+  <!-- What this scan MEANS. The same QR answers two different questions: "is this a
+       paid member, so give the bar discount" and "is this person here tonight". They
+       were the same button, which is why a community account could not be scanned at
+       all — the bar check rejects them by design. -->
+  <div class="scan-mode" id="scanMode">
+    <button type="button" class="smode on" data-mode="door">
+      <i class="fa-solid fa-door-open"></i> Door check-in
+    </button>
+    <button type="button" class="smode" data-mode="bar">
+      <i class="fa-solid fa-martini-glass"></i> Bar discount
+    </button>
+  </div>
+
+  <!-- Which night we are on the door of. -->
+  <div class="scan-event" id="scanEvent" hidden>
+    <select id="eventPick" aria-label="Which event"></select>
+    <span class="scan-count" id="scanCount">—</span>
+  </div>
 
   <!-- Camera Viewfinder -->
   <div class="scanner-viewport">
@@ -117,9 +166,13 @@
 
   <!-- Manual Code Entry Fallback Bar -->
   <form class="manual-bar" onsubmit="submitManualCode(event)">
-    <input type="text" id="manualInput" placeholder="Enter code manually (ISOT-2026-0000)" />
+    <input type="text" id="manualInput" placeholder="Code, or search a name" autocomplete="off" />
     <button type="submit" class="btn btn-pink" style="width: auto; padding: 0 16px;"><i class="fa-solid fa-arrow-right"></i></button>
   </form>
+
+  <!-- Name matches, for people who have not got the app open. A queue does not wait
+       while somebody reinstalls. -->
+  <div class="scan-search" id="scanSearch" hidden></div>
 
   <!-- Result Overlay Card (Hidden until scan) -->
   <div class="scan-result-card result-neutral" id="resultOverlay" style="display: none;" onclick="resetScanner()">
@@ -143,11 +196,66 @@
     let resetTimer = null;
     let partnerVenueId = null;
 
+    let scanMode = 'door';          // 'door' | 'bar'
+    let tonight = [];               // events on the ISOT day
+    let picked = null;              // { event_id, event_date, title }
+
+    // 06:00 boundary, same as the rest of the app: a Thursday night is still Thursday
+    // at 01:00, which is exactly when a door is busiest.
+    const isotToday = () => {
+      const d = new Date(Date.now() - 6 * 3600 * 1000);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+
     async function initScanner() {
       const me = await requireAuth({ staff: true });
       partnerVenueId = me.partner_venue_id || '00000000-0000-0000-0000-000000000000';
 
+      document.querySelectorAll('.smode').forEach((b) => {
+        b.onclick = () => {
+          scanMode = b.dataset.mode;
+          document.querySelectorAll('.smode').forEach((x) => x.classList.toggle('on', x === b));
+          document.getElementById('scanEvent').hidden = scanMode !== 'door';
+          document.getElementById('scanSearch').hidden = true;
+          if (scanMode === 'door') refreshCount();
+        };
+      });
+
+      await loadTonight();
       startCamera();
+    }
+
+    async function loadTonight() {
+      const day = isotToday();
+      const { data, error } = await db.rpc('calendar_between', { p_from: day, p_to: day });
+      const sel = document.getElementById('eventPick');
+      tonight = error ? [] : (data || []);
+
+      if (!tonight.length) {
+        // No invented night. If nothing is on, the door mode says so rather than
+        // checking people into a event that does not exist.
+        sel.innerHTML = '<option>Nothing on tonight</option>';
+        sel.disabled = true;
+        document.getElementById('scanEvent').hidden = false;
+        return;
+      }
+
+      sel.disabled = false;
+      sel.innerHTML = tonight.map((e, i) =>
+        `<option value="${i}">${escapeHtml(e.title)}${e.venue_name ? ' — ' + escapeHtml(e.venue_name) : ''}</option>`
+      ).join('');
+      picked = tonight[0];
+      sel.onchange = () => { picked = tonight[Number(sel.value)]; refreshCount(); };
+      document.getElementById('scanEvent').hidden = false;
+      refreshCount();
+    }
+
+    async function refreshCount() {
+      const el = document.getElementById('scanCount');
+      if (!picked) { el.textContent = '—'; return; }
+      const { data } = await db.rpc('door_stats',
+        { p_event_id: picked.event_id, p_date: picked.event_date });
+      el.textContent = (data && data.ok) ? `${data.in} in · ${data.rsvps} said yes` : '—';
     }
 
     function startCamera() {
@@ -166,25 +274,83 @@
       isProcessing = true;
 
       try {
-        const { data, error } = await db.rpc('validate_member_qr', {
-          p_token: decodedText,
-          p_venue_id: partnerVenueId
-        });
-
-        const res = data || { ok: false, result: 'bad_code', message: 'Invalid scan payload' };
+        let res;
+        if (scanMode === 'door') {
+          if (!picked) {
+            showScanResult({ ok: false, result: 'bad_code',
+                             message: 'Pick which event first.' });
+            return;
+          }
+          const { data } = await db.rpc('door_check_in', {
+            p_token: decodedText,
+            p_event_id: picked.event_id,
+            p_date: picked.event_date,
+          });
+          res = data || { ok: false, result: 'bad_code', message: 'Invalid scan payload' };
+          if (res.ok) refreshCount();
+        } else {
+          const { data } = await db.rpc('validate_member_qr', {
+            p_token: decodedText,
+            p_venue_id: partnerVenueId,
+          });
+          res = data || { ok: false, result: 'bad_code', message: 'Invalid scan payload' };
+        }
         showScanResult(res);
       } catch (e) {
         showScanResult({ ok: false, result: 'bad_code', message: 'Connection error' });
       }
     }
 
+    /* On the door this box takes a code OR a name. A token always has two dots in it,
+       so the shape tells us which the volunteer meant without asking them to choose. */
     function submitManualCode(e) {
       e.preventDefault();
-      const code = document.getElementById('manualInput').value.trim();
-      if (!code) return;
-      document.getElementById('manualInput').value = '';
-      onScanSuccess(code);
+      const box = document.getElementById('manualInput');
+      const text = box.value.trim();
+      if (!text) return;
+
+      if (scanMode === 'door' && text.split('.').length !== 3) {
+        doorSearch(text);
+        return;
+      }
+      box.value = '';
+      onScanSuccess(text);
     }
+
+    async function doorSearch(q) {
+      const panel = document.getElementById('scanSearch');
+      if (!picked) {
+        showScanResult({ ok: false, result: 'bad_code', message: 'Pick which event first.' });
+        return;
+      }
+      const { data, error } = await db.rpc('door_search',
+        { p_query: q, p_event_id: picked.event_id, p_date: picked.event_date });
+
+      if (error) { panel.hidden = true; return; }
+      const rows = data || [];
+      panel.hidden = false;
+      panel.innerHTML = rows.length ? rows.map((r) => `
+        <button type="button" class="sres" onclick="doorPick('${r.id}')">
+          <span>
+            ${escapeHtml(r.full_name || 'Member')}
+            <span class="sub">${escapeHtml(r.member_code || '')}${r.tier === 'socio' ? ' · member' : ' · community'}${r.rsvp ? ' · said yes' : ''}</span>
+          </span>
+          <span class="tag ${r.checked_in ? 'in' : 'new'}">${r.checked_in ? 'already in' : 'check in'}</span>
+        </button>`).join('')
+        : '<p style="padding:16px;color:var(--text-dim);font-size:0.86rem;margin:0">Nobody by that name.</p>';
+    }
+
+    window.doorPick = async function (profileId) {
+      const { data } = await db.rpc('door_check_in_manual', {
+        p_profile_id: profileId,
+        p_event_id: picked.event_id,
+        p_date: picked.event_date,
+      });
+      document.getElementById('scanSearch').hidden = true;
+      document.getElementById('manualInput').value = '';
+      showScanResult(data || { ok: false, message: 'Could not check in.' });
+      refreshCount();
+    };
 
     function showScanResult(res) {
       const overlay = document.getElementById('resultOverlay');

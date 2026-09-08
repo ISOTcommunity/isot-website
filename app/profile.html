@@ -169,6 +169,10 @@
         <div style="text-align: center;">
           <div class="qr-container">
             <div id="qrCode"></div>
+            <!-- Says what this code is for. A community member's code opens the door
+                 but not the bar discount, and the card should not leave that ambiguous. -->
+            <p id="cardQrNote" hidden style="font-size:0.72rem;line-height:1.5;color:var(--text-dim);
+               margin:10px auto 0;max-width:250px;text-align:center"></p>
           </div>
           
           <div>
@@ -298,9 +302,38 @@
           showQrProblem(e && e.message ? e.message : String(e));
         }
       } else {
+        /* Community accounts get a real, working code — it just is not the discount.
+         *
+         * This used to render the literal string 'LOCKED-UPGRADE-REQUIRED' as a QR: a
+         * code that scans to nothing, behind a locked overlay. Fine while the only
+         * scanner was the bar, where tier is the whole question. Wrong at a door,
+         * where everyone is welcome and a community member had nothing to show.
+         *
+         * issue_qr_token() has always issued to any signed-in account; only this
+         * branch hid it. The bar still refuses it — validate_member_qr() checks tier —
+         * so nothing about the membership benefit changes. The overlay now says what
+         * the code is FOR rather than covering a fake one.
+         */
         document.getElementById('cardTierBadge').innerHTML = '<span class="badge badge-participant">COMMUNITY</span>';
-        document.getElementById('lockedOverlay').style.display = 'flex';
-        renderQrCode('LOCKED-UPGRADE-REQUIRED');
+        document.getElementById('lockedOverlay').style.display = 'none';
+
+        const note = document.getElementById('cardQrNote');
+        if (note) {
+          note.hidden = false;
+          note.innerHTML = 'Entry code — show this at the door. '
+            + '<a href="account.html">Become a member for &euro;10</a> to add bar discounts.';
+        }
+
+        try {
+          const { data, error } = await db.rpc('issue_qr_token');
+          if (error || !data || !data.token) {
+            showQrProblem(error ? error.message : 'No token was issued.');
+          } else {
+            renderQrCode(data.token);
+          }
+        } catch (e) {
+          showQrProblem(e && e.message ? e.message : String(e));
+        }
       }
 
       // Start anti-screenshot live clock tell
