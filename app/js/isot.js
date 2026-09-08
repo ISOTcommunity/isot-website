@@ -26,15 +26,43 @@ const db = isConfigured() && window.supabase
   document.addEventListener('touchend', (e) => {
     const now = Date.now();
     if (now - lastTouch <= 300) {
-      // closest(), not tagName: a double tap inside a field can resolve to a wrapper,
-      // and preventDefault there still kills the selection callout — which is how you
-      // paste on a phone.
       const inField = e.target && e.target.closest &&
         e.target.closest('input, textarea, select, [contenteditable], .no-tap-guard');
       if (!inField) e.preventDefault();
     }
     lastTouch = now;
   }, { passive: false });
+})();
+
+/* ---------------------------------------------------------------
+ * PWA Home Screen Installation Analytics & Detection
+ * ------------------------------------------------------------- */
+(function initPwaInstallTracking() {
+  // 1. Detect if running as installed standalone app from Home Screen
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  
+  if (isStandalone && !localStorage.getItem('pwa_launch_logged')) {
+    localStorage.setItem('pwa_launch_logged', Date.now());
+    if (typeof gtag === 'function') {
+      gtag('event', 'pwa_home_screen_launch', { event_category: 'PWA', event_label: 'Launched from Home Screen' });
+    }
+    if (window.va) {
+      window.va('event', { name: 'pwa_home_screen_launch' });
+    }
+  }
+
+  // 2. Track when user clicks "Add to Home Screen" prompt in browser
+  window.addEventListener('appinstalled', (evt) => {
+    localStorage.setItem('pwa_installed_timestamp', Date.now());
+    console.log('🎉 PWA successfully installed to Home Screen!');
+    
+    if (typeof gtag === 'function') {
+      gtag('event', 'pwa_installed', { event_category: 'PWA', event_label: 'App Added to Home Screen' });
+    }
+    if (window.va) {
+      window.va('event', { name: 'pwa_installed' });
+    }
+  });
 })();
 
 /* ---------------------------------------------------------------
