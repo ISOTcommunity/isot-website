@@ -973,7 +973,10 @@
                 <div class="event-badge-label">
                   <div class="pulse-dot"></div> UPCOMING EVENT
                 </div>
-                <div class="event-badge-title" id="heroNextEvent">Thursday Social Hub @ Capodoglio</div>
+                <!-- Generic on purpose. The script replaces this with the real next night; if that
+                     call fails, the fallback must not restate the hardcoded claim it exists to
+                     remove. "Events every week" is true on any day. -->
+                <div class="event-badge-title" id="heroNextEvent">Events every week &middot; see the calendar</div>
               </div>
               <button onclick="cycleHeroPhoto()" class="event-badge-icon" aria-label="Cycle hero photo" style="border:none; cursor:pointer;" title="Next crowd photo">
                 <i class="fa-solid fa-sync"></i>
