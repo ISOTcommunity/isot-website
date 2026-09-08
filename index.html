@@ -973,7 +973,7 @@
                 <div class="event-badge-label">
                   <div class="pulse-dot"></div> UPCOMING EVENT
                 </div>
-                <div class="event-badge-title">Thursday Social Hub @ Capodoglio</div>
+                <div class="event-badge-title" id="heroNextEvent">Thursday Social Hub @ Capodoglio</div>
               </div>
               <button onclick="cycleHeroPhoto()" class="event-badge-icon" aria-label="Cycle hero photo" style="border:none; cursor:pointer;" title="Next crowd photo">
                 <i class="fa-solid fa-sync"></i>
@@ -1048,15 +1048,23 @@
         <a href="/app" class="btn-app-install">Get Free App Access <i class="fa-solid fa-arrow-right"></i></a>
       </div>
 
-      <!-- 2. UPCOMING FEATURED EVENT HIGHLIGHT CARD -->
+      <!-- 2. WHAT IS ACTUALLY NEXT
+           Was a hardcoded "Thursday Social Hub" card, which said Thursday on a Monday
+           and never mentioned a one-off. Now read from calendar_between(), the same
+           source as /calendar and the member app, so the front page cannot advertise a
+           night that is not happening. -->
       <div class="community-card" style="background: linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(15,23,42,0.9) 100%); border-color: rgba(245,158,11,0.35); padding: 22px;">
-        <span class="app-badge" style="color: var(--gold); background: rgba(245,158,11,0.15); margin-bottom: 12px;"><i class="fa-solid fa-star"></i> Featured Weekly</span>
-        <h3 class="app-promo-title" style="font-size: 1.15rem; color: #FFF; margin-bottom: 8px;">Thursday Social Hub</h3>
-        <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 14px; line-height: 1.5;">
-          Weekly international gathering @ Capodoglio on Murazzi riverbanks. Member perks at bar.
-        </p>
-        <a href="events.html" class="btn btn-outline" style="width: 100%; justify-content: center; font-size: 0.82rem; padding: 8px 16px;">
-          <i class="fa-solid fa-calendar-check" style="color: var(--gold);"></i> RSVP Free Entry
+        <span class="app-badge" style="color: var(--gold); background: rgba(245,158,11,0.15); margin-bottom: 12px;"><i class="fa-solid fa-star"></i> What's next</span>
+        <div id="nextEvents">
+          <!-- The weekly pattern, shown until the live list arrives. True on any week,
+               so it is a reasonable thing to look at for 300ms — but it is replaced by
+               real dates, never left as the answer. -->
+          <p style="font-size: 0.85rem; color: var(--text-dim); margin: 0 0 14px; line-height: 1.5;">
+            Karaoke on Mondays, Social Hub on Thursdays, parties on the weekend.
+          </p>
+        </div>
+        <a href="calendar.html" class="btn btn-outline" style="width: 100%; justify-content: center; font-size: 0.82rem; padding: 8px 16px;">
+          <i class="fa-solid fa-calendar-check" style="color: var(--gold);"></i> See the full calendar
         </a>
       </div>
 
@@ -1500,5 +1508,89 @@
     checkExistingVerification();
 
   </script>
+
+<!-- ── What's on, from the real calendar ─────────────────────────────────────
+     The front page used to state "Thursday Social Hub @ Capodoglio" as the upcoming
+     event in two places, hardcoded. It said Thursday on a Monday, and a one-off like
+     the Circle opening party never appeared at all.
+
+     calendar_between() is the same function /calendar and the member app read, and it
+     is already granted to anon, so no new access is needed. The anon key is public by
+     design and RLS is what protects the data.
+
+     If the fetch fails, the weekly pattern already in the HTML stays. Nothing here
+     invents a date. -->
+<script src="/app/vendor/supabase.js"></script>
+<script>
+(async () => {
+  const SUPABASE_URL = 'https://ywmdaekblhabyajzusfm.supabase.co';
+  const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3bWRhZWtibGhhYnlhanp1c2ZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNDM2NDYsImV4cCI6MjEwMjcxOTY0Nn0.PyMpTzffZ12j1HoheuRQMYH8d0WvfYkLXGfd1wJXTWw';
+  if (!window.supabase) return;
+  const db = window.supabase.createClient(SUPABASE_URL, ANON);
+
+  const esc = (t) => String(t ?? '').replace(/[&<>"']/g,
+    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  // The ISOT day runs 06:00 to 06:00, the same boundary the app and check-in use, so a
+  // Monday night still reads as Monday at 01:00 rather than becoming Tuesday.
+  const isotToday = () => {
+    const d = new Date(Date.now() - 6 * 3600 * 1000);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+
+  const from = isotToday();
+  const to = new Date(Date.now() + 21 * 86400000).toISOString().slice(0, 10);
+
+  let rows;
+  try {
+    const { data, error } = await db.rpc('calendar_between', { p_from: from, p_to: to });
+    if (error) throw error;
+    rows = (data || []).filter((e) => e.event_date >= from);
+  } catch (e) {
+    console.warn('Could not load events; leaving the weekly pattern in place.', e.message || e);
+    return;                                  // the static fallback stays on screen
+  }
+  if (!rows.length) return;
+
+  rows.sort((a, b) => a.event_date.localeCompare(b.event_date)
+                   || (a.start_time || '').localeCompare(b.start_time || ''));
+
+  const when = (iso) => {
+    const d = new Date(iso + 'T00:00:00');
+    const days = Math.round((d - new Date(from + 'T00:00:00')) / 86400000);
+    if (days === 0) return 'Tonight';
+    if (days === 1) return 'Tomorrow';
+    return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
+  };
+
+  // 1. The hero badge — the very next thing happening.
+  const n = rows[0];
+  const badge = document.getElementById('heroNextEvent');
+  if (badge) {
+    badge.textContent = `${when(n.event_date)} · ${n.title}`
+      + (n.venue_name ? ` @ ${n.venue_name}` : '');
+  }
+
+  // 2. The next three, with real dates and times.
+  const host = document.getElementById('nextEvents');
+  if (host) {
+    host.innerHTML = rows.slice(0, 3).map((e) => `
+      <a href="calendar.html" style="display:flex;gap:11px;align-items:baseline;
+         padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.08);
+         text-decoration:none;color:inherit">
+        <span style="flex:1;min-width:0">
+          <span style="display:block;font-weight:700;font-size:0.9rem;color:#FFF">${esc(e.title)}</span>
+          <span style="display:block;font-size:0.78rem;color:var(--text-dim);margin-top:2px">
+            ${esc(when(e.event_date))}${e.start_time ? ' · ' + esc(e.start_time.slice(0, 5)) : ''}${e.venue_name ? ' · ' + esc(e.venue_name) : ''}
+          </span>
+        </span>
+      </a>`).join('')
+      + `<p style="font-size:0.75rem;color:var(--text-dim);margin:12px 0 14px">
+           Free entry. Bring your student card.
+         </p>`;
+  }
+})();
+</script>
+
 </body>
 </html>
