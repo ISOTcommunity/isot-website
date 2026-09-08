@@ -105,3 +105,56 @@ self.addEventListener('fetch', (e) => {
     })
   );
 });
+
+/* ---------------------------------------------------------------
+ * Web Push Notification Handler (Lock Screen Background Alerts)
+ * ------------------------------------------------------------- */
+self.addEventListener('push', (e) => {
+  let data = {
+    title: 'ISOT Community',
+    body: 'New update from ISOT Turin!',
+    url: 'home.html',
+    icon: 'icon-192.png',
+    badge: 'icon-192.png'
+  };
+
+  try {
+    if (e.data) {
+      data = Object.assign({}, data, e.data.json());
+    }
+  } catch (err) {
+    if (e.data) data.body = e.data.text();
+  }
+
+  const options = {
+    body: data.body,
+    icon: data.icon || 'icon-192.png',
+    badge: data.badge || 'icon-192.png',
+    vibrate: [100, 50, 100],
+    data: {
+      url: data.url || 'home.html'
+    }
+  };
+
+  e.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  const targetUrl = (e.notification.data && e.notification.data.url) ? e.notification.data.url : 'home.html';
+
+  e.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      for (let client of windowClients) {
+        if (client.url.includes(targetUrl) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
+    })
+  );
+});
