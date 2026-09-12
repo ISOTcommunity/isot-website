@@ -70,6 +70,11 @@
     /* Your own song: the count still shows, there is just nothing to press. */
     .like-chip.is-mine { cursor: default; opacity: 0.6; }
     .like-chip .n { font-variant-numeric: tabular-nums; }
+
+    .plays-chip { display:inline-flex; align-items:center; gap:4px; margin-left:8px;
+      font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:999px;
+      background:rgba(255,255,255,0.08); color:var(--text-dim);
+      font-variant-numeric:tabular-nums; white-space:nowrap; }
     @media (prefers-reduced-motion: reduce) { .like-chip:hover { transform: none; } }
     .now-on-stage i { color: var(--pink); margin-right: 5px; }
 
@@ -423,12 +428,23 @@
               </button>`;
     }
 
+    /* How often this song has been sung before. Only shown from the second time —
+       "1st time" on every new song is noise, and the interesting fact is that a song
+       keeps coming back. plays counts finished performances only. */
+    function playsHtml(slot) {
+      const n = Number(slot.plays || 0);
+      if (n < 2) return '';
+      return ` <span class="plays-chip" title="Times sung at ISOT karaoke">`
+           + `<i class="fa-solid fa-rotate-right"></i> ${n}x</span>`;
+    }
+
     function onStageHtml(slot) {
       return `<span class="on-stage-text">
                 <i class="fa-solid fa-microphone-lines"></i> On stage now:
                 <strong>${escapeHtml(slot.song_title)}</strong>` +
              (slot.artist_name ? ` &middot; ${escapeHtml(slot.artist_name)}` : '') +
              (slot.singer_name ? ` &mdash; ${escapeHtml(slot.singer_name)}` : '') +
+             playsHtml(slot) +
              `</span>` + likeButtonHtml(slot);
     }
 
@@ -495,7 +511,9 @@
         posText.textContent = `Now Playing: ${escapeHtml(playingSlot.song_title)}`;
         mySongSub.textContent = `Artist: ${escapeHtml(playingSlot.artist_name || 'Original Artist')} • Performed by ${escapeHtml(playingSlot.singer_name || 'Member')}`;
         nowLine.hidden = false;
-        nowLine.innerHTML = likeButtonHtml(playingSlot);
+        nowLine.innerHTML = (Number(playingSlot.plays || 0) > 1
+          ? `<span class="on-stage-text">Sung ${playingSlot.plays} times here before.</span>`
+          : '') + likeButtonHtml(playingSlot);
       } else {
         heroBadge.className = 'position-hero-badge';
         posText.textContent = "Monday Karaoke @ Rough";
