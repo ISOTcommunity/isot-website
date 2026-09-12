@@ -1204,37 +1204,49 @@ if (document.readyState === 'loading') {
 /* ── Basemap ──────────────────────────────────────────────────────────────
  * One place, so all five maps agree and a provider change is one edit.
  *
- * We were on CARTO's dark_all with no key. Their tiles are correct, but the
- * keyless tier is rate-limited and the app now has five map pages pulling from
- * it — past the limit CARTO serves a watermark tile instead of the map, which
- * is what "api is required" all over the map was.
+ * Esri's World Dark Gray Canvas. Two previous choices both broke, and both broke in
+ * the same way — a 200 response carrying an image that says no:
  *
- * OpenStreetMap's own tiles need no key and no account. They are light, so the
- * tile pane alone is inverted to sit on ISOT's black ground; markers, the route
- * line and popups live in other panes and are untouched.
+ *   · CARTO dark_all now watermarks "API KEY REQUIRED" across every tile. Amir
+ *     reported exactly that ("the map all over around is api is required") and I
+ *     tested the status code, got 200 and real-looking bytes, and told him the tiles
+ *     were fine. The watermark is IN the image.
+ *   · OpenStreetMap's own servers then returned HTTP 418 "Access blocked — App is not
+ *     following the tile usage policy". Their tiles are for openstreetmap.org, not
+ *     for use as an app basemap. That switch was mine and it was wrong.
  *
- * CARTO stays as a fallback: if OSM fails to serve, we swap rather than show a
- * grey rectangle.
+ * This one needs no key, and it is a "canvas" style: buildings are quiet blocks
+ * rather than drawn footprints, labels are few and muted. It is built to sit under
+ * data overlays, which is the whole job here — and it is dark natively, so the CSS
+ * invert that made OSM's roads come out brown is gone.
+ *
+ * maxNativeZoom is the important number. The dark canvas has no tiles past zoom 16;
+ * beyond that Esri serves a light grey "Map data not yet available" square. With
+ * maxNativeZoom Leaflet stretches the z16 tile instead, which is soft but honest.
+ *
+ * Attribution is required by Esri's terms and is not optional.
  */
 function isotBasemap(map) {
-  const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    crossOrigin: true,
+  document.body.classList.remove('map-dark');   // this style needs no inversion
+
+  const layer = L.tileLayer(
+    'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+    {
+      maxZoom: 19,
+      maxNativeZoom: 16,
+      attribution: 'Esri, HERE, Garmin, &copy; OpenStreetMap contributors',
+    }
+  );
+
+  // No silent fallback: the last two providers failed by serving a picture that said
+  // "no" with a 200, which a fallback could never detect. A console line beats
+  // swapping in something else that is also broken.
+  layer.on('tileerror', (e) => {
+    console.warn('basemap tile failed', e && e.coords);
   });
 
-  let swapped = false;
-  osm.on('tileerror', () => {
-    if (swapped) return;
-    swapped = true;
-    map.removeLayer(osm);
-    document.body.classList.remove('map-dark');
-    L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
-      { maxZoom: 19 }).addTo(map);
-  });
-
-  document.body.classList.add('map-dark');
-  osm.addTo(map);
-  return osm;
+  layer.addTo(map);
+  return layer;
 }
 
 /* ── WhatsApp group prompt ────────────────────────────────────────────────

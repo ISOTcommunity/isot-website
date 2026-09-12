@@ -142,7 +142,7 @@
        right edge with nothing to say they were there — the same way the Explore buttons
        hid karaoke. A row you cannot see is a layer that does not exist. */
     .layers {
-      display:flex; flex-wrap:wrap; gap:6px; padding:8px; border-radius:20px;
+      display:flex; gap:5px; padding:6px; border-radius:999px;
       background:rgba(12,12,16,0.78);
       backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
       border:1px solid rgba(255,255,255,0.09);
@@ -150,16 +150,13 @@
     }
     .layers::-webkit-scrollbar { display:none; }
     .lbtn {
-      flex-shrink:0; padding:5px 11px; border-radius:999px; cursor:pointer;
+      flex:1; min-width:0; padding:8px 0; border-radius:999px; cursor:pointer;
       background:transparent; border:1px solid var(--border-light); color:var(--text-muted);
-      font-family:inherit; font-size:0.76rem; display:inline-flex; align-items:center; gap:5px;
-      line-height:1.3;
+      font-family:inherit; font-size:0.8rem; display:inline-flex;
+      align-items:center; justify-content:center; line-height:1;
     }
-    /* On a narrow phone the icon and the count carry it; the label returns as soon as
-       there is room. Eight labelled pills will not fit two rows at 360px. */
-    @media (max-width: 400px) { .lbtn .lbl { display:none; } .lbtn.on .lbl { display:inline; } }
+    .lbtn .lbl { font-weight:700; font-size:0.72rem; }
     .lbtn.on { background:var(--pink); border-color:var(--pink); color:var(--on-accent,#0B0B0F); font-weight:600; }
-    .lbtn .n { font-variant-numeric:tabular-nums; opacity:0.75; }
 
     .score-strip {
       display: flex; align-items: center; gap: 14px;
@@ -283,10 +280,6 @@
        map can be traced to a name without relying on memory. */
     .run-row { border-left:3px solid transparent; padding-left:13px; }
 
-    #mensaHint { font-size:0.78rem; color:var(--text-muted); line-height:1.55;
-      padding:12px 14px; margin-bottom:14px; border:1px solid var(--border-light);
-      background:rgba(245,198,122,0.06);
-      border-radius:var(--radius-md) var(--radius-md) var(--radius-arc) var(--radius-md); }
   </style>
 </head>
 <body>
@@ -323,25 +316,7 @@
          questions — "where do I get a discount" and "where should I go on Sunday" —
          and a map showing both at once serves neither. -->
 
-    <div id="gemScore" hidden></div>
-
-    <!-- Populated by loadTour(); hidden until a trail actually exists, so the page
-         never advertises a walk that is not running. -->
-    <a id="tourBanner" href="tour.html" hidden>
-      <i class="fa-solid fa-route tb-ico"></i>
-      <div style="flex:1;min-width:0">
-        <div class="tb-name"></div>
-        <div class="tb-sub"></div>
-      </div>
-      <i class="fa-solid fa-chevron-right dim"></i>
-    </a>
     <div id="liveBanner" hidden></div>
-    <p id="mensaHint" hidden>
-      <i class="fa-solid fa-circle-info" style="color:#F5C67A"></i>
-      No canteen takes cash. You pay through the <strong>Campus Piemonte ID Meal</strong> app,
-      at the rate band EDISU assigns you — set it up before your first meal, not in the queue.
-      Exchange and visiting students have their own access route on the EDISU site.
-    </p>
 
     <div class="map-wrap">
       <div id="mapContainer"></div>
@@ -355,6 +330,20 @@
          moved the pin's popup and left the card advertising the old offer. The times
          were also simply stale: "Monday Karaoke (21:00)" and "Saturday Pre-Party
          (22:30)" against a calendar that says 19:00 and 22:00. -->
+    <!-- Context for whichever layer is showing. Below the map, not above it: these
+         used to push the map down the screen before you had chosen anything, on the
+         one page where the map is the content. -->
+    <div id="gemScore" hidden></div>
+
+    <a id="tourBanner" href="tour.html" hidden>
+      <i class="fa-solid fa-route tb-ico"></i>
+      <div style="flex:1;min-width:0">
+        <div class="tb-name"></div>
+        <div class="tb-sub"></div>
+      </div>
+      <i class="fa-solid fa-chevron-right dim"></i>
+    </a>
+
     <div id="venueCards"></div>
     <div id="layerCards" hidden></div>
 
@@ -417,10 +406,14 @@
       if (!bar) return;
 
       const total = Object.values(LAYER).reduce((n, l) => n + l.count, 0);
+      /* Icons, not labels. Eight labelled pills wrapped to three rows and covered the
+         top third of the map, on the one page where the map IS the content. The name
+         and the count both still appear — in the list heading under the map, which
+         says "Running routes · 5" the moment you select it. */
       const btn = (k, label, icon, n) => `
-        <button type="button" class="lbtn ${activeLayer === k ? 'on' : ''}" data-layer="${k}">
-          ${icon ? `<i class="fa-solid ${icon}"></i>` : ''}<span class="lbl">${label}</span>
-          <span class="n">${n}</span>
+        <button type="button" class="lbtn ${activeLayer === k ? 'on' : ''}" data-layer="${k}"
+                title="${label} (${n})" aria-label="${label}, ${n}">
+          ${icon ? `<i class="fa-solid ${icon}"></i>` : `<span class="lbl">${label}</span>`}
         </button>`;
 
       bar.innerHTML =
@@ -463,10 +456,6 @@
       const tb = document.getElementById('tourBanner');
       if (tb && !tb.hidden) {
         tb.style.display = (activeLayer === 'all' || activeLayer === 'tour') ? '' : 'none';
-      }
-      const mh = document.getElementById('mensaHint');
-      if (mh && !mh.hidden) {
-        mh.style.display = (activeLayer === 'mensa') ? '' : 'none';
       }
     }
 
@@ -775,11 +764,6 @@
       LAYER.campus.count = places.filter(p => p.kind === 'campus').length;
       LAYER.mensa.count  = places.filter(p => p.kind === 'mensa' || p.kind === 'mensa_alt').length;
       LAYER.museum.count = places.filter(p => p.kind === 'museum').length;
-
-      // Payment catches people out every year: there is no cash desk in any EDISU
-      // canteen, it is the Campus Piemonte ID Meal app or nothing.
-      const hint = document.getElementById('mensaHint');
-      if (hint) hint.hidden = false;
 
       applyLayers();
       renderLayerBar();

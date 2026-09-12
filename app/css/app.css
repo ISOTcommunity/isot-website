@@ -809,13 +809,6 @@ h3 {
   filter: drop-shadow(0 4px 12px rgba(238, 9, 121, 0.6));
 }
 
-/* Only the tile pane is inverted, so OSM's light cartography reads as dark on
-   ISOT's black ground. Markers, the tour road and popups sit in other panes and
-   keep their real colours. Dropped if the map falls back to CARTO's dark tiles,
-   which are already dark. */
-body.map-dark .leaflet-tile-pane {
-  filter: invert(1) hue-rotate(180deg) brightness(0.94) contrast(0.92) saturate(0.85);
-}
 
 /* WhatsApp group prompt. Uses the app's card idiom and the ISOT arc corner; the
    only borrowed colour is WhatsApp's own green on the mark, because that is the
