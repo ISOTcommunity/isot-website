@@ -71,6 +71,20 @@
     .like-chip.is-mine { cursor: default; opacity: 0.6; }
     .like-chip .n { font-variant-numeric: tabular-nums; }
 
+    /* Under the field, not floating over it: on a phone an overlay covers the artist
+       field you are about to fill in. */
+    .song-sugg { margin-top:6px; border:1px solid var(--border-light); border-radius:12px;
+      overflow:hidden; background:var(--bg-raised); }
+    .song-sugg button { display:flex; align-items:baseline; gap:9px; width:100%;
+      text-align:left; padding:10px 13px; background:none; border:none;
+      border-bottom:1px solid var(--border-light); color:#FFF; font-family:inherit;
+      font-size:0.88rem; cursor:pointer; }
+    .song-sugg button:last-child { border-bottom:none; }
+    .song-sugg button:hover, .song-sugg button:focus-visible { background:rgba(255,255,255,0.05); }
+    .song-sugg .sg-artist { color:var(--text-dim); font-size:0.78rem; }
+    .song-sugg .sg-plays { margin-left:auto; color:var(--text-dim); font-size:0.74rem;
+      white-space:nowrap; font-variant-numeric:tabular-nums; }
+
     .plays-chip { display:inline-flex; align-items:center; gap:4px; margin-left:8px;
       font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:999px;
       background:rgba(255,255,255,0.08); color:var(--text-dim);
@@ -177,7 +191,12 @@
       <form id="songForm" onsubmit="submitSong(event)">
         <div class="field">
           <label for="songTitle">Song Title <span class="text-pink">*</span></label>
-          <input type="text" id="songTitle" required placeholder="e.g. Despacito, Bohemian Rhapsody, Volare" />
+          <input type="text" id="songTitle" required autocomplete="off"
+                 placeholder="e.g. Despacito, Bohemian Rhapsody, Volare" />
+          <!-- Suggestions from songs already sung here. "As it was" and "As it was
+               Harry Styles" are in the data as two different songs, from two people
+               typing the same request. Picking from a list is what stops that. -->
+          <div class="song-sugg" id="songSugg" hidden></div>
         </div>
 
         <div class="field">
@@ -260,6 +279,23 @@
 
     async function initKaraoke() {
       me = await requireAuth();
+
+      loadSongbookForSuggest();
+      const titleBox = document.getElementById('songTitle');
+      if (titleBox) {
+        let deb = null;
+        titleBox.addEventListener('input', () => {
+          clearTimeout(deb);
+          deb = setTimeout(suggestSongs, 120);
+        });
+        titleBox.addEventListener('blur', () => {
+          // Late enough that a click on a suggestion lands first.
+          setTimeout(() => {
+            const pn = document.getElementById('songSugg');
+            if (pn) pn.hidden = true;
+          }, 180);
+        });
+      }
 
       // The hint is for people who have not opened the songbook; once they have, it
       // has nothing left to tell them.
@@ -578,6 +614,58 @@
           </div>
         `;
       }).join('');
+    }
+
+    /* Suggest songs already in the songbook as people type.
+     *
+     * "As it was" and "As it was Harry Styles" are in the data as two songs, because
+     * two people typed the same request differently. That splits the play count and
+     * hides repeats — it is why the count I added is almost always blank.
+     *
+     * The songbook is fetched once and filtered locally: a few hundred rows, and a
+     * request per keystroke would be worse for everyone. Picking a suggestion fills
+     * the artist too, which is the field left inconsistent most.
+     *
+     * Nothing is forced. A song nobody has sung here must stay typeable, or the queue
+     * could only ever contain songs it already had. */
+    let songbookCache = null;
+
+    async function loadSongbookForSuggest() {
+      const { data, error } = await db.rpc('karaoke_songbook', { p_limit: 400 });
+      songbookCache = error ? [] : (data || []);
+    }
+
+    function suggestSongs() {
+      const box = document.getElementById('songTitle');
+      const panel = document.getElementById('songSugg');
+      if (!box || !panel || !songbookCache) return;
+      const q = box.value.trim().toLowerCase();
+      if (q.length < 2) { panel.hidden = true; return; }
+
+      const hits = songbookCache
+        .filter((r) => (r.title || '').toLowerCase().includes(q))
+        .slice(0, 5);
+      if (!hits.length) { panel.hidden = true; return; }
+
+      panel.hidden = false;
+      panel.innerHTML = '';
+      hits.forEach((r) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.innerHTML = `<span>${escapeHtml(r.title)}</span>`
+          + (r.artist ? `<span class="sg-artist">${escapeHtml(r.artist)}</span>` : '')
+          + `<span class="sg-plays">${r.plays > 0 ? r.plays + 'x sung' : 'requested'}</span>`;
+        // A listener rather than an inline onclick: "Sweet Child O'mine" is already in
+        // the data and an apostrophe breaks a quoted attribute.
+        b.addEventListener('click', () => {
+          box.value = r.title;
+          const a = document.getElementById('artistName');
+          if (a && !a.value.trim() && r.artist) a.value = r.artist;
+          panel.hidden = true;
+          if (a) a.focus();
+        });
+        panel.appendChild(b);
+      });
     }
 
     async function submitSong(e) {
