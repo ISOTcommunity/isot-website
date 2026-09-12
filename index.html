@@ -1574,10 +1574,19 @@
       + (n.venue_name ? ` @ ${n.venue_name}` : '');
   }
 
-  // 2. The next three, with real dates and times.
+  // 2. The next three, with real dates and times — and the artwork for the first one
+  //    where a poster exists. The posters are already made and already in the app; the
+  //    public site was the only place still describing a night purely in words.
   const host = document.getElementById('nextEvents');
   if (host) {
-    host.innerHTML = rows.slice(0, 3).map((e) => `
+    const lead = rows[0];
+    const art = lead && lead.poster_url
+      ? `<a href="calendar.html" style="display:block;margin:0 0 14px">
+           <img src="${esc(lead.poster_url)}" alt="${esc(lead.title)} poster" loading="lazy"
+                style="display:block;width:100%;height:auto;border-radius:12px" />
+         </a>`
+      : '';
+    host.innerHTML = art + rows.slice(0, 3).map((e) => `
       <a href="calendar.html" style="display:flex;gap:11px;align-items:baseline;
          padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.08);
          text-decoration:none;color:inherit">
