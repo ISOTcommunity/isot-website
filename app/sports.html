@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-N2S3FL84RT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-N2S3FL84RT');
+</script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Free Outdoor Sports &amp; Courts Turin · ISOT</title>
+
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="../assets/favicon.png" sizes="48x48" type="image/png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-title" content="ISOT" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#000000" />
+  <script defer src="/_vercel/insights/script.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="vendor/leaflet.css" />
+  <link rel="stylesheet" href="css/app.css" />
+
+  <style>
+    #sportsMap {
+      height: 340px;
+      width: 100%;
+      border-radius: 20px;
+      border: 1px solid var(--border-glow);
+      box-shadow: 0 12px 32px rgba(238, 9, 121, 0.2);
+      margin-bottom: 20px;
+    }
+    
+    .leaflet-control-attribution {
+      background: rgba(11, 15, 25, 0.6) !important;
+      color: var(--text-dim) !important;
+      font-size: 0.65rem !important;
+      border-radius: 6px 0 0 0;
+    }
+    .leaflet-control-attribution a { color: var(--text-dim) !important; }
+
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+
+    .filter-btn {
+      flex-shrink: 0;
+      padding: 9px 16px;
+      border-radius: 9999px;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid var(--border-light);
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .filter-btn.active {
+      background: linear-gradient(135deg, #EE0979, #FF6A00);
+      border-color: transparent;
+      color: #FFF;
+      box-shadow: 0 6px 18px rgba(238, 9, 121, 0.4);
+    }
+
+    .sports-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .sports-card:hover {
+      border-color: rgba(238, 9, 121, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .badge-free {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: rgba(34, 197, 94, 0.15);
+      color: #22C55E;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display:flex;align-items:center;gap:8px">
+      <i class="fa-solid fa-basketball text-pink"></i>
+      <span>Free Sports &amp; Courts</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:12px">
+      <a href="partner.html" style="color:#FFF;font-size:1.15rem;padding:4px" title="Map"><i class="fa-solid fa-map-location-dot"></i></a>
+      <div id="headerAvatar" style="cursor:pointer" data-open-drawer></div>
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background:transparent;border:none;color:#FFF;font-size:1.3rem;cursor:pointer;padding:6px">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="shell" style="padding-top:18px;padding-bottom:96px">
+
+    <div style="margin-bottom: 16px;">
+      <div class="eyebrow"><i class="fa-solid fa-dumbbell text-pink"></i> Outdoor Student Athletics</div>
+      <h1 style="font-size: 1.8rem; margin-top: 4px;">Free Courts &amp; Ping Pong</h1>
+      <p style="color: var(--text-dim); font-size: 0.88rem; margin-top: 4px;">100% free outdoor public access basketball courts &amp; table tennis in Turin parks.</p>
+    </div>
+
+    <!-- Category Filter Bar -->
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterSports('all', this)"><i class="fa-solid fa-layer-group"></i> All Spots (11)</button>
+      <button class="filter-btn" onclick="filterSports('basketball', this)"><i class="fa-solid fa-basketball"></i> Basketball Courts (6)</button>
+      <button class="filter-btn" onclick="filterSports('pingpong', this)"><i class="fa-solid fa-table-tennis-paddle-ball"></i> Ping Pong (5)</button>
+    </div>
+
+    <!-- Interactive Sports Map -->
+    <div id="sportsMap"></div>
+
+    <!-- Sports List Container -->
+    <div id="sportsList"></div>
+
+  </main>
+
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="tabbar">
+    <a href="home.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 011-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </a>
+    <a href="events.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Calendar
+    </a>
+    <a href="partner.html" class="tab-item active">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+      Map
+    </a>
+    <a href="network.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+      Network
+    </a>
+  </nav>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="vendor/leaflet.js"></script>
+  <script src="js/isot.js"></script>
+
+  <script>
+    const SPORTS_SPOTS = [
+      // BASKETBALL COURTS
+      {
+        id: "dora-basket",
+        name: "Parco Dora Playground (Covered Roof)",
+        type: "basketball",
+        address: "Via Nole / Via Borgaro (Area Vitali), 10149 Torino",
+        coords: [45.0885, 7.6690],
+        icon: "fa-basketball",
+        badge: "Covered Roof • Rainproof 🔥",
+        desc: "Turin's most famous streetball court under the massive industrial steel roof. High-energy pickup games every afternoon."
+      },
+      {
+        id: "ruffini-basket",
+        name: "Parco Ruffini Basketball Playground",
+        type: "basketball",
+        address: "Corso Trapani / Corso Rosselli, 10141 Torino",
+        coords: [45.0645, 7.6405],
+        icon: "fa-basketball",
+        badge: "2 Full Courts + Night Lights",
+        desc: "Famous outdoor streetball hub next to Palazzetto dello Sport. Packed with local and university players every day."
+      },
+      {
+        id: "arbarello-basket",
+        name: "Piazza Arbarello Court (City Centre)",
+        type: "basketball",
+        address: "Piazza Arbarello, 10122 Torino",
+        coords: [45.0718, 7.6740],
+        icon: "fa-basketball",
+        badge: "Downtown Court",
+        desc: "Renovated outdoor basketball court in the heart of Turin near Corso Siccardi."
+      },
+      {
+        id: "ferrucci-basket",
+        name: "Giardino Ferrucci (PoliTo Court)",
+        type: "basketball",
+        address: "Corso Ferrucci / Via Borsellino, 10138 Torino",
+        coords: [45.0620, 7.6590],
+        icon: "fa-basketball",
+        badge: "2 Min Walk from PoliTo",
+        desc: "Outdoor streetball court very popular with Politecnico engineering and architecture students after lectures."
+      },
+      {
+        id: "valentino-basket",
+        name: "Parco del Valentino Basketball Court",
+        type: "basketball",
+        address: "Viale Mattioli (Castello del Valentino), 10125 Torino",
+        coords: [45.0535, 7.6850],
+        icon: "fa-basketball",
+        badge: "Park & River View",
+        desc: "Outdoor basketball hoops inside Valentino Park, surrounded by trees near the riverbank."
+      },
+      {
+        id: "colletta-basket",
+        name: "Giardino Nicholas Green (CLE Court)",
+        type: "basketball",
+        address: "Corso Regio Parco / Lungo Dora Colletta, 10153 Torino",
+        coords: [45.0780, 7.7050],
+        icon: "fa-basketball",
+        badge: "Near UniTo CLE Campus",
+        desc: "Free public court close to UniTo Campus Luigi Einaudi in Vanchiglietta."
+      },
+
+      // PING PONG TABLES
+      {
+        id: "valentino-pingpong",
+        name: "Parco del Valentino Ping Pong Zone",
+        type: "pingpong",
+        address: "Viale Virgiliano (Near Borgo Medievale), 10125 Torino",
+        coords: [45.0520, 7.6840],
+        icon: "fa-table-tennis-paddle-ball",
+        badge: "Concrete Tables in Shade",
+        desc: "Permanent stone/concrete ping pong tables under tree shade. Bring your own paddles & balls!"
+      },
+      {
+        id: "dora-pingpong",
+        name: "Parco Dora Ping Pong Tables",
+        type: "pingpong",
+        address: "Near Parco Dora Skatepark (Area Ingest), 10149 Torino",
+        coords: [45.0890, 7.6650],
+        icon: "fa-table-tennis-paddle-ball",
+        badge: "Next to Skatepark",
+        desc: "Outdoor concrete ping pong tables surrounded by the industrial park scenery."
+      },
+      {
+        id: "reali-pingpong",
+        name: "Giardini Reali Public Ping Pong",
+        type: "pingpong",
+        address: "Viale Primo Maggio / Piazza Castello, 10122 Torino",
+        coords: [45.0735, 7.6880],
+        icon: "fa-table-tennis-paddle-ball",
+        badge: "Royal Gardens Area",
+        desc: "Public outdoor ping pong zone right near the city center in the Royal Gardens area."
+      },
+      {
+        id: "pellerina-pingpong",
+        name: "Parco della Pellerina Ping Pong",
+        type: "pingpong",
+        address: "Corso Appio Claudio, 10146 Torino",
+        coords: [45.0875, 7.6360],
+        icon: "fa-table-tennis-paddle-ball",
+        badge: "Near Central Pond",
+        desc: "Concrete ping pong tables next to the duck pond and running track in Turin's largest green park."
+      },
+      {
+        id: "ruffini-pingpong",
+        name: "Parco Ruffini Outdoor Ping Pong",
+        type: "pingpong",
+        address: "Corso Rosselli Entrance, 10141 Torino",
+        coords: [45.0640, 7.6420],
+        icon: "fa-table-tennis-paddle-ball",
+        badge: "Next to Workout Area",
+        desc: "Outdoor ping pong tables alongside the outdoor calisthenics fitness zone."
+      }
+    ];
+
+    let map = null;
+    let markers = [];
+
+    async function initSportsPage() {
+      const me = await requireAuth();
+      document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(me, 36);
+
+      // Initialize Leaflet Map
+      map = L.map('sportsMap', { zoomControl: false, attributionControl: false }).setView([45.0684, 7.6740], 13);
+      L.control.attribution({ prefix: false, position: 'bottomright' }).addAttribution('&copy; OSM').addTo(map);
+
+      L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
+        maxZoom: 19
+      }).addTo(map);
+
+      renderSports(SPORTS_SPOTS);
+    }
+
+    function renderSports(list) {
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+
+      const container = document.getElementById('sportsList');
+      container.innerHTML = list.map(s => `
+        <div class="sports-card">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <span class="badge-free"><i class="fa-solid fa-circle-check"></i> 100% Free Public Access</span>
+            <span style="font-size:0.75rem; color:var(--text-dim); font-weight:700;">${s.badge}</span>
+          </div>
+          <h3 style="font-size:1.2rem; color:#FFF; margin-bottom:4px;"><i class="fa-solid ${s.icon} text-pink"></i> ${s.name}</h3>
+          <p style="font-size:0.82rem; color:var(--pink); margin-bottom:8px;"><i class="fa-solid fa-location-dot"></i> ${s.address}</p>
+          <p style="color:var(--text-dim); font-size:0.86rem; line-height:1.5; margin-bottom:14px;">${s.desc}</p>
+          <div style="display:flex; gap:10px;">
+            <a href="https://maps.google.com/?q=${s.coords[0]},${s.coords[1]}" target="_blank" rel="noopener" class="btn btn-pink" style="flex:1; justify-content:center; padding:9px;">
+              <i class="fa-solid fa-location-arrow"></i> Navigate to Court
+            </a>
+          </div>
+        </div>
+      `).join('');
+
+      const bounds = L.latLngBounds();
+      list.forEach(s => {
+        const pinColor = s.type === 'basketball' ? '#FF6A00' : '#22C55E';
+        const pinHtml = `<div class="isot-pin" style="background:${pinColor}; box-shadow: 0 0 16px ${pinColor}88;"><i class="fa-solid ${s.icon}"></i></div>`;
+        const customPin = L.divIcon({
+          className: 'isot-pin-wrapper',
+          html: pinHtml,
+          iconSize: [32, 32], iconAnchor: [16, 16]
+        });
+
+        const marker = L.marker(s.coords, { icon: customPin }).addTo(map).bindPopup(`<b>${s.name}</b><br>${s.badge}`);
+        markers.push(marker);
+        bounds.extend(s.coords);
+      });
+
+      if (list.length > 0) {
+        map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
+      }
+    }
+
+    function filterSports(type, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      let filtered = SPORTS_SPOTS;
+      if (type === 'basketball') filtered = SPORTS_SPOTS.filter(s => s.type === 'basketball');
+      if (type === 'pingpong') filtered = SPORTS_SPOTS.filter(s => s.type === 'pingpong');
+
+      renderSports(filtered);
+    }
+
+    document.addEventListener('DOMContentLoaded', initSportsPage);
+  </script>
+</body>
+</html>
