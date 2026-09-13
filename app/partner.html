@@ -388,6 +388,7 @@
       // Same reasoning as the tour: five routes crossing the city, on by default, would
       // bury every pin under a net of lines.
       running:  { label: 'Running',  icon: 'fa-person-running', group: null, count: 0, optIn: true },
+      sports:   { label: 'Sports',   icon: 'fa-basketball',     group: null, count: 0, optIn: true },
       campus:   { label: 'Campus',   icon: 'fa-graduation-cap', group: null, count: 0, zoomed: true },
       // Contracted places sit in the Mensa layer rather than getting their own. A
       // student looking for lunch cares where the app pays, not which contract EDISU
@@ -1133,6 +1134,18 @@
               </div>
             </div>
           </a>`).join(''));
+      else if (activeLayer === 'sports') {
+        html = shell('Free Outdoor Sports', 11, `
+          <a class="card card-glass" href="sports.html"
+             style="display:block;text-decoration:none;color:inherit;margin-bottom:12px;border-left:3px solid #FF6A00;">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="font-weight:700;font-size:1.02rem;color:#FFF"><i class="fa-solid fa-basketball text-pink"></i> Outdoor Courts &amp; Ping Pong</div>
+              <span style="font-size:0.8rem;color:var(--pink)">Open Full Guide &rarr;</span>
+            </div>
+            <p class="dim" style="font-size:0.82rem;margin-top:6px;line-height:1.4">
+              100% free outdoor public access basketball courts (including covered Parco Dora) and concrete ping pong tables across Turin.
+            </p>
+          </a>`);
       }
 
       else if (activeLayer === 'museum') {
