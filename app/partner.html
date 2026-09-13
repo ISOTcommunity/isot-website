@@ -265,6 +265,7 @@
        but it is a bar with a deal, not a mensa. */
     .ref-pin.mensa_alt { background:#2A2418; color:#C9A46A; border-style:dashed; }
     .ref-pin.museum { background:#2C2036; color:#C79BE0; }
+    .ref-pin.sport  { background:#1E3620; color:#8FD99A; }
 
     /* The route colour is the ring, not the fill. A number printed on the colour needs
        4.5:1 against it, and a mid-tone like sky blue gives that to neither black nor
@@ -388,7 +389,7 @@
       // Same reasoning as the tour: five routes crossing the city, on by default, would
       // bury every pin under a net of lines.
       running:  { label: 'Running',  icon: 'fa-person-running', group: null, count: 0, optIn: true },
-      sports:   { label: 'Sports',   icon: 'fa-basketball',     group: null, count: 0, optIn: true },
+      sports:   { label: 'Sports',   icon: 'fa-basketball-ball', group: null, count: 0, optIn: true },
       campus:   { label: 'Campus',   icon: 'fa-graduation-cap', group: null, count: 0, zoomed: true },
       // Contracted places sit in the Mensa layer rather than getting their own. A
       // student looking for lunch cares where the app pays, not which contract EDISU
@@ -475,6 +476,7 @@
       LAYER.campus.group   = L.layerGroup();
       LAYER.mensa.group    = L.layerGroup();
       LAYER.museum.group   = L.layerGroup();
+      LAYER.sports.group   = L.layerGroup();
 
       const map = L.map('mapContainer', {
         zoomControl: false,
@@ -732,11 +734,13 @@
       if (error || !places) return;
 
       const ICON = { mensa: 'fa-utensils', mensa_alt: 'fa-mug-saucer',
-                     campus: 'fa-graduation-cap', museum: 'fa-landmark' };
+                     campus: 'fa-graduation-cap', museum: 'fa-landmark',
+                     sport: 'fa-basketball-ball' };
 
       places.forEach(p => {
         const group = (p.kind === 'mensa' || p.kind === 'mensa_alt') ? LAYER.mensa.group
                     : (p.kind === 'museum') ? LAYER.museum.group
+                    : (p.kind === 'sport') ? LAYER.sports.group
                     : LAYER.campus.group;
         if (!group) return;
 
@@ -765,6 +769,7 @@
       LAYER.campus.count = places.filter(p => p.kind === 'campus').length;
       LAYER.mensa.count  = places.filter(p => p.kind === 'mensa' || p.kind === 'mensa_alt').length;
       LAYER.museum.count = places.filter(p => p.kind === 'museum').length;
+      LAYER.sports.count = places.filter(p => p.kind === 'sport').length;
 
       applyLayers();
       renderLayerBar();
@@ -1137,17 +1142,36 @@
       }
 
       else if (activeLayer === 'sports') {
-        html = shell('Free Outdoor Sports', 11, `
-          <a class="card card-glass" href="sports.html"
-             style="display:block;text-decoration:none;color:inherit;margin-bottom:12px;border-left:3px solid #FF6A00;">
-            <div style="display:flex;align-items:center;justify-content:space-between">
-              <div style="font-weight:700;font-size:1.02rem;color:#FFF"><i class="fa-solid fa-basketball text-pink"></i> Outdoor Courts &amp; Ping Pong</div>
-              <span style="font-size:0.8rem;color:var(--pink)">Open Full Guide &rarr;</span>
-            </div>
-            <p class="dim" style="font-size:0.82rem;margin-top:6px;line-height:1.4">
-              100% free outdoor public access basketball courts (including covered Parco Dora) and concrete ping pong tables across Turin.
-            </p>
-          </a>`);
+        // Real OpenStreetMap points, grouped by park. Last night's list named 11
+        // spots (a "Piazza Arbarello Court", named CLE and PoliTo courts) that did
+        // not match a real court anywhere within 500 m-2 km, and claimed a ping pong
+        // table at Giardini Reali that does not exist in OSM at all. These 8 are the
+        // ones that checked out.
+        const rows = cityPlaces.filter(p => p.kind === 'sport');
+        const byPark = {};
+        rows.forEach(r => { (byPark[r.operator || 'Turin'] ||= []).push(r); });
+        html = shell('Free Outdoor Sports', rows.length, `
+          <p class="dim" style="font-size:0.78rem;line-height:1.55;margin:-2px 0 12px">
+            Public basketball and table-tennis in the city's parks. No fee is shown for
+            any of these in OpenStreetMap, which is how public park equipment is
+            normally tagged there — but nothing here promises "free", only "public".
+          </p>
+          ${Object.entries(byPark).map(([park, list]) => `
+            <p class="eyebrow" style="margin:14px 0 6px;color:var(--text-dim)">${escapeHtml(park)}</p>
+            <div class="card card-glass" style="margin-bottom:12px">
+              ${list.map(r => `
+                <a href="https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}"
+                   target="_blank" rel="noopener"
+                   style="display:block;text-decoration:none;color:inherit;padding:9px 0;
+                          border-top:1px solid var(--border-light)">
+                  <div style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:0.92rem">
+                    <i class="fa-solid ${r.name.startsWith('Table') ? 'fa-table-tennis-paddle-ball' : 'fa-basketball-ball'}"
+                       style="color:#8FD99A;font-size:0.8rem"></i>
+                    ${escapeHtml(r.name.replace(/ — .*/, ''))}
+                  </div>
+                  ${r.note ? `<div class="dim" style="font-size:0.78rem;margin-top:3px;margin-left:19px">${escapeHtml(r.note)}</div>` : ''}
+                </a>`).join('')}
+            </div>`).join('')}`);
       }
 
       else if (activeLayer === 'museum') {
