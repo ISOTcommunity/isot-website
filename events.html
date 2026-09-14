@@ -470,6 +470,25 @@
     </div>
   </section>
 
+  <!-- Interactive Events Calendar (Live, App-Style) -->
+  <section class="app-cal-section reveal">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <div class="pill-tag"><i class="fa-solid fa-calendar-days"></i> Live Calendar</div>
+        <h2 style="font-family: var(--font-display); font-size: 3.2rem; line-height: 1;">What's <span class="text-gradient">On</span></h2>
+      </div>
+
+      <div class="view-toggle-bar">
+        <button type="button" id="btnMonthlyView" class="view-btn active" onclick="setViewMode('monthly')"><i class="fa-solid fa-table-cells"></i> Monthly</button>
+        <button type="button" id="btnListView" class="view-btn" onclick="setViewMode('list')"><i class="fa-solid fa-list"></i> List</button>
+      </div>
+
+      <div id="calendarViewContainer">
+        <div style="text-align:center; padding:50px 0; color:var(--text-dim);"><i class="fa-solid fa-spinner fa-spin"></i> Loading events&hellip;</div>
+      </div>
+    </div>
+  </section>
+
   <!-- FEATURED NIGHT — hidden by default, revealed by script only while it is on -->
   <section class="section-padding" id="featuredNight" style="display: none; padding-top: 0;">
     <div class="container">
