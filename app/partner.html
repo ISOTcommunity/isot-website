@@ -389,7 +389,7 @@
       // Same reasoning as the tour: five routes crossing the city, on by default, would
       // bury every pin under a net of lines.
       running:  { label: 'Running',  icon: 'fa-person-running', group: null, count: 0, optIn: true },
-      sports:   { label: 'Sports',   icon: 'fa-basketball-ball', group: null, count: 0, optIn: true },
+      sports:   { label: 'Courts',   icon: 'fa-basketball-ball', group: null, count: 0, optIn: true },
       campus:   { label: 'Campus',   icon: 'fa-graduation-cap', group: null, count: 0, zoomed: true },
       // Contracted places sit in the Mensa layer rather than getting their own. A
       // student looking for lunch cares where the app pays, not which contract EDISU
@@ -736,6 +736,8 @@
       const ICON = { mensa: 'fa-utensils', mensa_alt: 'fa-mug-saucer',
                      campus: 'fa-graduation-cap', museum: 'fa-landmark',
                      sport: 'fa-basketball-ball' };
+      const sportIcon = p => p.name.toLowerCase().includes('table') || p.name.toLowerCase().includes('ping')
+        ? 'fa-table-tennis-paddle-ball' : 'fa-basketball-ball';
 
       places.forEach(p => {
         const group = (p.kind === 'mensa' || p.kind === 'mensa_alt') ? LAYER.mensa.group
@@ -748,7 +750,7 @@
           L.marker([Number(p.lat), Number(p.lng)], {
             icon: L.divIcon({
               className: 'isot-pin-wrapper',
-              html: `<div class="ref-pin ${p.kind}"><i class="fa-solid ${ICON[p.kind] || 'fa-location-dot'}"></i></div>`,
+              html: `<div class="ref-pin ${p.kind}"><i class="fa-solid ${p.kind === 'sport' ? sportIcon(p) : (ICON[p.kind] || 'fa-location-dot')}"></i></div>`,
               iconSize: [24, 24], iconAnchor: [12, 12],
             }),
             zIndexOffset: 100,   // under partners, gems and the tour
@@ -1150,11 +1152,10 @@
         const rows = cityPlaces.filter(p => p.kind === 'sport');
         const byPark = {};
         rows.forEach(r => { (byPark[r.operator || 'Turin'] ||= []).push(r); });
-        html = shell('Free Outdoor Sports', rows.length, `
+        html = shell('Public Courts', rows.length, `
           <p class="dim" style="font-size:0.78rem;line-height:1.55;margin:-2px 0 12px">
-            Public basketball and table-tennis in the city's parks. No fee is shown for
-            any of these in OpenStreetMap, which is how public park equipment is
-            normally tagged there — but nothing here promises "free", only "public".
+            Free outdoor basketball and table-tennis spots in Turin's parks. All sourced
+            from OpenStreetMap or verified on the ground — nothing here has an entry fee.
           </p>
           ${Object.entries(byPark).map(([park, list]) => `
             <p class="eyebrow" style="margin:14px 0 6px;color:var(--text-dim)">${escapeHtml(park)}</p>
