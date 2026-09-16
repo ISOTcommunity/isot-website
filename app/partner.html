@@ -309,6 +309,14 @@
       box-shadow:0 0 0 3px rgba(67,219,143,.28);
       animation:todayPulse 2.4s ease-in-out infinite;
     }
+    /* Approved and collecting votes. Gold, not green: it is a candidate, not a plan, and
+       the two must not be mistaken for each other at a glance. The number IS the pin —
+       how many are going is the thing that decides it. */
+    .ref-pin.voting {
+      background:#D4AF50; color:#241A05; border-color:#E8C870;
+      box-shadow:0 0 0 3px rgba(212,175,80,.22);
+      font-weight:800; font-size:0.78rem;
+    }
     @keyframes todayPulse {
       0%,100% { box-shadow:0 0 0 3px rgba(67,219,143,.28); }
       50%     { box-shadow:0 0 0 8px rgba(67,219,143,.06); }
@@ -842,35 +850,85 @@
     // browsing categories, and this is a single time-boxed thing that should not disappear
     // because someone filtered to Courts. It is silent when nothing is confirmed, and when
     // the winner has no coordinates (a free-text place nobody has mapped).
+    // Today's activities on the map: the confirmed one AND everything approved that is
+    // still collecting votes. The map is where members browse, so a proposal that only
+    // existed on the Today page was invisible to exactly the people whose votes decide it.
+    //
+    // Pending proposals are never drawn — they are not public until the board approves.
+    let todayLayer = null;
+
     async function loadTodayActivity(map) {
       try {
         const { data, error } = await db.rpc('daily_activity_board', { p_date: null });
         if (error || !data) return;
 
-        const w = data.find(r => r.id && r.status === 'confirmed');
-        if (!w || w.lat == null || w.lng == null) return;
+        const live = data.filter(r =>
+          r.id && r.lat != null && r.lng != null &&
+          (r.status === 'confirmed' || r.status === 'open'));
+        if (!live.length) return;
 
-        L.marker([Number(w.lat), Number(w.lng)], {
-          icon: L.divIcon({
-            className: 'isot-pin-wrapper',
-            html: `<div class="ref-pin today"><i class="fa-solid fa-bolt"></i></div>`,
-            iconSize: [26, 26], iconAnchor: [13, 13],
-          }),
-          zIndexOffset: 900,   // above partners, gems and the tour
-        }).addTo(map).bindPopup(`
-          <div style="min-width:200px">
-            <div style="font-size:0.66rem;font-weight:700;letter-spacing:0.1em;
-                        text-transform:uppercase;color:#43DB8F">
-              Today &middot; ${w.votes} coming</div>
-            <div style="font-weight:700;font-size:0.98rem;margin-top:3px">${escapeHtml(w.title)}</div>
-            <div style="font-size:0.8rem;margin-top:5px;opacity:0.8">
-              ${String(w.start_time).slice(0,5)}${w.place_name ? ' · ' + escapeHtml(w.place_name) : ''}</div>
-            ${w.description ? `<div style="font-size:0.8rem;margin-top:7px;line-height:1.5">${escapeHtml(w.description)}</div>` : ''}
-            <a href="today.html" style="display:inline-block;margin-top:9px;font-size:0.8rem;
-                                        color:#43DB8F;text-decoration:none">
-              Open the chat &rarr;</a>
-          </div>`);
+        // Added to the map rather than to a LAYER group: these are time-boxed and should
+        // not vanish because someone filtered to Courts.
+        if (todayLayer) map.removeLayer(todayLayer);
+        todayLayer = L.layerGroup().addTo(map);
+
+        live.forEach(r => {
+          const won = r.status === 'confirmed';
+          const t = String(r.start_time).slice(0, 5);
+
+          L.marker([Number(r.lat), Number(r.lng)], {
+            icon: L.divIcon({
+              className: 'isot-pin-wrapper',
+              html: won
+                ? `<div class="ref-pin today"><i class="fa-solid fa-bolt"></i></div>`
+                : `<div class="ref-pin voting">${r.votes}</div>`,
+              iconSize: [26, 26], iconAnchor: [13, 13],
+            }),
+            zIndexOffset: won ? 900 : 880,
+          }).addTo(todayLayer).bindPopup(`
+            <div style="min-width:210px">
+              <div style="font-size:0.66rem;font-weight:700;letter-spacing:0.1em;
+                          text-transform:uppercase;color:${won ? '#43DB8F' : '#D4AF50'}">
+                ${won ? `Today &middot; ${r.votes} coming`
+                      : `Voting &middot; ${r.votes} of ${r.vote_floor} needed`}</div>
+              <div style="font-weight:700;font-size:0.98rem;margin-top:3px">${escapeHtml(r.title)}</div>
+              <div style="font-size:0.8rem;margin-top:5px;opacity:0.8">
+                ${t}${r.place_name ? ' · ' + escapeHtml(r.place_name) : ''}</div>
+              ${r.description ? `<div style="font-size:0.8rem;margin-top:7px;line-height:1.5">${escapeHtml(r.description)}</div>` : ''}
+              ${won
+                ? `<a href="today.html" style="display:inline-block;margin-top:9px;
+                       font-size:0.8rem;color:#43DB8F;text-decoration:none">
+                     Open the chat &rarr;</a>`
+                : `<button type="button" onclick="voteFromMap('${r.id}')"
+                        style="margin-top:10px;width:100%;padding:7px 0;border-radius:8px;
+                               border:none;cursor:pointer;font-weight:700;font-size:0.8rem;
+                               background:${r.i_voted ? '#2B2B36' : '#D4AF50'};
+                               color:${r.i_voted ? '#C4BDE0' : '#241A05'}">
+                     ${r.i_voted ? 'You are going — tap to withdraw' : 'Count me in'}
+                   </button>`}
+            </div>`);
+        });
       } catch (_) { /* the map must never fail to draw because of this */ }
+    }
+
+    // Voting straight from the pin, so a member who spotted it on the map never has to
+    // find the same thing again on another page.
+    async function voteFromMap(proposalId) {
+      try {
+        const { data } = await db.rpc('daily_activity_board', { p_date: null });
+        const row = (data || []).find(r => r.id === proposalId);
+        const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Rome',
+          year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+
+        const { error } = row && row.i_voted
+          ? await db.rpc('unvote_activity', { p_date: today })
+          : await db.rpc('vote_activity',   { p_proposal_id: proposalId });
+
+        if (error) { alert(error.message || 'Could not register that vote.'); return; }
+        if (mapRef) { mapRef.closePopup(); await loadTodayActivity(mapRef); }
+      } catch (e) {
+        alert('Could not register that vote.');
+      }
     }
 
     async function loadCityPlaces(map) {
