@@ -35,6 +35,16 @@
       "source": "/checkin",
       "destination": "/app/checkin",
       "permanent": false
+    },
+    {
+      "source": "/saa-presentation",
+      "destination": "/isot-saa-presentation.html",
+      "permanent": false
+    },
+    {
+      "source": "/presentation",
+      "destination": "/isot-saa-presentation.html",
+      "permanent": false
     }
   ],
   "headers": [
