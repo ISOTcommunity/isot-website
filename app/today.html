@@ -242,9 +242,15 @@
 
       document.getElementById('proposeBtn').addEventListener('click', () => openSheet());
 
-      // Arriving from a map pin: open the sheet with that place already chosen.
-      const fromMap = new URLSearchParams(location.search).get('place');
-      if (fromMap && !document.getElementById('proposeBtn').disabled) openSheet(fromMap);
+      // Arriving from the map — either a place pin that is already mapped, or a spot the
+      // member dropped a pin on themselves.
+      const q = new URLSearchParams(location.search);
+      const fromPlace = q.get('place');
+      const lat = parseFloat(q.get('lat')), lng = parseFloat(q.get('lng'));
+      const dropped = Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+      if ((fromPlace || dropped) && !document.getElementById('proposeBtn').disabled) {
+        openSheet(fromPlace, dropped);
+      }
     }
 
     async function loadPlaces() {
@@ -507,7 +513,7 @@
     }
 
     /* ── Propose sheet ───────────────────────────────────────────────── */
-    function openSheet(preselectPlaceId) {
+    function openSheet(preselectPlaceId, droppedPin) {
       const meta = boardRows[0] || {};
       const latest = meta.latest_start ? hhmm(meta.latest_start) : null;
 
@@ -525,7 +531,7 @@
       wrap.innerHTML = `
         <div class="sheet" role="dialog" aria-label="Propose an activity">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-            <h2 style="font-size:1.05rem;margin:0">Propose an activity</h2>
+            <h2 style="font-size:1.05rem;margin:0">Propose an activity or gathering</h2>
             <button type="button" id="sheetClose"
                     style="background:none;border:none;color:var(--text-dim);font-size:1.2rem;cursor:pointer">
               <i class="fa-solid fa-xmark"></i></button>
@@ -548,14 +554,34 @@
             </div>
 
             <div class="field">
-              <label for="pPlace">Where</label>
-              <select id="pPlace">
-                <option value="">— Somewhere else —</option>
-                ${opts}
-              </select>
-              <input type="text" id="pLabel" maxlength="80" style="margin-top:8px"
-                     placeholder="Name the place" />
-              <div class="hint">Pick a spot from the map, or type anywhere else.</div>
+              <label for="${droppedPin ? 'pLabel' : 'pPlace'}">Where</label>
+
+              ${droppedPin ? `
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;
+                            border-radius:10px;margin-bottom:8px;
+                            background:rgba(67,219,143,.10);border:1px solid rgba(67,219,143,.32)">
+                  <i class="fa-solid fa-location-dot" style="color:#43DB8F"></i>
+                  <div style="font-size:.8rem;line-height:1.35">
+                    <strong style="color:#FFF">Pinned on the map</strong><br>
+                    <span class="dim" style="font-size:.72rem">
+                      ${droppedPin.lat.toFixed(5)}, ${droppedPin.lng.toFixed(5)}</span>
+                  </div>
+                  <a href="partner.html" style="margin-left:auto;font-size:.74rem;color:var(--pink)">
+                    Change</a>
+                </div>
+                <input type="text" id="pLabel" maxlength="80" required
+                       placeholder="What is this place called?" />
+                <div class="hint">Give it a name so people know where they are going.</div>
+              ` : `
+                <select id="pPlace">
+                  <option value="">— Somewhere else —</option>
+                  ${opts}
+                </select>
+                <input type="text" id="pLabel" maxlength="80" style="margin-top:8px"
+                       placeholder="Name the place" />
+                <div class="hint">Pick a spot from the map, or drop a pin from the
+                  <a href="partner.html" style="color:var(--pink)">map page</a>.</div>
+              `}
             </div>
 
             <div class="field">
@@ -579,14 +605,17 @@
       wrap.querySelector('#sheetClose').addEventListener('click', close);
 
       // Free-text place only matters when no mapped place is chosen.
+      // sel is absent in dropped-pin mode — the pin already answers "where".
       const sel = wrap.querySelector('#pPlace'), lbl = wrap.querySelector('#pLabel');
-      // Only honour a place that is really in the list, so a stale or hand-typed ?place=
-      // falls back to the free-text field instead of silently selecting nothing.
-      if (preselectPlaceId && places.some(p => p.id === preselectPlaceId)) {
-        sel.value = preselectPlaceId;
+      if (sel) {
+        // Only honour a place that is really in the list, so a stale or hand-typed ?place=
+        // falls back to the free-text field instead of silently selecting nothing.
+        if (preselectPlaceId && places.some(p => p.id === preselectPlaceId)) {
+          sel.value = preselectPlaceId;
+        }
+        const syncLabel = () => { lbl.style.display = sel.value ? 'none' : ''; };
+        sel.addEventListener('change', syncLabel); syncLabel();
       }
-      const syncLabel = () => { lbl.style.display = sel.value ? 'none' : ''; };
-      sel.addEventListener('change', syncLabel); syncLabel();
 
       // With the place settled, the next thing to fill is the title.
       setTimeout(() => wrap.querySelector('#pTitle')?.focus(), 60);
@@ -595,11 +624,13 @@
         e.preventDefault();
         const btn = wrap.querySelector('#pSubmit');
         const alertBox = wrap.querySelector('#sheetAlert');
-        const placeId = sel.value || null;
+        const placeId = sel ? (sel.value || null) : null;
         const label = lbl.value.trim();
 
         if (!placeId && !label) {
-          setAlert(alertBox, 'Pick a place from the map or type where it is.');
+          setAlert(alertBox, droppedPin
+            ? 'Give the spot a name so people know where they are going.'
+            : 'Pick a place from the map or type where it is.');
           return;
         }
         const done = busy(btn, 'Proposing…');
@@ -609,7 +640,10 @@
           p_start_time:  wrap.querySelector('#pTime').value,
           p_description: wrap.querySelector('#pDesc').value.trim() || null,
           p_place_id:    placeId,
-          p_place_label: placeId ? null : label
+          p_place_label: placeId ? null : label,
+          // Only meaningful without a mapped place; the server ignores it otherwise.
+          p_lat:         !placeId && droppedPin ? droppedPin.lat : null,
+          p_lng:         !placeId && droppedPin ? droppedPin.lng : null
         });
         if (typeof done === 'function') done();
         if (error) { setAlert(alertBox, error.message || 'Could not post that.'); return; }
