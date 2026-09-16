@@ -350,6 +350,11 @@
       <!-- The next three nights. The first with its poster, the other two compact. -->
       <div id="featuredNight" hidden style="margin-bottom:18px"></div>
 
+      <!-- Today's member-proposed activity. Hidden until there is something to say, so a
+           quiet day does not leave an empty box on the home page. -->
+      <a href="today.html" id="todayCard" hidden
+         style="display:block;text-decoration:none;color:inherit;margin-bottom:18px"></a>
+
       <!-- 5 Categories Character Strip -->
       <div style="margin-bottom: 8px;">
         <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
@@ -537,6 +542,57 @@
     }
 
 
+    // Today's member-proposed activity, summarised in one line on the home page.
+    // Deliberately quiet: it stays hidden unless there is a confirmed activity or an open
+    // ballot, so a day nobody proposed anything on does not show a dead box.
+    async function loadTodayCard() {
+      const el = document.getElementById('todayCard');
+      if (!el) return;
+      try {
+        // Settles the day if the cutoff has passed and nobody has opened the app since.
+        await db.rpc('confirm_daily_activity', { p_date: null });
+        const { data, error } = await db.rpc('daily_activity_board', { p_date: null });
+        if (error || !data || !data.length) return;
+
+        const meta = data[0];
+        const proposals = data.filter(r => r.id);
+        const winner = proposals.find(r => r.status === 'confirmed');
+
+        let tag, title, sub, accent;
+        if (winner) {
+          accent = 'var(--green)';
+          tag = `<i class="fa-solid fa-bolt"></i> Today · ${winner.votes} coming`;
+          title = winner.title;
+          sub = `${String(winner.start_time).slice(0,5)}`
+              + (winner.place_name ? ` · ${winner.place_name}` : '')
+              + ' — tap to open the chat';
+        } else if (meta.voting_open && proposals.length) {
+          accent = 'var(--pink)';
+          const top = Math.max(...proposals.map(p => Number(p.votes)));
+          tag = `<i class="fa-regular fa-hourglass"></i> Voting until 14:00`;
+          title = `${proposals.length} ${proposals.length === 1 ? 'idea' : 'ideas'} for today`;
+          sub = `Leader has ${top} of ${meta.vote_floor} votes needed — add yours`;
+        } else if (meta.voting_open) {
+          accent = 'var(--pink)';
+          tag = `<i class="fa-regular fa-lightbulb"></i> Nothing planned yet`;
+          title = 'Propose something for today';
+          sub = `${meta.vote_floor} people have to be in by 14:00 for it to happen`;
+        } else {
+          return;   // closed and nothing happened — say nothing
+        }
+
+        el.innerHTML = `
+          <div class="card card-glass" style="border-color:${accent};padding:15px 16px">
+            <div style="font-size:.62rem;font-weight:700;letter-spacing:.12em;
+                        text-transform:uppercase;color:${accent};margin-bottom:6px">${tag}</div>
+            <div style="font-weight:700;color:#FFF;font-size:1rem;line-height:1.25">
+              ${escapeHtml(title)}</div>
+            <div class="dim" style="font-size:.79rem;margin-top:4px">${escapeHtml(sub)}</div>
+          </div>`;
+        el.hidden = false;
+      } catch (_) { /* never block the home page on this */ }
+    }
+
     async function initHome() {
       try {
         meProfile = await requireAuth();
@@ -562,6 +618,7 @@
         if (memberView) memberView.style.display = 'block';
 
         renderFeaturedNight();
+        loadTodayCard();
 
         // Once the page is actually showing something, never over a spinner.
 

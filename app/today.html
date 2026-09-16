@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-N2S3FL84RT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-N2S3FL84RT');
+</script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Today &middot; ISOT App</title>
+
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="../assets/favicon.png" sizes="48x48" type="image/png" />
+
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-title" content="ISOT" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#000000" />
+  <script defer src="/_vercel/insights/script.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    /* Day strip — seven taps, the whole planning horizon in one row. */
+    .day-strip {
+      display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;
+      margin-bottom: 16px; -webkit-overflow-scrolling: touch;
+    }
+    .day-strip::-webkit-scrollbar { display: none; }
+    .day-pill {
+      flex: 0 0 auto; min-width: 56px; padding: 8px 10px; border-radius: 12px;
+      background: var(--bg-card); border: 1px solid var(--border-light);
+      text-align: center; cursor: pointer; transition: border-color .15s, background .15s;
+    }
+    .day-pill.on { border-color: var(--pink); background: rgba(212,90,232,.12); }
+    .day-pill-dow { font-size: .62rem; font-weight: 700; letter-spacing: .1em;
+                    text-transform: uppercase; color: var(--text-dim); }
+    .day-pill.on .day-pill-dow { color: var(--pink); }
+    .day-pill-num { font-size: 1.05rem; font-weight: 700; color: #FFF; margin-top: 2px; }
+    .day-pill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--pink);
+                    margin: 4px auto 0; }
+
+    /* Status banner */
+    .status-bar {
+      border-radius: 14px; padding: 12px 14px; margin-bottom: 16px;
+      border: 1px solid var(--border-light); background: var(--bg-card);
+      display: flex; align-items: center; gap: 11px;
+    }
+    .status-bar.live   { border-color: rgba(67,219,143,.35); background: rgba(67,219,143,.10); }
+    .status-bar.closed { border-color: rgba(255,255,255,.10); }
+    .status-ico { font-size: 1.05rem; flex-shrink: 0; }
+    .status-txt { font-size: .84rem; line-height: 1.45; color: var(--text-muted); }
+    .status-txt strong { color: #FFF; }
+
+    /* Winner */
+    .winner {
+      border-radius: 18px; padding: 18px; margin-bottom: 18px;
+      border: 1px solid rgba(67,219,143,.35);
+      background: linear-gradient(150deg, rgba(67,219,143,.12), var(--bg-card));
+    }
+    .winner-tag {
+      font-size: .6rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase;
+      color: var(--green); margin-bottom: 7px;
+    }
+    .winner-title { font-size: 1.2rem; font-weight: 700; color: #FFF; line-height: 1.2; }
+    .winner-meta { font-size: .82rem; color: var(--text-muted); margin-top: 6px;
+                   display: flex; flex-wrap: wrap; gap: 12px; }
+
+    /* Proposal card */
+    .prop {
+      border-radius: 14px; padding: 14px; margin-bottom: 10px;
+      background: var(--bg-card); border: 1px solid var(--border-light);
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .prop.mine  { border-color: rgba(212,90,232,.30); }
+    .prop.lost  { opacity: .5; }
+    .prop-body  { flex: 1; min-width: 0; }
+    .prop-title { font-size: .96rem; font-weight: 700; color: #FFF; line-height: 1.3; }
+    .prop-meta  { font-size: .76rem; color: var(--text-dim); margin-top: 4px; }
+    .prop-desc  { font-size: .8rem; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+
+    /* Vote button doubles as the count, because the count IS the turnout. */
+    .vote-btn {
+      flex-shrink: 0; width: 60px; border-radius: 12px; padding: 9px 0;
+      background: rgba(255,255,255,.05); border: 1px solid var(--border-light);
+      color: var(--text-main); cursor: pointer; text-align: center;
+      transition: border-color .15s, background .15s;
+    }
+    .vote-btn:hover:not(:disabled) { border-color: var(--pink); }
+    .vote-btn.on { background: var(--pink); border-color: var(--pink); color: #FFF; }
+    .vote-btn:disabled { opacity: .45; cursor: default; }
+    .vote-n   { font-size: 1.15rem; font-weight: 700; line-height: 1; }
+    .vote-lbl { font-size: .56rem; letter-spacing: .09em; text-transform: uppercase;
+                margin-top: 3px; opacity: .75; }
+
+    /* Chat */
+    .chat-wrap { border-top: 1px solid var(--border-light); margin-top: 16px; padding-top: 14px; }
+    .chat-list { max-height: 44vh; overflow-y: auto; display: flex; flex-direction: column;
+                 gap: 10px; margin-bottom: 12px; }
+    .msg { display: flex; gap: 9px; align-items: flex-start; }
+    .msg-av { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; overflow: hidden; }
+    .msg-b  { flex: 1; min-width: 0; }
+    .msg-who  { font-size: .72rem; color: var(--text-dim); font-weight: 600; }
+    .msg-time { font-size: .66rem; color: var(--text-dark); margin-left: 6px; font-weight: 400; }
+    .msg-txt  { font-size: .87rem; color: var(--text-main); line-height: 1.45;
+                margin-top: 2px; word-wrap: break-word; overflow-wrap: anywhere; }
+    .chat-form { display: flex; gap: 8px; }
+    .chat-form input { flex: 1; }
+
+    /* Propose sheet */
+    .sheet-bg {
+      position: fixed; inset: 0; background: rgba(0,0,0,.72); z-index: 900;
+      backdrop-filter: blur(3px); display: flex; align-items: flex-end; justify-content: center;
+    }
+    .sheet {
+      width: 100%; max-width: 560px; background: var(--bg-raised);
+      border-radius: 20px 20px 0 0; padding: 20px 18px calc(22px + env(safe-area-inset-bottom, 0px));
+      max-height: 90vh; overflow-y: auto; border-top: 1px solid var(--border-light);
+    }
+    .field { margin-bottom: 13px; }
+    .field label {
+      display: block; font-size: .7rem; font-weight: 700; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px;
+    }
+    .hint { font-size: .74rem; color: var(--text-dim); margin-top: 5px; line-height: 1.45; }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display:flex;align-items:center;gap:8px;">
+      <i class="fa-solid fa-bolt text-pink"></i>
+      <span>Today</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div id="headerAvatar" style="cursor:pointer;" data-open-drawer></div>
+      <button type="button" id="burgerBtn" aria-label="Account menu"
+              style="background:transparent;border:none;color:#FFF;font-size:1.3rem;cursor:pointer;padding:6px;">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <div class="container" style="padding-bottom:90px;">
+
+      <div class="day-strip" id="dayStrip"></div>
+      <div id="statusBar"></div>
+      <div id="winnerBox"></div>
+
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;">
+        <div class="eyebrow" style="margin:0" id="ballotHead">On the ballot</div>
+        <span class="dim" style="font-size:.72rem" id="slotsLeft"></span>
+      </div>
+
+      <div id="ballot"></div>
+
+      <button type="button" class="btn btn-pink" id="proposeBtn"
+              style="width:100%;margin-top:14px;">
+        <i class="fa-solid fa-plus"></i> Propose something
+      </button>
+
+      <p class="dim" style="font-size:.74rem;line-height:1.5;margin-top:14px;text-align:center">
+        One vote each per day, and voting for something means you are coming.
+        The top activity wins at <strong style="color:var(--text-muted)">14:00</strong>
+        if it reaches <strong style="color:var(--text-muted)"><span id="floorTxt">5</span> votes</strong>.
+      </p>
+
+    </div>
+  </main>
+
+  <nav class="tabbar">
+    <a href="home.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 011-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </a>
+    <a href="events.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Calendar
+    </a>
+    <a href="today.html" class="tab-item active">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      Today
+    </a>
+    <a href="partner.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+      Map
+    </a>
+  </nav>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+
+  <script>
+    let meProfile = null;
+    let selectedDate = null;      // 'YYYY-MM-DD' in Rome
+    let boardRows = [];           // last daily_activity_board() result
+    let places = [];              // city_places for the picker
+    let chatTimer = null;
+    let lastChatKey = '';         // so we only repaint when messages change
+
+    // Rome, not the device. A member in another timezone must see the same day as the city.
+    function romeToday() {
+      return new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Europe/Rome', year: 'numeric', month: '2-digit', day: '2-digit'
+      }).format(new Date());
+    }
+    function addDays(iso, n) {
+      const d = new Date(iso + 'T12:00:00Z');
+      d.setUTCDate(d.getUTCDate() + n);
+      return d.toISOString().slice(0, 10);
+    }
+    function hhmm(t) { return t ? String(t).slice(0, 5) : ''; }
+
+    async function initToday() {
+      meProfile = await requireAuth();
+      document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(meProfile, 36);
+
+      selectedDate = romeToday();
+
+      // Idempotent: the first member to open the app after the cutoff settles the day.
+      // No cron, and calling it again costs nothing.
+      try { await db.rpc('confirm_daily_activity', { p_date: null }); } catch (_) {}
+
+      loadPlaces();
+      renderDayStrip();
+      await refresh();
+
+      document.getElementById('proposeBtn').addEventListener('click', openSheet);
+    }
+
+    async function loadPlaces() {
+      const { data } = await db
+        .from('city_places')
+        .select('id,name,kind')
+        .eq('active', true)
+        .order('kind').order('name');
+      places = data || [];
+    }
+
+    function renderDayStrip() {
+      const today = romeToday();
+      const bar = document.getElementById('dayStrip');
+      let html = '';
+      for (let i = 0; i < 7; i++) {
+        const iso = addDays(today, i);
+        const d = new Date(iso + 'T12:00:00Z');
+        const dow = i === 0 ? 'Today'
+                  : d.toLocaleDateString('en-GB', { weekday: 'short', timeZone: 'UTC' });
+        html += `
+          <div class="day-pill ${iso === selectedDate ? 'on' : ''}" data-date="${iso}">
+            <div class="day-pill-dow">${escapeHtml(dow)}</div>
+            <div class="day-pill-num">${d.getUTCDate()}</div>
+          </div>`;
+      }
+      bar.innerHTML = html;
+      bar.querySelectorAll('.day-pill').forEach(p => {
+        p.addEventListener('click', async () => {
+          selectedDate = p.dataset.date;
+          renderDayStrip();
+          await refresh();
+        });
+      });
+    }
+
+    async function refresh() {
+      const { data, error } = await db.rpc('daily_activity_board', { p_date: selectedDate });
+      if (error) {
+        document.getElementById('ballot').innerHTML =
+          `<p class="dim" style="text-align:center;padding:20px">Could not load the day.</p>`;
+        return;
+      }
+      boardRows = data || [];
+      render();
+    }
+
+    function render() {
+      // The function LEFT JOINs, so an empty day still returns one row carrying the
+      // cutoff, the floor and the free slots — with a null id.
+      const meta = boardRows[0] || {};
+      const proposals = boardRows.filter(r => r.id);
+      const winner = proposals.find(r => r.status === 'confirmed');
+
+      document.getElementById('floorTxt').textContent = meta.vote_floor ?? 5;
+
+      const slots = meta.slots_left ?? 5;
+      document.getElementById('slotsLeft').textContent =
+        slots > 0 ? `${slots} of ${meta.proposal_cap ?? 5} slots free` : 'Day is full';
+
+      renderStatus(meta, proposals, winner);
+      renderWinner(winner);
+      renderBallot(proposals, meta, winner);
+
+      const btn = document.getElementById('proposeBtn');
+      const canPropose = meta.voting_open && slots > 0
+                         && !proposals.some(p => p.proposed_by === meProfile.id);
+      btn.disabled = !canPropose;
+      btn.style.display = meta.voting_open ? '' : 'none';
+      if (proposals.some(p => p.proposed_by === meProfile.id)) {
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> You proposed for this day';
+      } else if (slots <= 0) {
+        btn.innerHTML = '<i class="fa-solid fa-lock"></i> Day is full — vote for one instead';
+      } else {
+        btn.innerHTML = '<i class="fa-solid fa-plus"></i> Propose something';
+      }
+    }
+
+    function renderStatus(meta, proposals, winner) {
+      const el = document.getElementById('statusBar');
+      const isToday = selectedDate === romeToday();
+      let cls = '', ico = '', txt = '';
+
+      if (winner) {
+        cls = 'live'; ico = '<i class="fa-solid fa-circle-check text-green"></i>';
+        txt = isToday ? '<strong>It is on.</strong> Chat is open below.'
+                      : '<strong>Confirmed</strong> for this day.';
+      } else if (meta.voting_open) {
+        ico = '<i class="fa-solid fa-hourglass-half text-pink"></i>';
+        const need = meta.vote_floor ?? 5;
+        const top = proposals.length ? Math.max(...proposals.map(p => Number(p.votes))) : 0;
+        txt = proposals.length
+          ? `Voting until <strong>14:00</strong>. Leader has <strong>${top}</strong> of ${need} votes needed.`
+          : `Voting until <strong>14:00</strong>. Nothing proposed yet — be the first.`;
+      } else {
+        cls = 'closed'; ico = '<i class="fa-solid fa-moon" style="color:var(--text-dim)"></i>';
+        txt = proposals.length
+          ? 'Voting closed. Nothing reached the minimum, so no activity today.'
+          : 'Voting closed and nothing was proposed for this day.';
+      }
+
+      if (meta.latest_start) {
+        txt += `<br><span style="font-size:.76rem;opacity:.75">Must start before
+                ${hhmm(meta.latest_start)} — the ISOT night begins then.</span>`;
+      }
+      el.innerHTML = `<div class="status-bar ${cls}">
+          <span class="status-ico">${ico}</span><div class="status-txt">${txt}</div></div>`;
+    }
+
+    function renderWinner(w) {
+      const box = document.getElementById('winnerBox');
+      if (!w) {
+        box.innerHTML = '';
+        if (chatTimer) { clearInterval(chatTimer); chatTimer = null; }
+        return;
+      }
+      const canPost = selectedDate >= romeToday();
+      box.innerHTML = `
+        <div class="winner">
+          <div class="winner-tag"><i class="fa-solid fa-bolt"></i> Confirmed &middot; ${w.votes} coming</div>
+          <div class="winner-title">${escapeHtml(w.title)}</div>
+          <div class="winner-meta">
+            <span><i class="fa-regular fa-clock"></i> ${hhmm(w.start_time)}</span>
+            ${w.place_name ? `<span><i class="fa-solid fa-location-dot"></i> ${escapeHtml(w.place_name)}</span>` : ''}
+            ${w.proposer_name ? `<span><i class="fa-regular fa-user"></i> ${escapeHtml(w.proposer_name)}</span>` : ''}
+          </div>
+          ${w.description ? `<div class="prop-desc">${escapeHtml(w.description)}</div>` : ''}
+          ${w.lat ? `<a href="https://www.google.com/maps/dir/?api=1&destination=${w.lat},${w.lng}"
+             target="_blank" rel="noopener" class="btn btn-outline"
+             style="width:auto;padding:6px 14px;font-size:.78rem;margin-top:12px;display:inline-flex">
+             Directions &rarr;</a>` : ''}
+
+          <div class="chat-wrap">
+            <div class="eyebrow" style="margin-bottom:10px">
+              <i class="fa-regular fa-comments"></i> Chat
+            </div>
+            <div class="chat-list" id="chatList">
+              <p class="dim" style="font-size:.8rem">Loading…</p>
+            </div>
+            ${canPost ? `
+              <form class="chat-form" id="chatForm" autocomplete="off">
+                <input type="text" id="chatInput" maxlength="600" placeholder="Say something…" />
+                <button type="submit" class="btn btn-pink" style="width:auto;padding:0 16px;">
+                  <i class="fa-solid fa-paper-plane"></i>
+                </button>
+              </form>` : `<p class="dim" style="font-size:.78rem">This day is over — chat is read-only.</p>`}
+          </div>
+        </div>`;
+
+      if (canPost) {
+        document.getElementById('chatForm').addEventListener('submit', e => sendMessage(e, w.id));
+      }
+      loadChat(w.id);
+      if (chatTimer) clearInterval(chatTimer);
+      // Polling, not realtime: the thread is tiny and scoped to one day, and a poll cannot
+      // silently do nothing the way an un-enabled realtime channel can.
+      chatTimer = setInterval(() => loadChat(w.id), 5000);
+    }
+
+    async function loadChat(proposalId) {
+      // Via the function, not the table: profiles_read only lets a member read their own
+      // profile, so a PostgREST embed would render everyone else as an anonymous "Member".
+      const { data, error } = await db.rpc('activity_chat', { p_proposal_id: proposalId });
+
+      const list = document.getElementById('chatList');
+      if (!list) return;
+      if (error) { list.innerHTML = `<p class="dim" style="font-size:.8rem">Chat unavailable.</p>`; return; }
+
+      const rows = data || [];
+      const key = rows.map(r => r.id).join(',');
+      if (key === lastChatKey) return;      // nothing new, leave the scroll alone
+      lastChatKey = key;
+
+      if (!rows.length) {
+        list.innerHTML = `<p class="dim" style="font-size:.8rem">No messages yet. Say hello.</p>`;
+        return;
+      }
+
+      list.innerHTML = rows.map(m => {
+        // activity_chat() returns the author flat alongside the message.
+        const p = { full_name: m.full_name, avatar_url: m.avatar_url, member_code: m.member_code };
+        const t = new Date(m.created_at).toLocaleTimeString('en-GB',
+                    { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' });
+        return `<div class="msg">
+            <div class="msg-av">${renderUserAvatarHtml(p, 30)}</div>
+            <div class="msg-b">
+              <div class="msg-who">${escapeHtml(p.full_name || 'Member')}<span class="msg-time">${t}</span></div>
+              <div class="msg-txt">${escapeHtml(m.body)}</div>
+            </div>
+          </div>`;
+      }).join('');
+      list.scrollTop = list.scrollHeight;
+    }
+
+    async function sendMessage(e, proposalId) {
+      e.preventDefault();
+      const input = document.getElementById('chatInput');
+      const body = input.value.trim();
+      if (!body) return;
+      input.value = '';
+      const { error } = await db.from('activity_messages')
+        .insert({ proposal_id: proposalId, author_id: meProfile.id, body });
+      if (error) { input.value = body; alert('Could not send that message.'); return; }
+      lastChatKey = '';
+      loadChat(proposalId);
+    }
+
+    function renderBallot(proposals, meta, winner) {
+      const el = document.getElementById('ballot');
+      const others = proposals.filter(p => !winner || p.id !== winner.id);
+
+      document.getElementById('ballotHead').textContent =
+        winner ? 'Also proposed' : 'On the ballot';
+
+      if (!others.length) {
+        el.innerHTML = winner ? ''
+          : `<p class="dim" style="text-align:center;padding:22px 10px;font-size:.85rem">
+               Nothing proposed for this day yet.</p>`;
+        return;
+      }
+
+      el.innerHTML = others.map(p => {
+        const mine = p.proposed_by === meProfile.id;
+        const canVote = meta.voting_open;
+        return `
+          <div class="prop ${mine ? 'mine' : ''} ${p.status === 'lost' ? 'lost' : ''}">
+            <div class="prop-body">
+              <div class="prop-title">${escapeHtml(p.title)}</div>
+              <div class="prop-meta">
+                ${hhmm(p.start_time)}
+                ${p.place_name ? ' &middot; ' + escapeHtml(p.place_name) : ''}
+                ${p.proposer_name ? ' &middot; ' + escapeHtml(p.proposer_name) : ''}
+                ${mine ? ' &middot; <span style="color:var(--pink)">yours</span>' : ''}
+              </div>
+              ${p.description ? `<div class="prop-desc">${escapeHtml(p.description)}</div>` : ''}
+            </div>
+            <button type="button" class="vote-btn ${p.i_voted ? 'on' : ''}"
+                    data-id="${p.id}" ${canVote ? '' : 'disabled'}>
+              <div class="vote-n">${p.votes}</div>
+              <div class="vote-lbl">${p.i_voted ? 'going' : 'join'}</div>
+            </button>
+          </div>`;
+      }).join('');
+
+      el.querySelectorAll('.vote-btn').forEach(b => {
+        b.addEventListener('click', () => castVote(b.dataset.id, b));
+      });
+    }
+
+    async function castVote(proposalId, btn) {
+      btn.disabled = true;
+      const row = boardRows.find(r => r.id === proposalId);
+      // Clicking the one you already back withdraws you, so "I changed my mind" is
+      // one tap and not a dead end.
+      const { error } = row && row.i_voted
+        ? await db.rpc('unvote_activity', { p_date: selectedDate })
+        : await db.rpc('vote_activity',   { p_proposal_id: proposalId });
+      if (error) alert(error.message || 'Could not register that vote.');
+      await refresh();
+    }
+
+    /* ── Propose sheet ───────────────────────────────────────────────── */
+    function openSheet() {
+      const meta = boardRows[0] || {};
+      const latest = meta.latest_start ? hhmm(meta.latest_start) : null;
+
+      const grouped = {};
+      places.forEach(p => { (grouped[p.kind] || (grouped[p.kind] = [])).push(p); });
+      const KIND = { sport: 'Courts & sport', mensa: 'Canteens', mensa_alt: 'Canteens',
+                     museum: 'Museums', campus: 'Campus' };
+      const opts = Object.entries(grouped).map(([k, list]) =>
+        `<optgroup label="${escapeHtml(KIND[k] || k)}">` +
+        list.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('') +
+        `</optgroup>`).join('');
+
+      const wrap = document.createElement('div');
+      wrap.className = 'sheet-bg';
+      wrap.innerHTML = `
+        <div class="sheet" role="dialog" aria-label="Propose an activity">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <h2 style="font-size:1.05rem;margin:0">Propose an activity</h2>
+            <button type="button" id="sheetClose"
+                    style="background:none;border:none;color:var(--text-dim);font-size:1.2rem;cursor:pointer">
+              <i class="fa-solid fa-xmark"></i></button>
+          </div>
+
+          <div id="sheetAlert"></div>
+
+          <form id="proposeForm" autocomplete="off">
+            <div class="field">
+              <label for="pTitle">What is it</label>
+              <input type="text" id="pTitle" maxlength="80" required
+                     placeholder="Bouldering at the wall" />
+            </div>
+
+            <div class="field">
+              <label for="pTime">Start time</label>
+              <input type="time" id="pTime" required />
+              ${latest ? `<div class="hint">Must start before <strong>${latest}</strong> —
+                          the ISOT night begins then.</div>` : ''}
+            </div>
+
+            <div class="field">
+              <label for="pPlace">Where</label>
+              <select id="pPlace">
+                <option value="">— Somewhere else —</option>
+                ${opts}
+              </select>
+              <input type="text" id="pLabel" maxlength="80" style="margin-top:8px"
+                     placeholder="Name the place" />
+              <div class="hint">Pick a spot from the map, or type anywhere else.</div>
+            </div>
+
+            <div class="field">
+              <label for="pDesc">Anything to add <span style="opacity:.6">(optional)</span></label>
+              <textarea id="pDesc" rows="2" maxlength="400"
+                        placeholder="Bring shoes. Meeting at the entrance."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-pink" id="pSubmit" style="width:100%;margin-top:6px">
+              Propose &amp; count me in
+            </button>
+            <p class="dim" style="font-size:.74rem;margin-top:10px;line-height:1.45">
+              Proposing counts as your vote for the day — you are saying you will be there.
+            </p>
+          </form>
+        </div>`;
+      document.body.appendChild(wrap);
+
+      const close = () => wrap.remove();
+      wrap.addEventListener('click', e => { if (e.target === wrap) close(); });
+      wrap.querySelector('#sheetClose').addEventListener('click', close);
+
+      // Free-text place only matters when no mapped place is chosen.
+      const sel = wrap.querySelector('#pPlace'), lbl = wrap.querySelector('#pLabel');
+      const syncLabel = () => { lbl.style.display = sel.value ? 'none' : ''; };
+      sel.addEventListener('change', syncLabel); syncLabel();
+
+      wrap.querySelector('#proposeForm').addEventListener('submit', async e => {
+        e.preventDefault();
+        const btn = wrap.querySelector('#pSubmit');
+        const alertBox = wrap.querySelector('#sheetAlert');
+        const placeId = sel.value || null;
+        const label = lbl.value.trim();
+
+        if (!placeId && !label) {
+          setAlert(alertBox, 'Pick a place from the map or type where it is.');
+          return;
+        }
+        const done = busy(btn, 'Proposing…');
+        const { data, error } = await db.rpc('propose_activity', {
+          p_date:        selectedDate,
+          p_title:       wrap.querySelector('#pTitle').value.trim(),
+          p_start_time:  wrap.querySelector('#pTime').value,
+          p_description: wrap.querySelector('#pDesc').value.trim() || null,
+          p_place_id:    placeId,
+          p_place_label: placeId ? null : label
+        });
+        if (typeof done === 'function') done();
+        if (error) { setAlert(alertBox, error.message || 'Could not post that.'); return; }
+        close();
+        await refresh();
+      });
+    }
+
+    initToday();
+  </script>
+</body>
+</html>
