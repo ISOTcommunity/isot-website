@@ -235,11 +235,16 @@
       // No cron, and calling it again costs nothing.
       try { await db.rpc('confirm_daily_activity', { p_date: null }); } catch (_) {}
 
-      loadPlaces();
       renderDayStrip();
-      await refresh();
+      // Both, before anything can open the sheet: the place list is what the picker is
+      // built from, and a deep link from the map opens that picker immediately.
+      await Promise.all([loadPlaces(), refresh()]);
 
-      document.getElementById('proposeBtn').addEventListener('click', openSheet);
+      document.getElementById('proposeBtn').addEventListener('click', () => openSheet());
+
+      // Arriving from a map pin: open the sheet with that place already chosen.
+      const fromMap = new URLSearchParams(location.search).get('place');
+      if (fromMap && !document.getElementById('proposeBtn').disabled) openSheet(fromMap);
     }
 
     async function loadPlaces() {
@@ -502,7 +507,7 @@
     }
 
     /* ── Propose sheet ───────────────────────────────────────────────── */
-    function openSheet() {
+    function openSheet(preselectPlaceId) {
       const meta = boardRows[0] || {};
       const latest = meta.latest_start ? hhmm(meta.latest_start) : null;
 
@@ -575,8 +580,16 @@
 
       // Free-text place only matters when no mapped place is chosen.
       const sel = wrap.querySelector('#pPlace'), lbl = wrap.querySelector('#pLabel');
+      // Only honour a place that is really in the list, so a stale or hand-typed ?place=
+      // falls back to the free-text field instead of silently selecting nothing.
+      if (preselectPlaceId && places.some(p => p.id === preselectPlaceId)) {
+        sel.value = preselectPlaceId;
+      }
       const syncLabel = () => { lbl.style.display = sel.value ? 'none' : ''; };
       sel.addEventListener('change', syncLabel); syncLabel();
+
+      // With the place settled, the next thing to fill is the title.
+      setTimeout(() => wrap.querySelector('#pTitle')?.focus(), 60);
 
       wrap.querySelector('#proposeForm').addEventListener('submit', async e => {
         e.preventDefault();

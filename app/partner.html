@@ -266,6 +266,18 @@
     .ref-pin.mensa_alt { background:#2A2418; color:#C9A46A; border-style:dashed; }
     .ref-pin.museum { background:#2C2036; color:#C79BE0; }
     .ref-pin.sport  { background:#1E3620; color:#8FD99A; }
+    /* Today's confirmed activity. Not a filterable layer — one pin, always on top,
+       because on the day it runs it is the most relevant thing on the map. */
+    .ref-pin.today {
+      background:#43DB8F; color:#06240F; border-color:#43DB8F;
+      box-shadow:0 0 0 3px rgba(67,219,143,.28);
+      animation:todayPulse 2.4s ease-in-out infinite;
+    }
+    @keyframes todayPulse {
+      0%,100% { box-shadow:0 0 0 3px rgba(67,219,143,.28); }
+      50%     { box-shadow:0 0 0 8px rgba(67,219,143,.06); }
+    }
+    @media (prefers-reduced-motion: reduce) { .ref-pin.today { animation:none; } }
 
     /* The route colour is the ring, not the fill. A number printed on the colour needs
        4.5:1 against it, and a mid-tone like sky blue gives that to neither black nor
@@ -638,6 +650,7 @@
       await loadTour(map);
       loadRunning(map);
       await loadCityPlaces(map);
+      loadTodayActivity(map);
       watchNearby(venues || [], tonightByVenue);
 
       // Fit every pin rather than centring on a guessed midpoint — with one venue
@@ -727,6 +740,43 @@
        we only point at it, so there is no claiming and no state. The mensa note is the
        opening hours as EDISU publishes them, which is the whole reason a pin is worth
        tapping: the walk is short, the closed door is not. */
+    // Today's confirmed member activity, pinned straight onto the map.
+    //
+    // Added to the map rather than to a LAYER group on purpose: the layer filters are for
+    // browsing categories, and this is a single time-boxed thing that should not disappear
+    // because someone filtered to Courts. It is silent when nothing is confirmed, and when
+    // the winner has no coordinates (a free-text place nobody has mapped).
+    async function loadTodayActivity(map) {
+      try {
+        const { data, error } = await db.rpc('daily_activity_board', { p_date: null });
+        if (error || !data) return;
+
+        const w = data.find(r => r.id && r.status === 'confirmed');
+        if (!w || w.lat == null || w.lng == null) return;
+
+        L.marker([Number(w.lat), Number(w.lng)], {
+          icon: L.divIcon({
+            className: 'isot-pin-wrapper',
+            html: `<div class="ref-pin today"><i class="fa-solid fa-bolt"></i></div>`,
+            iconSize: [26, 26], iconAnchor: [13, 13],
+          }),
+          zIndexOffset: 900,   // above partners, gems and the tour
+        }).addTo(map).bindPopup(`
+          <div style="min-width:200px">
+            <div style="font-size:0.66rem;font-weight:700;letter-spacing:0.1em;
+                        text-transform:uppercase;color:#43DB8F">
+              Today &middot; ${w.votes} coming</div>
+            <div style="font-weight:700;font-size:0.98rem;margin-top:3px">${escapeHtml(w.title)}</div>
+            <div style="font-size:0.8rem;margin-top:5px;opacity:0.8">
+              ${String(w.start_time).slice(0,5)}${w.place_name ? ' · ' + escapeHtml(w.place_name) : ''}</div>
+            ${w.description ? `<div style="font-size:0.8rem;margin-top:7px;line-height:1.5">${escapeHtml(w.description)}</div>` : ''}
+            <a href="today.html" style="display:inline-block;margin-top:9px;font-size:0.8rem;
+                                        color:#43DB8F;text-decoration:none">
+              Open the chat &rarr;</a>
+          </div>`);
+      } catch (_) { /* the map must never fail to draw because of this */ }
+    }
+
     async function loadCityPlaces(map) {
       const { data: places, error } = await db.from('city_places')
         .select('id,kind,name,operator,address,lat,lng,note,url')
@@ -760,10 +810,17 @@
               ${p.operator ? `<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:#D45AE8;margin-top:2px">${escapeHtml(p.operator)}</div>` : ''}
               ${p.address ? `<div style="font-size:0.8rem;margin-top:6px;opacity:0.75">${escapeHtml(p.address)}</div>` : ''}
               ${p.note ? `<div style="font-size:0.8rem;margin-top:7px;line-height:1.5">${escapeHtml(p.note)}</div>` : ''}
-              <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}"
-                 target="_blank" rel="noopener"
-                 style="display:inline-block;margin-top:9px;font-size:0.8rem;color:#D45AE8;text-decoration:none">
-                Directions &rarr;</a>
+              <div style="display:flex;gap:14px;align-items:center;margin-top:9px;flex-wrap:wrap">
+                <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}"
+                   target="_blank" rel="noopener"
+                   style="font-size:0.8rem;color:#D45AE8;text-decoration:none">
+                  Directions &rarr;</a>
+                <!-- Straight from the pin into the proposal sheet with this place already
+                     chosen, so "let's go here" is one tap from looking at the map. -->
+                <a href="today.html?place=${p.id}"
+                   style="font-size:0.8rem;color:#8FD99A;text-decoration:none">
+                  Propose an activity &rarr;</a>
+              </div>
             </div>`));
       });
 
