@@ -59,7 +59,9 @@
     @media (prefers-reduced-motion: reduce) { .pin-cross { animation: none; } }
 
     .pin-hint {
-      position: absolute; left: 50%; top: 14px; transform: translateX(-50%); z-index: 500;
+      /* Bottom, not top: the layer filter bar floats over the top of the map and the hint
+         disappeared behind it. */
+      position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 500;
       background: rgba(8,8,8,.86); border: 1px solid rgba(67,219,143,.4);
       color: #E9F7EE; font-size: .78rem; font-weight: 600;
       padding: 7px 14px; border-radius: 999px; white-space: nowrap;
@@ -67,7 +69,10 @@
     }
 
     .propose-bar { display: flex; gap: 10px; margin-bottom: 22px; }
-    .propose-bar .btn { flex: 1; }
+    /* .btn carries width:100%, which in a flex row fights the flex basis and made Cancel
+       swallow the row while the confirm button wrapped onto three lines. */
+    .propose-bar .btn { flex: 1; width: auto; white-space: nowrap; }
+    .propose-bar .btn.secondary { flex: 0 0 auto; padding-inline: 20px; }
     #mapContainer {
       /* Was a fixed 320px, which left a map page mostly not showing a map. A viewport
          fraction with a floor keeps it generous on a phone without collapsing on a
@@ -378,7 +383,7 @@
     </div>
 
     <div class="propose-bar" id="pinConfirmBar" hidden>
-      <button type="button" class="btn btn-outline" id="cancelPinBtn" style="flex:0 0 auto;padding-inline:18px">
+      <button type="button" class="btn btn-outline secondary" id="cancelPinBtn">
         Cancel
       </button>
       <button type="button" class="btn btn-pink" id="usePinBtn">
