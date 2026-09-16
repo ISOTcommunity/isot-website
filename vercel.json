@@ -199,6 +199,14 @@
       "destination": "/post_medical1.html"
     },
     {
+      "source": "/saa-presentation",
+      "destination": "/isot-saa-presentation.html"
+    },
+    {
+      "source": "/presentation",
+      "destination": "/isot-saa-presentation.html"
+    },
+    {
       "source": "/welcome",
       "destination": "/welcome.html"
     }
