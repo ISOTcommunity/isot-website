@@ -156,16 +156,21 @@
     </div>
   </header>
 
-  <main class="app-main">
-    <div class="container" style="padding-bottom:90px;">
+  <!-- .shell, like every other page: it carries the side gutter, the max-width and the
+       bottom clearance for the tab bar. The earlier .app-main/.container names were not
+       classes this stylesheet defines, so the page ran edge to edge. -->
+  <main class="shell">
+    <div>
 
       <div class="day-strip" id="dayStrip"></div>
       <div id="statusBar"></div>
       <div id="winnerBox"></div>
 
-      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;">
-        <div class="eyebrow" style="margin:0" id="ballotHead">On the ballot</div>
-        <span class="dim" style="font-size:.72rem" id="slotsLeft"></span>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;
+                  gap:12px;margin-bottom:10px;">
+        <div class="eyebrow" style="margin:0;min-width:0" id="ballotHead">On the ballot</div>
+        <span class="dim" style="font-size:.72rem;white-space:nowrap;flex-shrink:0"
+              id="slotsLeft"></span>
       </div>
 
       <div id="ballot"></div>
@@ -322,7 +327,11 @@
                          && !proposals.some(p => p.proposed_by === meProfile.id);
       btn.disabled = !canPropose;
       btn.style.display = meta.voting_open ? '' : 'none';
-      if (proposals.some(p => p.proposed_by === meProfile.id)) {
+      const myPending = proposals.find(p => p.proposed_by === meProfile.id
+                                         && p.status === 'pending');
+      if (myPending) {
+        btn.innerHTML = '<i class="fa-solid fa-hourglass-half"></i> Yours is with the board';
+      } else if (proposals.some(p => p.proposed_by === meProfile.id)) {
         btn.innerHTML = '<i class="fa-solid fa-check"></i> You proposed for this day';
       } else if (slots <= 0) {
         btn.innerHTML = '<i class="fa-solid fa-lock"></i> Day is full — vote for one instead';
@@ -343,10 +352,15 @@
       } else if (meta.voting_open) {
         ico = '<i class="fa-solid fa-hourglass-half text-pink"></i>';
         const need = meta.vote_floor ?? 5;
-        const top = proposals.length ? Math.max(...proposals.map(p => Number(p.votes))) : 0;
-        txt = proposals.length
+        // A pending proposal is not on the ballot, so it cannot be "the leader".
+        const live = proposals.filter(p => p.status !== 'pending');
+        const held = proposals.length - live.length;
+        const top = live.length ? Math.max(...live.map(p => Number(p.votes))) : 0;
+        txt = live.length
           ? `Voting until <strong>14:00</strong>. Leader has <strong>${top}</strong> of ${need} votes needed.`
-          : `Voting until <strong>14:00</strong>. Nothing proposed yet — be the first.`;
+          : held
+            ? `Voting until <strong>14:00</strong>. Yours is with the board — nothing on the ballot yet.`
+            : `Voting until <strong>14:00</strong>. Nothing proposed yet — be the first.`;
       } else {
         cls = 'closed'; ico = '<i class="fa-solid fa-moon" style="color:var(--text-dim)"></i>';
         txt = proposals.length
@@ -476,7 +490,10 @@
 
       el.innerHTML = others.map(p => {
         const mine = p.proposed_by === meProfile.id;
-        const canVote = meta.voting_open;
+        // Only the author can see their own pending proposal. It is not on the ballot yet,
+        // so it gets a waiting badge instead of a vote button.
+        const waiting = p.status === 'pending';
+        const canVote = meta.voting_open && !waiting;
         return `
           <div class="prop ${mine ? 'mine' : ''} ${p.status === 'lost' ? 'lost' : ''}">
             <div class="prop-body">
@@ -488,12 +505,22 @@
                 ${mine ? ' &middot; <span style="color:var(--pink)">yours</span>' : ''}
               </div>
               ${p.description ? `<div class="prop-desc">${escapeHtml(p.description)}</div>` : ''}
+              ${waiting ? `<div style="font-size:.74rem;color:#E8C870;margin-top:6px">
+                  <i class="fa-solid fa-hourglass-half"></i>
+                  Waiting for the board — nobody else can see it yet.</div>` : ''}
             </div>
-            <button type="button" class="vote-btn ${p.i_voted ? 'on' : ''}"
-                    data-id="${p.id}" ${canVote ? '' : 'disabled'}>
-              <div class="vote-n">${p.votes}</div>
-              <div class="vote-lbl">${p.i_voted ? 'going' : 'join'}</div>
-            </button>
+            ${waiting ? `
+              <div class="vote-btn" style="opacity:.5;cursor:default">
+                <div class="vote-n"><i class="fa-solid fa-hourglass-half"
+                     style="font-size:.9rem"></i></div>
+                <div class="vote-lbl">held</div>
+              </div>`
+            : `
+              <button type="button" class="vote-btn ${p.i_voted ? 'on' : ''}"
+                      data-id="${p.id}" ${canVote ? '' : 'disabled'}>
+                <div class="vote-n">${p.votes}</div>
+                <div class="vote-lbl">${p.i_voted ? 'going' : 'join'}</div>
+              </button>`}
           </div>`;
       }).join('');
 
@@ -596,7 +623,8 @@
               Propose &amp; count me in
             </button>
             <p class="dim" style="font-size:.74rem;margin-top:10px;line-height:1.45">
-              Proposing counts as your vote for the day — you are saying you will be there.
+              The board checks it first, then it goes on the ballot. Proposing counts as
+              your vote — you are saying you will be there.
             </p>
           </form>
         </div>`;
