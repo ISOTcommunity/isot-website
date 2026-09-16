@@ -115,8 +115,23 @@
     .msg-time { font-size: .66rem; color: var(--text-dark); margin-left: 6px; font-weight: 400; }
     .msg-txt  { font-size: .87rem; color: var(--text-main); line-height: 1.45;
                 margin-top: 2px; word-wrap: break-word; overflow-wrap: anywhere; }
-    .chat-form { display: flex; gap: 8px; }
-    .chat-form input { flex: 1; }
+    .chat-form { display: flex; gap: 8px; align-items: center; }
+    /* app.css dresses .field input, not a bare input, so this one fell back to the
+       browser default and rendered white on a dark card. */
+    .chat-form input {
+      flex: 1; min-width: 0;
+      min-height: 44px; padding: 10px 14px;
+      background: var(--bg-darker);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      color: var(--text-main);
+      font-family: var(--font-body); font-size: 0.92rem;
+    }
+    .chat-form input:focus {
+      outline: none; border-color: var(--pink);
+      box-shadow: 0 0 0 3px rgba(212, 90, 232, 0.15);
+    }
+    .chat-form button { flex: 0 0 auto; width: auto; padding: 0 16px; min-height: 44px; }
 
     /* Propose sheet */
     .sheet-bg {
@@ -217,7 +232,9 @@
     let boardRows = [];           // last daily_activity_board() result
     let places = [];              // city_places for the picker
     let chatTimer = null;
-    let lastChatKey = '';         // so we only repaint when messages change
+    // null, not '': an empty thread produces the key '', which would equal an '' sentinel
+    // and make the first paint a no-op — leaving "Loading…" on screen forever.
+    let lastChatKey = null;       // so we only repaint when messages change
 
     // Rome, not the device. A member in another timezone must see the same day as the city.
     function romeToday() {
@@ -419,6 +436,9 @@
       if (canPost) {
         document.getElementById('chatForm').addEventListener('submit', e => sendMessage(e, w.id));
       }
+      // Switching days rebuilds the thread element, so the previous day's key must not
+      // suppress the first paint of this one.
+      lastChatKey = null;
       loadChat(w.id);
       if (chatTimer) clearInterval(chatTimer);
       // Polling, not realtime: the thread is tiny and scoped to one day, and a poll cannot
@@ -470,7 +490,7 @@
       const { error } = await db.from('activity_messages')
         .insert({ proposal_id: proposalId, author_id: meProfile.id, body });
       if (error) { input.value = body; alert('Could not send that message.'); return; }
-      lastChatKey = '';
+      lastChatKey = null;
       loadChat(proposalId);
     }
 
