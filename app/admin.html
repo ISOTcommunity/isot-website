@@ -95,6 +95,7 @@
       <button type="button" class="navbtn on" data-s="overview" onclick="go('overview')">Overview</button>
       <button type="button" class="navbtn" data-s="members"  onclick="go('members')">Members</button>
       <button type="button" class="navbtn" data-s="activity" onclick="go('activity')">Activity</button>
+      <button type="button" class="navbtn" data-s="proposals" onclick="go('proposals')">Proposals</button>
       <button type="button" class="navbtn" data-s="events"   onclick="go('events')">Events</button>
       <button type="button" class="navbtn" data-s="venues"   onclick="go('venues')">Venues</button>
     </nav>
@@ -116,7 +117,7 @@
 
   const TITLES = {
     overview: 'Overview', members: 'Members',
-    activity: 'Activity', events: 'Events', venues: 'Venues',
+    activity: 'Activity', proposals: 'Proposals', events: 'Events', venues: 'Venues',
   };
 
   (async () => {
@@ -161,6 +162,7 @@
     el.innerHTML = '<div class="spinner" style="margin:36px auto"></div>';
     try {
       await ({ overview: renderOverview, members: renderMembers, activity: renderActivity,
+               proposals: renderProposals,
                events: renderEvents, venues: renderVenues }[section])(el);
     } catch (e) {
       el.innerHTML = fail(e.message || String(e));
@@ -288,6 +290,109 @@
     const { error } = await db.from('profiles').update({ tier }).eq('id', id);
     if (error) { alert('Could not change that: ' + error.message); return; }
     delete cache.members;
+    render();
+  }
+
+  /* ── Proposals ───────────────────────────────────────────────────────── */
+  // Member-proposed activities. Moderation after the fact, not an approval queue: the
+  // votes decide, and the board steps in only to remove something or to override.
+  async function renderProposals(el) {
+    const { data, error } = await db.rpc('board_proposals', { p_from: null, p_to: null });
+    if (error) { el.innerHTML = fail(error.message); return; }
+
+    const rows = data || [];
+    if (!rows.length) {
+      el.innerHTML = `<div class="card card-glass" style="text-align:center;padding:30px 18px">
+          <p class="dim" style="font-size:0.88rem;margin:0">
+            Nothing proposed in the last week or the next two.</p></div>`;
+      return;
+    }
+
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Rome',
+      year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date());
+
+    // Grouped by day, because "one winner per day" is the rule the board is overseeing.
+    const byDay = {};
+    rows.forEach(r => { (byDay[r.activity_date] ||= []).push(r); });
+
+    const STATUS = {
+      confirmed: ['Confirmed', 'var(--green)'],
+      open:      ['Open',      'var(--pink)'],
+      lost:      ['Did not win', 'var(--text-dim)'],
+      hidden:    ['Hidden',    '#F36C51'],
+    };
+
+    el.innerHTML = Object.entries(byDay).map(([day, list]) => {
+      const d = new Date(day + 'T12:00:00Z');
+      const label = d.toLocaleDateString('en-GB',
+        { weekday:'long', day:'numeric', month:'short', timeZone:'UTC' });
+      return `
+        <div style="margin-bottom:18px">
+          <div class="eyebrow" style="margin-bottom:8px">
+            ${escapeHtml(label)}${day === today ? ' · today' : ''}
+          </div>
+          <div class="card card-glass" style="padding:6px 16px">
+            ${list.map(r => {
+              const [txt, col] = STATUS[r.status] || ['?', 'var(--text-dim)'];
+              return `
+              <div style="padding:12px 0;border-top:1px solid var(--border-light)">
+                <div style="display:flex;align-items:flex-start;gap:10px">
+                  <div style="flex:1;min-width:0">
+                    <div style="font-weight:700;color:#FFF;font-size:0.92rem">
+                      ${escapeHtml(r.title)}</div>
+                    <div class="dim" style="font-size:0.75rem;margin-top:3px">
+                      ${String(r.start_time).slice(0,5)}
+                      ${r.place_name ? ' · ' + escapeHtml(r.place_name) : ''}
+                      ${r.is_pinned ? ' · <span style="color:#E8C870">dropped pin</span>' : ''}
+                    </div>
+                    <div class="dim" style="font-size:0.72rem;margin-top:2px">
+                      by ${escapeHtml(r.proposer_name || 'Unknown')}
+                      ${r.proposer_code ? '· ' + escapeHtml(r.proposer_code) : ''}
+                    </div>
+                    ${r.description ? `<div class="dim" style="font-size:0.76rem;margin-top:5px;line-height:1.45">${escapeHtml(r.description)}</div>` : ''}
+                  </div>
+                  <div style="text-align:right;flex-shrink:0">
+                    <div style="font-size:1.1rem;font-weight:700;color:#FFF">${r.votes}</div>
+                    <div class="dim" style="font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase">going</div>
+                    <div style="font-size:0.62rem;font-weight:700;color:${col};margin-top:4px">${txt}</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:9px;flex-wrap:wrap">
+                  ${r.status !== 'confirmed' && r.status !== 'hidden' ? `
+                    <button type="button" class="btn btn-outline mini"
+                            onclick="confirmProposal('${r.id}')">
+                      <i class="fa-solid fa-check"></i> Confirm this one</button>` : ''}
+                  ${r.status === 'hidden' ? `
+                    <button type="button" class="btn btn-outline mini"
+                            onclick="hideProposal('${r.id}', false)">
+                      <i class="fa-solid fa-rotate-left"></i> Restore</button>`
+                  : `
+                    <button type="button" class="btn btn-outline mini"
+                            onclick="hideProposal('${r.id}', true)">
+                      <i class="fa-solid fa-eye-slash"></i> Hide</button>`}
+                  ${r.lat ? `
+                    <a class="btn btn-outline mini" target="_blank" rel="noopener"
+                       href="https://www.google.com/maps?q=${r.lat},${r.lng}">
+                      <i class="fa-solid fa-location-dot"></i> Where</a>` : ''}
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  async function hideProposal(id, hide) {
+    if (hide && !confirm('Hide this proposal? Its votes are released so people can back something else. You can restore it later.')) return;
+    const { error } = await db.rpc('set_proposal_hidden', { p_id: id, p_hidden: hide });
+    if (error) { alert(error.message); return; }
+    render();
+  }
+
+  async function confirmProposal(id) {
+    if (!confirm('Confirm this one for its day? It overrides the vote, and anything else proposed that day is closed.')) return;
+    const { error } = await db.rpc('board_confirm_proposal', { p_id: id });
+    if (error) { alert(error.message); return; }
     render();
   }
 
