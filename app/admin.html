@@ -447,7 +447,13 @@
                              .map(([, label, size]) => `  · ${label} — ${size}`).join('\n')
              || '  · (not specified)';
 
-    const when = [d.bDate, d.bTime].filter(Boolean).join('  ');
+    // Spelled out, not ISO. A designer reads "Thursday 2 October" and catches a wrong
+    // weekday instantly; nobody proofreads 2026-10-02.
+    const niceDate = d.bDate
+      ? new Date(d.bDate + 'T12:00:00Z').toLocaleDateString('en-GB',
+          { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
+      : '';
+    const when = [niceDate, d.bTime].filter(Boolean).join('   ·   ');
 
     const out = `ISOT — GRAPHIC BRIEF
 ${'='.repeat(46)}
