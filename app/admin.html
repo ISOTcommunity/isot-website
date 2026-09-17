@@ -96,6 +96,7 @@
       <button type="button" class="navbtn" data-s="members"  onclick="go('members')">Members</button>
       <button type="button" class="navbtn" data-s="activity" onclick="go('activity')">Activity</button>
       <button type="button" class="navbtn" data-s="proposals" onclick="go('proposals')">Proposals</button>
+      <button type="button" class="navbtn" data-s="graphics" onclick="go('graphics')">Graphics</button>
       <button type="button" class="navbtn" data-s="events"   onclick="go('events')">Events</button>
       <button type="button" class="navbtn" data-s="venues"   onclick="go('venues')">Venues</button>
     </nav>
@@ -117,7 +118,8 @@
 
   const TITLES = {
     overview: 'Overview', members: 'Members',
-    activity: 'Activity', proposals: 'Proposals', events: 'Events', venues: 'Venues',
+    activity: 'Activity', proposals: 'Proposals', graphics: 'Graphics',
+    events: 'Events', venues: 'Venues',
   };
 
   (async () => {
@@ -162,7 +164,7 @@
     el.innerHTML = '<div class="spinner" style="margin:36px auto"></div>';
     try {
       await ({ overview: renderOverview, members: renderMembers, activity: renderActivity,
-               proposals: renderProposals,
+               proposals: renderProposals, graphics: renderGraphics,
                events: renderEvents, venues: renderVenues }[section])(el);
     } catch (e) {
       el.innerHTML = fail(e.message || String(e));
@@ -291,6 +293,247 @@
     if (error) { alert('Could not change that: ' + error.message); return; }
     delete cache.members;
     render();
+  }
+
+  /* ── Graphics briefs ─────────────────────────────────────────────────── */
+  // Produces one complete brief to hand a designer, and keeps it. The brand rules ride
+  // along with every brief because they are exactly what gets left out of a WhatsApp
+  // thread — including the one that bites: Moderna has no digits.
+  const BRIEF_TYPES  = ['Karaoke', 'Social Hub', 'Pre-Party', 'Cultural night',
+                        'Career / workshop', 'Sport / trip', 'Announcement'];
+  const BRIEF_MOODS  = ['Energetic', 'Warm & cosy', 'Elegant', 'Playful', 'Cultural', 'Bold'];
+  const BRIEF_FORMATS = [
+    ['instagram_post', 'Instagram post', '1080×1350'],
+    ['story',          'Story',          '1080×1920'],
+    ['whatsapp',       'WhatsApp',       '1080×1080'],
+    ['poster',         'Printed poster', 'A3'],
+  ];
+
+  let briefDraft = { event_type: BRIEF_TYPES[1], mood: BRIEF_MOODS[0], formats: ['instagram_post'] };
+
+  async function renderGraphics(el) {
+    const { data, error } = await db.from('graphic_briefs')
+      .select('*').order('created_at', { ascending: false }).limit(25);
+    if (error) { el.innerHTML = fail(error.message); return; }
+
+    const d = briefDraft;
+    el.innerHTML = `
+      <div class="card card-glass" style="padding:16px">
+        <div class="eyebrow" style="margin-bottom:12px">New brief</div>
+
+        <div class="field">
+          <label>What is it</label>
+          <input type="text" id="bTitle" maxlength="120" placeholder="Thursday Social Hub — WGM opening" />
+        </div>
+
+        <div class="field">
+          <label>Event type</label>
+          <div class="sub" id="bTypes">
+            ${BRIEF_TYPES.map(t => `
+              <button type="button" class="subbtn ${d.event_type === t ? 'on' : ''}"
+                      onclick="pickBriefType('${t}')">${escapeHtml(t)}</button>`).join('')}
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Mood</label>
+          <div class="sub" id="bMoods">
+            ${BRIEF_MOODS.map(m => `
+              <button type="button" class="subbtn ${d.mood === m ? 'on' : ''}"
+                      onclick="pickBriefMood('${m}')">${escapeHtml(m)}</button>`).join('')}
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Formats needed</label>
+          <div class="sub">
+            ${BRIEF_FORMATS.map(([k, label, size]) => `
+              <button type="button" class="subbtn ${d.formats.includes(k) ? 'on' : ''}"
+                      onclick="toggleBriefFormat('${k}')">${escapeHtml(label)}
+                <span style="opacity:.55">${size}</span></button>`).join('')}
+          </div>
+        </div>
+
+        <div class="two">
+          <div class="field"><label>Date</label><input type="date" id="bDate" /></div>
+          <div class="field"><label>Start time</label><input type="time" id="bTime" /></div>
+        </div>
+
+        <div class="field"><label>Venue</label>
+          <input type="text" id="bVenue" maxlength="120" placeholder="Capodoglio · Murazzi" /></div>
+
+        <div class="field"><label>Line-up / guests</label>
+          <input type="text" id="bLineup" maxlength="200" placeholder="beaddie, chiuraz" /></div>
+
+        <div class="field"><label>Text that must appear exactly</label>
+          <textarea id="bMust" rows="2" maxlength="400"
+            placeholder="Free entry until 23:30 — after that 5€"></textarea></div>
+
+        <div class="field"><label>Anything else</label>
+          <textarea id="bNotes" rows="2" maxlength="400"
+            placeholder="Reuse the vinyl illustration from September"></textarea></div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn btn-pink mini" onclick="buildBrief()">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Build brief</button>
+          <button type="button" class="btn btn-outline mini" onclick="buildBrief(true)">
+            <i class="fa-solid fa-floppy-disk"></i> Build &amp; save</button>
+        </div>
+
+        <div id="briefOut" hidden style="margin-top:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">
+            <div class="eyebrow" style="margin:0">Ready to send</div>
+            <button type="button" class="btn btn-outline mini" onclick="copyBrief()">
+              <i class="fa-regular fa-copy"></i> Copy</button>
+          </div>
+          <textarea id="briefText" rows="18" readonly
+            style="width:100%;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+                   font-size:0.74rem;line-height:1.55;background:var(--bg-darker);
+                   border:1px solid var(--border-light);border-radius:12px;padding:12px;
+                   color:var(--text-main)"></textarea>
+        </div>
+      </div>
+
+      <div class="eyebrow" style="margin:20px 0 8px">Recent briefs</div>
+      ${(data || []).length ? `<div class="card card-glass" style="padding:4px 16px">
+        ${data.map(b => `
+          <div class="row">
+            <div class="grow">
+              <b>${escapeHtml(b.title)}</b>
+              <div class="dim" style="font-size:0.74rem;margin-top:2px">
+                ${escapeHtml(b.event_type || '—')}
+                ${b.event_date ? ' · ' + b.event_date : ''}
+                ${(b.formats || []).length ? ' · ' + b.formats.length + ' format(s)' : ''}
+                · ${ago(b.created_at)}
+              </div>
+            </div>
+            <span class="tag ${b.status === 'done' ? '' : 'gold'}">${escapeHtml(b.status)}</span>
+            <button type="button" class="btn btn-outline mini" onclick="reopenBrief('${b.id}')">Open</button>
+          </div>`).join('')}
+      </div>` : `<p class="dim" style="font-size:0.84rem">No briefs yet.</p>`}`;
+
+    // Re-apply anything already typed, so switching a pill does not wipe the form.
+    ['bTitle','bDate','bTime','bVenue','bLineup','bMust','bNotes'].forEach(id => {
+      if (d[id] != null) { const n = document.getElementById(id); if (n) n.value = d[id]; }
+    });
+    if (d.output) {
+      document.getElementById('briefText').value = d.output;
+      document.getElementById('briefOut').hidden = false;
+    }
+  }
+
+  // The pills re-render the panel, so stash the typed fields first.
+  function keepBriefFields() {
+    ['bTitle','bDate','bTime','bVenue','bLineup','bMust','bNotes'].forEach(id => {
+      const n = document.getElementById(id);
+      if (n) briefDraft[id] = n.value;
+    });
+  }
+  function pickBriefType(t) { keepBriefFields(); briefDraft.event_type = t; render(); }
+  function pickBriefMood(m) { keepBriefFields(); briefDraft.mood = m; render(); }
+  function toggleBriefFormat(k) {
+    keepBriefFields();
+    const f = briefDraft.formats;
+    briefDraft.formats = f.includes(k) ? f.filter(x => x !== k) : [...f, k];
+    render();
+  }
+
+  async function buildBrief(save) {
+    keepBriefFields();
+    const d = briefDraft;
+    if (!(d.bTitle || '').trim()) { alert('Give the brief a title first.'); return; }
+
+    const fmt = BRIEF_FORMATS.filter(([k]) => d.formats.includes(k))
+                             .map(([, label, size]) => `  · ${label} — ${size}`).join('\n')
+             || '  · (not specified)';
+
+    const when = [d.bDate, d.bTime].filter(Boolean).join('  ');
+
+    const out = `ISOT — GRAPHIC BRIEF
+${'='.repeat(46)}
+
+${d.bTitle.trim()}
+Type: ${d.event_type}${d.mood ? `   ·   Mood: ${d.mood}` : ''}
+
+${when   ? `WHEN\n  ${when}\n` : ''}${d.bVenue  ? `WHERE\n  ${d.bVenue}\n` : ''}${d.bLineup ? `LINE-UP\n  ${d.bLineup}\n` : ''}
+FORMATS
+${fmt}
+${d.bMust ? `\nMUST APPEAR EXACTLY\n  ${d.bMust.split('\n').join('\n  ')}\n` : ''}${d.bNotes ? `\nNOTES\n  ${d.bNotes.split('\n').join('\n  ')}\n` : ''}
+${'-'.repeat(46)}
+BRAND RULES — these are not suggestions
+
+COLOUR  (black + gold + lavender only, NO teal/green)
+  Background      #080808
+  Accent / times  #D4AF50   gold
+  Secondary       #9B8FD4   lavender
+  Text            #FFFFFF
+
+TYPE
+  Moderna    — titles only, ALWAYS ALL CAPS
+  Myanmar    — body text, and EVERY number
+
+  ⚠ Moderna has no digits. 0-9 and the comma are mapped to the
+    "#" glyph, so "4,000" set in Moderna renders as "#####".
+    All numbers, dates and times must be set in Myanmar.
+
+LOGO
+  ISOT wordmark, white, clear space on all sides.
+
+Motto: "Live globally, connect locally."
+`;
+
+    briefDraft.output = out;
+    const outEl = document.getElementById('briefOut');
+    document.getElementById('briefText').value = out;
+    outEl.hidden = false;
+
+    if (save) {
+      const { error } = await db.from('graphic_briefs').insert({
+        title:        d.bTitle.trim(),
+        event_type:   d.event_type,
+        mood:         d.mood,
+        formats:      d.formats,
+        event_date:   d.bDate  || null,
+        start_time:   d.bTime  || null,
+        venue:        d.bVenue || null,
+        lineup:       d.bLineup || null,
+        must_include: d.bMust  || null,
+        notes:        d.bNotes || null,
+        created_by:   me.id,
+      });
+      if (error) { alert(error.message); return; }
+      briefDraft = { event_type: d.event_type, mood: d.mood, formats: d.formats, output: out };
+      render();
+    }
+  }
+
+  async function copyBrief() {
+    const t = document.getElementById('briefText');
+    try {
+      await navigator.clipboard.writeText(t.value);
+      alert('Brief copied — paste it to the designer.');
+    } catch (_) {
+      // Clipboard API needs a secure context and permission; selecting the text at least
+      // leaves the user one keystroke away.
+      t.removeAttribute('readonly'); t.select(); t.setAttribute('readonly', '');
+      alert('Select-all is done — press Cmd+C to copy.');
+    }
+  }
+
+  async function reopenBrief(id) {
+    const { data, error } = await db.from('graphic_briefs').select('*').eq('id', id).single();
+    if (error) { alert(error.message); return; }
+    briefDraft = {
+      event_type: data.event_type || BRIEF_TYPES[1],
+      mood:       data.mood       || BRIEF_MOODS[0],
+      formats:    data.formats    || [],
+      bTitle: data.title || '', bDate: data.event_date || '',
+      bTime:  data.start_time ? String(data.start_time).slice(0,5) : '',
+      bVenue: data.venue || '', bLineup: data.lineup || '',
+      bMust:  data.must_include || '', bNotes: data.notes || '',
+    };
+    render();
+    buildBrief(false);
   }
 
   /* ── Proposals ───────────────────────────────────────────────────────── */
