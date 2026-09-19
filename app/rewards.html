@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-N2S3FL84RT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-N2S3FL84RT');
+</script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Rewards · ISOT App</title>
+
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="../assets/favicon.png" sizes="48x48" type="image/png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-title" content="ISOT" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#000000" />
+  <script defer src="/_vercel/insights/script.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .bal-card {
+      background: linear-gradient(150deg, rgba(212,175,80,.13), var(--bg-card));
+      border: 1px solid rgba(212,175,80,.34);
+      border-radius: 20px; padding: 22px; margin-bottom: 18px;
+    }
+    .bal-n { font-size: 3rem; font-weight: 700; color: #FFF; line-height: 1;
+             font-variant-numeric: tabular-nums; }
+    .bal-l { font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+             color: var(--gold, #D4AF50); font-weight: 700; margin-top: 6px; }
+
+    /* Early bird */
+    .eb {
+      border-radius: 18px; padding: 16px; margin-bottom: 18px;
+      border: 1px solid var(--border-light); background: var(--bg-card);
+    }
+    .eb.live { border-color: rgba(67,219,143,.45);
+               background: linear-gradient(150deg, rgba(67,219,143,.12), var(--bg-card)); }
+    .eb-tag { font-size: .62rem; font-weight: 700; letter-spacing: .13em;
+              text-transform: uppercase; margin-bottom: 7px; }
+
+    /* Token */
+    .tok { border-radius: 20px; overflow: hidden; margin-bottom: 14px;
+           border: 1px solid rgba(212,175,80,.4); background: var(--bg-card); }
+    .tok-poster { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
+    .tok-body { padding: 16px; }
+    .tok-kind { font-size: 1.15rem; font-weight: 700; color: #FFF; }
+    .tok-note { font-size: .82rem; color: var(--text-muted); margin-top: 3px; }
+    .tok-exp  { font-size: .72rem; color: var(--gold, #D4AF50); margin-top: 8px; font-weight: 600; }
+
+    /* Burnt proof — the bit a screenshot cannot fake */
+    .burnt {
+      border-radius: 20px; padding: 22px 18px; margin-bottom: 14px; text-align: center;
+      border: 1px solid rgba(243,108,81,.45);
+      background: linear-gradient(150deg, rgba(243,108,81,.14), var(--bg-card));
+    }
+    .burnt-stamp {
+      font-size: 1.5rem; font-weight: 700; letter-spacing: .16em; color: #F8A18E;
+      text-transform: uppercase;
+    }
+    .burnt-clock {
+      font-size: 2.3rem; font-weight: 700; color: #FFF; line-height: 1.05; margin-top: 10px;
+      font-variant-numeric: tabular-nums; letter-spacing: .02em;
+    }
+    .burnt-date { font-size: .88rem; color: var(--text-muted); margin-top: 2px; }
+    .burnt-since { font-size: .76rem; color: #F8A18E; margin-top: 10px; font-weight: 600; }
+    .burnt-who { font-size: .82rem; color: var(--text-muted); margin-top: 12px;
+                 border-top: 1px solid var(--border-light); padding-top: 12px; }
+    .burnt-who strong { color: #FFF; }
+
+    .hrow { display: flex; gap: 12px; padding: 10px 0;
+            border-bottom: 1px solid var(--border-light); align-items: center; }
+    .hrow:last-child { border-bottom: none; }
+    .hpts { font-weight: 700; font-variant-numeric: tabular-nums; min-width: 46px;
+            text-align: right; }
+    .hpts.pos { color: var(--green); }
+    .hpts.neg { color: var(--text-dim); }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display:flex;align-items:center;gap:8px;">
+      <i class="fa-solid fa-martini-glass-citrus text-pink"></i>
+      <span>Rewards</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div id="headerAvatar" style="cursor:pointer;" data-open-drawer></div>
+      <button type="button" id="burgerBtn" aria-label="Account menu"
+              style="background:transparent;border:none;color:#FFF;font-size:1.3rem;cursor:pointer;padding:6px">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="shell">
+    <div id="panel"><div class="spinner" style="margin:40px auto"></div></div>
+  </main>
+
+  <nav class="tabbar">
+    <a href="home.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 011-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </a>
+    <a href="events.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Calendar
+    </a>
+    <a href="today.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      Today
+    </a>
+    <a href="partner.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+      Map
+    </a>
+  </nav>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+  <script>
+    let me = null;
+    let data = null;      // my_rewards()
+    let eb = null;        // early_bird_status()
+    let clockTimer = null;
+
+    // The device clock is not trusted: a member can set their phone to anything. Every
+    // time shown here is derived from the server's clock plus the elapsed time since we
+    // measured the offset — so the seconds on screen are the bar's seconds.
+    let serverOffsetMs = 0;
+    function setServerNow(iso) {
+      if (!iso) return;
+      serverOffsetMs = new Date(iso.replace(' ', 'T')).getTime() - Date.now();
+    }
+    function serverNow() { return new Date(Date.now() + serverOffsetMs); }
+
+    const pad = n => String(n).padStart(2, '0');
+    function clockText(d) { return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; }
+    function dateText(d)  {
+      return d.toLocaleDateString('en-GB',
+        { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    async function init() {
+      me = await requireAuth();
+      document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(me, 36);
+      await load();
+    }
+
+    async function load() {
+      const [r, e] = await Promise.all([
+        db.rpc('my_rewards'),
+        db.rpc('early_bird_status'),
+      ]);
+      if (r.error) {
+        document.getElementById('panel').innerHTML =
+          `<p class="dim" style="text-align:center;padding:30px">Could not load your rewards.</p>`;
+        return;
+      }
+      data = r.data; eb = e.data || {};
+      setServerNow(data.server_now || eb.server_now);
+      render();
+    }
+
+    function render() {
+      const tokens = data.tokens || [];
+      const burned = data.just_burned || [];
+      const hist   = data.history || [];
+
+      document.getElementById('panel').innerHTML = `
+        <div class="bal-card">
+          <div class="bal-n">${data.balance}</div>
+          <div class="bal-l">Points</div>
+          <p class="dim" style="font-size:.78rem;margin-top:12px;line-height:1.5">
+            Sing a song, bring friends, find gems. ${data.shot_cost} points buys a shot.
+          </p>
+          ${data.balance >= data.shot_cost ? `
+            <button type="button" class="btn btn-pink" id="btnExchange" style="width:100%;margin-top:12px">
+              <i class="fa-solid fa-right-left"></i> Trade ${data.shot_cost} points for a shot
+            </button>` : ''}
+        </div>
+
+        ${renderEarlyBird()}
+
+        ${burned.length ? `<div class="eyebrow" style="margin:18px 0 8px">Just used</div>
+          ${burned.map(renderBurnt).join('')}` : ''}
+
+        ${tokens.length ? `<div class="eyebrow" style="margin:18px 0 8px">
+            Your shots &middot; ${tokens.length}</div>
+          ${tokens.map(renderToken).join('')}` : ''}
+
+        ${hist.length ? `
+          <div class="eyebrow" style="margin:22px 0 8px">How you got here</div>
+          <div class="card card-glass" style="padding:4px 16px">
+            ${hist.map(h => `
+              <div class="hrow">
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:.86rem;color:#FFF">${escapeHtml(h.note || h.kind)}</div>
+                  <div class="dim" style="font-size:.7rem;margin-top:2px">
+                    ${new Date(h.created_at).toLocaleDateString('en-GB',
+                       { day:'numeric', month:'short' })}</div>
+                </div>
+                <div class="hpts ${h.points >= 0 ? 'pos' : 'neg'}">
+                  ${h.points >= 0 ? '+' : ''}${h.points}</div>
+              </div>`).join('')}
+          </div>` : ''}
+
+        <p class="dim" style="font-size:.74rem;text-align:center;margin-top:22px;line-height:1.5">
+          Shots are poured by the bar. Show your phone and let them press the button.
+        </p>`;
+
+      const ex = document.getElementById('btnExchange');
+      if (ex) ex.addEventListener('click', exchange);
+      document.querySelectorAll('[data-give]').forEach(b =>
+        b.addEventListener('click', () => armToken(b.dataset.give)));
+      const claim = document.getElementById('btnClaim');
+      if (claim) claim.addEventListener('click', claimEarlyBird);
+
+      startClock();
+    }
+
+    function renderEarlyBird() {
+      if (!eb || !eb.applicable) return '';
+      if (eb.already) return '';        // the token itself is shown below
+
+      if (!eb.rsvp_in_time) {
+        return `<div class="eb">
+          <div class="eb-tag" style="color:var(--text-dim)">Tonight's free shot</div>
+          <div style="font-size:.88rem;color:var(--text-muted);line-height:1.5">
+            You needed to say <strong style="color:#FFF">going</strong> before
+            ${escapeHtml(eb.deadline)} today to get one. Next Monday.
+          </div></div>`;
+      }
+      if (!eb.window_open) {
+        return `<div class="eb">
+          <div class="eb-tag" style="color:var(--gold,#D4AF50)">Tonight's free shot</div>
+          <div style="font-size:.88rem;color:var(--text-muted);line-height:1.5">
+            You are on the list. Open this page between
+            <strong style="color:#FFF">${escapeHtml(eb.opens)}</strong> and
+            <strong style="color:#FFF">${escapeHtml(eb.closes)}</strong> at the bar to claim it.
+          </div></div>`;
+      }
+      return `<div class="eb live">
+        <div class="eb-tag" style="color:var(--green)">
+          <i class="fa-solid fa-bolt"></i> Open now &middot; until ${escapeHtml(eb.closes)}</div>
+        <div style="font-size:1rem;font-weight:700;color:#FFF;margin-bottom:10px">
+          Your free shot is ready</div>
+        <button type="button" class="btn btn-pink" id="btnClaim" style="width:100%">
+          Claim it</button>
+      </div>`;
+    }
+
+    function renderToken(t) {
+      return `
+        <div class="tok">
+          ${t.poster_url ? `<img class="tok-poster" src="${escapeHtml(t.poster_url)}" alt="" />` : ''}
+          <div class="tok-body">
+            <div class="tok-kind">Free shot</div>
+            <div class="tok-note">${escapeHtml(t.note || '')}</div>
+            <div class="tok-exp">
+              <i class="fa-regular fa-clock"></i>
+              Expires ${new Date(t.expires_at).toLocaleTimeString('en-GB',
+                 { hour:'2-digit', minute:'2-digit' })}
+            </div>
+            <button type="button" class="btn btn-pink" data-give="${t.id}"
+                    style="width:100%;margin-top:12px">
+              Give to the bar
+            </button>
+          </div>
+        </div>`;
+    }
+
+    function renderBurnt(b) {
+      return `
+        <div class="burnt" data-burnt="${b.redeemed_at}">
+          <div class="burnt-stamp">Used</div>
+          <div class="burnt-clock" data-clock>--:--:--</div>
+          <div class="burnt-date" data-date></div>
+          <div class="burnt-since" data-since></div>
+          <div class="burnt-who">
+            <strong>${escapeHtml(me.full_name || 'Member')}</strong><br>
+            <span style="font-size:.74rem">${escapeHtml(b.note || '')}</span>
+          </div>
+        </div>`;
+    }
+
+    // One ticking clock for every burnt card, so a screenshot is stale the moment it is
+    // taken — that is the whole anti-reuse mechanism, so it must never stop.
+    function startClock() {
+      if (clockTimer) clearInterval(clockTimer);
+      const tick = () => {
+        const now = serverNow();
+        document.querySelectorAll('[data-burnt]').forEach(card => {
+          card.querySelector('[data-clock]').textContent = clockText(now);
+          card.querySelector('[data-date]').textContent  = dateText(now);
+          const at = new Date(card.dataset.burnt.replace(' ', 'T'));
+          const s = Math.max(0, Math.round((now - at) / 1000));
+          card.querySelector('[data-since]').textContent =
+            s < 60 ? `burned ${s}s ago` : `burned ${Math.floor(s / 60)}m ${s % 60}s ago`;
+        });
+      };
+      tick();
+      if (document.querySelector('[data-burnt]')) clockTimer = setInterval(tick, 250);
+    }
+
+    async function claimEarlyBird() {
+      const { data: res, error } = await db.rpc('claim_early_bird');
+      if (error) { alert(error.message); return; }
+      if (!res.granted) {
+        alert({
+          'outside the window':   `It opens at ${res.opens} and closes at ${res.closes}.`,
+          'no RSVP before noon':  'You needed to say going before midday today.',
+          'no karaoke tonight':   'No karaoke tonight.',
+          'already claimed tonight': 'You already claimed tonight.',
+        }[res.reason] || 'Not available right now.');
+      }
+      await load();
+    }
+
+    // Two steps on purpose: burning is final and it happens in a loud room. The first tap
+    // is the member's, the second is the bartender's.
+    function armToken(id) {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = `position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.86);
+        backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px`;
+      wrap.innerHTML = `
+        <div style="max-width:420px;width:100%;text-align:center">
+          <div style="font-size:.68rem;font-weight:700;letter-spacing:.14em;
+                      text-transform:uppercase;color:var(--gold,#D4AF50);margin-bottom:10px">
+            Hand the phone over</div>
+          <h2 style="font-size:1.5rem;color:#FFF;margin-bottom:8px">Bartender taps below</h2>
+          <p class="dim" style="font-size:.86rem;line-height:1.55;margin-bottom:22px">
+            This uses the shot immediately and cannot be undone.</p>
+          <button type="button" id="doBurn" class="btn btn-pink"
+                  style="width:100%;padding:18px;font-size:1.05rem">
+            Use the shot now</button>
+          <button type="button" id="cancelBurn" class="btn btn-outline"
+                  style="width:100%;margin-top:10px">Not yet</button>
+        </div>`;
+      document.body.appendChild(wrap);
+      wrap.querySelector('#cancelBurn').addEventListener('click', () => wrap.remove());
+      wrap.querySelector('#doBurn').addEventListener('click', async () => {
+        const btn = wrap.querySelector('#doBurn');
+        const done = busy(btn, 'Using…');
+        const { data: res, error } = await db.rpc('redeem_token',
+          { p_token: id, p_venue: null, p_note: null });
+        if (typeof done === 'function') done();
+        if (error) { alert(error.message); wrap.remove(); await load(); return; }
+        setServerNow(res.server_now);
+        wrap.remove();
+        await load();
+      });
+    }
+
+    async function exchange() {
+      if (!confirm(`Trade ${data.shot_cost} points for a free shot?`)) return;
+      const { error } = await db.rpc('exchange_points_for_shot');
+      if (error) { alert(error.message); return; }
+      await load();
+    }
+
+    init();
+  </script>
+</body>
+</html>

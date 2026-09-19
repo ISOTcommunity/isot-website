@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="robots" content="noindex" />
+  <title>ISOT · Venue</title>
+
+  <link rel="icon" href="logo.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .big {
+      background: linear-gradient(150deg, rgba(212,175,80,.13), var(--bg-card));
+      border: 1px solid rgba(212,175,80,.34);
+      border-radius: 20px; padding: 24px; margin-bottom: 14px;
+    }
+    .big .n { font-size: 3.2rem; font-weight: 700; color: #FFF; line-height: 1;
+              font-variant-numeric: tabular-nums; }
+    .big .l { font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+              color: #D4AF50; font-weight: 700; margin-top: 6px; }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+    .small { background: var(--bg-card); border: 1px solid var(--border-light);
+             border-radius: 16px; padding: 18px; }
+    .small .n { font-size: 1.9rem; font-weight: 700; color: #FFF; line-height: 1;
+                font-variant-numeric: tabular-nums; }
+    .small .l { font-size: .64rem; letter-spacing: .1em; text-transform: uppercase;
+                color: var(--text-dim); font-weight: 700; margin-top: 6px; }
+    .nrow { display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid var(--border-light); }
+    .nrow:last-child { border-bottom: none; }
+    .nrow .d { font-size: .88rem; color: #FFF; }
+    .nrow .c { font-size: 1.1rem; font-weight: 700; color: #D4AF50;
+               font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <header class="topbar">
+    <a href="#" class="topbar-title" id="venueName">ISOT · Venue</a>
+    <button type="button" id="burgerBtn" aria-label="Account menu"
+            style="background:transparent;border:none;color:#FFF;font-size:1.3rem;cursor:pointer;padding:6px">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </header>
+
+  <main class="shell" style="max-width:560px">
+    <div class="eyebrow">Venue partner</div>
+    <h1 style="font-size:1.7rem;margin:2px 0 4px" id="title">Shots</h1>
+    <p class="dim" style="font-size:.84rem;line-height:1.5;margin-bottom:20px">
+      Every free shot an ISOT member has used here. These are your numbers, counted from
+      the tokens handed to this bar — not a report from anyone.
+    </p>
+
+    <div id="panel"><div class="spinner" style="margin:40px auto"></div></div>
+
+    <p class="dim" style="font-size:.74rem;margin-top:20px" id="stamp"></p>
+  </main>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+  <script>
+    (async () => {
+      // Partner OR board: the board needs to be able to see what a venue sees.
+      const me = await requireAuth();
+      if (me.staff_role !== 'partner' && me.staff_role !== 'board') {
+        denyAccess('This page is for venue partners.');
+        return;
+      }
+      await load();
+    })();
+
+    async function load() {
+      const { data, error } = await db.rpc('venue_token_summary', { p_days: 180 });
+      const panel = document.getElementById('panel');
+
+      if (error) {
+        panel.innerHTML = `<div class="card card-glass" style="padding:20px">
+          <p class="dim" style="margin:0;font-size:.88rem">${escapeHtml(error.message)}</p></div>`;
+        return;
+      }
+
+      if (data.venue) {
+        document.getElementById('venueName').textContent = data.venue;
+        document.getElementById('title').textContent = 'Shots at ' + data.venue;
+      }
+
+      const nights = data.by_night || [];
+      panel.innerHTML = `
+        <div class="big">
+          <div class="n">${data.this_month || 0}</div>
+          <div class="l">Shots this month</div>
+        </div>
+
+        <div class="two">
+          <div class="small">
+            <div class="n">${data.total || 0}</div>
+            <div class="l">Last 6 months</div>
+          </div>
+          <div class="small">
+            <div class="n">${nights.length}</div>
+            <div class="l">Nights with shots</div>
+          </div>
+        </div>
+
+        ${nights.length ? `
+          <div class="eyebrow" style="margin-bottom:8px">Night by night</div>
+          <div class="card card-glass" style="padding:6px 18px">
+            ${nights.map(n => {
+              const d = new Date(n.night + 'T12:00:00Z');
+              return `<div class="nrow">
+                  <div class="d">${d.toLocaleDateString('en-GB',
+                    { weekday:'short', day:'numeric', month:'short', timeZone:'UTC' })}</div>
+                  <div class="c">${n.shots}</div>
+                </div>`;
+            }).join('')}
+          </div>` : `
+          <div class="card card-glass" style="padding:26px 18px;text-align:center">
+            <p class="dim" style="margin:0;font-size:.88rem">
+              No shots used yet. They will appear here the moment the first one is handed over.</p>
+          </div>`}`;
+
+      document.getElementById('stamp').textContent =
+        'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+  </script>
+</body>
+</html>

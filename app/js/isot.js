@@ -828,7 +828,9 @@ async function signOut() {
  * Navigation Helpers
  * ------------------------------------------------------------- */
 function homeFor(profile) {
-  if (profile.staff_role === 'partner')   return 'partner.html';
+  // venue.html, not partner.html: partner.html is the city map, so a venue partner used to
+  // land on courts and canteens instead of their own numbers.
+  if (profile.staff_role === 'partner')   return 'venue.html';
   if (profile.staff_role === 'volunteer') return 'home.html';
   return 'home.html';
 }
