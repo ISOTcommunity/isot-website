@@ -370,8 +370,16 @@
           <div style="font-size:.68rem;font-weight:700;letter-spacing:.14em;
                       text-transform:uppercase;color:var(--gold,#D4AF50);margin-bottom:10px">
             Hand the phone over</div>
-          <h2 style="font-size:1.5rem;color:#FFF;margin-bottom:8px">Bartender taps below</h2>
-          <p class="dim" style="font-size:.86rem;line-height:1.55;margin-bottom:22px">
+          <h2 style="font-size:1.5rem;color:#FFF;margin-bottom:14px">Bartender taps below</h2>
+
+          <!-- The clock belongs here above all: this is the screen the bartender is
+               reading at the moment they decide to pour. Seconds moving = a live phone. -->
+          <div class="live-clock" style="margin:0 0 18px">
+            <span class="lc-time" data-clock style="font-size:1.8rem">--:--:--</span>
+            <span class="lc-date" data-date></span>
+          </div>
+
+          <p class="dim" style="font-size:.86rem;line-height:1.55;margin-bottom:18px">
             This uses the shot immediately and cannot be undone.</p>
           <button type="button" id="doBurn" class="btn btn-pink"
                   style="width:100%;padding:18px;font-size:1.05rem">
@@ -380,6 +388,9 @@
                   style="width:100%;margin-top:10px">Not yet</button>
         </div>`;
       document.body.appendChild(wrap);
+      // The overlay's clock is new to the DOM, so paint it immediately rather than letting
+      // it sit on "--:--:--" until the next tick.
+      startClock();
       wrap.querySelector('#cancelBurn').addEventListener('click', () => wrap.remove());
       wrap.querySelector('#doBurn').addEventListener('click', async () => {
         const btn = wrap.querySelector('#doBurn');
