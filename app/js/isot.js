@@ -525,6 +525,10 @@ async function requireAuth(opts = {}) {
   // a count is not worth delaying the page for, and it repaints itself when it lands.
   loadNotifications().catch(e => console.warn('notifications:', e));
 
+  // Points and any unused shot, in the header next to the bell. Same reasoning as the
+  // bell itself: done once here so every page gets it, including ones built later.
+  ensureRewardsChip().catch(e => console.warn('rewards chip:', e));
+
   return profile;
 }
 
@@ -588,6 +592,47 @@ document.addEventListener('submit', (e) => {
  *
  * Done here rather than in each page so it also covers whatever gets built next.
  * ------------------------------------------------------------- */
+/* ---------------------------------------------------------------
+ * Rewards chip — points, and a live shot, next to the bell
+ *
+ * A token the member cannot find is a token they do not use, and the wallet was one tap
+ * too deep: nothing anywhere said they had a free shot waiting. This puts the count where
+ * the eye already goes for the bell.
+ *
+ * It renders nothing at all when there is nothing to say — no points and no shots — so a
+ * new member does not carry a permanent "0" around the app.
+ * ------------------------------------------------------------- */
+async function ensureRewardsChip() {
+  const bell = document.getElementById('notifBellBtn');
+  const bar  = bell ? bell.parentElement : document.querySelector('.topbar > div:last-child');
+  if (!bar || document.getElementById('rewardsChip')) return;
+
+  const { data, error } = await db.rpc('my_rewards');
+  if (error || !data) return;
+
+  const shots  = (data.tokens || []).length;
+  const points = data.balance || 0;
+  if (!shots && !points) return;
+
+  const chip = document.createElement('a');
+  chip.id = 'rewardsChip';
+  chip.href = 'rewards.html';
+  chip.title = shots ? `${shots} free shot${shots > 1 ? 's' : ''} waiting` : `${points} points`;
+  chip.style.cssText = `display:inline-flex;align-items:center;gap:6px;text-decoration:none;
+    padding:4px 10px;border-radius:999px;font-size:0.78rem;font-weight:700;line-height:1;
+    border:1px solid ${shots ? 'rgba(67,219,143,.45)' : 'rgba(212,175,80,.35)'};
+    background:${shots ? 'rgba(67,219,143,.14)' : 'rgba(212,175,80,.10)'};
+    color:${shots ? '#8FD99A' : '#D4AF50'};white-space:nowrap`;
+
+  // A waiting shot outranks the score: one is a thing to go and use tonight, the other is
+  // a number. Only the more urgent of the two gets the header.
+  chip.innerHTML = shots
+    ? `<i class="fa-solid fa-martini-glass-citrus"></i>${shots}`
+    : `<i class="fa-solid fa-gem" style="font-size:.72rem"></i>${points}`;
+
+  bar.insertBefore(chip, bar.firstChild);
+}
+
 function ensureNav() {
   const hasTabbar = !!document.querySelector('.tabbar');
   let topbar = document.querySelector('.topbar');
