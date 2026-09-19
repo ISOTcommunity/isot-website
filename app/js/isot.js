@@ -599,8 +599,9 @@ document.addEventListener('submit', (e) => {
  * too deep: nothing anywhere said they had a free shot waiting. This puts the count where
  * the eye already goes for the bell.
  *
- * It renders nothing at all when there is nothing to say — no points and no shots — so a
- * new member does not carry a permanent "0" around the app.
+ * Always present, never hidden. Green with a count when there is a shot to use, red on
+ * zero — a permanent place on the screen that means one thing, so a member learns to read
+ * it at a glance instead of hunting for whether it appeared.
  * ------------------------------------------------------------- */
 async function ensureRewardsChip() {
   const bell = document.getElementById('notifBellBtn');
@@ -612,23 +613,24 @@ async function ensureRewardsChip() {
 
   const shots  = (data.tokens || []).length;
   const points = data.balance || 0;
-  if (!shots && !points) return;
+  const has    = shots > 0;
 
   const chip = document.createElement('a');
   chip.id = 'rewardsChip';
   chip.href = 'rewards.html';
-  chip.title = shots ? `${shots} free shot${shots > 1 ? 's' : ''} waiting` : `${points} points`;
+  chip.title = has
+    ? `${shots} free shot${shots > 1 ? 's' : ''} waiting`
+    : `No shot yet — ${points} point${points === 1 ? '' : 's'}`;
+
   chip.style.cssText = `display:inline-flex;align-items:center;gap:6px;text-decoration:none;
     padding:4px 10px;border-radius:999px;font-size:0.78rem;font-weight:700;line-height:1;
-    border:1px solid ${shots ? 'rgba(67,219,143,.45)' : 'rgba(212,175,80,.35)'};
-    background:${shots ? 'rgba(67,219,143,.14)' : 'rgba(212,175,80,.10)'};
-    color:${shots ? '#8FD99A' : '#D4AF50'};white-space:nowrap`;
+    border:1px solid ${has ? 'rgba(67,219,143,.45)' : 'rgba(243,108,81,.45)'};
+    background:${has ? 'rgba(67,219,143,.14)' : 'rgba(243,108,81,.12)'};
+    color:${has ? '#8FD99A' : '#F8A18E'};white-space:nowrap`;
 
-  // A waiting shot outranks the score: one is a thing to go and use tonight, the other is
-  // a number. Only the more urgent of the two gets the header.
-  chip.innerHTML = shots
-    ? `<i class="fa-solid fa-martini-glass-citrus"></i>${shots}`
-    : `<i class="fa-solid fa-gem" style="font-size:.72rem"></i>${points}`;
+  // Same glass either way, so the colour is doing the talking rather than the icon
+  // changing shape underneath them.
+  chip.innerHTML = `<i class="fa-solid fa-martini-glass-citrus"></i>${shots}`;
 
   bar.insertBefore(chip, bar.firstChild);
 }
