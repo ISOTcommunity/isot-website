@@ -77,6 +77,21 @@
                  border-top: 1px solid var(--border-light); padding-top: 12px; }
     .burnt-who strong { color: #FFF; }
 
+    /* Live clock under the button — deliberately the same footprint as the button above
+       it, so the two read as one control: "this is live, now use it". */
+    .live-clock {
+      width: 100%; margin-top: 10px;
+      min-height: 48px; padding: 8px 16px; border-radius: var(--radius-sm);
+      background: rgba(67,219,143,.14); border: 1px solid rgba(67,219,143,.45);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 1px;
+    }
+    .lc-time {
+      font-size: 1.45rem; font-weight: 700; color: #8FD99A; line-height: 1;
+      font-variant-numeric: tabular-nums; letter-spacing: .03em;
+    }
+    .lc-date { font-size: .66rem; color: rgba(143,217,154,.75); font-weight: 600; }
+
     .hrow { display: flex; gap: 12px; padding: 10px 0;
             border-bottom: 1px solid var(--border-light); align-items: center; }
     .hrow:last-child { border-bottom: none; }
@@ -277,6 +292,14 @@
                     style="width:100%;margin-top:12px">
               Give to the bar
             </button>
+
+            <!-- Same size as the button, directly under it: the bartender sees the seconds
+                 moving BEFORE they tap, which is what proves the screen is live and not a
+                 screenshot of somebody else's token. -->
+            <div class="live-clock" data-liveclock>
+              <span class="lc-time" data-clock>--:--:--</span>
+              <span class="lc-date" data-date></span>
+            </div>
           </div>
         </div>`;
     }
@@ -301,9 +324,17 @@
       if (clockTimer) clearInterval(clockTimer);
       const tick = () => {
         const now = serverNow();
+
+        // Every clock on the page — the live ones on unused tokens and the frozen-proof
+        // ones on burnt cards — reads from the same server-corrected time.
+        document.querySelectorAll('[data-clock]').forEach(el => {
+          el.textContent = clockText(now);
+        });
+        document.querySelectorAll('[data-date]').forEach(el => {
+          el.textContent = dateText(now);
+        });
+
         document.querySelectorAll('[data-burnt]').forEach(card => {
-          card.querySelector('[data-clock]').textContent = clockText(now);
-          card.querySelector('[data-date]').textContent  = dateText(now);
           const at = new Date(card.dataset.burnt.replace(' ', 'T'));
           const s = Math.max(0, Math.round((now - at) / 1000));
           card.querySelector('[data-since]').textContent =
@@ -311,7 +342,7 @@
         });
       };
       tick();
-      if (document.querySelector('[data-burnt]')) clockTimer = setInterval(tick, 250);
+      if (document.querySelector('[data-clock]')) clockTimer = setInterval(tick, 250);
     }
 
     async function claimEarlyBird() {
