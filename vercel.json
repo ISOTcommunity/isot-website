@@ -105,6 +105,10 @@
   ],
   "rewrites": [
     {
+      "source": "/italian-dining-culture-turin-guide",
+      "destination": "/italian-dining-culture-turin-guide.html"
+    },
+    {
       "source": "/turin-international-student-nightlife-guide",
       "destination": "/turin-international-student-nightlife-guide.html"
     },
