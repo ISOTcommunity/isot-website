@@ -117,6 +117,30 @@
             text-align: right; }
     .hpts.pos { color: var(--green); }
     .hpts.neg { color: var(--text-dim); }
+
+    /* ── Characters ─────────────────────────────────────────────────────── */
+    .bal-card { position: relative; overflow: hidden; }
+    .hero-dancer { position: absolute; right: -6px; top: -4px; height: 128px; opacity: .92;
+                   pointer-events: none; animation: sway 3.2s ease-in-out infinite; transform-origin: bottom center; }
+    .hero-mark { height: 18px; filter: brightness(0) invert(1); opacity: .85; display: block; }
+    .hero-kicker { font-size: .66rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+                   color: #D4AF50; margin: 6px 0 14px; }
+    @keyframes sway { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+    @media (prefers-reduced-motion: reduce) { .hero-dancer { animation: none; } }
+
+    .rule-art { width: 58px; height: 58px; flex-shrink: 0; border-radius: 16px;
+                background: radial-gradient(circle at 50% 60%, rgba(212,175,80,.18), rgba(255,255,255,.03));
+                display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .rule-art img { max-width: 50px; max-height: 50px; object-fit: contain; }
+    .rule { align-items: center; }
+
+    .section-head, .board-head { display: flex; align-items: center; gap: 10px; margin: 26px 0 10px; }
+    .section-head img { height: 46px; }
+    .board-head img { height: 38px; }
+
+    .empty-board { display: flex; align-items: center; gap: 14px; margin-top: 24px; padding: 16px;
+                   border-radius: 18px; border: 1px dashed rgba(212,175,80,.4); background: rgba(212,175,80,.05); }
+    .empty-board img { height: 56px; }
   </style>
 </head>
 <body>
@@ -225,7 +249,10 @@
 
       document.getElementById('panel').innerHTML = `
         <div class="bal-card">
-          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px">
+          <img class="hero-dancer" src="${C}char_yellow_dancer.png" alt="" />
+          <img class="hero-mark" src="../assets/LOGOS/scritta isot.png" alt="ISOT" />
+          <div class="hero-kicker">The Game</div>
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;position:relative;padding-right:84px">
             <div>
               <div class="bal-n">${data.balance}</div>
               <div class="bal-l">Points</div>
@@ -300,12 +327,15 @@
 
     // Every number comes from game_state(), which reads the same functions the triggers
     // pay out from — so this page cannot drift from what the game actually does.
+    const C = '../assets/characters/web/';
     function renderHowToPlay() {
       if (!game) return '';
       const r = game.rules, p = game.progress;
-      const rule = (icon, title, pts, body, prog) => `
+      // Each way to play has its own ISOT character — the same cast as the posters and
+      // the home page — so the rules read as the community, not a points table.
+      const rule = (img, title, pts, body, prog) => `
         <div class="rule">
-          <div class="rule-ico"><i class="fa-solid ${icon}"></i></div>
+          <div class="rule-art"><img src="${C}${img}.png" alt="" loading="lazy" /></div>
           <div class="rule-body">
             <div class="rule-top">
               <span class="rule-title">${title}</span>
@@ -317,31 +347,35 @@
         </div>`;
 
       return `
-        <div class="eyebrow" style="margin:24px 0 10px">How to play</div>
+        <div class="section-head">
+          <img src="${C}char_wavy_arms.png" alt="" />
+          <div><div class="eyebrow" style="margin:0">How to play</div>
+          <div class="dim" style="font-size:.76rem">Every night out counts.</div></div>
+        </div>
         <div class="card card-glass" style="padding:6px 16px">
-          ${rule('fa-qrcode', 'Come to a night', `+${r.attendance}`,
+          ${rule('char_duo_sitting', 'Come to a night', `+${r.attendance}`,
             'At Karaoke or the Social Hub, find a volunteer and show your ISOT card. Once per night.',
             `You have been scanned at <strong>${p.nights}</strong> night${p.nights === 1 ? '' : 's'}`)}
-          ${rule('fa-microphone', 'Sing', `+${r.song}`,
+          ${rule('char_karaoke_singer', 'Sing', `+${r.song}`,
             'Every song you actually sing on Monday karaoke — counted when the host marks it done.',
             `<strong>${p.songs}</strong> song${p.songs === 1 ? '' : 's'} so far`)}
-          ${rule('fa-user-group', 'Make friends', `+${r.friends}`,
+          ${rule('char_spiky_twins', 'Make friends', `+${r.friends}`,
             `Every ${r.step} friends you connect with in the app.`,
             `<strong>${p.friends}</strong> friends · next reward at ${p.friends_next}`)}
-          ${rule('fa-paper-plane', 'Bring people', `+${r.invites}`,
+          ${rule('char_starjumper', 'Bring people', `+${r.invites}`,
             `Every ${r.step} people you invite who then turn up to that night and get scanned.`,
             `<strong>${p.invites}</strong> came · next reward at ${p.invites_next}`)}
-          ${rule('fa-gem', 'Find gems', 'varies',
+          ${rule('char_cat_wizards', 'Find gems', 'varies',
             'Hidden spots on the map. Go there, take the photo, claim it.',
             `<a href="partner.html" style="color:var(--pink)">Open the map &rarr;</a>`)}
         </div>
 
         <div class="eyebrow" style="margin:22px 0 10px">Spend it</div>
         <div class="card card-glass" style="padding:6px 16px">
-          ${rule('fa-martini-glass-citrus', 'A free shot', `${r.shot_cost} pts`,
+          ${rule('char_bottle_rider', 'A free shot', `${r.shot_cost} pts`,
             'Trade points for a shot during Monday karaoke at Rough — from when the doors open until the night ends. The shot is for that night only. Show the phone, the bartender taps.',
             null)}
-          ${rule('fa-clock', 'Monday early bird', 'free',
+          ${rule('char_runner', 'Monday early bird', 'free',
             `Say <strong>going</strong> to karaoke before ${r.eb_deadline}, then open this page at the bar between
              ${r.eb_from} and ${r.eb_until}. The shot only exists in that window. One per person.`,
             null)}
@@ -349,10 +383,21 @@
     }
 
     function renderBoard() {
-      if (!board || !board.length) return '';
+      if (!board || !board.length) return `
+        <div class="empty-board">
+          <img src="${C}char_starjumper.png" alt="" />
+          <div>
+            <div style="font-weight:700;color:#FFF">Nobody on the board yet this month</div>
+            <div class="dim" style="font-size:.78rem;margin-top:3px">
+              Get scanned at the next night and you are number one.</div>
+          </div>
+        </div>`;
       const medal = n => n === 1 ? '#D4AF50' : n === 2 ? '#C4BDE0' : n === 3 ? '#C9A46A' : 'var(--text-dim)';
       return `
-        <div class="eyebrow" style="margin:24px 0 10px">This month's leaderboard</div>
+        <div class="board-head">
+          <img src="${C}char_starjumper.png" alt="" />
+          <div class="eyebrow" style="margin:0">This month's leaderboard</div>
+        </div>
         <div class="card card-glass" style="padding:4px 16px">
           ${board.map(b => `
             <div class="hrow" style="${b.is_me ? 'background:rgba(212,90,232,.08);margin:0 -16px;padding-inline:16px' : ''}">
