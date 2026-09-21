@@ -899,8 +899,12 @@
                padding: 12px 18px 12px 12px; border-radius: 20px; text-decoration: none;
                background: rgba(255,255,255,0.04); border: 1px solid rgba(212,90,232,0.35); }
     .get-app:hover { border-color: var(--pink); }
-    .get-app-qr { width: 96px; height: 96px; flex-shrink: 0; background: #FFF; padding: 6px;
-                  border-radius: 12px; }
+    /* 140px of code inside an 18px white border. The URL encodes to a 29×29 grid, so a
+       square is ~4.8px and the quiet zone a camera needs (4 squares) is ~19px. The first
+       version had 84px of code and a 6px border straight onto the dark page, and phones
+       could not find its edges. */
+    .get-app-qr { width: 176px; height: 176px; flex-shrink: 0; background: #FFF; padding: 18px;
+                  border-radius: 14px; box-sizing: border-box; }
     .get-app-qr img, .get-app-qr canvas { width: 100% !important; height: 100% !important; }
     .get-app-k { font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
                  color: var(--pink); }
@@ -1638,7 +1642,7 @@
     (function () {
       var el = document.getElementById('homeAppQr');
       if (!el || typeof QRCode === 'undefined') return;
-      new QRCode(el, { text: 'https://isotcommunity.com/download', width: 256, height: 256,
+      new QRCode(el, { text: 'https://isotcommunity.com/download', width: 280, height: 280,
                        colorDark: '#000000', colorLight: '#FFFFFF',
                        correctLevel: QRCode.CorrectLevel.M });
     })();
