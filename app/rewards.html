@@ -148,6 +148,16 @@
     a.rule { text-decoration: none; color: inherit; cursor: pointer; transition: background .15s; }
     a.rule:hover, a.rule:active { background: rgba(255,255,255,.03); }
     .rule-go { color: var(--text-dim); font-size: .75rem; flex-shrink: 0; align-self: center; }
+
+    .prize { display: flex; align-items: center; gap: 14px; margin-top: 26px; padding: 16px;
+             border-radius: 20px; border: 1px solid rgba(212,175,80,.45);
+             background: linear-gradient(135deg, rgba(212,175,80,.18), rgba(155,143,212,.10)); }
+    .prize img { height: 74px; flex-shrink: 0; }
+    .prize-k { font-size: .62rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #D4AF50; }
+    .prize-t { font-size: 1.05rem; font-weight: 700; color: #FFF; margin-top: 3px; line-height: 1.3; }
+    .winner-card { margin-top: 12px; padding: 14px 16px; border-radius: 18px;
+                   border: 1px solid rgba(67,219,143,.35); background: rgba(67,219,143,.07); }
+    .winner-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -200,6 +210,7 @@
     let game = null;      // game_state(): rules, progress
     let board = [];       // game_leaderboard()
     let trade = { open: false };  // trade_status(): only during Monday karaoke
+    let last = null;              // game_last_winner(): prize + last month's #1
     let clockTimer = null;
 
     // The device clock is not trusted: a member can set their phone to anything. Every
@@ -226,12 +237,13 @@
     }
 
     async function load() {
-      const [r, e, g, lb, ts] = await Promise.all([
+      const [r, e, g, lb, ts, lw] = await Promise.all([
         db.rpc('my_rewards'),
         db.rpc('early_bird_status'),
         db.rpc('game_state'),
         db.rpc('game_leaderboard', { p_limit: 10 }),
         db.rpc('trade_status'),
+        db.rpc('game_last_winner'),
       ]);
       if (r.error) {
         document.getElementById('panel').innerHTML =
@@ -241,6 +253,7 @@
       data = r.data; eb = e.data || {};
       game = g.data || null; board = lb.data || [];
       trade = (ts && ts.data) || { open: false };
+      last = (lw && lw.data) || null;
       setServerNow(data.server_now || eb.server_now);
       render();
     }
@@ -299,6 +312,8 @@
           ${tokens.map(renderToken).join('')}` : ''}
 
         ${renderHowToPlay()}
+
+        ${renderPrize()}
 
         ${renderBoard()}
 
@@ -390,6 +405,39 @@
              ${r.eb_from} and ${r.eb_until}. The shot only exists in that window. One per person.`,
             null, 'events.html?cat=karaoke')}
         </div>`;
+    }
+
+    // The prize and last month's winner sit directly above the table: that is what the
+    // table is for. Hidden entirely until the board has set a prize.
+    function renderPrize() {
+      if (!last) return '';
+      const w = last.winners || [];
+      const prize = last.prize ? `
+        <div class="prize">
+          <img src="${C}char_yellow_dancer.png" alt="" />
+          <div>
+            <div class="prize-k">#1 this month wins</div>
+            <div class="prize-t">${escapeHtml(last.prize)}</div>
+            <div class="dim" style="font-size:.72rem;margin-top:3px">Handed out by ISOT at a night early next month.</div>
+          </div>
+        </div>` : '';
+
+      const winner = w.length ? `
+        <div class="winner-card">
+          <div class="prize-k" style="color:#8FD99A">${escapeHtml(last.month)} winner${w.length > 1 ? 's' : ''}</div>
+          ${w.map(x => `
+            <div class="winner-row">
+              <div style="width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0">
+                ${renderUserAvatarHtml({ full_name: x.name, avatar_url: x.avatar_url, member_code: x.member_code }, 34)}
+              </div>
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:700;color:#FFF">${escapeHtml(x.name)}${x.is_me ? ' — that is you 🎉' : ''}</div>
+                ${x.full_name ? `<div class="dim" style="font-size:.72rem">Give the prize to: ${escapeHtml(x.full_name)} · ${escapeHtml(x.member_code)}</div>` : ''}
+              </div>
+              <div class="hpts pos">${x.points}</div>
+            </div>`).join('')}
+        </div>` : '';
+      return prize + winner;
     }
 
     function renderBoard() {
