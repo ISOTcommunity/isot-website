@@ -110,22 +110,35 @@
       border-radius: 0.9em 0.9em 0 0;
       flex-shrink: 0;
     }
+
+    .open-app { display: none; margin-top: 2.2vmin; padding: 14px 26px; border-radius: 999px;
+                background: var(--orchid); color: #0B0B0F; font-weight: 700; text-decoration: none;
+                font-size: 1.05rem; }
+    @media (hover: none) and (pointer: coarse) {
+      .open-app { display: inline-block; }
+      .qr-wrap { display: none; }
+    }
   </style>
 </head>
 <body>
 
   <div class="stage">
-    <img class="poster"
+    <!-- The src is only a fallback: the script swaps in today's poster, or the next
+         night's when nothing is on today. -->
+    <img class="poster" id="poster"
          src="/assets/optimized/karaoke_rough_2026-09-07.jpg"
          alt="ISOT Karaoke Night poster — Rough, San Salvario. Doors 19:00, singing from 21:00. Scan to get the app." />
 
     <div class="panel">
-      <div class="kicker">Rough Dive Bar</div>
+      <div class="kicker" id="kicker">ISOT · Turin</div>
       <h1>Scan to get the <em>ISOT app</em></h1>
 
       <div class="qr-wrap"><div id="qr"></div></div>
 
       <div class="url">isotcommunity.com/app</div>
+
+      <!-- On a phone there is nothing to scan — you are already holding the phone. -->
+      <a class="open-app" href="/app/signup.html">Open the ISOT app</a>
 
       <div class="what">
         <span>Karaoke queue</span>
@@ -136,6 +149,32 @@
   </div>
 
   <script src="/app/vendor/qrcode.min.js"></script>
+  <script src="/app/vendor/supabase.js"></script>
+  <script src="/app/js/isot.js"></script>
+  <script>
+    // Today's night, or the next one. calendar_between() is granted to anon, so this works
+    // for anyone who scanned a QR and has no account yet — which is everyone this page is for.
+    (async () => {
+      // typeof, not window.db: a top-level const is not a window property.
+      if (typeof db === 'undefined' || !db) return;
+      const pad = n => String(n).padStart(2, '0');
+      const day = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      const now = new Date();
+      const { data } = await db.rpc('calendar_between',
+        { p_from: day(now), p_to: day(new Date(Date.now() + 14 * 864e5)) });
+      const night = (data || []).find(e => e.poster_url);
+      if (!night) return;                        // keep the fallback poster
+
+      const img = document.getElementById('poster');
+      img.src = night.poster_url;
+      img.alt = `${night.headline || night.title} — ${night.venue_name}. Scan to get the ISOT app.`;
+
+      const d = new Date(night.event_date + 'T12:00:00');
+      const when = night.event_date === day(now) ? 'Tonight'
+                 : d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
+      document.getElementById('kicker').textContent = `${when} · ${night.venue_name}`;
+    })();
+  </script>
   <script>
     // Rendered here rather than reusing the poster's own QR: on a laptop screen the
     // embedded one is only a few hundred pixels and fails from across a bar. This one

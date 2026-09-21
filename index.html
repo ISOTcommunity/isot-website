@@ -894,7 +894,24 @@
       .home-main-container { order: -1; }
     }
 
-  </style>
+  
+    .get-app { display: inline-flex; align-items: center; gap: 16px; margin-top: 26px;
+               padding: 12px 18px 12px 12px; border-radius: 20px; text-decoration: none;
+               background: rgba(255,255,255,0.04); border: 1px solid rgba(212,90,232,0.35); }
+    .get-app:hover { border-color: var(--pink); }
+    .get-app-qr { width: 96px; height: 96px; flex-shrink: 0; background: #FFF; padding: 6px;
+                  border-radius: 12px; }
+    .get-app-qr img, .get-app-qr canvas { width: 100% !important; height: 100% !important; }
+    .get-app-k { font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+                 color: var(--pink); }
+    .get-app-t { font-size: 1.05rem; font-weight: 700; color: #FFF; margin-top: 2px; }
+    .get-app-s { font-size: .8rem; color: var(--text-dim, #8C93A3); margin-top: 3px; max-width: 260px; }
+    .on-phone { display: none; }
+    @media (hover: none) and (pointer: coarse) {
+      .get-app-qr, .on-desk { display: none; }
+      .on-phone { display: inline; }
+    }
+</style>
 </head>
 <body>
 
@@ -962,6 +979,17 @@
               <i class="fa-solid fa-calendar-days" style="color: var(--pink);"></i> See Events
             </a>
           </div>
+
+          <!-- Get the app. On a laptop the QR is the way across to a phone; on a phone
+               the QR is pointless, so it becomes a button to the same page. -->
+          <a href="/download" class="get-app">
+            <div class="get-app-qr" id="homeAppQr" aria-hidden="true"></div>
+            <div>
+              <div class="get-app-k">Get the ISOT app</div>
+              <div class="get-app-t"><span class="on-desk">Scan with your phone</span><span class="on-phone">Open the app &rarr;</span></div>
+              <div class="get-app-s">Events, your member card, karaoke queue, the game.</div>
+            </div>
+          </a>
         </div>
 
         <div class="hero-card-wrapper" style="position:relative;">
@@ -1604,5 +1632,16 @@
 })();
 </script>
 
+
+  <script src="/app/vendor/qrcode.min.js"></script>
+  <script>
+    (function () {
+      var el = document.getElementById('homeAppQr');
+      if (!el || typeof QRCode === 'undefined') return;
+      new QRCode(el, { text: 'https://isotcommunity.com/download', width: 256, height: 256,
+                       colorDark: '#000000', colorLight: '#FFFFFF',
+                       correctLevel: QRCode.CorrectLevel.M });
+    })();
+  </script>
 </body>
 </html>
