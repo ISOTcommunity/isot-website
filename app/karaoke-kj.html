@@ -559,8 +559,10 @@
         showKjScanResult(false, 'No karaoke night open — start the night first');
         return;
       }
-      // Find today's date in Europe/Rome
-      const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Rome' });
+      // Mirror isot_day(): a night belongs to the day it started, so subtract 6 h
+      // before formatting. At 1 AM Tuesday Rome time this still returns Monday.
+      const today = new Date(Date.now() - 6 * 3600 * 1000)
+        .toLocaleDateString('sv-SE', { timeZone: 'Europe/Rome' });
       const { data, error } = await db.rpc('door_check_in', {
         p_token: token,
         p_event_id: tonight.event_id,
