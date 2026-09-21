@@ -736,6 +736,15 @@ function initBurgerMenu(profile) {
         <i class="fa-solid fa-compass"></i>
         <span>Explore</span>
       </a>
+      <!-- Moved here from the bottom bar, which now carries The Game. -->
+      <a href="network.html" class="drawer-item">
+        <i class="fa-solid fa-user-group"></i>
+        <span>Network &amp; friends</span>
+      </a>
+      <a href="rewards.html" class="drawer-item">
+        <i class="fa-solid fa-star"></i>
+        <span>The Game</span>
+      </a>
       ${isBoard ? `
       <a href="admin.html" class="drawer-item">
         <i class="fa-solid fa-sliders text-pink"></i>
