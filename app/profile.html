@@ -277,8 +277,8 @@
       const isSocio = me.tier === 'socio' || me.staff_role === 'board';
 
       const statusEl = document.getElementById('infoStatus');
-      statusEl.textContent = isSocio ? 'Active' : 'Not a paid member';
-      statusEl.style.color = isSocio ? 'var(--green)' : 'var(--text-dim)';
+      statusEl.textContent = isSocio ? 'Active' : 'Active (app)';
+      statusEl.style.color = 'var(--green)';
 
       if (isSocio) {
         document.getElementById('cardTierBadge').innerHTML = '<span class="badge badge-socio"><i class="fa-solid fa-star"></i> OFFICIAL MEMBER</span>';
@@ -314,15 +314,10 @@
          * so nothing about the membership benefit changes. The overlay now says what
          * the code is FOR rather than covering a fake one.
          */
-        document.getElementById('cardTierBadge').innerHTML = '<span class="badge badge-participant">COMMUNITY</span>';
+        // Since 054 the bar discount applies to every app account, so a non-paying user
+        // carries the same working card — no upsell line, no "no discount" framing.
+        document.getElementById('cardTierBadge').innerHTML = '<span class="badge badge-participant">ISOT CARD</span>';
         document.getElementById('lockedOverlay').style.display = 'none';
-
-        const note = document.getElementById('cardQrNote');
-        if (note) {
-          note.hidden = false;
-          note.innerHTML = 'Entry code — show this at the door. '
-            + '<a href="account.html">Become a member for &euro;10</a> to add bar discounts.';
-        }
 
         try {
           const { data, error } = await db.rpc('issue_qr_token');
