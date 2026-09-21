@@ -144,6 +144,10 @@
     .empty-board { display: flex; align-items: center; gap: 14px; margin-top: 24px; padding: 16px;
                    border-radius: 18px; border: 1px dashed rgba(212,175,80,.4); background: rgba(212,175,80,.05); }
     .empty-board img { height: 56px; }
+
+    a.rule { text-decoration: none; color: inherit; cursor: pointer; transition: background .15s; }
+    a.rule:hover, a.rule:active { background: rgba(255,255,255,.03); }
+    .rule-go { color: var(--text-dim); font-size: .75rem; flex-shrink: 0; align-self: center; }
   </style>
 </head>
 <body>
@@ -336,8 +340,10 @@
       const r = game.rules, p = game.progress;
       // Each way to play has its own ISOT character — the same cast as the posters and
       // the home page — so the rules read as the community, not a points table.
-      const rule = (img, title, pts, body, prog) => `
-        <div class="rule">
+      // Every rule is also the way in: tap "Sing" and you land on karaoke, not a
+      // paragraph about it.
+      const rule = (img, title, pts, body, prog, href) => `
+        <a class="rule" href="${href}">
           <div class="rule-art"><img src="${C}${img}.png" alt="" loading="lazy" /></div>
           <div class="rule-body">
             <div class="rule-top">
@@ -347,7 +353,8 @@
             <div class="rule-txt">${body}</div>
             ${prog ? `<div class="rule-prog">${prog}</div>` : ''}
           </div>
-        </div>`;
+          <i class="fa-solid fa-chevron-right rule-go"></i>
+        </a>`;
 
       return `
         <div class="section-head">
@@ -358,30 +365,30 @@
         <div class="card card-glass" style="padding:6px 16px">
           ${rule('char_duo_sitting', 'Come to a night', `+${r.attendance}`,
             'At Karaoke or the Social Hub, find a volunteer and show your ISOT card. Once per night.',
-            `You have been scanned at <strong>${p.nights}</strong> night${p.nights === 1 ? '' : 's'}`)}
+            `You have been scanned at <strong>${p.nights}</strong> night${p.nights === 1 ? '' : 's'}`, 'events.html')}
           ${rule('char_karaoke_singer', 'Sing', `+${r.song}`,
             'Every song you actually sing on Monday karaoke — counted when the host marks it done.',
-            `<strong>${p.songs}</strong> song${p.songs === 1 ? '' : 's'} so far`)}
+            `<strong>${p.songs}</strong> song${p.songs === 1 ? '' : 's'} so far`, 'karaoke.html')}
           ${rule('char_spiky_twins', 'Make friends', `+${r.friends}`,
             `Every ${r.step} friends you connect with in the app.`,
-            `<strong>${p.friends}</strong> friends · next reward at ${p.friends_next}`)}
+            `<strong>${p.friends}</strong> friends · next reward at ${p.friends_next}`, 'network.html')}
           ${rule('char_white_starjumper', 'Bring people', `+${r.invites}`,
             `Every ${r.step} people you invite who then turn up to that night and get scanned.`,
-            `<strong>${p.invites}</strong> came · next reward at ${p.invites_next}`)}
+            `<strong>${p.invites}</strong> came · next reward at ${p.invites_next}`, 'events.html')}
           ${rule('char_cat_wizards', 'Find gems', 'varies',
             'Hidden spots on the map. Go there, take the photo, claim it.',
-            `<a href="partner.html" style="color:var(--pink)">Open the map &rarr;</a>`)}
+            'Tap to open the map', 'partner.html')}
         </div>
 
         <div class="eyebrow" style="margin:22px 0 10px">Spend it</div>
         <div class="card card-glass" style="padding:6px 16px">
           ${rule('char_bottle_rider', 'A free shot', `${r.shot_cost} pts`,
             'Trade points for a shot during Monday karaoke at Rough — from when the doors open until the night ends. The shot is for that night only. Show the phone, the bartender taps.',
-            null)}
+            null, 'events.html?cat=karaoke')}
           ${rule('char_white_runner', 'Monday early bird', 'free',
             `Say <strong>going</strong> to karaoke before ${r.eb_deadline}, then open this page at the bar between
              ${r.eb_from} and ${r.eb_until}. The shot only exists in that window. One per person.`,
-            null)}
+            null, 'events.html?cat=karaoke')}
         </div>`;
     }
 
