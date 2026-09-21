@@ -129,7 +129,10 @@
     @media (prefers-reduced-motion: reduce) { .hero-dancer { animation: none; } }
 
     .rule-art { width: 58px; height: 58px; flex-shrink: 0; border-radius: 16px;
-                background: radial-gradient(circle at 50% 60%, rgba(212,175,80,.18), rgba(255,255,255,.03));
+                /* Lavender, not near-black: the singer and the twins are dark figures and
+                   vanished on the card colour. Light enough for them, dark enough for the
+                   white characters. */
+                background: radial-gradient(circle at 50% 55%, rgba(196,189,224,.42), rgba(155,143,212,.16));
                 display: flex; align-items: center; justify-content: center; overflow: hidden; }
     .rule-art img { max-width: 50px; max-height: 50px; object-fit: contain; }
     .rule { align-items: center; }
@@ -348,7 +351,7 @@
 
       return `
         <div class="section-head">
-          <img src="${C}char_wavy_arms.png" alt="" />
+          <img src="${C}char_white_leaper.png" alt="" />
           <div><div class="eyebrow" style="margin:0">How to play</div>
           <div class="dim" style="font-size:.76rem">Every night out counts.</div></div>
         </div>
@@ -362,7 +365,7 @@
           ${rule('char_spiky_twins', 'Make friends', `+${r.friends}`,
             `Every ${r.step} friends you connect with in the app.`,
             `<strong>${p.friends}</strong> friends · next reward at ${p.friends_next}`)}
-          ${rule('char_starjumper', 'Bring people', `+${r.invites}`,
+          ${rule('char_white_starjumper', 'Bring people', `+${r.invites}`,
             `Every ${r.step} people you invite who then turn up to that night and get scanned.`,
             `<strong>${p.invites}</strong> came · next reward at ${p.invites_next}`)}
           ${rule('char_cat_wizards', 'Find gems', 'varies',
@@ -375,7 +378,7 @@
           ${rule('char_bottle_rider', 'A free shot', `${r.shot_cost} pts`,
             'Trade points for a shot during Monday karaoke at Rough — from when the doors open until the night ends. The shot is for that night only. Show the phone, the bartender taps.',
             null)}
-          ${rule('char_runner', 'Monday early bird', 'free',
+          ${rule('char_white_runner', 'Monday early bird', 'free',
             `Say <strong>going</strong> to karaoke before ${r.eb_deadline}, then open this page at the bar between
              ${r.eb_from} and ${r.eb_until}. The shot only exists in that window. One per person.`,
             null)}
@@ -385,7 +388,7 @@
     function renderBoard() {
       if (!board || !board.length) return `
         <div class="empty-board">
-          <img src="${C}char_starjumper.png" alt="" />
+          <img src="${C}char_white_starjumper.png" alt="" />
           <div>
             <div style="font-weight:700;color:#FFF">Nobody on the board yet this month</div>
             <div class="dim" style="font-size:.78rem;margin-top:3px">
@@ -395,7 +398,7 @@
       const medal = n => n === 1 ? '#D4AF50' : n === 2 ? '#C4BDE0' : n === 3 ? '#C9A46A' : 'var(--text-dim)';
       return `
         <div class="board-head">
-          <img src="${C}char_starjumper.png" alt="" />
+          <img src="${C}char_white_starjumper.png" alt="" />
           <div class="eyebrow" style="margin:0">This month's leaderboard</div>
         </div>
         <div class="card card-glass" style="padding:4px 16px">
