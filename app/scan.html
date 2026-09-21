@@ -275,13 +275,36 @@
     }
 
     function startCamera() {
-      html5QrcodeScanner = new Html5Qrcode("reader");
+      // QR only, and the phone's own barcode reader where it has one (Chrome/Android):
+      // looking for 17 barcode formats in JavaScript is what made a member card on a
+      // phone screen slow to lock on, or not lock on at all.
+      html5QrcodeScanner = new Html5Qrcode("reader", {
+        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+        experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+        verbose: false,
+      });
       html5QrcodeScanner.start(
         { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
+        {
+          fps: 15,
+          // Scan box sized to the camera view instead of a fixed 250px: the card no longer
+          // has to be held at exactly the right distance to fit inside it.
+          qrbox: (w, h) => { const s = Math.floor(Math.min(w, h) * 0.8); return { width: s, height: s }; },
+        },
         onScanSuccess
       ).catch(err => {
-        console.log("Camera permissions error", err);
+        // Said on screen, not only in the console: a blocked camera looked exactly like
+        // "it just doesn't scan".
+        console.warn('camera', err);
+        const box = document.getElementById('reader');
+        box.innerHTML = `<div style="padding:28px 20px;text-align:center;color:#FFF">
+          <div style="font-size:1.6rem;margin-bottom:8px">📷</div>
+          <div style="font-weight:700;margin-bottom:6px">The camera did not start</div>
+          <div style="font-size:.84rem;opacity:.75;line-height:1.5">
+            Allow camera access for isotcommunity.com in your browser settings, then reload.
+            You can also type the member's name below.</div>
+          <button type="button" onclick="location.reload()" class="btn btn-pink"
+                  style="width:auto;margin-top:14px;padding:8px 18px">Try again</button></div>`;
       });
     }
 
@@ -297,19 +320,23 @@
                              message: 'Pick which event first.' });
             return;
           }
-          const { data } = await db.rpc('door_check_in', {
+          const { data, error } = await db.rpc('door_check_in', {
             p_token: decodedText,
             p_event_id: picked.event_id,
             p_date: picked.event_date,
           });
-          res = data || { ok: false, result: 'bad_code', message: 'Invalid scan payload' };
+          // The server's own reason, not a generic one: "Invalid scan payload" hid every
+          // real failure behind the same words.
+          res = data || { ok: false, result: 'bad_code',
+                          message: error ? error.message : 'Invalid scan payload' };
           if (res.ok) refreshCount();
         } else {
-          const { data } = await db.rpc('validate_member_qr', {
+          const { data, error } = await db.rpc('validate_member_qr', {
             p_token: decodedText,
             p_venue_id: partnerVenueId,
           });
-          res = data || { ok: false, result: 'bad_code', message: 'Invalid scan payload' };
+          res = data || { ok: false, result: 'bad_code',
+                          message: error ? error.message : 'Invalid scan payload' };
         }
         showScanResult(res);
       } catch (e) {
