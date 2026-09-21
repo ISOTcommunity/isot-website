@@ -122,10 +122,15 @@
 
     <div id="alertBox"></div>
 
-    <!-- Scan button — top of page so it's always one tap away -->
-    <button type="button" onclick="openScanModal()" class="btn btn-pink big-tap-btn" style="width:100%;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:10px" id="scanBtn">
-      <i class="fa-solid fa-qrcode" style="font-size:1.3rem"></i> Scan member card
-    </button>
+    <!-- Quick-action row — scan + broadcast side by side -->
+    <div style="display:flex;gap:10px;margin-bottom:14px">
+      <button type="button" onclick="openScanModal()" class="btn btn-pink big-tap-btn" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px" id="scanBtn">
+        <i class="fa-solid fa-qrcode"></i> Scan card
+      </button>
+      <button type="button" onclick="sendCheckinBroadcast()" class="btn btn-outline big-tap-btn" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px" id="broadcastBtn">
+        <i class="fa-solid fa-tower-broadcast" style="color:var(--pink)"></i> Notify all
+      </button>
+    </div>
 
     <!-- The night has to be opened before any estimate is honest: tonight_karaoke()
          only knows the SCHEDULED time, and a night that starts at 22:15 makes every
@@ -563,6 +568,30 @@
       });
       const res = data || { ok: false, message: error ? error.message : 'Scan failed' };
       showKjScanResult(res.ok, res.message || (res.ok ? 'Checked in!' : 'Invalid card'));
+    }
+
+    // ── Broadcast ──────────────────────────────────────────────────────────
+    async function sendCheckinBroadcast() {
+      const btn = document.getElementById('broadcastBtn');
+      if (!confirm('Send a notification to all members:\n\n"Show your member card to a volunteer to get checked in and earn 10 points!"\n\nSend to everyone?')) return;
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
+
+      const { data, error } = await db.rpc('board_broadcast', {
+        p_title: '📲 Get your check-in points!',
+        p_message: 'Show your member card (Profile → QR code) to a volunteer at the door tonight to get checked in and earn 10 points.',
+      });
+
+      if (error) {
+        setAlert(document.getElementById('alertBox'), 'Could not send: ' + error.message, 'error');
+      } else {
+        setAlert(document.getElementById('alertBox'),
+          `Sent to ${data.sent} member${data.sent === 1 ? '' : 's'} ✓`, 'success');
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-tower-broadcast" style="color:var(--pink)"></i> Notify all';
     }
 
     document.addEventListener('DOMContentLoaded', initKjController);
