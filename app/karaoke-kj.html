@@ -59,6 +59,28 @@
       font-weight: 700;
       border-radius: 14px;
     }
+
+    /* Scan modal */
+    #scanModal {
+      display: none; position: fixed; inset: 0; z-index: 999;
+      background: rgba(0,0,0,.82); align-items: flex-end; justify-content: center;
+    }
+    #scanModal.open { display: flex; }
+    .scan-sheet {
+      background: #0E0E13; border-radius: 24px 24px 0 0;
+      padding: 20px 20px 32px; width: 100%; max-width: 500px;
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+    #scanReader { width: 100%; border-radius: 14px; overflow: hidden; margin: 12px 0; }
+    #scanResult {
+      min-height: 52px; border-radius: 14px; padding: 14px 16px;
+      font-weight: 700; font-size: .95rem; display: none;
+      align-items: center; gap: 10px;
+    }
+    #scanResult.ok  { display: flex; background: rgba(67,219,143,.15); color: #43DB8F;
+                      border: 1px solid rgba(67,219,143,.35); }
+    #scanResult.err { display: flex; background: rgba(243,108,81,.15); color: #F36C51;
+                      border: 1px solid rgba(243,108,81,.35); }
   </style>
 </head>
 <body>
@@ -79,9 +101,31 @@
     </div>
   </header>
 
+  <!-- Scan modal — opens inside the app, no Chrome -->
+  <div id="scanModal" role="dialog" aria-modal="true">
+    <div class="scan-sheet">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div style="font-weight:700;font-size:1.1rem;color:#FFF">
+          <i class="fa-solid fa-qrcode" style="color:var(--pink);margin-right:8px"></i>Scan member card
+        </div>
+        <button type="button" onclick="closeScanModal()" style="background:transparent;border:none;color:var(--text-dim);font-size:1.3rem;cursor:pointer;padding:4px">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="dim" style="font-size:.8rem;margin-bottom:4px">Point camera at the QR on the member's phone — they get +10 pts</div>
+      <div id="scanReader"></div>
+      <div id="scanResult"></div>
+    </div>
+  </div>
+
   <main class="shell" style="max-width: 500px;">
 
     <div id="alertBox"></div>
+
+    <!-- Scan button — top of page so it's always one tap away -->
+    <button type="button" onclick="openScanModal()" class="btn btn-pink big-tap-btn" style="width:100%;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:10px" id="scanBtn">
+      <i class="fa-solid fa-qrcode" style="font-size:1.3rem"></i> Scan member card
+    </button>
 
     <!-- The night has to be opened before any estimate is honest: tonight_karaoke()
          only knows the SCHEDULED time, and a night that starts at 22:15 makes every
@@ -150,6 +194,7 @@
   </main>
 
   <script src="vendor/supabase.js"></script>
+  <script src="vendor/html5-qrcode.min.js"></script>
   <script src="js/isot.js"></script>
 
   <script>
@@ -428,6 +473,96 @@
       document.getElementById('walkupSong').value = '';
       await fetchQueue();
       setAlert(box, `Added "${escapeHtml(song)}" to the queue.`, 'success');
+    }
+
+    // ── In-app QR scanner ──────────────────────────────────────────────────
+    let kjScanner = null;
+    let scanBusy  = false;
+
+    function tokenFrom(text) {
+      const t = String(text || '').trim();
+      if (/^https?:\/\//i.test(t)) {
+        try { return new URL(t).searchParams.get('t') || t; } catch (_) { return t; }
+      }
+      return t;
+    }
+
+    function openScanModal() {
+      const modal = document.getElementById('scanModal');
+      modal.classList.add('open');
+      clearScanResult();
+      startKjScanner();
+    }
+
+    function closeScanModal() {
+      document.getElementById('scanModal').classList.remove('open');
+      stopKjScanner();
+    }
+
+    // Close on backdrop tap
+    document.getElementById('scanModal').addEventListener('click', function(e) {
+      if (e.target === this) closeScanModal();
+    });
+
+    function clearScanResult() {
+      const el = document.getElementById('scanResult');
+      el.className = ''; el.textContent = '';
+    }
+
+    function showKjScanResult(ok, text) {
+      const el = document.getElementById('scanResult');
+      el.className = ok ? 'ok' : 'err';
+      el.innerHTML = `<i class="fa-solid ${ok ? 'fa-circle-check' : 'fa-circle-xmark'}"></i> ${escapeHtml(text)}`;
+      // Auto-reset after 3 s so the KJ can scan the next person without tapping anything
+      setTimeout(() => { clearScanResult(); scanBusy = false; }, 3000);
+    }
+
+    function startKjScanner() {
+      if (kjScanner) return;
+      kjScanner = new Html5Qrcode('scanReader', {
+        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+        experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+        verbose: false,
+      });
+      kjScanner.start(
+        { facingMode: 'environment' },
+        { fps: 15, qrbox: (w, h) => { const s = Math.floor(Math.min(w, h) * 0.8); return { width: s, height: s }; } },
+        async (raw) => {
+          if (scanBusy) return;
+          scanBusy = true;
+          const token = tokenFrom(raw);
+          await kjDoCheckin(token);
+        }
+      ).catch(err => {
+        showKjScanResult(false, 'Camera blocked — allow camera access and try again');
+        kjScanner = null;
+      });
+    }
+
+    function stopKjScanner() {
+      if (!kjScanner) return;
+      kjScanner.stop().catch(() => {}).finally(() => {
+        kjScanner = null;
+        scanBusy = false;
+        document.getElementById('scanReader').innerHTML = '';
+      });
+    }
+
+    async function kjDoCheckin(token) {
+      // Door check-in: awards attendance points; requires tonight's instance
+      if (!tonight?.open) {
+        showKjScanResult(false, 'No karaoke night open — start the night first');
+        return;
+      }
+      // Find today's date in Europe/Rome
+      const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Rome' });
+      const { data, error } = await db.rpc('door_check_in', {
+        p_token: token,
+        p_event_id: tonight.event_id,
+        p_date: today,
+      });
+      const res = data || { ok: false, message: error ? error.message : 'Scan failed' };
+      showKjScanResult(res.ok, res.message || (res.ok ? 'Checked in!' : 'Invalid card'));
     }
 
     document.addEventListener('DOMContentLoaded', initKjController);
