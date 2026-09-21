@@ -224,6 +224,11 @@
         document.getElementById('scanMode').hidden = true;
         document.getElementById('scanEvent').hidden = true;
         startCamera();
+        const fromLinkBar = new URLSearchParams(location.search).get('t');
+        if (fromLinkBar) {
+          history.replaceState(null, '', location.pathname);
+          onScanSuccess(fromLinkBar);
+        }
         return;
       }
 
@@ -239,6 +244,13 @@
 
       await loadTonight();
       startCamera();
+
+      // Opened by pointing a normal phone camera at a member card: act on it straight away.
+      const fromLink = new URLSearchParams(location.search).get('t');
+      if (fromLink) {
+        history.replaceState(null, '', location.pathname);   // a reload must not re-scan
+        onScanSuccess(fromLink);
+      }
     }
 
     async function loadTonight() {
@@ -308,9 +320,20 @@
       });
     }
 
+    // Cards carry https://isotcommunity.com/app/scan.html?t=<token>; older screenshots and
+    // the manual box carry the bare token. Both come down to the token.
+    function tokenFrom(text) {
+      const t = String(text || '').trim();
+      if (/^https?:\/\//i.test(t)) {
+        try { return new URL(t).searchParams.get('t') || t; } catch (_) { return t; }
+      }
+      return t;
+    }
+
     async function onScanSuccess(decodedText) {
       if (isProcessing) return;
       isProcessing = true;
+      decodedText = tokenFrom(decodedText);
 
       try {
         let res;

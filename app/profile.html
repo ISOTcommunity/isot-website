@@ -350,8 +350,12 @@
     function renderQrCode(text) {
       const container = document.getElementById('qrCode');
       container.innerHTML = '';
+      // A link, not the bare token: a volunteer's ordinary camera app then opens the scan
+      // page with the code already in it. The bare token scanned to plain text that no
+      // phone camera does anything with. scan.html pulls the token back out of either.
+      const payload = 'https://isotcommunity.com/app/scan.html?t=' + encodeURIComponent(text);
       qrcodeObj = new QRCode(container, {
-        text: text,
+        text: payload,
         width: 180,
         height: 180,
         colorDark : "#000000",
