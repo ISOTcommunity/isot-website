@@ -363,7 +363,10 @@
         console.error('Could not load the queue:', error.message);
         return;                       // keep what is on screen rather than inventing a queue
       }
-      if (!ns.error) night = ns.data;
+      if (!ns.error) {
+        night = ns.data;
+        renderQueueFull(night);
+      }
 
       renderQueueUI((data || []).map(r => ({
         ...r,
@@ -433,6 +436,41 @@
         ? `${st.used} of ${st.max} tonight — ${st.remaining} left.`
         : `Up to ${st.max} songs a night, ${st.gap_minutes} minutes apart.`;
       btn.disabled = false;
+    }
+
+    /* Locks the submit form when the projected wait exceeds one hour.
+     * Uses data already fetched by karaoke_night_state — no extra round trip.
+     * waiting × slot_seconds gives total seconds of songs ahead; if that exceeds
+     * 3600 the queue is "full". The reopen time is when enough songs will have
+     * played that the backlog drops back to exactly one hour. */
+    function renderQueueFull(st) {
+      const note = document.getElementById('limitNote');
+      const btn  = document.getElementById('addBtn');
+      if (!note || !btn || !st) return;
+
+      const waiting = Number(st.waiting) || 0;
+      const pace    = Number(st.slot_seconds) || 300;
+      const projSec = waiting * pace;
+
+      if (projSec <= 3600) {
+        // Under the limit — let renderLimit() keep control of the button state
+        return;
+      }
+
+      // How many songs need to finish before the backlog is ≤ 1 hour?
+      // overSec = projSec - 3600  →  songs to go = ceil(overSec / pace)
+      let reopenText = '';
+      if (st.started && !st.paused) {
+        const overSec  = projSec - 3600;
+        const songsUntilOpen = Math.ceil(overSec / pace);
+        const reopenMs = Date.now() + songsUntilOpen * pace * 1000;
+        const reopenAt = new Date(reopenMs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        reopenText = ` — reopens around ${reopenAt}`;
+      }
+
+      note.hidden = false;
+      note.textContent = `Queue full (over 1 hour of songs ahead)${reopenText}. Check back soon!`;
+      btn.disabled = true;
     }
 
     /* The song on the mic, with a heart.
