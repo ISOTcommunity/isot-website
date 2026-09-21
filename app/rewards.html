@@ -168,6 +168,7 @@
     let eb = null;        // early_bird_status()
     let game = null;      // game_state(): rules, progress
     let board = [];       // game_leaderboard()
+    let trade = { open: false };  // trade_status(): only during Monday karaoke
     let clockTimer = null;
 
     // The device clock is not trusted: a member can set their phone to anything. Every
@@ -194,11 +195,12 @@
     }
 
     async function load() {
-      const [r, e, g, lb] = await Promise.all([
+      const [r, e, g, lb, ts] = await Promise.all([
         db.rpc('my_rewards'),
         db.rpc('early_bird_status'),
         db.rpc('game_state'),
         db.rpc('game_leaderboard', { p_limit: 10 }),
+        db.rpc('trade_status'),
       ]);
       if (r.error) {
         document.getElementById('panel').innerHTML =
@@ -207,6 +209,7 @@
       }
       data = r.data; eb = e.data || {};
       game = g.data || null; board = lb.data || [];
+      trade = (ts && ts.data) || { open: false };
       setServerNow(data.server_now || eb.server_now);
       render();
     }
@@ -241,10 +244,15 @@
               : `Enough for a shot — trade it below or keep saving`}
           </div>
 
-          ${data.balance >= cost ? `
+          ${data.balance >= cost && trade.open ? `
             <button type="button" class="btn btn-pink" id="btnExchange" style="width:100%;margin-top:14px">
-              <i class="fa-solid fa-right-left"></i> Trade ${cost} points for a shot
-            </button>` : ''}
+              <i class="fa-solid fa-right-left"></i> Trade ${cost} points for a shot at ${escapeHtml(trade.venue || 'the bar')}
+            </button>`
+          : data.balance >= cost ? `
+            <div class="dim" style="font-size:.76rem;margin-top:12px;line-height:1.5">
+              <i class="fa-solid fa-lock" style="color:#D4AF50"></i>
+              Trading opens during <strong style="color:#FFF">Monday karaoke at Rough</strong>.
+            </div>` : ''}
         </div>
 
         ${renderEarlyBird()}
@@ -331,7 +339,7 @@
         <div class="eyebrow" style="margin:22px 0 10px">Spend it</div>
         <div class="card card-glass" style="padding:6px 16px">
           ${rule('fa-martini-glass-citrus', 'A free shot', `${r.shot_cost} pts`,
-            'Trade points for a shot at Rough or Capodoglio. Kept for 30 days. Show the phone, the bartender taps.',
+            'Trade points for a shot during Monday karaoke at Rough — from when the doors open until the night ends. The shot is for that night only. Show the phone, the bartender taps.',
             null)}
           ${rule('fa-clock', 'Monday early bird', 'free',
             `Say <strong>going</strong> to karaoke before ${r.eb_deadline}, then open this page at the bar between
