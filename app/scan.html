@@ -208,8 +208,24 @@
     };
 
     async function initScanner() {
-      const me = await requireAuth({ staff: true });
+      // Venue partners scan too — validate_member_qr() was written for them — but only
+      // cards at their own bar. { staff: true } shut them out of this page entirely.
+      const me = await requireAuth();
+      const role = me.staff_role;
+      if (role !== 'volunteer' && role !== 'board' && role !== 'partner') {
+        denyAccess('This page is for volunteers, the board and partner venues.');
+        return;
+      }
       partnerVenueId = me.partner_venue_id || '00000000-0000-0000-0000-000000000000';
+
+      if (role === 'partner') {
+        // A bar has no door to run: straight to checking cards, no mode switch to get wrong.
+        scanMode = 'bar';
+        document.getElementById('scanMode').hidden = true;
+        document.getElementById('scanEvent').hidden = true;
+        startCamera();
+        return;
+      }
 
       document.querySelectorAll('.smode').forEach((b) => {
         b.onclick = () => {
