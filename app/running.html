@@ -447,6 +447,7 @@
 
       renderPills();
       selectRoute(0);
+      loadLastRunTrail();
 
       // Bind Timer Button
       document.getElementById('btnStartRun').addEventListener('click', startRun);
@@ -530,40 +531,52 @@
     }
 
     function renderMapRoute(route) {
-      if (currentPolyline) map.removeLayer(currentPolyline);
+      // Map stays plain — no pre-drawn routes. Shows live GPS trail during a run,
+      // or the user's last recorded run path on load.
+    }
+
+    function clearLastRunTrail() {
+      if (currentPolyline) { map.removeLayer(currentPolyline); currentPolyline = null; }
       currentMarkers.forEach(m => map.removeLayer(m));
       currentMarkers = [];
+    }
 
-      // Draw polyline
-      currentPolyline = L.polyline(route.points, {
-        color: route.color || '#43DB8F',
-        weight: 5,
-        opacity: 0.9,
-        lineCap: 'round',
-        lineJoin: 'round'
+    function drawTrailOnMap(coords, label) {
+      clearLastRunTrail();
+      if (!coords || coords.length < 2) return;
+
+      currentPolyline = L.polyline(coords, {
+        color: '#5787EA', weight: 4, opacity: 0.85, dashArray: '6, 8',
+        lineCap: 'round', lineJoin: 'round'
       }).addTo(map);
 
-      // Start Pin
+      // Start pin
       const startPin = L.divIcon({
         className: 'isot-pin-wrapper',
-        html: `<div class="isot-pin" style="background:#22C55E; box-shadow:0 0 16px rgba(34,197,94,0.8);"><i class="fa-solid fa-play"></i></div>`,
-        iconSize: [32, 32], iconAnchor: [16, 16]
+        html: `<div class="isot-pin" style="background:#22C55E;box-shadow:0 0 14px rgba(34,197,94,0.7);"><i class="fa-solid fa-play"></i></div>`,
+        iconSize: [28, 28], iconAnchor: [14, 14]
       });
-      const startMarker = L.marker(route.points[0], { icon: startPin }).addTo(map).bindPopup(`<b>Start Point</b><br>${escapeHtml(route.name)}`);
-      currentMarkers.push(startMarker);
+      currentMarkers.push(L.marker(coords[0], { icon: startPin }).addTo(map));
 
-      // Finish Pin
-      const endPoint = route.points[route.points.length - 1];
+      // Finish pin
       const finishPin = L.divIcon({
         className: 'isot-pin-wrapper',
         html: `<div class="isot-pin" style="background:var(--pink);"><i class="fa-solid fa-flag-checkered"></i></div>`,
-        iconSize: [32, 32], iconAnchor: [16, 16]
+        iconSize: [28, 28], iconAnchor: [14, 14]
       });
-      const finishMarker = L.marker(endPoint, { icon: finishPin }).addTo(map);
-      currentMarkers.push(finishMarker);
+      currentMarkers.push(L.marker(coords[coords.length - 1], { icon: finishPin }).addTo(map).bindPopup(label || 'Last run'));
 
-      // Fit map
-      map.fitBounds(currentPolyline.getBounds(), { padding: [35, 35], maxZoom: 16 });
+      map.fitBounds(currentPolyline.getBounds(), { padding: [40, 40], maxZoom: 17 });
+    }
+
+    async function loadLastRunTrail() {
+      const { data, error } = await db.rpc('my_last_run_path');
+      if (error || !data || !data.ok || !data.gps_path) {
+        // No prior run — center on Turin
+        map.setView([45.0703, 7.6869], 13);
+        return;
+      }
+      drawTrailOnMap(data.gps_path, `Last run · ${formatDuration(data.duration_seconds)}`);
     }
 
     // ── Data Fetching: Leaderboard, Personal History & Streak ─────────────────
@@ -849,9 +862,10 @@
       timerInterval = null;
       stopGpsTracking();
 
-      // Clear map runner layers
+      // Clear map runner layers, restore last saved trail
       if (runnerMarker) { map.removeLayer(runnerMarker); runnerMarker = null; }
       if (runnerTrailPolyline) { map.removeLayer(runnerTrailPolyline); runnerTrailPolyline = null; }
+      loadLastRunTrail();
 
       // Reset UI
       document.getElementById('timerDisplay').textContent = '00:00';
@@ -891,9 +905,12 @@
       }
 
       try {
+        const savedPath = gpsTrailCoords.length >= 2 ? gpsTrailCoords : null;
+
         const { data, error } = await db.rpc('log_run', {
           p_route_id: route.id,
-          p_seconds: finalSeconds
+          p_seconds: finalSeconds,
+          p_gps_path: savedPath ? JSON.stringify(savedPath) : null
         });
 
         if (error) {
@@ -901,6 +918,14 @@
           cancelRun();
           return;
         }
+
+        // Draw this run's trail on the map
+        if (runnerTrailPolyline) { map.removeLayer(runnerTrailPolyline); runnerTrailPolyline = null; }
+        if (runnerMarker) { map.removeLayer(runnerMarker); runnerMarker = null; }
+        if (savedPath) drawTrailOnMap(savedPath, `Your run · ${formatDuration(finalSeconds)}`);
+
+        // Update My Routes set
+        myRouteIds.add(route.id);
 
         // Show Modal
         showRunResultModal({
