@@ -217,6 +217,8 @@
 
   <main class="shell" style="padding-top:18px;padding-bottom:96px">
 
+    <div id="alertBox"></div>
+
     <div style="margin-bottom: 14px;">
       <div class="eyebrow"><i class="fa-solid fa-fire text-pink"></i> ISOT Athletics &amp; Outdoor</div>
       <h1 style="font-size: 1.75rem; margin-top: 4px;">Turin Running Club</h1>
@@ -325,7 +327,7 @@
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
       Calendar
     </a>
-    <a href="partner.html" class="tab-item active">
+    <a href="partner.html" class="tab-item">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
       Map
     </a>
@@ -857,7 +859,7 @@
         });
 
         if (error) {
-          alert('Could not save your run: ' + error.message);
+          setAlert(document.getElementById('alertBox'), 'Could not save your run: ' + error.message, 'error');
           cancelRun();
           return;
         }
@@ -872,7 +874,7 @@
         });
 
       } catch (err) {
-        alert('Network error saving run: ' + err.message);
+        setAlert(document.getElementById('alertBox'), 'Network error saving run: ' + err.message, 'error');
         cancelRun();
       }
     }
