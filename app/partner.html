@@ -678,7 +678,7 @@
       }
 
       located.forEach(v => {
-        const isClub = /club|zenit/i.test(v.name);
+        const isClub = /club/i.test(v.name);
         const on = tonightByVenue[v.name];
 
         const cls = on ? (on.live ? 'live' : 'tonight') : (isClub ? 'party' : '');
