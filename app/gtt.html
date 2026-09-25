@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-N2S3FL84RT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-N2S3FL84RT');
+</script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>GTT & Strikes · ISOT Community</title>
+
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="../assets/favicon.png" sizes="48x48" type="image/png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-title" content="ISOT" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#000000" />
+  <script defer src="/_vercel/insights/script.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/app.css" />
+
+  <style>
+    .gtt-hero {
+      background: linear-gradient(145deg, rgba(87,135,234,0.14), rgba(14,14,19,0.9));
+      border: 1px solid rgba(87,135,234,0.3);
+      border-radius: 24px;
+      padding: 18px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .gtt-hero .hero-icon {
+      width: 48px; height: 48px; flex-shrink: 0;
+      border-radius: 14px;
+      background: rgba(87,135,234,0.18); color: var(--c-sky-blue);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+    }
+    .gtt-hero .hero-icon i, .strike-icon i, .link-row .link-icon i {
+      display: inline-flex; align-items: center; justify-content: center; line-height: 1; margin: 0; padding: 0;
+    }
+    .gtt-hero.is-alert {
+      background: linear-gradient(145deg, rgba(243,108,81,0.16), rgba(14,14,19,0.9));
+      border-color: rgba(243,108,81,0.45);
+    }
+    .gtt-hero.is-alert .hero-icon { background: rgba(243,108,81,0.18); color: var(--red); }
+
+    .strike {
+      display: flex; gap: 12px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border-light);
+      margin-bottom: 10px;
+    }
+    .strike.gtt { border-color: rgba(243,108,81,0.35); }
+    .strike-date {
+      width: 52px; flex-shrink: 0; text-align: center;
+      border-radius: 12px; padding: 6px 0;
+      background: rgba(255,255,255,0.05);
+      line-height: 1.1;
+    }
+    .strike-date .d { font-size: 1.3rem; font-weight: 800; color: #FFF; font-variant-numeric: tabular-nums; }
+    .strike-date .m { font-size: 0.66rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+    .strike-date.soon { background: rgba(243,108,81,0.16); }
+    .strike-date.soon .m { color: var(--red); }
+    .strike-body { flex: 1; min-width: 0; }
+    .strike-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .strike-kind { font-size: 0.9rem; font-weight: 700; color: #FFF; display: inline-flex; align-items: center; gap: 7px; }
+    .strike-kind i { color: var(--text-muted); font-size: 0.85rem; }
+    .scope-chip {
+      font-size: 0.64rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 2px 8px; border-radius: 9999px;
+      background: rgba(255,255,255,0.06); color: var(--text-muted);
+    }
+    .strike-title { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; line-height: 1.4; }
+    .strike-note { font-size: 0.76rem; color: var(--text-dim); margin-top: 4px; line-height: 1.4; }
+    .strike-guarantee { font-size: 0.74rem; color: var(--green); margin-top: 6px; font-weight: 600; }
+
+    .link-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+      text-decoration: none;
+      margin-bottom: 10px;
+    }
+    .link-row .link-icon {
+      width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+    .link-row .link-title { font-size: 0.88rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .link-row .link-sub { font-size: 0.72rem; color: var(--text-dim); }
+    .link-row .link-arrow { margin-left: auto; color: var(--text-dim); }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display:flex;align-items:center;gap:8px">
+      <i class="fa-solid fa-bus text-pink"></i>
+      <span>GTT &amp; Strikes</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div id="headerAvatar" style="cursor:pointer" data-open-drawer></div>
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background:transparent;border:none;color:#FFF;font-size:1.3rem;cursor:pointer;padding:6px">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="shell" style="padding-top:18px;padding-bottom:96px">
+
+    <div style="margin-bottom: 14px;">
+      <div class="eyebrow">Getting around Turin</div>
+      <h1 style="font-size: 1.75rem; margin-top: 4px;">GTT &amp; Strikes</h1>
+      <p style="color: var(--text-dim); font-size: 0.88rem; margin-top: 4px;">Buses, trams and metro, plus the train and flight strikes that affect you in Turin.</p>
+    </div>
+
+    <div id="gttHero" class="gtt-hero">
+      <div class="hero-icon"><i class="fa-solid fa-bus"></i></div>
+      <div>
+        <div id="heroTitle" style="font-size:1rem;font-weight:700;color:#FFF;">Checking for strikes…</div>
+        <div id="heroSub" style="font-size:0.78rem;color:var(--text-dim);margin-top:2px;"></div>
+      </div>
+    </div>
+
+    <div class="eyebrow" style="margin:6px 0 10px">Upcoming strikes</div>
+    <div id="strikeList"><div class="dim" style="text-align:center;padding:16px"><div class="spinner"></div></div></div>
+    <p id="strikeSource" class="dim" style="font-size:0.72rem;line-height:1.5;margin:4px 0 22px"></p>
+
+    <div class="eyebrow" style="margin:0 0 10px">Useful</div>
+    <a class="link-row" href="https://www.google.com/maps/dir/?api=1&travelmode=transit" target="_blank" rel="noopener">
+      <div class="link-icon" style="background:rgba(67,219,143,0.16);color:var(--green)"><i class="fa-solid fa-route"></i></div>
+      <div style="min-width:0"><div class="link-title">Plan a trip</div><div class="link-sub">Buses, trams and metro in Google Maps</div></div>
+      <span class="link-arrow">↗</span>
+    </a>
+    <a class="link-row" href="../turin-public-transport-gtt-student-pass.html">
+      <div class="link-icon" style="background:rgba(212,90,232,0.16);color:var(--pink)"><i class="fa-solid fa-ticket"></i></div>
+      <div style="min-width:0"><div class="link-title">Tickets &amp; student pass</div><div class="link-sub">ISOT guide to GTT fares for students</div></div>
+      <span class="link-arrow">→</span>
+    </a>
+    <a class="link-row" href="https://www.gtt.to.it" target="_blank" rel="noopener">
+      <div class="link-icon" style="background:rgba(87,135,234,0.16);color:var(--c-sky-blue)"><i class="fa-solid fa-bus"></i></div>
+      <div style="min-width:0"><div class="link-title">GTT official site</div><div class="link-sub">Timetables, service changes, news</div></div>
+      <span class="link-arrow">↗</span>
+    </a>
+    <a class="link-row" href="https://scioperi.mit.gov.it/mit2/public/scioperi" target="_blank" rel="noopener">
+      <div class="link-icon" style="background:rgba(230,147,33,0.16);color:var(--c-amber)"><i class="fa-solid fa-landmark"></i></div>
+      <div style="min-width:0"><div class="link-title">Official strike register</div><div class="link-sub">Ministry of Transport, all of Italy</div></div>
+      <span class="link-arrow">↗</span>
+    </a>
+
+  </main>
+
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="tabbar">
+    <a href="home.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </a>
+    <a href="events.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Calendar
+    </a>
+    <a href="partner.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+      Map
+    </a>
+    <a href="rewards.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+      Game
+    </a>
+    <a href="running.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      Run
+    </a>
+  </nav>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+  <script src="js/transport.js"></script>
+
+  <script>
+    function strikeCard(s) {
+      const k = STRIKE_KIND[s.kind];
+      const d = new Date(s.date + 'T12:00:00');
+      const today = romeDateStr();
+      const soon = s.date <= romeDateStr(new Date(Date.now() + 2 * 864e5));
+      const days = s.end && s.end !== s.date
+        ? ` to ${new Date(s.end + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}` : '';
+      return `
+        <div class="strike ${affectsGtt(s) ? 'gtt' : ''}">
+          <div class="strike-date ${soon ? 'soon' : ''}">
+            <div class="d">${d.getDate()}</div>
+            <div class="m">${s.date <= today ? 'Today' : d.toLocaleDateString('en-GB', { month: 'short' })}</div>
+          </div>
+          <div class="strike-body">
+            <div class="strike-top">
+              <span class="strike-kind"><i class="fa-solid ${k.icon}"></i>${k.label}</span>
+              <span class="scope-chip">${STRIKE_SCOPE[s.scope] || ''}</span>
+            </div>
+            <div class="strike-title">${escapeHtml(strikeDayLabel(s.date))}${days}${s.title ? ' · ' + escapeHtml(s.title) : ''}</div>
+            ${s.note ? `<div class="strike-note">${escapeHtml(s.note)}</div>` : ''}
+            ${affectsGtt(s) ? `<div class="strike-guarantee"><i class="fa-solid fa-shield-halved"></i> ${GTT_GUARANTEED}</div>` : ''}
+          </div>
+        </div>`;
+    }
+
+    async function initGtt() {
+      const me = await requireAuth();
+      document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(me, 36);
+
+      const result = await loadStrikes();
+      const list = result.strikes;
+      const listEl = document.getElementById('strikeList');
+      listEl.innerHTML = list.length
+        ? list.map(strikeCard).join('')
+        : `<div style="text-align:center;padding:20px 16px;color:var(--text-dim);font-size:0.86rem;background:rgba(255,255,255,0.02);border-radius:16px;border:1px dashed var(--border-light);">
+             No strikes announced that affect Turin in the next weeks.
+           </div>`;
+
+      const status = gttStatusHtml(result);
+      const hero = document.getElementById('gttHero');
+      hero.classList.toggle('is-alert', status.alert);
+      const next = list.find(affectsGtt);
+      document.getElementById('heroTitle').textContent = status.alert
+        ? 'Strike coming up'
+        : 'No GTT strike in the next days';
+      document.getElementById('heroSub').textContent = next
+        ? `Next GTT strike: ${strikeDayLabel(next.date)}. ${GTT_GUARANTEED}`
+        : 'Buses, trams and metro: nothing announced.';
+
+      const checked = result.checkedAt
+        ? new Date(result.checkedAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : null;
+      document.getElementById('strikeSource').textContent = result.autoOk
+        ? `From the Ministry of Transport's official strike register${checked ? ', checked at ' + checked : ''}, plus ISOT's own notes. Strikes can be cancelled or changed, so check again before you travel.`
+        : `From ISOT's own list. The official register could not be reached just now. Strikes can be cancelled or changed, so check again before you travel.`;
+    }
+
+    document.addEventListener('DOMContentLoaded', initGtt);
+  </script>
+</body>
+</html>

@@ -279,6 +279,50 @@
       line-height: 1; margin: 0; padding: 0;
       background: rgba(212, 90, 232, 0.15); color: var(--pink); font-size: 0.82rem;
     }
+  
+    /* Today in Turin: weather report, weather advice, GTT strike status */
+    .tit-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+    }
+    .tit-weather { display: flex; align-items: center; gap: 12px; }
+    .tit-wicon {
+      width: 44px; height: 44px; flex-shrink: 0; border-radius: 14px;
+      background: rgba(255,255,255,0.05);
+      display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem;
+    }
+    .tit-wicon i, .tit-tip i, .tit-gtt i { display: inline-flex; align-items: center; justify-content: center; line-height: 1; margin: 0; padding: 0; }
+    .tit-temp { font-size: 1.35rem; font-weight: 800; color: #FFF; line-height: 1.1; font-variant-numeric: tabular-nums; }
+    .tit-temp span { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-left: 4px; }
+    .tit-meta { font-size: 0.74rem; color: var(--text-dim); margin-top: 3px; font-variant-numeric: tabular-nums; }
+    .tit-tip {
+      display: flex; align-items: flex-start; gap: 10px;
+      margin-top: 10px; padding: 10px 12px; border-radius: 14px;
+      font-size: 0.84rem; font-weight: 600; color: #FFF; line-height: 1.4;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border-light);
+    }
+    .tit-tip i { width: 20px; height: 20px; flex-shrink: 0; font-size: 0.95rem; }
+    .tit-tip-rain, .tit-tip-snow { background: rgba(87,135,234,0.14); border-color: rgba(87,135,234,0.4); }
+    .tit-tip-rain i, .tit-tip-snow i { color: var(--c-sky-blue); }
+    .tit-tip-jacket, .tit-tip-cold { background: rgba(187,193,249,0.10); border-color: rgba(187,193,249,0.32); }
+    .tit-tip-jacket i, .tit-tip-cold i { color: var(--c-lavender); }
+    .tit-tip-hot { background: rgba(230,147,33,0.12); border-color: rgba(230,147,33,0.4); }
+    .tit-tip-hot i { color: var(--c-amber); }
+    .tit-gtt {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-light);
+      font-size: 0.8rem; color: var(--text-muted); text-decoration: none;
+    }
+    .tit-gtt i { width: 20px; height: 20px; flex-shrink: 0; color: var(--text-dim); }
+    .tit-gtt span { flex: 1; min-width: 0; }
+    .tit-gtt .go { flex: 0 0 auto; color: var(--text-dim); font-size: 0.75rem; }
+    .tit-gtt.is-alert { color: #FFF; }
+    .tit-gtt.is-alert i:first-child { color: var(--red); }
+    .tit-gtt.is-alert strong { color: var(--red); }
+    .tit-gtt[hidden] { display: none; }
   </style>
 </head>
 <body>
@@ -346,6 +390,13 @@
 
     <!-- MEMBER / COMMUNITY ORDINARY HOME VIEW -->
     <div id="memberHomeView">
+
+      <!-- Today in Turin: the weather, what to take with you, and whether GTT is on
+           strike. Hidden until something loads, so a failed forecast leaves no box. -->
+      <div id="todayTurin" class="tit-card" hidden>
+        <div id="titWeather"></div>
+        <a id="titGtt" class="tit-gtt" href="gtt.html" hidden></a>
+      </div>
 
       <!-- The next three nights. The first with its poster, the other two compact. -->
       <div id="featuredNight" hidden style="margin-bottom:18px"></div>
@@ -515,6 +566,8 @@
 
   <script src="vendor/supabase.js"></script>
   <script src="js/isot.js"></script>
+  <script src="js/weather.js"></script>
+  <script src="js/transport.js"></script>
 
   <script>
     // Was five hardcoded events. Now the same source as the calendar page, so the
@@ -626,6 +679,28 @@
       } catch (_) { /* never block the home page on this */ }
     }
 
+    // Weather and strikes load side by side; either can fail without the other
+    async function loadTodayInTurin() {
+      const card = document.getElementById('todayTurin');
+      const weatherEl = document.getElementById('titWeather');
+      const gttEl = document.getElementById('titGtt');
+      const show = () => { card.hidden = false; };
+
+      loadTurinWeather()
+        .then(data => { weatherEl.innerHTML = renderWeatherHtml(data); show(); })
+        .catch(() => { weatherEl.innerHTML = ''; });
+
+      loadStrikes()
+        .then(result => {
+          const st = gttStatusHtml(result);
+          gttEl.innerHTML = st.html + '<i class="fa-solid fa-chevron-right go"></i>';
+          gttEl.classList.toggle('is-alert', st.alert);
+          gttEl.hidden = false;
+          show();
+        })
+        .catch(() => {});
+    }
+
     async function initHome() {
       try {
         meProfile = await requireAuth();
@@ -652,6 +727,7 @@
 
         renderFeaturedNight();
         loadTodayCard();
+        loadTodayInTurin();
 
         // Once the page is actually showing something, never over a spinner.
 
