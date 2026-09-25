@@ -48,71 +48,6 @@
     }
     .leaflet-control-attribution a { color: var(--text-dim) !important; }
 
-    .route-selector {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 8px;
-      margin-bottom: 16px;
-      -webkit-overflow-scrolling: touch;
-    }
-    .route-selector::-webkit-scrollbar { display: none; }
-    
-    .route-pill {
-      flex-shrink: 0;
-      padding: 8px 16px;
-      border-radius: 9999px;
-      background: var(--bg-raised);
-      border: 1px solid var(--border-light);
-      color: var(--text-muted);
-      font-family: inherit;
-      font-size: 0.84rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-height: 44px;
-      touch-action: manipulation;
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease;
-    }
-    .route-pill:active { transform: scale(0.95); }
-    .route-pill .pill-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
-    .route-pill .pill-meta { font-size: 0.68rem; font-weight: 600; color: var(--text-dim); font-variant-numeric: tabular-nums; }
-    .route-pill .pill-done { color: var(--green); font-size: 0.72rem; }
-    .route-pill.active {
-      background: linear-gradient(135deg, var(--pink), var(--gold));
-      border-color: transparent;
-      color: #FFF;
-      box-shadow: 0 6px 18px rgba(212, 90, 232, 0.35);
-    }
-    .route-pill.active .pill-meta, .route-pill.active .pill-done { color: rgba(255,255,255,0.85); }
-
-    /* Filter toggle ("My routes") — state lives on aria-pressed, not inline styles */
-    .filter-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      min-height: 36px;
-      padding: 6px 14px;
-      border-radius: 9999px;
-      background: transparent;
-      border: 1px solid var(--border-light);
-      color: var(--text-dim);
-      font-family: inherit;
-      font-size: 0.78rem;
-      font-weight: 600;
-      cursor: pointer;
-      touch-action: manipulation;
-      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
-    }
-    .filter-toggle:active { transform: scale(0.95); }
-    .filter-toggle[aria-pressed="true"] {
-      background: var(--pink);
-      border-color: var(--pink);
-      color: var(--on-accent);
-    }
-
     /* Secondary button — outline on the card surface (app.css has no .btn-secondary) */
     .btn-secondary {
       background: rgba(255, 255, 255, 0.04);
@@ -284,6 +219,100 @@
       0% { transform: scale(0.92); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
+
+    /* Start sheet: two big choices after tapping Start Run */
+    .mode-option {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+      font-family: inherit;
+      text-align: left;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease, background-color 0.2s ease;
+    }
+    .mode-option + .mode-option { margin-top: 10px; }
+    .mode-option:active { transform: scale(0.97); }
+    .mode-option .mode-icon {
+      width: 46px; height: 46px; flex-shrink: 0;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem;
+    }
+    .mode-option .mode-icon i { display: inline-flex; align-items: center; justify-content: center; line-height: 1; margin: 0; padding: 0; }
+    .mode-option .mode-title { font-size: 1rem; font-weight: 700; color: #FFF; }
+    .mode-option .mode-sub { font-size: 0.78rem; color: var(--text-dim); margin-top: 2px; line-height: 1.4; }
+    .mode-option .mode-arrow { margin-left: auto; color: var(--text-dim); }
+
+    /* Routes sheet: the club routes packed into one page */
+    #routesSheet .modal-sheet { max-height: 92vh; padding-top: 14px; }
+    .sheet-grip { width: 40px; height: 4px; border-radius: 9999px; background: rgba(255,255,255,0.18); margin: 0 auto 14px; }
+    .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    .sheet-close {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border-light);
+      color: var(--text-main); font-size: 1rem; cursor: pointer; flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .sheet-close i { display: inline-flex; align-items: center; justify-content: center; line-height: 1; margin: 0; padding: 0; }
+    .route-item {
+      position: relative;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 16px 16px 16px 20px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .route-item::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+      background: var(--route-color, var(--pink));
+    }
+    .route-item.done { border-color: rgba(67, 219, 143, 0.35); }
+    .route-item .route-title { font-size: 1.02rem; font-weight: 700; color: #FFF; line-height: 1.3; }
+    .route-item .route-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 0.76rem; color: var(--text-muted); font-weight: 600; margin-top: 6px; font-variant-numeric: tabular-nums; }
+    .route-item .route-meta i { color: var(--text-dim); margin-right: 4px; }
+    .route-item .route-desc { font-size: 0.8rem; color: var(--text-dim); line-height: 1.45; margin-top: 8px; }
+    .route-item .route-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .route-item .route-actions .btn { padding: 11px 12px; min-height: 42px; font-size: 0.86rem; }
+    .route-item .route-actions .btn-icon { width: 42px; flex: 0 0 42px; padding: 0; }
+    .route-done-badge {
+      position: absolute; top: 12px; right: 12px;
+      font-size: 0.68rem; font-weight: 700; color: var(--green);
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+
+    /* Route chip: which route the stats cards are showing */
+    .route-chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      max-width: 100%;
+      padding: 7px 12px 7px 14px;
+      border-radius: 9999px;
+      background: var(--bg-raised);
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+      font-family: inherit; font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; touch-action: manipulation;
+    }
+    .route-chip span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .route-chip i { color: var(--text-dim); font-size: 0.7rem; }
+    .route-chip .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--route-color, var(--pink)); flex-shrink: 0; }
+
+    /* Compact "browse routes" row under the Start button */
+    .start-sub {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 12px;
+      background: transparent; border: none; color: var(--text-dim);
+      font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+      width: 100%; padding: 6px;
+    }
+    .start-sub:active { color: var(--text-main); }
   </style>
 </head>
 <body>
@@ -312,7 +341,7 @@
     <div style="margin-bottom: 14px;">
       <div class="eyebrow"><i class="fa-solid fa-fire text-pink"></i> ISOT Athletics &amp; Outdoor</div>
       <h1 style="font-size: 1.75rem; margin-top: 4px;">Turin Running Club</h1>
-      <p style="color: var(--text-dim); font-size: 0.88rem; margin-top: 4px;">Track fixed routes with GPS, earn game points, beat your personal records, and climb the club leaderboard.</p>
+      <p style="color: var(--text-dim); font-size: 0.88rem; margin-top: 4px;">Run anywhere with GPS, or race one of the ISOT routes. Earn game points, beat your records, and climb the club leaderboard.</p>
     </div>
 
     <!-- Weekly Streak Banner -->
@@ -329,25 +358,14 @@
       <div id="streakVal" style="font-size:1.45rem; font-weight:800; color:var(--pink); font-variant-numeric:tabular-nums;">0w</div>
     </div>
 
-    <!-- Route Filter Toggle -->
-    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px;">
-      <div class="eyebrow" style="margin:0;">Choose a route</div>
-      <button type="button" id="btnMyRoutes" class="filter-toggle" aria-pressed="false" onclick="toggleMyRoutes()">
-        <i class="fa-solid fa-person-running"></i> My routes
-      </button>
-    </div>
-
-    <!-- Route Selector Pills -->
-    <div class="route-selector" id="routePills"></div>
-
-    <!-- Interactive Route Map -->
+    <!-- Live Map -->
     <div id="runMap"></div>
 
     <!-- GPS Timer & Live Tracker Card -->
     <div class="route-card" id="timerCard" style="border:1px solid var(--border-glow); position:relative;">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
         <span class="badge" style="background:rgba(67,219,143,0.15); color:var(--green); border:1px solid rgba(67,219,143,0.3);">
-          <i class="fa-solid fa-stopwatch"></i> Route Timer &amp; GPS
+          <i class="fa-solid fa-stopwatch"></i> Run Timer &amp; GPS
         </span>
         <span id="gpsStatusBadge" role="status" aria-live="polite" style="font-size:0.75rem; color:var(--text-dim); font-weight:600; display:flex; align-items:center; gap:5px;">
           <i class="fa-solid fa-satellite-dish"></i> GPS Standby
@@ -374,7 +392,7 @@
           <div class="stat-val" id="livePace" style="color:var(--gold);">--:--</div>
           <div class="stat-lbl">Pace /km</div>
         </div>
-        <div>
+        <div id="liveTargetCell">
           <div class="stat-val" id="liveTarget" style="color:var(--green); font-size:1.05rem;">--</div>
           <div class="stat-lbl">Target</div>
         </div>
@@ -385,15 +403,16 @@
       </div>
 
       <!-- Timer Action Controls -->
-      <div id="timerControls">
-        <button type="button" id="btnStartRun" class="btn btn-pink" style="width:100%; justify-content:center; padding:13px; font-size:1rem; font-weight:700;">
-          <i class="fa-solid fa-play"></i> Start Run
-        </button>
-      </div>
+      <div id="timerControls"></div>
     </div>
 
-    <!-- Active Route Detail Card -->
-    <div class="route-card" id="routeCard"></div>
+    <!-- Route Stats: performance + leaderboard for one route -->
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin:6px 0 12px;">
+      <div class="eyebrow" style="margin:0; flex-shrink:0;">Route stats</div>
+      <button type="button" id="focusRouteChip" class="route-chip" onclick="openRoutesSheet('browse')" title="Change route">
+        <span class="dot"></span><span id="focusRouteName">Route</span><i class="fa-solid fa-chevron-down"></i>
+      </button>
+    </div>
 
     <!-- Personal Performance Card -->
     <div class="route-card" id="historyCard">
@@ -443,19 +462,77 @@
     </a>
   </nav>
 
+  <!-- Start Sheet: free run or ISOT route -->
+  <div id="startSheet" class="modal-backdrop" onclick="closeStartSheet()" role="dialog" aria-modal="true" aria-labelledby="startSheetTitle">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="sheet-grip"></div>
+      <div class="sheet-head">
+        <div>
+          <h3 id="startSheetTitle" style="font-size:1.2rem; color:#FFF;">How do you want to run?</h3>
+          <p style="color:var(--text-dim); font-size:0.82rem; margin-top:2px;">Both count for your weekly streak and game points.</p>
+        </div>
+        <button type="button" class="sheet-close" onclick="closeStartSheet()" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <button type="button" class="mode-option" onclick="chooseFreeRun()">
+        <div class="mode-icon" style="background:rgba(87,135,234,0.16); color:var(--c-sky-blue);"><i class="fa-solid fa-location-arrow"></i></div>
+        <div>
+          <div class="mode-title">Free run</div>
+          <div class="mode-sub">Run anywhere. GPS tracks your distance, pace and trail on the map.</div>
+        </div>
+        <i class="fa-solid fa-chevron-right mode-arrow"></i>
+      </button>
+      <button type="button" class="mode-option" onclick="chooseIsotRoute()">
+        <div class="mode-icon" style="background:rgba(212,90,232,0.16); color:var(--pink);"><i class="fa-solid fa-route"></i></div>
+        <div>
+          <div class="mode-title">ISOT route</div>
+          <div class="mode-sub">Pick one of the club routes and race the leaderboard for a personal record.</div>
+        </div>
+        <i class="fa-solid fa-chevron-right mode-arrow"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Routes Sheet: all ISOT routes in one page -->
+  <div id="routesSheet" class="modal-backdrop" onclick="closeRoutesSheet()" role="dialog" aria-modal="true" aria-labelledby="routesSheetTitle">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="sheet-grip"></div>
+      <div class="sheet-head">
+        <div>
+          <h3 id="routesSheetTitle" style="font-size:1.2rem; color:#FFF;">ISOT Routes</h3>
+          <p id="routesSheetSub" style="color:var(--text-dim); font-size:0.82rem; margin-top:2px;">Measured club routes around Turin.</p>
+        </div>
+        <button type="button" class="sheet-close" onclick="closeRoutesSheet()" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="routesList"></div>
+    </div>
+  </div>
+
+  <!-- In-app Confirm Sheet -->
+  <div id="confirmSheet" class="modal-backdrop" onclick="resolveConfirm(false)" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <h3 id="confirmTitle" style="font-size:1.15rem; color:#FFF; margin-bottom:6px;"></h3>
+      <p id="confirmBody" style="color:var(--text-dim); font-size:0.88rem; line-height:1.5;"></p>
+      <div class="confirm-actions">
+        <button type="button" id="confirmCancel" class="btn btn-secondary" onclick="resolveConfirm(false)">Keep going</button>
+        <button type="button" id="confirmOk" class="btn btn-danger" onclick="resolveConfirm(true)">Confirm</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Run Result Celebration Modal -->
   <div id="runResultModal" class="run-modal-backdrop" style="display:none;">
     <div class="run-modal">
       <div style="width:58px; height:58px; border-radius:50%; background:rgba(67,219,143,0.18); color:var(--green); display:inline-flex; align-items:center; justify-content:center; font-size:1.6rem; margin-bottom:12px;">
         <i class="fa-solid fa-flag-checkered"></i>
       </div>
-      <h2 style="font-size:1.45rem; color:#FFF; margin-bottom:4px;">Run Completed!</h2>
+      <h2 id="modalTitle" style="font-size:1.45rem; color:#FFF; margin-bottom:4px;">Run Completed!</h2>
       <p id="modalRouteName" style="color:var(--text-muted); font-size:0.86rem; margin-bottom:14px;"></p>
 
       <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-light); border-radius:18px; padding:14px; margin-bottom:16px;">
         <div style="font-size:0.72rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Official Time</div>
         <div id="modalRunTime" style="font-size:2.5rem; font-weight:800; color:#FFF; font-variant-numeric:tabular-nums; margin:2px 0;">00:00</div>
-        <div id="modalPbBadge" style="display:none; margin-top:4px;">
+        <div id="modalDistance" style="font-size:0.82rem; color:var(--text-muted); font-weight:600; font-variant-numeric:tabular-nums;"></div>
+        <div id="modalPbBadge" style="display:none; margin-top:6px;">
           <span class="badge" style="background:rgba(201,128,26,0.22); color:var(--gold); border:1px solid rgba(201,128,26,0.45); padding:4px 10px; font-size:0.8rem;">
             <i class="fa-solid fa-medal"></i> New Personal Record!
           </span>
@@ -479,18 +556,6 @@
     </div>
   </div>
 
-  <!-- In-app Confirm Sheet -->
-  <div id="confirmSheet" class="modal-backdrop" onclick="resolveConfirm(false)" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <h3 id="confirmTitle" style="font-size:1.15rem; color:#FFF; margin-bottom:6px;"></h3>
-      <p id="confirmBody" style="color:var(--text-dim); font-size:0.88rem; line-height:1.5;"></p>
-      <div class="confirm-actions">
-        <button type="button" id="confirmCancel" class="btn btn-secondary" onclick="resolveConfirm(false)">Keep going</button>
-        <button type="button" id="confirmOk" class="btn btn-danger" onclick="resolveConfirm(true)">Confirm</button>
-      </div>
-    </div>
-  </div>
-
   <script src="vendor/supabase.js"></script>
   <script src="vendor/leaflet.js"></script>
   <script src="js/isot.js"></script>
@@ -498,11 +563,18 @@
 
   <script>
     const ROUTES = RUNNING_ROUTES;
+    // Route id logged for a run that is not on a club route. The run RPCs take the
+    // route id as free text, so a free run is just another id in the same table.
+    const FREE_RUN_ID = 'free-run';
 
     let map = null;
     let currentPolyline = null;
     let currentMarkers = [];
-    let selectedRouteIndex = 0;
+
+    // Which route the stats cards show (never the free-run pseudo route)
+    let focusRoute = ROUTES[0];
+    // Route being run right now; null while a free run is in progress
+    let activeRoute = null;
 
     // Run Tracker State
     let isRunning = false;
@@ -521,7 +593,6 @@
     // User & Data Cache
     let currentUser = null;
     let myRouteIds = new Set();
-    let myRoutesOnly = false;
     let wakeLock = null;
 
     // ── In-app confirm (no native confirm() — it looks foreign inside the PWA) ──
@@ -566,63 +637,94 @@
       e.returnValue = '';
     });
 
-    function toggleMyRoutes() {
-      myRoutesOnly = !myRoutesOnly;
-      document.getElementById('btnMyRoutes').setAttribute('aria-pressed', String(myRoutesOnly));
-      renderPills();
-      // If currently selected route is now hidden, pick first visible
-      const visibleRoutes = ROUTES.filter((r, i) => !myRoutesOnly || myRouteIds.has(r.id));
-      if (visibleRoutes.length > 0) {
-        const newIdx = ROUTES.indexOf(visibleRoutes[0]);
-        if (myRoutesOnly && !myRouteIds.has(ROUTES[selectedRouteIndex].id)) selectRoute(newIdx);
-      }
-    }
-
+    // ── Page init ─────────────────────────────────────────────────────────────
     async function initRunningPage() {
       currentUser = await requireAuth();
       document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(currentUser, 36);
-
-      // Fetch routes this user has run
-      const { data: runData } = await db.rpc('my_all_route_ids');
-      if (runData) myRouteIds = new Set(runData.map(r => r.route_id));
 
       // Initialize Leaflet Map — view set at once so tiles load while the last-run RPC is in flight
       map = L.map('runMap', { zoomControl: false, attributionControl: false });
       L.control.attribution({ prefix: false, position: 'bottomright' }).addAttribution('&copy; OSM').addTo(map);
       map.setView([45.0703, 7.6869], 13);
-
       isotBasemap(map);
 
-      renderPills();
-      selectRoute(0);
-      loadLastRunTrail();
+      resetTimerCard();
+      setFocusRoute(focusRoute, { load: false });
 
-      // Bind Timer Button
-      document.getElementById('btnStartRun').addEventListener('click', startRun);
+      // Routes this user has run, then the last trail (which may name the route to focus)
+      const { data: runData } = await db.rpc('my_all_route_ids');
+      if (runData) myRouteIds = new Set(runData.map(r => r.route_id));
+      renderRoutesList();
+
+      await loadLastRunTrail();
+      loadRouteData(focusRoute.id);
     }
 
-    function renderPills() {
-      const container = document.getElementById('routePills');
-      const visible = ROUTES.filter(r => !myRoutesOnly || myRouteIds.has(r.id));
-      if (visible.length === 0) {
-        container.innerHTML = `<span style="color:var(--text-dim);font-size:0.82rem;padding:6px 4px;">No routes run yet — complete your first run to see it here.</span>`;
-        return;
-      }
-      container.innerHTML = visible.map(r => {
-        const idx = ROUTES.indexOf(r);
+    // ── Start flow: Start Run → free run or ISOT route ────────────────────────
+    function openStartSheet() {
+      if (isRunning) return;
+      document.getElementById('startSheet').classList.add('active');
+    }
+    function closeStartSheet() {
+      document.getElementById('startSheet').classList.remove('active');
+    }
+    function chooseFreeRun() {
+      closeStartSheet();
+      startRun(null);
+    }
+    function chooseIsotRoute() {
+      closeStartSheet();
+      openRoutesSheet('start');
+    }
+
+    // ── Routes sheet ──────────────────────────────────────────────────────────
+    function openRoutesSheet(mode = 'browse') {
+      const starting = mode === 'start';
+      document.getElementById('routesSheetTitle').textContent = starting ? 'Pick your route' : 'ISOT Routes';
+      document.getElementById('routesSheetSub').textContent = starting
+        ? 'The timer starts as soon as you choose.'
+        : 'Measured club routes around Turin. Tap a route for its leaderboard.';
+      renderRoutesList();
+      const sheet = document.getElementById('routesSheet');
+      sheet.classList.add('active');
+      sheet.querySelector('.modal-sheet').scrollTop = 0;
+    }
+    function closeRoutesSheet() {
+      document.getElementById('routesSheet').classList.remove('active');
+    }
+
+    function renderRoutesList() {
+      const el = document.getElementById('routesList');
+      el.innerHTML = ROUTES.map((r, idx) => {
         const done = myRouteIds.has(r.id);
-        return `<button type="button" class="route-pill ${idx === selectedRouteIndex ? 'active' : ''}" onclick="onRoutePillClick(${idx})" aria-pressed="${idx === selectedRouteIndex}">
-          ${done ? '<i class="fa-solid fa-circle-check pill-done" title="You have run this route"></i>' : '<i class="fa-solid fa-person-running"></i>'}
-          <span class="pill-text">
-            <span>${escapeHtml(r.shortName)}</span>
-            <span class="pill-meta">${escapeHtml(r.distance)} · ${escapeHtml(r.difficulty.split(' / ')[0])}</span>
-          </span>
-        </button>`;
+        const isFocus = r.id === focusRoute.id;
+        return `
+          <div class="route-item ${done ? 'done' : ''}" style="--route-color:${r.color}">
+            ${done ? '<span class="route-done-badge"><i class="fa-solid fa-circle-check"></i> Done</span>' : ''}
+            <div class="route-title">${escapeHtml(r.name)}</div>
+            <div class="route-meta">
+              <span><i class="fa-solid fa-ruler-horizontal"></i>${escapeHtml(r.distance)}</span>
+              <span><i class="fa-solid fa-mountain"></i>${escapeHtml(r.elevation)}</span>
+              <span><i class="fa-solid fa-gauge-high"></i>${escapeHtml(r.difficulty)}</span>
+              <span><i class="fa-solid fa-road"></i>${escapeHtml(r.surface)}</span>
+            </div>
+            <div class="route-desc">${escapeHtml(r.desc)}</div>
+            <div class="route-actions">
+              <button type="button" class="btn btn-pink" onclick="runRoute(${idx})" style="flex:2;">
+                <i class="fa-solid fa-play"></i> Run this route
+              </button>
+              <button type="button" class="btn btn-secondary" onclick="focusRouteFromSheet(${idx})" style="flex:1;" ${isFocus ? 'aria-current="true"' : ''}>
+                <i class="fa-solid fa-trophy"></i> Stats
+              </button>
+              <a href="https://maps.google.com/?q=${r.points[0][0]},${r.points[0][1]}" target="_blank" rel="noopener" class="btn btn-secondary btn-icon" title="Navigate to start" aria-label="Navigate to start">
+                <i class="fa-solid fa-location-arrow"></i>
+              </a>
+            </div>
+          </div>`;
       }).join('');
     }
 
-    async function onRoutePillClick(idx) {
-      if (idx === selectedRouteIndex) return;
+    async function runRoute(idx) {
       if (isRunning) {
         const ok = await askConfirm({
           title: 'Switch route?',
@@ -632,68 +734,29 @@
         if (!ok) return;
         cancelRun();
       }
-      selectRoute(idx);
+      closeRoutesSheet();
+      startRun(ROUTES[idx]);
     }
 
-    function selectRoute(idx) {
-      selectedRouteIndex = idx;
-      const route = ROUTES[idx];
-
-      // Update pills UI
-      document.querySelectorAll('.route-pill').forEach((btn, i) => {
-        btn.classList.toggle('active', i === idx);
-      });
-
-      // Update Details Card
-      document.getElementById('routeCard').innerHTML = `
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 8px;">
-          <span class="badge" style="background:rgba(212,90,232,0.15); color:var(--pink);"><i class="fa-solid fa-location-dot"></i> Verified Route</span>
-          <span style="font-size:0.8rem; color:var(--text-dim); font-weight:600;"><i class="fa-solid fa-mountain"></i> ${escapeHtml(route.difficulty)}</span>
-        </div>
-        <h2 style="font-size:1.35rem; color:#FFF; margin-bottom:6px;">${escapeHtml(route.name)}</h2>
-        <p style="color:var(--text-dim); font-size:0.86rem; line-height:1.5; margin-bottom:12px;">${escapeHtml(route.desc)}</p>
-        
-        <div class="route-stats-grid">
-          <div>
-            <div class="stat-val">${escapeHtml(route.distance)}</div>
-            <div class="stat-lbl">Distance</div>
-            <div class="stat-note">${escapeHtml(route.runTime)}</div>
-          </div>
-          <div>
-            <div class="stat-val" style="color:var(--gold);">${escapeHtml(route.elevation)}</div>
-            <div class="stat-lbl">Elevation</div>
-          </div>
-          <div>
-            <div class="stat-val" style="color:var(--green);">${escapeHtml(route.surface.split(/[ ,]/)[0])}</div>
-            <div class="stat-lbl">Terrain</div>
-            <div class="stat-note">${escapeHtml(route.surface)}</div>
-          </div>
-        </div>
-
-        <div style="display:flex; gap:10px; margin-top:14px;">
-          <a href="https://maps.google.com/?q=${route.points[0][0]},${route.points[0][1]}" target="_blank" rel="noopener" class="btn btn-secondary" style="flex:1; padding:12px;">
-            <i class="fa-solid fa-location-arrow"></i> Navigate to Start
-          </a>
-        </div>
-      `;
-
-      // Update Map
-      renderMapRoute(route);
-
-      // Target in live stats + idle timer label
-      const liveTarget = document.getElementById('liveTarget');
-      if (liveTarget) liveTarget.textContent = route.distance;
-      if (!isRunning) document.getElementById('timerSub').textContent = `Ready · ${route.shortName}`;
-
-      // Load data for this route
-      loadRouteData(route.id);
+    function focusRouteFromSheet(idx) {
+      setFocusRoute(ROUTES[idx]);
+      closeRoutesSheet();
+      document.getElementById('historyCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    function renderMapRoute(route) {
-      // Map stays plain — no pre-drawn routes. Shows live GPS trail during a run,
-      // or the user's last recorded run path on load.
+    function setFocusRoute(route, { load = true } = {}) {
+      focusRoute = route;
+      const chip = document.getElementById('focusRouteChip');
+      chip.style.setProperty('--route-color', route.color);
+      document.getElementById('focusRouteName').textContent = route.shortName;
+      if (load) loadRouteData(route.id);
     }
 
+    function routeById(id) {
+      return ROUTES.find(r => r.id === id) || null;
+    }
+
+    // ── Map trail ─────────────────────────────────────────────────────────────
     function clearLastRunTrail() {
       if (currentPolyline) { map.removeLayer(currentPolyline); currentPolyline = null; }
       currentMarkers.forEach(m => map.removeLayer(m));
@@ -709,7 +772,6 @@
         lineCap: 'round', lineJoin: 'round'
       }).addTo(map);
 
-      // Start pin
       const startPin = L.divIcon({
         className: 'isot-pin-wrapper',
         html: `<div class="isot-pin" style="background:#22C55E;box-shadow:0 0 14px rgba(34,197,94,0.7);"><i class="fa-solid fa-play"></i></div>`,
@@ -717,7 +779,6 @@
       });
       currentMarkers.push(L.marker(coords[0], { icon: startPin }).addTo(map));
 
-      // Finish pin
       const finishPin = L.divIcon({
         className: 'isot-pin-wrapper',
         html: `<div class="isot-pin" style="background:var(--pink);"><i class="fa-solid fa-flag-checkered"></i></div>`,
@@ -730,12 +791,11 @@
 
     async function loadLastRunTrail() {
       const { data, error } = await db.rpc('my_last_run_path');
-      if (error || !data || !data.ok || !data.gps_path) {
-        // No prior run — center on Turin
-        map.setView([45.0703, 7.6869], 13);
-        return;
-      }
-      drawTrailOnMap(data.gps_path, `Last run · ${formatDuration(data.duration_seconds)}`);
+      if (error || !data || !data.ok) return;
+      // If the RPC names the route of that run, the stats cards open on it
+      const last = data.route_id ? routeById(data.route_id) : null;
+      if (last) setFocusRoute(last, { load: false });
+      if (data.gps_path) drawTrailOnMap(data.gps_path, `Last run · ${formatDuration(data.duration_seconds)}`);
     }
 
     // ── Data Fetching: Leaderboard, Personal History & Streak ─────────────────
@@ -753,10 +813,9 @@
         histEl.innerHTML = `<div class="dim" style="font-size:0.82rem;padding:8px">Could not load run history.</div>`;
         return;
       }
+      if (routeId !== focusRoute.id) return; // a newer selection won the race
 
-      // Update weekly streak banner
       updateStreakUI(data.streak_weeks || 0);
-
       countEl.textContent = `${data.route_runs_count || 0} runs logged`;
 
       let pbHtml = '';
@@ -781,7 +840,7 @@
         pbHtml = `
           <div style="background:rgba(255,255,255,0.03);border:1px dashed var(--border-light);border-radius:14px;padding:14px;text-align:center;margin-bottom:12px;">
             <div style="font-size:0.86rem;color:#FFF;font-weight:600;">No runs on this route yet</div>
-            <div style="font-size:0.76rem;color:var(--text-dim);margin-top:2px;">Hit Start Run above to log your first attempt and earn points!</div>
+            <div style="font-size:0.76rem;color:var(--text-dim);margin-top:2px;">Tap Start Run, choose ISOT route, and log your first attempt.</div>
           </div>
         `;
       }
@@ -818,6 +877,7 @@
         lbEl.innerHTML = `<div class="dim" style="font-size:0.82rem;padding:8px">Could not load leaderboard.</div>`;
         return;
       }
+      if (routeId !== focusRoute.id) return;
 
       if (!data.length) {
         lbEl.innerHTML = `
@@ -878,10 +938,12 @@
     }
 
     // ── GPS Timer & Tracker ──────────────────────────────────────────────────
-    function startRun() {
+    // route = a club route object, or null for a free run
+    function startRun(route) {
       if (isRunning) return;
 
       isRunning = true;
+      activeRoute = route;
       runStartTime = Date.now();
       elapsedSeconds = 0;
       totalDistanceMeters = 0;
@@ -889,12 +951,14 @@
       gpsTrailCoords = [];
 
       // Update Timer Card UI
-      document.getElementById('timerSub').textContent = `Running · ${ROUTES[selectedRouteIndex].shortName}`;
+      document.getElementById('timerSub').textContent = route ? `Running · ${route.shortName}` : 'Free run · anywhere you like';
       document.getElementById('liveRunStats').style.display = 'grid';
       document.getElementById('liveDistance').textContent = '0.00 km';
       document.getElementById('livePace').textContent = '--:--';
-      document.getElementById('liveTarget').textContent = ROUTES[selectedRouteIndex].distance;
-      document.getElementById('runProgress').style.display = 'block';
+      document.getElementById('liveTargetCell').style.display = route ? '' : 'none';
+      document.getElementById('liveRunStats').style.gridTemplateColumns = route ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)';
+      document.getElementById('liveTarget').textContent = route ? route.distance : '--';
+      document.getElementById('runProgress').style.display = route ? 'block' : 'none';
       updateProgress();
 
       // The previous run's trail would be confused with today's — clear it
@@ -913,7 +977,6 @@
           </button>
         </div>
       `;
-
       document.getElementById('btnFinishRun').addEventListener('click', finishRun);
       document.getElementById('btnCancelRun').addEventListener('click', confirmCancelRun);
       document.getElementById('timerCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -940,7 +1003,8 @@
     }
 
     function routeTargetKm() {
-      const km = parseFloat(ROUTES[selectedRouteIndex].distance);
+      if (!activeRoute) return null;
+      const km = parseFloat(activeRoute.distance);
       return isNaN(km) || km <= 0 ? null : km;
     }
 
@@ -1049,16 +1113,20 @@
 
     // Idle state of the timer card: clock at zero, Start button back
     function resetTimerCard() {
+      activeRoute = null;
       document.getElementById('timerDisplay').textContent = '00:00';
-      document.getElementById('timerSub').textContent = `Ready · ${ROUTES[selectedRouteIndex].shortName}`;
+      document.getElementById('timerSub').textContent = 'Ready to run';
       document.getElementById('liveRunStats').style.display = 'none';
       document.getElementById('runProgress').style.display = 'none';
       document.getElementById('timerControls').innerHTML = `
         <button type="button" id="btnStartRun" class="btn btn-pink" style="width:100%; justify-content:center; padding:13px; font-size:1rem; font-weight:700;">
           <i class="fa-solid fa-play"></i> Start Run
         </button>
+        <button type="button" class="start-sub" onclick="openRoutesSheet('browse')">
+          <i class="fa-solid fa-route"></i> Browse the ${ROUTES.length} ISOT routes <i class="fa-solid fa-chevron-right" style="font-size:0.65rem;"></i>
+        </button>
       `;
-      document.getElementById('btnStartRun').addEventListener('click', startRun);
+      document.getElementById('btnStartRun').addEventListener('click', openStartSheet);
     }
 
     function cancelRun() {
@@ -1099,7 +1167,8 @@
       releaseWakeLock();
       haptic([40, 60, 40]);
 
-      const route = ROUTES[selectedRouteIndex];
+      const route = activeRoute;
+      const distanceMeters = totalDistanceMeters;
       const finishBtn = document.getElementById('btnFinishRun');
       if (finishBtn) {
         finishBtn.disabled = true;
@@ -1110,7 +1179,7 @@
         const savedPath = gpsTrailCoords.length >= 2 ? gpsTrailCoords : null;
 
         const { data, error } = await db.rpc('log_run', {
-          p_route_id: route.id,
+          p_route_id: route ? route.id : FREE_RUN_ID,
           p_seconds: finalSeconds,
           p_gps_path: savedPath ? JSON.stringify(savedPath) : null
         });
@@ -1126,16 +1195,16 @@
         if (runnerMarker) { map.removeLayer(runnerMarker); runnerMarker = null; }
         if (savedPath) drawTrailOnMap(savedPath, `Your run · ${formatDuration(finalSeconds)}`);
 
-        // Update My Routes set
-        myRouteIds.add(route.id);
+        // A route run becomes the one the stats cards show
+        if (route) { myRouteIds.add(route.id); setFocusRoute(route, { load: false }); }
 
-        // Show Modal
         showRunResultModal({
-          routeName: route.name,
+          route,
           seconds: finalSeconds,
-          isPb: data.is_personal_best,
-          points: data.points_earned,
-          streak: data.streak_weeks
+          meters: distanceMeters,
+          isPb: !!(route && data && data.is_personal_best),
+          points: data && data.points_earned,
+          streak: data && data.streak_weeks
         });
 
       } catch (err) {
@@ -1145,34 +1214,30 @@
     }
 
     function showRunResultModal(res) {
-      document.getElementById('modalRouteName').textContent = res.routeName;
+      const km = (res.meters / 1000).toFixed(2);
+      document.getElementById('modalTitle').textContent = res.route ? 'Run Completed!' : 'Free Run Completed!';
+      document.getElementById('modalRouteName').textContent = res.route ? res.route.name : 'Your own route around Turin';
       document.getElementById('modalRunTime').textContent = formatDuration(res.seconds);
-
-      const pbBadge = document.getElementById('modalPbBadge');
-      if (res.isPb) {
-        pbBadge.style.display = 'block';
-      } else {
-        pbBadge.style.display = 'none';
-      }
-
+      document.getElementById('modalDistance').textContent = res.meters > 50
+        ? `${km} km${res.route ? ` of ${res.route.distance}` : ''}`
+        : '';
+      document.getElementById('modalPbBadge').style.display = res.isPb ? 'block' : 'none';
       document.getElementById('modalPointsEarned').textContent = `+${res.points || 5}`;
       document.getElementById('modalStreakWeeks').textContent = `${res.streak || 1}w`;
-
       document.getElementById('runResultModal').style.display = 'flex';
     }
 
     function closeRunModal() {
       document.getElementById('runResultModal').style.display = 'none';
 
-      // Clean up map layers
       if (runnerMarker) { map.removeLayer(runnerMarker); runnerMarker = null; }
       if (runnerTrailPolyline) { map.removeLayer(runnerTrailPolyline); runnerTrailPolyline = null; }
 
       resetTimerCard();
+      renderRoutesList();
 
       // Reload route data to reflect new personal record and leaderboard position
-      const route = ROUTES[selectedRouteIndex];
-      loadRouteData(route.id);
+      loadRouteData(focusRoute.id);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
