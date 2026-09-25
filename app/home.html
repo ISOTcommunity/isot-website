@@ -979,7 +979,89 @@
     document.addEventListener('DOMContentLoaded', () => {
       renderFeaturedNight();
       initHome();
+      initInstallBanner();
     });
+
+    // ── PWA Install Banner ────────────────────────────────────────────────────
+    const INSTALL_KEY = 'isot-install-dismissed-v2';
+
+    function initInstallBanner() {
+      // Don't show if already dismissed or already running as installed PWA
+      try { if (localStorage.getItem(INSTALL_KEY)) return; } catch(e) {}
+      if (window.matchMedia('(display-mode: standalone)').matches) return;
+      if (navigator.standalone === true) return; // iOS installed
+
+      const ua = navigator.userAgent;
+      const isIOS = /iPhone|iPad|iPod/i.test(ua) && !/CriOS|FxiOS/i.test(ua);
+
+      let deferredPrompt = null;
+
+      const banner = document.createElement('div');
+      banner.id = 'installBanner';
+      banner.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">
+          <img src="../assets/icon-192.png" width="40" height="40" style="border-radius:10px;flex-shrink:0;" onerror="this.style.display='none'">
+          <div style="min-width:0;">
+            <div style="font-weight:700;font-size:0.9rem;color:#fff;">Add ISOT to Home Screen</div>
+            <div id="installSub" style="font-size:0.76rem;color:rgba(255,255,255,0.6);margin-top:2px;">
+              ${isIOS ? 'Tap Share → Add to Home Screen' : 'One tap for faster access'}
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0;">
+          ${isIOS ? '' : '<button id="installBtn" style="background:var(--pink);color:#fff;border:none;border-radius:20px;padding:7px 16px;font-size:0.82rem;font-weight:700;font-family:inherit;cursor:pointer;">Install</button>'}
+          <button id="installDismiss" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);border:none;border-radius:20px;padding:7px 12px;font-size:0.82rem;font-family:inherit;cursor:pointer;">Not now</button>
+        </div>
+      `;
+
+      Object.assign(banner.style, {
+        position: 'fixed', bottom: '72px', left: '12px', right: '12px',
+        background: 'rgba(20,20,28,0.97)',
+        border: '1px solid rgba(255,255,255,0.1)',
+        borderRadius: '16px', padding: '14px 16px',
+        display: 'flex', alignItems: 'center', gap: '12px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+        backdropFilter: 'blur(16px)', zIndex: '9999',
+        transform: 'translateY(20px)', opacity: '0',
+        transition: 'transform 0.3s ease, opacity 0.3s ease'
+      });
+
+      function dismiss() {
+        banner.style.transform = 'translateY(20px)';
+        banner.style.opacity = '0';
+        setTimeout(() => banner.remove(), 350);
+        try { localStorage.setItem(INSTALL_KEY, '1'); } catch(e) {}
+      }
+
+      document.body.appendChild(banner);
+      requestAnimationFrame(() => {
+        banner.style.transform = 'translateY(0)';
+        banner.style.opacity = '1';
+      });
+
+      document.getElementById('installDismiss').onclick = dismiss;
+
+      if (!isIOS) {
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          deferredPrompt = e;
+        });
+
+        document.getElementById('installBtn').onclick = async () => {
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+              if (typeof gtag === 'function') gtag('event', 'pwa_installed', { event_category: 'PWA', event_label: 'Banner' });
+              dismiss();
+            }
+            deferredPrompt = null;
+          }
+        };
+      }
+
+      window.addEventListener('appinstalled', dismiss);
+    }
   </script>
 </body>
 </html>
