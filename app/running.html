@@ -658,6 +658,13 @@
 
       await loadLastRunTrail();
       loadRouteData(focusRoute.id);
+
+      // A run that failed to save last time is still waiting in this browser
+      const leftover = readPendingRun();
+      if (leftover) {
+        if (leftover.path) drawTrailOnMap(leftover.path, `Unsaved run · ${formatDuration(leftover.seconds)}`);
+        showSaveFailedState(leftover, 'saved on this phone from your last session');
+      }
     }
 
     // ── Start flow: Start Run → free run or ISOT route ────────────────────────
@@ -1167,50 +1174,113 @@
       releaseWakeLock();
       haptic([40, 60, 40]);
 
-      const route = activeRoute;
-      const distanceMeters = totalDistanceMeters;
-      const finishBtn = document.getElementById('btnFinishRun');
-      if (finishBtn) {
-        finishBtn.disabled = true;
-        finishBtn.innerHTML = `<span class="spinner"></span> Saving...`;
-      }
+      const pending = {
+        routeId: activeRoute ? activeRoute.id : FREE_RUN_ID,
+        seconds: finalSeconds,
+        meters: totalDistanceMeters,
+        path: gpsTrailCoords.length >= 2 ? gpsTrailCoords.slice() : null,
+        at: Date.now()
+      };
+      storePendingRun(pending);
+      await saveRun(pending);
+    }
 
+    // ── Saving: a failed save never throws the run away ──────────────────────
+    // Runs often end where signal is weakest. The run is kept in this browser until
+    // the server confirms it, and the timer card offers Retry until then.
+    const PENDING_KEY = 'isot_pending_run';
+
+    function storePendingRun(run) {
+      try { localStorage.setItem(PENDING_KEY, JSON.stringify(run)); } catch (_) {}
+    }
+    function clearPendingRun() {
+      try { localStorage.removeItem(PENDING_KEY); } catch (_) {}
+    }
+    function readPendingRun() {
       try {
-        const savedPath = gpsTrailCoords.length >= 2 ? gpsTrailCoords : null;
+        const run = JSON.parse(localStorage.getItem(PENDING_KEY) || 'null');
+        return run && run.routeId && run.seconds ? run : null;
+      } catch (_) { return null; }
+    }
 
-        const { data, error } = await db.rpc('log_run', {
-          p_route_id: route ? route.id : FREE_RUN_ID,
-          p_seconds: finalSeconds,
-          p_gps_path: savedPath ? JSON.stringify(savedPath) : null
+    async function saveRun(pending) {
+      const route = routeById(pending.routeId);
+      showSavingState();
+
+      let data = null, errMsg = null;
+      try {
+        const res = await db.rpc('log_run', {
+          p_route_id: pending.routeId,
+          p_seconds: pending.seconds,
+          p_gps_path: pending.path ? JSON.stringify(pending.path) : null
         });
-
-        if (error) {
-          setAlert(document.getElementById('alertBox'), 'Could not save your run: ' + error.message, 'error');
-          cancelRun();
-          return;
-        }
-
-        // Draw this run's trail on the map
-        if (runnerTrailPolyline) { map.removeLayer(runnerTrailPolyline); runnerTrailPolyline = null; }
-        if (runnerMarker) { map.removeLayer(runnerMarker); runnerMarker = null; }
-        if (savedPath) drawTrailOnMap(savedPath, `Your run · ${formatDuration(finalSeconds)}`);
-
-        // A route run becomes the one the stats cards show
-        if (route) { myRouteIds.add(route.id); setFocusRoute(route, { load: false }); }
-
-        showRunResultModal({
-          route,
-          seconds: finalSeconds,
-          meters: distanceMeters,
-          isPb: !!(route && data && data.is_personal_best),
-          points: data && data.points_earned,
-          streak: data && data.streak_weeks
-        });
-
+        data = res.data;
+        if (res.error) errMsg = res.error.message;
       } catch (err) {
-        setAlert(document.getElementById('alertBox'), 'Network error saving run: ' + err.message, 'error');
-        cancelRun();
+        errMsg = (err && err.message) || 'network error';
       }
+
+      if (errMsg) {
+        showSaveFailedState(pending, errMsg);
+        return;
+      }
+
+      clearPendingRun();
+      document.getElementById('alertBox').innerHTML = '';
+
+      // Draw this run's trail on the map
+      if (runnerTrailPolyline) { map.removeLayer(runnerTrailPolyline); runnerTrailPolyline = null; }
+      if (runnerMarker) { map.removeLayer(runnerMarker); runnerMarker = null; }
+      if (pending.path) drawTrailOnMap(pending.path, `Your run · ${formatDuration(pending.seconds)}`);
+
+      // A route run becomes the one the stats cards show
+      if (route) { myRouteIds.add(route.id); setFocusRoute(route, { load: false }); }
+
+      showRunResultModal({
+        route,
+        seconds: pending.seconds,
+        meters: pending.meters || 0,
+        isPb: !!(route && data && data.is_personal_best),
+        points: data ? data.points_earned : null,
+        streak: data ? data.streak_weeks : null
+      });
+    }
+
+    function showSavingState() {
+      document.getElementById('timerControls').innerHTML = `
+        <button type="button" class="btn" disabled style="width:100%;padding:13px;font-size:1rem;font-weight:700;background:var(--green);color:#0B0B0F;">
+          <span class="spinner"></span> Saving your run...
+        </button>`;
+    }
+
+    function showSaveFailedState(pending, errMsg) {
+      const route = routeById(pending.routeId);
+      document.getElementById('timerDisplay').textContent = formatDuration(pending.seconds);
+      document.getElementById('timerSub').textContent = route ? `Not saved yet · ${route.shortName}` : 'Not saved yet · free run';
+      setAlert(document.getElementById('alertBox'),
+        `Your run is not saved yet (${errMsg}). It is kept on this phone, so you can retry when you have signal.`, 'error');
+      document.getElementById('timerControls').innerHTML = `
+        <div style="display:flex;gap:10px;">
+          <button type="button" id="btnRetrySave" class="btn btn-pink" style="flex:2;padding:13px;font-size:1rem;font-weight:700;">
+            <i class="fa-solid fa-rotate-right"></i> Retry save
+          </button>
+          <button type="button" id="btnDiscardSave" class="btn btn-secondary" style="flex:1;padding:13px;">
+            Discard
+          </button>
+        </div>`;
+      document.getElementById('btnRetrySave').addEventListener('click', () => saveRun(pending));
+      document.getElementById('btnDiscardSave').addEventListener('click', async () => {
+        const ok = await askConfirm({
+          title: 'Discard this run?',
+          body: `${formatDuration(pending.seconds)} will be deleted from this phone and never logged.`,
+          okLabel: 'Discard run'
+        });
+        if (!ok) return;
+        clearPendingRun();
+        document.getElementById('alertBox').innerHTML = '';
+        cancelRun();
+      });
+      document.getElementById('timerCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function showRunResultModal(res) {
@@ -1222,8 +1292,8 @@
         ? `${km} km${res.route ? ` of ${res.route.distance}` : ''}`
         : '';
       document.getElementById('modalPbBadge').style.display = res.isPb ? 'block' : 'none';
-      document.getElementById('modalPointsEarned').textContent = `+${res.points || 5}`;
-      document.getElementById('modalStreakWeeks').textContent = `${res.streak || 1}w`;
+      document.getElementById('modalPointsEarned').textContent = `+${res.points ?? 5}`;
+      document.getElementById('modalStreakWeeks').textContent = `${res.streak ?? 1}w`;
       document.getElementById('runResultModal').style.display = 'flex';
     }
 
