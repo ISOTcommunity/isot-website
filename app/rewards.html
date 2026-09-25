@@ -394,6 +394,9 @@
           ${rule('char_white_starjumper', 'Bring people', `+${r.invites}`,
             `Every ${r.step} people you invite who then turn up to that night and get scanned.`,
             `<strong>${p.invites}</strong> came · next reward at ${p.invites_next}`, 'events.html')}
+          ${r.run_km ? rule('char_white_runner', 'Run', `+${r.run_km} / km`,
+            'Every full kilometre you run with the Run tab, free run or ISOT route. GPS measured, up to 42 km a run.',
+            null, 'running.html') : ''}
           ${rule('char_cat_wizards', 'Find gems', 'varies',
             'Hidden spots on the map. Go there, take the photo, claim it.',
             'Tap to open the map', 'partner.html')}
