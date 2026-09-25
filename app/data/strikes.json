@@ -1,0 +1,30 @@
+{
+  "_readme": "ISOT's own strike list. Edit on GitHub and commit: the app reads it on every open. The official register (via /api/strikes) is merged in automatically; add an entry here only to correct its wording or to add something it misses. kind: local | general | rail | air. scope: turin | region | national. date and end: YYYY-MM-DD. Past entries disappear on their own.",
+  "updated": "2026-09-25",
+  "strikes": [
+    {
+      "date": "2026-10-02",
+      "end": "2026-10-02",
+      "kind": "general",
+      "scope": "national",
+      "title": "General strike, public and private sectors",
+      "note": "All day. Buses, trams, metro and trains may stop outside guaranteed hours."
+    },
+    {
+      "date": "2026-10-15",
+      "end": "2026-10-15",
+      "kind": "air",
+      "scope": "national",
+      "title": "EasyJet cabin crew",
+      "note": "24 hours. Check your flight with EasyJet before going to the airport."
+    },
+    {
+      "date": "2026-10-16",
+      "end": "2026-10-16",
+      "kind": "air",
+      "scope": "national",
+      "title": "ENAV air traffic staff (4 h) and EasyJet cabin crew (24 h)",
+      "note": "Flights across Italy may be delayed or cancelled. Check with your airline."
+    }
+  ]
+}

@@ -3,7 +3,7 @@
  * Supabase calls are NEVER cached to ensure real-time RLS security.
  */
 
-const CACHE = 'isot-shell-v13';
+const CACHE = 'isot-shell-v14';
 
 const SHELL = [
   './',
@@ -25,8 +25,11 @@ const SHELL = [
   'admin.html',
   'assembly.html',
   'partner.html',
+  'gtt.html',
   'css/app.css',
   'js/isot.js',
+  'js/weather.js',
+  'js/transport.js',
   'vendor/supabase.js',
   'vendor/qrcode.min.js',
   'vendor/html5-qrcode.min.js',
@@ -62,6 +65,10 @@ self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   if (url.origin !== location.origin) return;
 
+  // Live data from our own functions (strikes): never cached here. Vercel's edge cache
+  // already holds it for an hour; a copy in the phone would outlive the strike.
+  if (url.pathname.startsWith('/api/')) return;
+
   const isPage = e.request.mode === 'navigate' || url.pathname.endsWith('.html');
 
   if (isPage) {
@@ -76,13 +83,13 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Code (JS/CSS): network-first, cache as fallback.
+  // Code (JS/CSS) and data (JSON, e.g. data/strikes.json): network-first, cache as fallback.
   //
   // Cache-first was wrong here: a fix to isot.js would not reach anyone until the cache
   // version changed AND the new worker activated, so users could run stale code against a
   // changed database. A stale member card at a bar is worse than one round-trip. Offline
   // still works — the cache is the fallback.
-  if (/\.(js|css)$/.test(url.pathname)) {
+  if (/\.(js|css|json)$/.test(url.pathname)) {
     e.respondWith(
       fetch(e.request)
         .then((res) => {
