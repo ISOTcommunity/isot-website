@@ -736,6 +736,10 @@ function initBurgerMenu(profile) {
         <i class="fa-solid fa-compass"></i>
         <span>Explore</span>
       </a>
+      <a href="turin-events.html" class="drawer-item" data-newdot="bigturin">
+        <i class="fa-solid fa-city"></i>
+        <span>Big in Turin</span>
+      </a>
       <!-- Moved here from the bottom bar, which now carries The Game. -->
       <a href="network.html" class="drawer-item">
         <i class="fa-solid fa-user-group"></i>

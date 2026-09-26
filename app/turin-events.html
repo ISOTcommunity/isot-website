@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-N2S3FL84RT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-N2S3FL84RT');
+</script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Big in Turin · ISOT Community</title>
+
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="../assets/favicon.png" sizes="48x48" type="image/png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-title" content="ISOT" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#000000" />
+  <script defer src="/_vercel/insights/script.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/app.css" />
+
+  <style>
+    .month-head {
+      font-size: 0.74rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-dim); margin: 22px 0 10px;
+    }
+    .ev {
+      display: flex; gap: 12px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border-light);
+      margin-bottom: 10px;
+      color: inherit; text-decoration: none;
+    }
+    .ev.now { border-color: rgba(67,219,143,0.45); background: rgba(67,219,143,0.06); }
+    .ev-date {
+      width: 54px; flex-shrink: 0; text-align: center;
+      border-radius: 12px; padding: 7px 0;
+      background: rgba(255,255,255,0.05);
+      line-height: 1.1;
+    }
+    .ev-date .d { font-size: 1.3rem; font-weight: 800; color: #FFF; font-variant-numeric: tabular-nums; }
+    .ev-date .m { font-size: 0.64rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+    .ev-body { flex: 1; min-width: 0; }
+    .ev-title { font-size: 0.98rem; font-weight: 700; color: #FFF; line-height: 1.3; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .ev-kind {
+      width: 22px; height: 22px; border-radius: 7px; flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;
+    }
+    .ev-kind i { display: inline-flex; align-items: center; justify-content: center; line-height: 1; margin: 0; padding: 0; }
+    .ev-when { font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .ev-where { font-size: 0.76rem; color: var(--text-dim); margin-top: 2px; }
+    .ev-note { font-size: 0.78rem; color: var(--text-dim); margin-top: 6px; line-height: 1.45; }
+    .ev-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+    .ev-badge {
+      font-size: 0.64rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 9999px;
+    }
+    .ev-badge.now  { background: rgba(67,219,143,0.18); color: var(--green); }
+    .ev-badge.soon { background: rgba(212,90,232,0.16); color: var(--pink); }
+    .ev-badge.tbc  { background: rgba(230,147,33,0.16); color: var(--c-amber); }
+    .ev-link { font-size: 0.76rem; color: var(--pink); font-weight: 600; text-decoration: none; }
+
+    .hol-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 10px 0; border-bottom: 1px solid var(--border-light);
+      font-size: 0.84rem;
+    }
+    .hol-row:last-child { border-bottom: none; }
+    .hol-row span:last-child { color: var(--text-dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display:flex;align-items:center;gap:8px">
+      <i class="fa-solid fa-city text-pink"></i>
+      <span>Big in Turin</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div id="headerAvatar" style="cursor:pointer" data-open-drawer></div>
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background:transparent;border:none;color:#FFF;font-size:1.3rem;cursor:pointer;padding:6px">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="shell" style="padding-top:18px;padding-bottom:96px">
+
+    <div style="margin-bottom: 6px;">
+      <div class="eyebrow">The city's calendar</div>
+      <h1 style="font-size: 1.75rem; margin-top: 4px;">Big in Turin</h1>
+      <p style="color: var(--text-dim); font-size: 0.88rem; margin-top: 4px;">The festivals, fairs and events the whole city talks about, until summer 2027.</p>
+    </div>
+
+    <div id="eventList"><div class="dim" style="text-align:center;padding:16px"><div class="spinner"></div></div></div>
+
+    <div class="month-head">Public holidays</div>
+    <div class="card card-glass" style="padding:4px 16px">
+      <div id="holidayList"></div>
+    </div>
+    <p class="dim" style="font-size:0.72rem;line-height:1.5;margin-top:10px">
+      On public holidays most shops and offices close and GTT runs a Sunday timetable.
+      Dates are checked by ISOT; always confirm on the event's own site before you go.
+    </p>
+
+  </main>
+
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="tabbar">
+    <a href="home.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </a>
+    <a href="events.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Calendar
+    </a>
+    <a href="partner.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+      Map
+    </a>
+    <a href="rewards.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+      Game
+    </a>
+    <a href="running.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      Run
+    </a>
+  </nav>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+
+  <script>
+    const KIND = {
+      food:  { icon: 'fa-utensils',        color: '#E69321' },
+      art:   { icon: 'fa-palette',         color: '#D45AE8' },
+      music: { icon: 'fa-music',           color: '#5787EA' },
+      sport: { icon: 'fa-trophy',          color: '#43DB8F' },
+      film:  { icon: 'fa-film',            color: '#F36C51' },
+      books: { icon: 'fa-book-open',       color: '#BBC1F9' },
+      city:  { icon: 'fa-city',            color: '#7AA4C2' }
+    };
+
+    // Turin's date, whatever timezone the phone is on
+    const romeDate = (d = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Rome' }).format(d);
+    const asDate = s => new Date(s + 'T12:00:00');
+    const fmt = (s, opts) => asDate(s).toLocaleDateString('en-GB', opts);
+
+    function whenText(e) {
+      if (e.start === e.end) return fmt(e.start, { weekday: 'short', day: 'numeric', month: 'long' });
+      const sameMonth = e.start.slice(0, 7) === e.end.slice(0, 7);
+      return sameMonth
+        ? `${fmt(e.start, { day: 'numeric' })}–${fmt(e.end, { day: 'numeric', month: 'long' })}`
+        : `${fmt(e.start, { day: 'numeric', month: 'short' })} – ${fmt(e.end, { day: 'numeric', month: 'short', year: 'numeric' })}`;
+    }
+
+    function eventCard(e, today) {
+      const k = KIND[e.kind] || KIND.city;
+      const now = e.start <= today && e.end >= today;
+      const soon = !now && e.start <= romeDate(new Date(Date.now() + 7 * 864e5));
+      const badge = now ? '<span class="ev-badge now">On now</span>'
+                  : soon ? '<span class="ev-badge soon">This week</span>' : '';
+      return `
+        <div class="ev ${now ? 'now' : ''}">
+          <div class="ev-date">
+            <div class="d">${asDate(e.start).getDate()}</div>
+            <div class="m">${fmt(e.start, { month: 'short' })}</div>
+          </div>
+          <div class="ev-body">
+            <div class="ev-title">
+              <span class="ev-kind" style="background:${k.color}22;color:${k.color}"><i class="fa-solid ${k.icon}"></i></span>
+              ${escapeHtml(e.title)}
+            </div>
+            <div class="ev-when">${escapeHtml(whenText(e))}</div>
+            <div class="ev-where"><i class="fa-solid fa-location-dot" style="margin-right:4px"></i>${escapeHtml(e.where)}</div>
+            ${e.note ? `<div class="ev-note">${escapeHtml(e.note)}</div>` : ''}
+            <div class="ev-foot">
+              ${badge}
+              ${e.confirmed ? '' : '<span class="ev-badge tbc">Dates not confirmed yet</span>'}
+              ${e.url ? `<a class="ev-link" href="${escapeHtml(e.url)}" target="_blank" rel="noopener">Official site ↗</a>` : ''}
+            </div>
+          </div>
+        </div>`;
+    }
+
+    async function initEvents() {
+      const me = await requireAuth();
+      document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(me, 36);
+      if (typeof markSeen === 'function') markSeen('bigturin');
+
+      let data = null;
+      try {
+        const r = await fetch('data/turin-events.json', { cache: 'no-store' });
+        if (r.ok) data = await r.json();
+      } catch (_) {}
+      const listEl = document.getElementById('eventList');
+      if (!data) {
+        listEl.innerHTML = '<p class="dim" style="text-align:center;padding:24px">Could not load the calendar. Check your connection.</p>';
+        return;
+      }
+
+      const today = romeDate();
+      const events = (data.events || [])
+        .filter(e => e.end >= today)
+        .sort((a, b) => a.start.localeCompare(b.start));
+
+      // Grouped by the month an event starts in; one that has already started sits first
+      let html = '', lastMonth = '';
+      events.forEach(e => {
+        const started = e.start < today;
+        const month = started ? 'Now' : fmt(e.start, { month: 'long', year: 'numeric' });
+        if (month !== lastMonth) {
+          html += `<div class="month-head">${started ? 'Happening now' : month}</div>`;
+          lastMonth = month;
+        }
+        html += eventCard(e, today);
+      });
+      listEl.innerHTML = html || '<p class="dim" style="text-align:center;padding:24px">Nothing listed yet. Check back soon.</p>';
+
+      const hol = (data.holidays || []).filter(h => h.date >= today);
+      document.getElementById('holidayList').innerHTML = hol.length
+        ? hol.map(h => `<div class="hol-row"><span>${escapeHtml(h.name)}</span><span>${fmt(h.date, { weekday: 'short', day: 'numeric', month: 'short' })}</span></div>`).join('')
+        : '<div class="dim" style="padding:10px 0">No holidays listed.</div>';
+    }
+
+    document.addEventListener('DOMContentLoaded', initEvents);
+  </script>
+</body>
+</html>
