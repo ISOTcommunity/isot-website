@@ -72,6 +72,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
       margin-bottom: 14px;
       background: var(--bg-card);
       border: 1px solid var(--border-light);
@@ -79,25 +80,33 @@
       padding: 10px 14px;
     }
     .cal-nav-btn {
+      flex: 0 0 auto;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      margin: 0;
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--border-light);
       color: #FFF;
-      border-radius: var(--radius-sm);
-      padding: 6px 12px;
-      font-size: 0.85rem;
-      font-weight: 600;
+      border-radius: 50%;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      line-height: 1;
       transition: var(--transition-fast);
     }
+    .cal-nav-btn svg { width: 18px; height: 18px; }
     .cal-nav-btn:hover {
       background: rgba(255, 255, 255, 0.12);
       border-color: var(--pink);
     }
     .cal-month-title {
+      flex: 1;
+      min-width: 0;
+      text-align: center;
       font-size: 1.1rem;
+      line-height: 1.25;
       font-weight: 700;
       color: #FFF;
     }
@@ -839,12 +848,12 @@
 
       let html = `
         <div class="cal-nav-header">
-          <button type="button" class="cal-nav-btn" onclick="changeMonth(-1)" ${currMonthIdx <= 7 ? 'disabled style="opacity:0.4"' : ''}>
-            <i class="fa-solid fa-chevron-left"></i> Prev Month
+          <button type="button" class="cal-nav-btn" onclick="changeMonth(-1)" aria-label="Previous month" ${currMonthIdx <= 7 ? 'disabled style="opacity:0.4"' : ''}>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M15 19l-7-7 7-7"/></svg>
           </button>
           <div class="cal-month-title">${MONTH_NAMES[currMonthIdx]} ${currYear}</div>
-          <button type="button" class="cal-nav-btn" onclick="changeMonth(1)" ${currMonthIdx >= 11 ? 'disabled style="opacity:0.4"' : ''}>
-            Next Month <i class="fa-solid fa-chevron-right"></i>
+          <button type="button" class="cal-nav-btn" onclick="changeMonth(1)" aria-label="Next month" ${currMonthIdx >= 11 ? 'disabled style="opacity:0.4"' : ''}>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M9 5l7 7-7 7"/></svg>
           </button>
         </div>
 
@@ -931,12 +940,12 @@
 
       let html = `
         <div class="cal-nav-header">
-          <button type="button" class="cal-nav-btn" onclick="changeWeek(-7)">
-            <i class="fa-solid fa-chevron-left"></i> Prev Week
+          <button type="button" class="cal-nav-btn" onclick="changeWeek(-7)" aria-label="Previous week">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M15 19l-7-7 7-7"/></svg>
           </button>
           <div class="cal-month-title">${startStr} – ${endStr}</div>
-          <button type="button" class="cal-nav-btn" onclick="changeWeek(7)">
-            Next Week <i class="fa-solid fa-chevron-right"></i>
+          <button type="button" class="cal-nav-btn" onclick="changeWeek(7)" aria-label="Next week">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M9 5l7 7-7 7"/></svg>
           </button>
         </div>
       `;
