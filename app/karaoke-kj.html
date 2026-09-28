@@ -428,6 +428,13 @@
     }
 
     async function playNow(id) {
+      const slot = kjQueue.find(s => String(s.id) === String(id));
+      const onStage = kjQueue.find(s => s.status === 'playing');
+      const who = slot ? `"${slot.song_title}" — ${slot.singer_name || 'Member'}` : 'this song';
+      const msg = `Are you sure you want to play ${who} now?` +
+        (onStage ? `\n\nThis ends "${onStage.song_title}" and skips the queue order.` : '\n\nThis skips the queue order.');
+      if (!confirm(msg)) return;
+
       const box = document.getElementById('alertBox');
       // Promote out of turn: end whoever is on, then set this one performing.
       const { error: e1 } = await db.from('karaoke_slots')
