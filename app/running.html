@@ -450,6 +450,17 @@
       </div>
     </div>
 
+    <!-- All my runs -->
+    <div class="route-card" id="myRunsCard">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+        <div class="eyebrow" style="margin:0;"><i class="fa-solid fa-clock-rotate-left text-pink"></i> My Run History</div>
+        <span id="myRunsTotal" style="font-size:0.75rem; color:var(--text-dim); font-weight:600;"></span>
+      </div>
+      <div id="myRunsList">
+        <div class="dim" style="text-align:center; padding:12px;"><div class="spinner"></div></div>
+      </div>
+    </div>
+
     <!-- Route Leaderboard Card -->
     <div class="route-card" id="leaderboardCard">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
@@ -605,6 +616,37 @@
     // Run Tracker State
     let isRunning = false;
     let runStartTime = null;
+    let isPaused = false;
+    let pausedMs = 0;
+    let pauseStartedAt = null;
+    let resumeSegment = false;
+
+    function activeSeconds() {
+      const now = isPaused ? pauseStartedAt : Date.now();
+      return Math.max(1, Math.round((now - runStartTime - pausedMs) / 1000));
+    }
+
+    function togglePause() {
+      const btn = document.getElementById('btnPauseRun');
+      if (!isPaused) {
+        isPaused = true;
+        pauseStartedAt = Date.now();
+        btn.innerHTML = '<i class="fa-solid fa-play"></i> Resume';
+        document.getElementById('timerSub').dataset.prev = document.getElementById('timerSub').textContent;
+        document.getElementById('timerSub').textContent = 'Paused';
+        document.getElementById('timerDisplay').style.opacity = '0.45';
+      } else {
+        pausedMs += Date.now() - pauseStartedAt;
+        isPaused = false;
+        pauseStartedAt = null;
+        resumeSegment = true; // distance moved while paused must not count
+        btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
+        document.getElementById('timerSub').textContent = document.getElementById('timerSub').dataset.prev || '';
+        document.getElementById('timerDisplay').style.opacity = '';
+      }
+      haptic(20);
+      updateClock();
+    }
     let timerInterval = null;
     let elapsedSeconds = 0;
 
@@ -697,6 +739,7 @@
 
       await loadLastRunTrail();
       loadRouteData(focusRoute.id);
+      loadMyRuns();
 
       // A run that failed to save last time is still waiting in this browser
       const leftover = readPendingRun();
@@ -841,26 +884,47 @@
       clearLastRunTrail();
       if (!coords || coords.length < 2) return;
 
-      currentPolyline = L.polyline(coords, {
-        color: '#7B9EF0', weight: 2.5, opacity: 0.75,
-        lineCap: 'round', lineJoin: 'round'
-      }).addTo(map);
+      currentPolyline = makeTrail(coords).addTo(map);
 
-      const startPin = L.divIcon({
-        className: 'isot-pin-wrapper',
-        html: `<div class="isot-pin" style="background:#22C55E;box-shadow:0 0 14px rgba(34,197,94,0.7);"><i class="fa-solid fa-play"></i></div>`,
-        iconSize: [28, 28], iconAnchor: [14, 14]
+      const dot = (bg) => L.divIcon({
+        className: '',
+        html: `<div style="width:14px;height:14px;border-radius:50%;background:${bg};border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.5);"></div>`,
+        iconSize: [14, 14], iconAnchor: [7, 7]
       });
-      currentMarkers.push(L.marker(coords[0], { icon: startPin }).addTo(map));
-
-      const finishPin = L.divIcon({
-        className: 'isot-pin-wrapper',
-        html: `<div class="isot-pin" style="background:var(--pink);"><i class="fa-solid fa-flag-checkered"></i></div>`,
-        iconSize: [28, 28], iconAnchor: [14, 14]
-      });
-      currentMarkers.push(L.marker(coords[coords.length - 1], { icon: finishPin }).addTo(map).bindPopup(label || 'Last run'));
+      currentMarkers.push(L.marker(coords[0], { icon: dot('#22C55E'), interactive: false }).addTo(map));
+      currentMarkers.push(L.marker(coords[coords.length - 1], { icon: dot('#111') }).addTo(map).bindPopup(label || 'Last run'));
 
       map.fitBounds(currentPolyline.getBounds(), { padding: [40, 40], maxZoom: 17 });
+    }
+
+    // Strava-style trail: dark casing under a bold solid line, lightly smoothed
+    const TRAIL_COLOR = (getComputedStyle(document.documentElement).getPropertyValue('--pink') || '').trim() || '#FC4C02';
+
+    function smoothPath(coords) {
+      if (coords.length < 3) return coords.map(c => [c[0], c[1]]);
+      const out = [[coords[0][0], coords[0][1]]];
+      for (let i = 1; i < coords.length - 1; i++) {
+        out.push([
+          (coords[i - 1][0] + 2 * coords[i][0] + coords[i + 1][0]) / 4,
+          (coords[i - 1][1] + 2 * coords[i][1] + coords[i + 1][1]) / 4
+        ]);
+      }
+      const last = coords[coords.length - 1];
+      out.push([last[0], last[1]]);
+      return out;
+    }
+
+    function makeTrail(coords) {
+      const pts = smoothPath(coords);
+      return L.featureGroup([
+        L.polyline(pts, { color: '#000', weight: 8, opacity: 0.35, lineCap: 'round', lineJoin: 'round', smoothFactor: 1.5, interactive: false }),
+        L.polyline(pts, { color: TRAIL_COLOR, weight: 4.5, opacity: 1, lineCap: 'round', lineJoin: 'round', smoothFactor: 1.5, interactive: false })
+      ]);
+    }
+
+    function setTrail(group, coords) {
+      const pts = smoothPath(coords);
+      group.eachLayer(l => l.setLatLngs(pts));
     }
 
     async function loadLastRunTrail() {
@@ -1019,6 +1083,7 @@
       isRunning = true;
       activeRoute = route;
       runStartTime = Date.now();
+      isPaused = false; pausedMs = 0; pauseStartedAt = null; resumeSegment = false;
       elapsedSeconds = 0;
       totalDistanceMeters = 0;
       lastPosition = null;
@@ -1045,6 +1110,9 @@
 
       // Controls
       document.getElementById('timerControls').innerHTML = `
+        <button type="button" id="btnPauseRun" class="btn btn-secondary" style="width:100%;justify-content:center;padding:13px;font-size:1rem;font-weight:700;margin-bottom:10px;">
+          <i class="fa-solid fa-pause"></i> Pause
+        </button>
         <div style="display:flex;gap:10px;">
           <button type="button" id="btnFinishRun" class="btn" style="flex:2;justify-content:center;padding:13px;font-size:1rem;font-weight:700;background:var(--green);color:#0B0B0F;">
             <i class="fa-solid fa-flag-checkered"></i> Finish &amp; Log Run
@@ -1054,6 +1122,7 @@
           </button>
         </div>
       `;
+      document.getElementById('btnPauseRun').addEventListener('click', togglePause);
       document.getElementById('btnFinishRun').addEventListener('click', finishRun);
       document.getElementById('btnCancelRun').addEventListener('click', confirmCancelRun);
       document.getElementById('timerCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1068,7 +1137,7 @@
 
     function updateClock() {
       if (!runStartTime) return;
-      elapsedSeconds = Math.max(1, Math.round((Date.now() - runStartTime) / 1000));
+      elapsedSeconds = activeSeconds();
       document.getElementById('timerDisplay').textContent = formatDuration(elapsedSeconds);
 
       // Update Pace
@@ -1128,8 +1197,14 @@
       // so jitter below the noise floor accumulates instead of being dropped.
       // The database re-measures the saved [lat,lng,t] trail with the same rule.
       const t = pos.timestamp || Date.now();
-      if (acc < 40) {
-        if (!lastPosition) {
+      if (acc < 40 && !isPaused) {
+        if (resumeSegment) {
+          // First fix after a pause: new segment, flagged so the server skips the gap too
+          resumeSegment = false;
+          gpsRejects = 0;
+          lastPosition = { lat, lng, t };
+          gpsTrailCoords.push([lat, lng, t, 1]);
+        } else if (!lastPosition) {
           lastPosition = { lat, lng, t };
           gpsTrailCoords.push([lat, lng, t]);
         } else {
@@ -1163,17 +1238,10 @@
         if (!map.getBounds().pad(-0.25).contains([lat, lng])) map.panTo([lat, lng]);
       }
 
-      // Draw breadcrumb trail
       if (!runnerTrailPolyline) {
-        runnerTrailPolyline = L.polyline(gpsTrailCoords, {
-          color: '#7B9EF0',
-          weight: 2.5,
-          opacity: 0.75,
-          lineCap: 'round',
-          lineJoin: 'round'
-        }).addTo(map);
+        runnerTrailPolyline = makeTrail(gpsTrailCoords).addTo(map);
       } else {
-        runnerTrailPolyline.setLatLngs(gpsTrailCoords);
+        setTrail(runnerTrailPolyline, gpsTrailCoords);
       }
     }
 
@@ -1242,7 +1310,7 @@
     async function finishRun() {
       if (!isRunning) return;
 
-      const finalSeconds = Math.max(1, Math.round((Date.now() - runStartTime) / 1000));
+      const finalSeconds = activeSeconds();
 
       if (finalSeconds < 15) {
         const ok = await askConfirm({
@@ -1320,6 +1388,8 @@
       if (runnerTrailPolyline) { map.removeLayer(runnerTrailPolyline); runnerTrailPolyline = null; }
       if (runnerMarker) { map.removeLayer(runnerMarker); runnerMarker = null; }
       if (pending.path) drawTrailOnMap(pending.path, `Your run · ${formatDuration(pending.seconds)}`);
+
+      loadMyRuns();
 
       // A route run becomes the one the stats cards show
       if (route) { myRouteIds.add(route.id); setFocusRoute(route, { load: false }); }
@@ -1407,6 +1477,61 @@
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
+    // ── My Run History ───────────────────────────────────────────────────────
+    async function loadMyRuns() {
+      const list = document.getElementById('myRunsList');
+      const { data, error } = await db.rpc('my_runs', { p_limit: 50 });
+      if (error) {
+        list.innerHTML = `<div class="dim" style="padding:8px;font-size:0.85rem;">Could not load your runs.</div>`;
+        return;
+      }
+      const runs = data || [];
+      const totalKm = runs.reduce((s, r) => s + (Number(r.distance_km) || 0), 0);
+      document.getElementById('myRunsTotal').textContent =
+        runs.length ? `${runs.length} run${runs.length > 1 ? 's' : ''} · ${totalKm.toFixed(1)} km` : '';
+
+      if (!runs.length) {
+        list.innerHTML = `<div class="dim" style="padding:8px;font-size:0.85rem;">No runs yet — your runs will show up here.</div>`;
+        return;
+      }
+
+      const routeName = (id) => {
+        if (id === FREE_RUN_ID) return 'Free run';
+        const r = (typeof ROUTES !== 'undefined') && ROUTES.find(x => x.id === id);
+        return r ? r.shortName || r.name : id;
+      };
+
+      list.innerHTML = runs.map(r => {
+        const km = Number(r.distance_km) || 0;
+        const pace = km >= 0.1 ? formatDuration(Math.round(r.duration_seconds / km)) + ' /km' : '--';
+        return `
+          <button type="button" class="my-run-row" data-id="${escapeHtml(String(r.id))}" ${r.has_path ? '' : 'disabled'}
+            style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:transparent;border:none;border-top:1px solid var(--border);padding:11px 2px;font-family:inherit;color:inherit;cursor:${r.has_path ? 'pointer' : 'default'};">
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:0.9rem;font-weight:700;color:#fff;">${escapeHtml(routeName(r.route_id))}</div>
+              <div style="font-size:0.74rem;color:var(--text-dim);margin-top:2px;">${formatDate(r.recorded_at)}</div>
+            </div>
+            <div style="text-align:right;font-variant-numeric:tabular-nums;">
+              <div style="font-size:0.9rem;font-weight:700;color:var(--pink);">${km.toFixed(2)} km</div>
+              <div style="font-size:0.74rem;color:var(--text-dim);margin-top:2px;">${formatDuration(r.duration_seconds)} · ${pace}</div>
+            </div>
+            ${r.has_path ? '<i class="fa-solid fa-map-location-dot" style="color:var(--text-dim);font-size:0.85rem;"></i>' : ''}
+          </button>`;
+      }).join('');
+
+      list.querySelectorAll('.my-run-row:not([disabled])').forEach(btn => {
+        btn.addEventListener('click', () => showRunOnMap(btn.dataset.id));
+      });
+    }
+
+    async function showRunOnMap(runId) {
+      if (isRunning) return;
+      const { data, error } = await db.rpc('my_run_path', { p_run_id: runId });
+      if (error || !data || !data.gps_path) return;
+      drawTrailOnMap(data.gps_path, `${formatDate(data.recorded_at)} · ${formatDuration(data.duration_seconds)}`);
+      document.getElementById('runMap').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
     function formatDuration(sec) {
       if (!sec || sec < 0) return '00:00';
       const s = Math.floor(sec % 60);
