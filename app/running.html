@@ -577,7 +577,7 @@
 
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px;">
         <div style="background:rgba(212,90,232,0.08); border:1px solid rgba(212,90,232,0.25); border-radius:14px; padding:10px;">
-          <div id="modalPointsEarned" style="font-size:1.25rem; font-weight:800; color:var(--pink); font-variant-numeric:tabular-nums;">+5</div>
+          <div id="modalPointsEarned" style="font-size:1.25rem; font-weight:800; color:var(--pink); font-variant-numeric:tabular-nums;">+0</div>
           <div style="font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; font-weight:600; margin-top:2px;">Game Points</div>
           <div id="modalKmPoints" style="display:none; font-size:0.68rem; color:var(--text-muted); margin-top:3px; font-variant-numeric:tabular-nums;"></div>
         </div>
@@ -587,6 +587,9 @@
         </div>
       </div>
 
+      <button type="button" class="btn btn-secondary" onclick="shareRun(lastRunResult)" style="width:100%; justify-content:center; padding:12px; font-weight:700; margin-bottom:10px;">
+        <i class="fa-solid fa-share-nodes"></i> Share my run
+      </button>
       <button type="button" class="btn btn-pink" onclick="closeRunModal()" style="width:100%; justify-content:center; padding:12px; font-weight:700;">
         Continue
       </button>
@@ -1395,6 +1398,7 @@
       if (route) { myRouteIds.add(route.id); setFocusRoute(route, { load: false }); }
 
       showRunResultModal({
+        path: pending.path,
         route,
         seconds: pending.seconds,
         meters: pending.meters || 0,
@@ -1442,6 +1446,8 @@
       document.getElementById('timerCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    let lastRunResult = null;
+
     function showRunResultModal(res) {
       const km = (res.meters / 1000).toFixed(2);
       document.getElementById('modalTitle').textContent = res.route ? 'Run Completed!' : 'Free Run Completed!';
@@ -1451,7 +1457,14 @@
         ? `${km} km${res.route ? ` of ${res.route.distance}` : ''}`
         : '';
       document.getElementById('modalPbBadge').style.display = res.isPb ? 'block' : 'none';
-      document.getElementById('modalPointsEarned').textContent = `+${res.points ?? 5}`;
+      document.getElementById('modalPointsEarned').textContent = `+${res.points ?? 0}`;
+      lastRunResult = {
+        path: res.path || null,
+        seconds: res.seconds,
+        km: (res.meters || 0) / 1000,
+        title: res.route ? res.route.name : 'Free run',
+        date: new Date().toISOString()
+      };
       document.getElementById('modalStreakWeeks').textContent = `${res.streak ?? 1}w`;
       const kmEl = document.getElementById('modalKmPoints');
       if (res.kmPoints > 0) {
@@ -1505,8 +1518,9 @@
         const km = Number(r.distance_km) || 0;
         const pace = km >= 0.1 ? formatDuration(Math.round(r.duration_seconds / km)) + ' /km' : '--';
         return `
+          <div style="display:flex;align-items:center;gap:6px;border-top:1px solid var(--border);">
           <button type="button" class="my-run-row" data-id="${escapeHtml(String(r.id))}" ${r.has_path ? '' : 'disabled'}
-            style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:transparent;border:none;border-top:1px solid var(--border);padding:11px 2px;font-family:inherit;color:inherit;cursor:${r.has_path ? 'pointer' : 'default'};">
+            style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;text-align:left;background:transparent;border:none;padding:11px 2px;font-family:inherit;color:inherit;cursor:${r.has_path ? 'pointer' : 'default'};">
             <div style="flex:1;min-width:0;">
               <div style="font-size:0.9rem;font-weight:700;color:#fff;">${escapeHtml(routeName(r.route_id))}</div>
               <div style="font-size:0.74rem;color:var(--text-dim);margin-top:2px;">${formatDate(r.recorded_at)}</div>
@@ -1516,11 +1530,29 @@
               <div style="font-size:0.74rem;color:var(--text-dim);margin-top:2px;">${formatDuration(r.duration_seconds)} · ${pace}</div>
             </div>
             ${r.has_path ? '<i class="fa-solid fa-map-location-dot" style="color:var(--text-dim);font-size:0.85rem;"></i>' : ''}
-          </button>`;
+          </button>
+          <button type="button" class="my-run-share" data-id="${escapeHtml(String(r.id))}" aria-label="Share this run"
+            style="background:transparent;border:none;color:var(--pink);padding:10px 8px;cursor:pointer;font-size:0.95rem;">
+            <i class="fa-solid fa-share-nodes"></i>
+          </button>
+          </div>`;
       }).join('');
 
       list.querySelectorAll('.my-run-row:not([disabled])').forEach(btn => {
         btn.addEventListener('click', () => showRunOnMap(btn.dataset.id));
+      });
+      list.querySelectorAll('.my-run-share').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const r = runs.find(x => String(x.id) === btn.dataset.id);
+          if (!r) return;
+          let path = null;
+          if (r.has_path) {
+            const { data } = await db.rpc('my_run_path', { p_run_id: r.id });
+            path = data && data.gps_path;
+          }
+          shareRun({ path, seconds: r.duration_seconds, km: Number(r.distance_km) || 0,
+                     title: routeName(r.route_id), date: r.recorded_at });
+        });
       });
     }
 
@@ -1530,6 +1562,99 @@
       if (error || !data || !data.gps_path) return;
       drawTrailOnMap(data.gps_path, `${formatDate(data.recorded_at)} · ${formatDuration(data.duration_seconds)}`);
       document.getElementById('runMap').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // ── Share a run as an image (trail + stats), Strava-style ────────────────
+    function renderShareCard(run) {
+      const W = 1080, H = 1350;
+      const c = document.createElement('canvas');
+      c.width = W; c.height = H;
+      const g = c.getContext('2d');
+      const pink = TRAIL_COLOR;
+
+      const bg = g.createLinearGradient(0, 0, 0, H);
+      bg.addColorStop(0, '#15151d'); bg.addColorStop(1, '#0B0B0F');
+      g.fillStyle = bg; g.fillRect(0, 0, W, H);
+
+      const font = (w, px) => `${w} ${px}px Outfit, system-ui, sans-serif`;
+      g.fillStyle = pink; g.font = font(700, 34);
+      g.fillText('ISOT RUNNING CLUB', 80, 110);
+      g.fillStyle = '#fff'; g.font = font(700, 58);
+      g.fillText(run.title || 'Run', 80, 185);
+      g.fillStyle = 'rgba(255,255,255,0.55)'; g.font = font(500, 32);
+      g.fillText(new Date(run.date || Date.now()).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' }), 80, 235);
+
+      // Trail, projected into the middle box
+      const pts = (run.path || []).map(p => [p[0], p[1]]);
+      const box = { x: 90, y: 300, w: W - 180, h: 660 };
+      if (pts.length >= 2) {
+        const sm = smoothPath(pts);
+        const lat0 = sm.reduce((s, p) => s + p[0], 0) / sm.length;
+        const k = Math.cos(lat0 * Math.PI / 180);
+        const xy = sm.map(p => [p[1] * k, -p[0]]);
+        const xs = xy.map(p => p[0]), ys = xy.map(p => p[1]);
+        const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+        const scale = Math.min(box.w / Math.max(maxX - minX, 1e-9), box.h / Math.max(maxY - minY, 1e-9));
+        const ox = box.x + (box.w - (maxX - minX) * scale) / 2;
+        const oy = box.y + (box.h - (maxY - minY) * scale) / 2;
+        const P = xy.map(p => [ox + (p[0] - minX) * scale, oy + (p[1] - minY) * scale]);
+
+        const stroke = (color, width) => {
+          g.beginPath(); g.moveTo(P[0][0], P[0][1]);
+          for (let i = 1; i < P.length; i++) g.lineTo(P[i][0], P[i][1]);
+          g.strokeStyle = color; g.lineWidth = width; g.lineCap = 'round'; g.lineJoin = 'round'; g.stroke();
+        };
+        stroke('rgba(0,0,0,0.6)', 22);
+        stroke(pink, 12);
+        const dot = (p, fill) => { g.beginPath(); g.arc(p[0], p[1], 16, 0, Math.PI * 2); g.fillStyle = fill; g.fill(); g.lineWidth = 7; g.strokeStyle = '#fff'; g.stroke(); };
+        dot(P[0], '#22C55E');
+        dot(P[P.length - 1], '#111');
+      } else {
+        g.fillStyle = 'rgba(255,255,255,0.35)'; g.font = font(500, 34); g.textAlign = 'center';
+        g.fillText('No GPS trail for this run', W / 2, box.y + box.h / 2);
+        g.textAlign = 'left';
+      }
+
+      // Stats row
+      const pace = run.km >= 0.1 ? formatDuration(Math.round(run.seconds / run.km)) + ' /km' : '--';
+      const stats = [['Distance', `${run.km.toFixed(2)} km`], ['Time', formatDuration(run.seconds)], ['Pace', pace]];
+      const colW = (W - 160) / 3;
+      stats.forEach(([label, val], i) => {
+        const x = 80 + i * colW;
+        g.fillStyle = 'rgba(255,255,255,0.5)'; g.font = font(600, 28);
+        g.fillText(label.toUpperCase(), x, 1070);
+        g.fillStyle = '#fff'; g.font = font(800, 56);
+        g.fillText(val, x, 1140);
+      });
+
+      g.fillStyle = 'rgba(255,255,255,0.35)'; g.font = font(500, 28);
+      g.fillText('isotcommunity.com', 80, H - 70);
+      g.fillStyle = pink; g.font = font(700, 28); g.textAlign = 'right';
+      g.fillText('Live globally, run locally.', W - 80, H - 70);
+      g.textAlign = 'left';
+      return c;
+    }
+
+    async function shareRun(run) {
+      if (!run) return;
+      const canvas = renderShareCard(run);
+      const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+      if (!blob) return;
+      const file = new File([blob], 'isot-run.png', { type: 'image/png' });
+      const text = `I ran ${run.km.toFixed(2)} km in ${formatDuration(run.seconds)} with the ISOT Running Club 🏃`;
+      try {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], text });
+          return;
+        }
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;
+      }
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'isot-run.png';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
     }
 
     function formatDuration(sec) {
