@@ -1565,96 +1565,159 @@
     }
 
     // ── Share a run as an image (trail + stats), Strava-style ────────────────
-    function renderShareCard(run) {
-      const W = 1080, H = 1350;
+    function loadTile(url) {
+      return new Promise(res => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => res(img);
+        img.onerror = () => res(null);
+        img.src = url;
+      });
+    }
+
+    async function renderShareCard(run) {
+      const W = 1080, H = 1350, MAP_H = 1000;
       const c = document.createElement('canvas');
       c.width = W; c.height = H;
       const g = c.getContext('2d');
       const pink = TRAIL_COLOR;
-
-      const bg = g.createLinearGradient(0, 0, 0, H);
-      bg.addColorStop(0, '#15151d'); bg.addColorStop(1, '#0B0B0F');
-      g.fillStyle = bg; g.fillRect(0, 0, W, H);
-
       const font = (w, px) => `${w} ${px}px Outfit, system-ui, sans-serif`;
-      g.fillStyle = pink; g.font = font(700, 34);
-      g.fillText('ISOT RUNNING CLUB', 80, 110);
-      g.fillStyle = '#fff'; g.font = font(700, 58);
-      g.fillText(run.title || 'Run', 80, 185);
-      g.fillStyle = 'rgba(255,255,255,0.55)'; g.font = font(500, 32);
-      g.fillText(new Date(run.date || Date.now()).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' }), 80, 235);
 
-      // Trail, projected into the middle box
-      const pts = (run.path || []).map(p => [p[0], p[1]]);
-      const box = { x: 90, y: 300, w: W - 180, h: 660 };
+      g.fillStyle = '#0B0B0F'; g.fillRect(0, 0, W, H);
+      g.fillStyle = '#1b1b22'; g.fillRect(0, 0, W, MAP_H);
+
+      const pts = smoothPath((run.path || []).map(p => [p[0], p[1]]));
       if (pts.length >= 2) {
-        const sm = smoothPath(pts);
-        const lat0 = sm.reduce((s, p) => s + p[0], 0) / sm.length;
-        const k = Math.cos(lat0 * Math.PI / 180);
-        const xy = sm.map(p => [p[1] * k, -p[0]]);
-        const xs = xy.map(p => p[0]), ys = xy.map(p => p[1]);
-        const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
-        const scale = Math.min(box.w / Math.max(maxX - minX, 1e-9), box.h / Math.max(maxY - minY, 1e-9));
-        const ox = box.x + (box.w - (maxX - minX) * scale) / 2;
-        const oy = box.y + (box.h - (maxY - minY) * scale) / 2;
-        const P = xy.map(p => [ox + (p[0] - minX) * scale, oy + (p[1] - minY) * scale]);
+        // Web Mercator, 256-px tiles. Fit the trail with a fractional zoom: fetch tiles at
+        // the integer zoom Z and scale them by S so the trail fills the frame.
+        const merc = (lat, lng) => {
+          const r = lat * Math.PI / 180;
+          return [(lng + 180) / 360 * 256, (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * 256];
+        };
+        const m0 = pts.map(p => merc(p[0], p[1]));
+        const xs0 = m0.map(p => p[0]), ys0 = m0.map(p => p[1]);
+        const availW = W - 2 * 150, availH = MAP_H - 2 * 150 - 120;
+        const spanX = Math.max(Math.max(...xs0) - Math.min(...xs0), 1e-9);
+        const spanY = Math.max(Math.max(...ys0) - Math.min(...ys0), 1e-9);
+        const zf = Math.min(17.5, Math.log2(Math.min(availW / spanX, availH / spanY)));
+        const Z = Math.max(3, Math.min(16, Math.floor(zf)));
+        const S = Math.pow(2, zf - Z);
+        const k = Math.pow(2, Z);
+        const cx = (Math.min(...xs0) + Math.max(...xs0)) / 2 * k;
+        const cy = (Math.min(...ys0) + Math.max(...ys0)) / 2 * k;
+        const left = cx - (W / 2) / S;
+        const top  = cy - (MAP_H / 2 + 40) / S; // shift down to clear the header
 
+        g.save();
+        g.beginPath(); g.rect(0, 0, W, MAP_H); g.clip();
+
+        const jobs = [];
+        const viewW = W / S, viewH = MAP_H / S;
+        for (let tx = Math.floor(left / 256); tx <= Math.floor((left + viewW) / 256); tx++) {
+          for (let ty = Math.floor(top / 256); ty <= Math.floor((top + viewH) / 256); ty++) {
+            const url = `https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/${Z}/${ty}/${tx}`;
+            jobs.push(loadTile(url).then(img => img && g.drawImage(img, (tx * 256 - left) * S, (ty * 256 - top) * S, 256 * S + 1, 256 * S + 1)));
+          }
+        }
+        await Promise.all(jobs);
+
+        const P = m0.map(p => [(p[0] * k - left) * S, (p[1] * k - top) * S]);
         const stroke = (color, width) => {
           g.beginPath(); g.moveTo(P[0][0], P[0][1]);
-          for (let i = 1; i < P.length; i++) g.lineTo(P[i][0], P[i][1]);
+          for (let q = 1; q < P.length; q++) g.lineTo(P[q][0], P[q][1]);
           g.strokeStyle = color; g.lineWidth = width; g.lineCap = 'round'; g.lineJoin = 'round'; g.stroke();
         };
-        stroke('rgba(0,0,0,0.6)', 22);
-        stroke(pink, 12);
-        const dot = (p, fill) => { g.beginPath(); g.arc(p[0], p[1], 16, 0, Math.PI * 2); g.fillStyle = fill; g.fill(); g.lineWidth = 7; g.strokeStyle = '#fff'; g.stroke(); };
+        stroke('rgba(0,0,0,0.55)', 20);
+        stroke(pink, 11);
+        const dot = (p, fill) => { g.beginPath(); g.arc(p[0], p[1], 15, 0, Math.PI * 2); g.fillStyle = fill; g.fill(); g.lineWidth = 6; g.strokeStyle = '#fff'; g.stroke(); };
         dot(P[0], '#22C55E');
         dot(P[P.length - 1], '#111');
+        g.restore();
       } else {
         g.fillStyle = 'rgba(255,255,255,0.35)'; g.font = font(500, 34); g.textAlign = 'center';
-        g.fillText('No GPS trail for this run', W / 2, box.y + box.h / 2);
+        g.fillText('No GPS trail for this run', W / 2, MAP_H / 2);
         g.textAlign = 'left';
       }
 
-      // Stats row
-      const pace = run.km >= 0.1 ? formatDuration(Math.round(run.seconds / run.km)) + ' /km' : '--';
+      // Header over the map, on a fade so it stays readable
+      const topFade = g.createLinearGradient(0, 0, 0, 300);
+      topFade.addColorStop(0, 'rgba(11,11,15,0.92)'); topFade.addColorStop(1, 'rgba(11,11,15,0)');
+      g.fillStyle = topFade; g.fillRect(0, 0, W, 300);
+      const botFade = g.createLinearGradient(0, MAP_H - 160, 0, MAP_H);
+      botFade.addColorStop(0, 'rgba(11,11,15,0)'); botFade.addColorStop(1, 'rgba(11,11,15,1)');
+      g.fillStyle = botFade; g.fillRect(0, MAP_H - 160, W, 160);
+
+      g.fillStyle = pink; g.font = font(700, 32);
+      g.fillText('ISOT RUNNING CLUB', 70, 95);
+      g.fillStyle = '#fff'; g.font = font(700, 56);
+      g.fillText(run.title || 'Run', 70, 165);
+      g.fillStyle = 'rgba(255,255,255,0.65)'; g.font = font(500, 30);
+      g.fillText(new Date(run.date || Date.now()).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' }), 70, 212);
+
+      g.fillStyle = 'rgba(255,255,255,0.4)'; g.font = font(400, 18); g.textAlign = 'right';
+      g.fillText('Esri, HERE, Garmin, © OpenStreetMap contributors', W - 24, MAP_H - 16);
+      g.textAlign = 'left';
+
+      // Stats
+      const pace = run.km >= 0.1 ? formatDuration(Math.round(run.seconds / run.km)).replace(/^0/, '') + ' /km' : '--';
       const stats = [['Distance', `${run.km.toFixed(2)} km`], ['Time', formatDuration(run.seconds)], ['Pace', pace]];
-      const colW = (W - 160) / 3;
-      stats.forEach(([label, val], i) => {
-        const x = 80 + i * colW;
-        g.fillStyle = 'rgba(255,255,255,0.5)'; g.font = font(600, 28);
-        g.fillText(label.toUpperCase(), x, 1070);
-        g.fillStyle = '#fff'; g.font = font(800, 56);
-        g.fillText(val, x, 1140);
+      const colW = (W - 140) / 3;
+      stats.forEach(([label, val], k) => {
+        const x = 70 + k * colW;
+        g.fillStyle = 'rgba(255,255,255,0.5)'; g.font = font(600, 26);
+        g.fillText(label.toUpperCase(), x, 1095);
+        g.fillStyle = '#fff'; g.font = font(800, 54);
+        g.fillText(val, x, 1160);
       });
 
-      g.fillStyle = 'rgba(255,255,255,0.35)'; g.font = font(500, 28);
-      g.fillText('isotcommunity.com', 80, H - 70);
-      g.fillStyle = pink; g.font = font(700, 28); g.textAlign = 'right';
-      g.fillText('Live globally, run locally.', W - 80, H - 70);
+      g.fillStyle = 'rgba(255,255,255,0.35)'; g.font = font(500, 26);
+      g.fillText('isotcommunity.com', 70, H - 60);
+      g.fillStyle = pink; g.font = font(700, 26); g.textAlign = 'right';
+      g.fillText('Live globally, run locally.', W - 70, H - 60);
       g.textAlign = 'left';
       return c;
     }
 
     async function shareRun(run) {
       if (!run) return;
-      const canvas = renderShareCard(run);
+      const ov = document.createElement('div');
+      ov.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;';
+      ov.innerHTML = `
+        <div id="sharePreview" style="width:min(88vw,380px);aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:#15151d;display:flex;align-items:center;justify-content:center;">
+          <div class="spinner"></div>
+        </div>
+        <div style="display:flex;gap:10px;width:min(88vw,380px);">
+          <button type="button" id="shareGo" class="btn btn-pink" disabled style="flex:2;justify-content:center;padding:12px;font-weight:700;"><i class="fa-solid fa-share-nodes"></i> Share</button>
+          <button type="button" id="shareClose" class="btn btn-secondary" style="flex:1;justify-content:center;padding:12px;">Close</button>
+        </div>`;
+      document.body.appendChild(ov);
+      const close = () => ov.remove();
+      ov.querySelector('#shareClose').onclick = close;
+      ov.addEventListener('click', e => { if (e.target === ov) close(); });
+
+      const canvas = await renderShareCard(run);
       const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
-      if (!blob) return;
+      if (!blob || !ov.isConnected) return;
+      const url = URL.createObjectURL(blob);
+      ov.querySelector('#sharePreview').innerHTML = `<img src="${url}" alt="Run share image" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+
       const file = new File([blob], 'isot-run.png', { type: 'image/png' });
       const text = `I ran ${run.km.toFixed(2)} km in ${formatDuration(run.seconds)} with the ISOT Running Club 🏃`;
-      try {
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], text });
-          return;
+      const go = ov.querySelector('#shareGo');
+      go.disabled = false;
+      go.onclick = async () => {
+        try {
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], text });
+            return;
+          }
+        } catch (e) {
+          if (e && e.name === 'AbortError') return;
         }
-      } catch (e) {
-        if (e && e.name === 'AbortError') return;
-      }
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'isot-run.png';
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'isot-run.png';
+        document.body.appendChild(a); a.click(); a.remove();
+      };
     }
 
     function formatDuration(sec) {
