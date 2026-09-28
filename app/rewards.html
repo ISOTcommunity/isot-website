@@ -213,6 +213,7 @@
     let eb = null;        // early_bird_status()
     let game = null;      // game_state(): rules, progress
     let board = [];       // game_leaderboard()
+    let friendState = {}; // other profile id → 'connected' | 'sent' | 'incoming'
     let trade = { open: false };  // trade_status(): only during Monday karaoke
     let last = null;              // game_last_winner(): prize + last month's #1
     let clockTimer = null;
@@ -240,7 +241,57 @@
       await load();
     }
 
+    async function loadFriendships() {
+      const { data, error } = await db.from('friendships')
+        .select('user_id, friend_id, status')
+        .or(`user_id.eq.${me.id},friend_id.eq.${me.id}`);
+      if (error) return;
+      friendState = {};
+      (data || []).forEach(f => {
+        const other = f.user_id === me.id ? f.friend_id : f.user_id;
+        if (f.status === 'connected') friendState[other] = 'connected';
+        else if (f.user_id === me.id) friendState[other] = 'sent';
+        else friendState[other] = 'incoming';
+      });
+      if (board.length) render();
+    }
+
+    function friendButton(b) {
+      if (b.is_me || !b.profile_id) return '';
+      const st = friendState[b.profile_id];
+      const base = 'border:none;border-radius:14px;padding:5px 10px;font-size:.72rem;font-weight:700;font-family:inherit;flex-shrink:0;';
+      if (st === 'connected') return `<span style="${base}color:var(--green);background:transparent;padding-inline:4px" title="Friends"><i class="fa-solid fa-user-check"></i></span>`;
+      if (st === 'sent')      return `<span style="${base}color:var(--text-dim);background:rgba(255,255,255,.06)">Requested</span>`;
+      if (st === 'incoming')  return `<button type="button" data-accept-friend="${b.profile_id}" style="${base}background:var(--green);color:#0B0B0F;cursor:pointer">Accept</button>`;
+      return `<button type="button" data-add-friend="${b.profile_id}" aria-label="Add ${escapeHtml(b.name)} as friend" style="${base}background:rgba(212,90,232,.15);color:var(--pink);cursor:pointer"><i class="fa-solid fa-user-plus"></i> Add</button>`;
+    }
+
+    document.addEventListener('click', async (e) => {
+      const add = e.target.closest('[data-add-friend]');
+      const acc = e.target.closest('[data-accept-friend]');
+      if (!add && !acc) return;
+      const btn = add || acc;
+      const id = btn.dataset.addFriend || btn.dataset.acceptFriend;
+      btn.disabled = true;
+      if (add) {
+        const { error } = await db.from('friendships').insert({ user_id: me.id, friend_id: id, status: 'pending' });
+        if (error) { btn.disabled = false; alert('Could not send the request: ' + error.message); return; }
+        friendState[id] = 'sent';
+        await sendNotification(id, 'friend_request', 'New friend request',
+          `${me.full_name || 'A member'} sent you a friend request from the Game leaderboard.`);
+      } else {
+        const { error } = await db.from('friendships').update({ status: 'connected' })
+          .eq('user_id', id).eq('friend_id', me.id);
+        if (error) { btn.disabled = false; alert('Could not accept: ' + error.message); return; }
+        friendState[id] = 'connected';
+        await sendNotification(id, 'friend_accept', 'Friend request accepted',
+          `${me.full_name || 'A member'} accepted your friend request.`);
+      }
+      render();
+    });
+
     async function load() {
+      loadFriendships();
       const [r, e, g, lb, ts, lw] = await Promise.all([
         db.rpc('my_rewards'),
         db.rpc('early_bird_status'),
@@ -474,6 +525,7 @@
                 ${escapeHtml(b.name)}${b.is_me ? ' <span style="color:var(--pink);font-size:.72rem">you</span>' : ''}
               </div>
               <div class="hpts pos">${b.points}</div>
+              ${friendButton(b)}
             </div>`).join('')}
         </div>
         <p class="dim" style="font-size:.7rem;margin-top:6px">Points earned since the 1st. Spending a shot does not lose you your place.</p>`;
