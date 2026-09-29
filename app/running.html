@@ -44,6 +44,16 @@
       font-size: 0.65rem !important;
       border-radius: 6px 0 0 0;
     }
+    .run-map-ctl { display: flex; flex-direction: column; gap: 6px; margin: 10px 10px 0 0 !important; }
+    .run-map-ctl button {
+      width: 38px; height: 38px; border-radius: 12px; border: 1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.95); color: #1b1b22; font-size: .95rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    }
+    .run-map-ctl button:active { transform: scale(.94); }
+    .run-compass { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; transition: transform .15s; }
+    .run-compass i { transform: rotate(-45deg); color: #E0245E; font-size: .9rem; }
+    .run-compass .n { position: absolute; top: 1px; font-size: .55rem; font-weight: 800; color: #E0245E; }
     .leaflet-control-attribution a { color: var(--text-dim) !important; }
 
     /* Secondary button — outline on the card surface (app.css has no .btn-secondary) */
@@ -599,6 +609,7 @@
 
   <script src="vendor/supabase.js"></script>
   <script src="vendor/leaflet.js"></script>
+  <script src="vendor/leaflet-rotate.js"></script>
   <script src="js/isot.js"></script>
   <script src="js/running_routes.js"></script>
 
@@ -716,12 +727,47 @@
     });
 
     // ── Page init ─────────────────────────────────────────────────────────────
+    // Zoom in / out and a compass that shows north; tapping it turns the map north-up
+    function addRunMapControls(m) {
+      const Ctl = L.Control.extend({
+        options: { position: 'topright' },
+        onAdd() {
+          const box = L.DomUtil.create('div', 'run-map-ctl');
+          box.innerHTML = `
+            <button type="button" data-z="in"  aria-label="Zoom in"><i class="fa-solid fa-plus"></i></button>
+            <button type="button" data-z="out" aria-label="Zoom out"><i class="fa-solid fa-minus"></i></button>
+            <button type="button" data-z="north" aria-label="Point map north" title="North up">
+              <span class="run-compass"><span class="n">N</span><i class="fa-solid fa-location-arrow"></i></span>
+            </button>`;
+          L.DomEvent.disableClickPropagation(box);
+          box.addEventListener('click', e => {
+            const b = e.target.closest('button'); if (!b) return;
+            if (b.dataset.z === 'in') m.zoomIn();
+            else if (b.dataset.z === 'out') m.zoomOut();
+            else if (m.setBearing) m.setBearing(0);
+          });
+          return box;
+        }
+      });
+      new Ctl().addTo(m);
+      const turn = () => {
+        const c = document.querySelector('.run-compass');
+        if (c && m.getBearing) c.style.transform = `rotate(${-m.getBearing()}deg)`;
+      };
+      m.on('rotate', turn);
+    }
+
     async function initRunningPage() {
       currentUser = await requireAuth();
       document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(currentUser, 36);
 
       // Initialize Leaflet Map — view set at once so tiles load while the last-run RPC is in flight
-      map = L.map('runMap', { zoomControl: false, attributionControl: false });
+      // leaflet-rotate: two-finger twist rotates the map; loaded on this page only
+      map = L.map('runMap', {
+        zoomControl: false, attributionControl: false,
+        rotate: true, touchRotate: true, rotateControl: false, bearing: 0
+      });
+      addRunMapControls(map);
       L.control.attribution({ prefix: false, position: 'bottomright' }).addAttribution('&copy; OSM').addTo(map);
       map.setView([45.0703, 7.6869], 13);
       // Run page only: OpenStreetMap's standard style shows footpaths, park trails and
