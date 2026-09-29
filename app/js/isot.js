@@ -89,6 +89,29 @@ function rgbaFrom(hex, alpha) {
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
 }
 
+/* Text on a surface: lift a colour toward white until it passes 4.5:1 on that surface.
+ * The default palette already passes, so on Night Blue nothing moves. Lighter grounds
+ * (Amber, Green) are where this earns its keep. */
+function lumOf(h) {
+  const c = [1, 3, 5].map(i => {
+    const v = parseInt(h.slice(i, i + 2), 16) / 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
+function contrastOf(a, b) {
+  const [hi, lo] = [lumOf(a), lumOf(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+}
+function legibleOn(hex, bg, min = 4.6) {
+  for (let t = 0; t <= 1.0001; t += 0.02) {
+    const c = mixHex(hex, '#FFFFFF', t);
+    if (contrastOf(c, bg) >= min) return c;
+  }
+  return '#FFFFFF';
+}
+function currentRaised() { return window.__isotRaised || '#26325D'; }
+
 /** Paint an accent. Only keys in ACCENTS are honoured — the value lands in a CSS
  *  custom property, so an unchecked string would reach the renderer. */
 function applyAccent(key) {
@@ -97,8 +120,10 @@ function applyAccent(key) {
   r.setProperty('--accent', a.hex);
   r.setProperty('--accent-hover', a.hover);
   r.setProperty('--on-accent', a.on);
-  r.setProperty('--orchid', a.text);
-  r.setProperty('--pink', a.text);             // historical name: the accent as text
+  const text = legibleOn(a.text, currentRaised());
+  window.__isotAccentText = a.text;
+  r.setProperty('--orchid', text);
+  r.setProperty('--pink', text);               // historical name: the accent as text
   r.setProperty('--pink-glow', rgbaFrom(a.hex, 0.28));
   return a;
 }
@@ -110,6 +135,87 @@ function applyAccent(key) {
   try { saved = localStorage.getItem(ACCENT_KEY); } catch (e) { /* private mode */ }
   applyAccent(saved && ACCENTS[saved] ? saved : DEFAULT_ACCENT);
 })();
+
+/* ---------------------------------------------------------------
+ * Member ground (background colour)
+ *
+ * Six options, each the Night tier of an ISOT Colour System v2.2 family, so the
+ * picker stays on-palette. Every surface is derived from the chosen Night exactly as
+ * app.css derives it from Night Blue: card = Night 6% toward Off-white, raised = 11%.
+ * Night Blue keeps its hand-set hexes, so the default is byte-for-byte what shipped.
+ * Text tokens are lifted per ground until they clear 4.5:1 on --bg-raised (legibleOn); the
+ * default ground moves nothing.
+ * Keys are stored in profiles.ground (supabase/067_member_ground.sql).
+ * ------------------------------------------------------------- */
+const GROUNDS = {
+  blue:    { name: 'Night Blue',    night: '#0C1A4A', darker: '#0D142C' },
+  violet:  { name: 'Night Violet',  night: '#1D1050' },
+  magenta: { name: 'Night Magenta', night: '#3B0A4A' },
+  coral:   { name: 'Night Coral',   night: '#3D1109' },
+  amber:   { name: 'Night Amber',   night: '#3A2405' },
+  green:   { name: 'Night Green',   night: '#06382A' },
+};
+const DEFAULT_GROUND = 'blue';
+const GROUND_KEY = 'isot_ground';
+
+function mixHex(a, b, t) {
+  const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const [x, y] = [p(a), p(b)];
+  return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, '0')).join('');
+}
+
+/** Paint a ground. Only keys in GROUNDS are honoured (see applyAccent). */
+function applyGround(key) {
+  const g = GROUNDS[key] || GROUNDS[DEFAULT_GROUND];
+  const n = g.night;
+  const card = mixHex(n, '#F6F7F9', 0.06);
+  const raised = mixHex(n, '#F6F7F9', 0.11);
+  const darker = g.darker || mixHex(n, '#000000', 0.45);
+  const r = document.documentElement.style;
+  r.setProperty('--bg-dark', n);
+  r.setProperty('--bg-darker', darker);
+  r.setProperty('--bg-card', card);
+  r.setProperty('--bg-raised', raised);
+  r.setProperty('--surface-glass', rgbaFrom(card, 0.78));
+  r.setProperty('--nav-glass', rgbaFrom(n, 0.78));
+
+  // Text tokens follow the surface they sit on.
+  window.__isotRaised = raised;
+  r.setProperty('--text-muted', legibleOn('#B0B5C5', raised));
+  r.setProperty('--text-dim', legibleOn('#A6ACBE', raised));
+  r.setProperty('--text-dark', legibleOn('#9DA3B7', raised));
+  r.setProperty('--red', legibleOn('#FF7359', raised));
+  if (window.__isotAccentText) {
+    const t = legibleOn(window.__isotAccentText, raised);
+    r.setProperty('--orchid', t);
+    r.setProperty('--pink', t);
+  }
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', n);
+  return g;
+}
+
+/** Applied before first paint, from localStorage, for the same reason as the accent. */
+(function initGround() {
+  let saved = null;
+  try { saved = localStorage.getItem(GROUND_KEY); } catch (e) { /* private mode */ }
+  if (saved && GROUNDS[saved] && saved !== DEFAULT_GROUND) applyGround(saved);
+})();
+
+async function saveGround(key) {
+  if (!GROUNDS[key]) return { ok: false, error: 'Unknown colour' };
+  applyGround(key);
+  try { localStorage.setItem(GROUND_KEY, key); } catch (e) { /* private mode */ }
+
+  const id = window.__isotProfileId;
+  if (!db || !id) return { ok: true, synced: false };
+  const { error } = await db.from('profiles').update({ ground: key }).eq('id', id);
+  if (error) {
+    console.warn('ground did not sync:', error.message);
+    return { ok: true, synced: false, error: error.message };
+  }
+  return { ok: true, synced: true };
+}
 
 /** Save the member's choice. Writes through to the profile so it follows them to
  *  another device, and caches locally so the next page load paints it immediately. */
@@ -511,6 +617,11 @@ async function requireAuth(opts = {}) {
   if (profile.accent && ACCENTS[profile.accent]) {
     applyAccent(profile.accent);
     try { localStorage.setItem(ACCENT_KEY, profile.accent); } catch (e) { /* private mode */ }
+  }
+
+  if (profile.ground && GROUNDS[profile.ground]) {
+    applyGround(profile.ground);
+    try { localStorage.setItem(GROUND_KEY, profile.ground); } catch (e) { /* private mode */ }
   }
 
   const isBoard = profile.staff_role === 'board';

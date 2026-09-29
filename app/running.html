@@ -331,6 +331,9 @@
       width: 100%; padding: 6px;
     }
     .start-sub:active { color: var(--text-main); }
+    /* A bit darker, still the detailed OSM style: dim the tiles only, so routes and
+       pins (a separate pane) keep their full colour. Raise brightness for lighter. */
+    .run-tiles { filter: brightness(0.68) saturate(0.85) contrast(1.05); }
   </style>
 </head>
 <body class="tone-green">
@@ -725,6 +728,7 @@
       document.body.classList.remove('map-dark');
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
+        className: 'run-tiles',
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
 

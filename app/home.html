@@ -12,7 +12,7 @@
 </script>
 
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ISOT App Hub</title>
   
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
@@ -145,7 +145,7 @@
       margin-left: -8px;
       overflow: hidden;
       flex-shrink: 0;
-      background: #1A2755;
+      background: var(--bg-card);
     }
     .avatar-stack-item-box:first-child {
       margin-left: 0;
@@ -248,24 +248,24 @@
     .tit-card {
       background: var(--bg-card);
       border: 1px solid var(--border-light);
-      border-radius: 20px;
-      padding: 14px 16px;
+      border-radius: 16px;
+      padding: 10px 14px;
       margin-bottom: 18px;
     }
     .tit-weather { display: flex; align-items: center; gap: 12px; }
     .tit-wicon {
-      width: 44px; height: 44px; flex-shrink: 0; border-radius: 14px;
+      width: 32px; height: 32px; flex-shrink: 0; border-radius: 10px;
       background: rgba(255,255,255,0.05);
-      display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem;
+      display: inline-flex; align-items: center; justify-content: center; font-size: 1.05rem;
     }
     .tit-wicon i, .tit-tip i, .tit-gtt i { display: inline-flex; align-items: center; justify-content: center; line-height: 1; margin: 0; padding: 0; }
-    .tit-temp { font-size: 1.35rem; font-weight: 800; color: #FFF; line-height: 1.1; font-variant-numeric: tabular-nums; }
+    .tit-temp { font-size: 1rem; font-weight: 700; color: #FFF; line-height: 1.1; font-variant-numeric: tabular-nums; }
     .tit-temp span { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-left: 4px; }
     .tit-meta { font-size: 0.74rem; color: var(--text-dim); margin-top: 3px; font-variant-numeric: tabular-nums; }
     .tit-tip {
       display: flex; align-items: flex-start; gap: 10px;
-      margin-top: 10px; padding: 10px 12px; border-radius: 14px;
-      font-size: 0.84rem; font-weight: 600; color: #FFF; line-height: 1.4;
+      margin-top: 8px; padding: 7px 10px; border-radius: 12px;
+      font-size: 0.78rem; font-weight: 600; color: #FFF; line-height: 1.4;
       background: rgba(255,255,255,0.05); border: 1px solid var(--border-light);
     }
     .tit-tip i { width: 20px; height: 20px; flex-shrink: 0; font-size: 0.95rem; }
@@ -277,8 +277,8 @@
     .tit-tip-hot i { color: var(--c-amber); }
     .tit-gtt {
       display: flex; align-items: center; gap: 10px;
-      margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-light);
-      font-size: 0.8rem; color: var(--text-muted); text-decoration: none;
+      margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-light);
+      font-size: 0.78rem; color: var(--text-muted); text-decoration: none;
     }
     .tit-gtt i { width: 20px; height: 20px; flex-shrink: 0; color: var(--text-dim); }
     .tit-gtt span { flex: 1; min-width: 0; }
@@ -355,13 +355,6 @@
     <!-- MEMBER / COMMUNITY ORDINARY HOME VIEW -->
     <div id="memberHomeView">
 
-      <!-- Today in Turin: the weather, what to take with you, and whether GTT is on
-           strike. Hidden until something loads, so a failed forecast leaves no box. -->
-      <div id="todayTurin" class="tit-card" hidden>
-        <div id="titWeather"></div>
-        <a id="titGtt" class="tit-gtt" href="gtt.html" hidden></a>
-      </div>
-
       <!-- The next three nights. The first with its poster, the other two compact. -->
       <div id="featuredNight" hidden style="margin-bottom:18px"></div>
 
@@ -369,6 +362,13 @@
            quiet day does not leave an empty box on the home page. -->
       <a href="today.html" id="todayCard" hidden
          style="display:block;text-decoration:none;color:inherit;margin-bottom:18px"></a>
+
+      <!-- Today in Turin (a strip, below the nights: the next event is what people open the app for): the weather, what to take with you, and whether GTT is on
+           strike. Hidden until something loads, so a failed forecast leaves no box. -->
+      <div id="todayTurin" class="tit-card" hidden>
+        <div id="titWeather"></div>
+        <a id="titGtt" class="tit-gtt" href="gtt.html" hidden></a>
+      </div>
 
       <!-- 5 Categories Character Strip -->
       <div style="margin-bottom: 8px;">
@@ -382,7 +382,7 @@
              Tapping through goes to real events, not a hardcoded panel. -->
         <div class="categories-strip">
           <div class="cat-pill-item" onclick="location.href='events.html?cat=karaoke'">
-            <div class="cat-pill-img" style="position:relative; background:#1A2755;"><img src="../assets/characters/char_karaoke_singer.png" alt="Karaoke Night" style="object-fit:contain; padding:4px;" /></div>
+            <div class="cat-pill-img" style="position:relative; background:var(--bg-card);"><img src="../assets/characters/char_karaoke_singer.png" alt="Karaoke Night" style="object-fit:contain; padding:4px;" /></div>
             <span class="cat-pill-label">Karaoke Night</span>
           </div>
 
@@ -392,7 +392,7 @@
           </div>
 
           <div class="cat-pill-item" onclick="location.href='events.html?cat=party'">
-            <div class="cat-pill-img" style="position:relative; background:#1A2755;"><img src="../assets/characters/char_dancer_1.png" alt="Party & Nightlife" style="object-fit:contain; padding:4px;" /></div>
+            <div class="cat-pill-img" style="position:relative; background:var(--bg-card);"><img src="../assets/characters/char_dancer_1.png" alt="Party & Nightlife" style="object-fit:contain; padding:4px;" /></div>
             <span class="cat-pill-label">Party &amp; Nightlife</span>
           </div>
 
@@ -402,7 +402,7 @@
           </div>
 
           <div class="cat-pill-item" onclick="location.href='events.html?cat=sports'">
-            <div class="cat-pill-img" style="position:relative; background:#1A2755;"><img src="../assets/characters/char_cat_wizards.png" alt="Sports & Trips" style="object-fit:contain; padding:2px;" /></div>
+            <div class="cat-pill-img" style="position:relative; background:var(--bg-card);"><img src="../assets/characters/char_cat_wizards.png" alt="Sports & Trips" style="object-fit:contain; padding:2px;" /></div>
             <span class="cat-pill-label">Sports &amp; Trips</span>
           </div>
         </div>
@@ -759,18 +759,19 @@
               ${escapeHtml(label(lead))}${lead.headline ? ' · ' + escapeHtml(lead.headline) : ''}
             </div>
             <a href="event.html?e=${lead.eventId}&d=${lead.date}" style="text-decoration:none">
-              <h2 style="font-size:1.25rem;color:#FFF;margin:4px 0 2px">${escapeHtml(lead.title)}</h2>
+              <h2 style="font-size:1.55rem;line-height:1.1;letter-spacing:-0.02em;color:#FFF;margin:4px 0 6px">${escapeHtml(lead.title)}</h2>
             </a>
-            <div class="dim" style="font-size:0.82rem">
+            <div style="font-size:0.95rem;font-weight:600;color:var(--text-main)">
               ${escapeHtml(lead.time)} · ${escapeHtml(lead.venueName || '')}
-              ${lead.goingCount ? ' · ' + lead.goingCount + ' going' : ''}
             </div>
+            ${lead.goingCount ? `<div style="font-size:0.82rem;font-weight:700;color:var(--pink);margin-top:4px">
+              <i class="fa-solid fa-user-group" aria-hidden="true" style="font-size:0.72rem"></i> ${lead.goingCount} going</div>` : ''}
             <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
               <button type="button" class="btn btn-sm ${userRsvps[lead.id] ? 'btn-outline' : 'btn-pink'}"
                       style="width:auto;padding:8px 16px;font-size:0.84rem"
                       onclick="toggleFeaturedRsvp('${lead.id}')">
                 <i class="fa-solid ${userRsvps[lead.id] ? 'fa-circle-check text-green' : 'fa-calendar-plus'}"></i>
-                ${userRsvps[lead.id] ? "You're going" : "I'm going"}
+                ${userRsvps[lead.id] ? "You're going" : "Count me in"}
               </button>
               ${lead.registerUrl ? `
                 <a href="${escapeHtml(lead.registerUrl)}" target="_blank" rel="noopener noreferrer"
@@ -809,7 +810,7 @@
               <button type="button" class="btn btn-sm ${userRsvps[e.id] ? 'btn-going' : 'btn-outline'}"
                       style="width:auto;padding:5px 12px;font-size:0.74rem;flex-shrink:0"
                       onclick="toggleFeaturedRsvp('${e.id}')">
-                ${userRsvps[e.id] ? '<i class="fa-solid fa-check" aria-hidden="true"></i> Going' : "I'm in"}
+                ${userRsvps[e.id] ? '<i class="fa-solid fa-check" aria-hidden="true"></i> Going' : "Join"}
               </button>
             </div>`).join('')}
         </div>` : ''}`;

@@ -48,7 +48,7 @@
       --radius-lg: 32px;
       --radius-full: 9999px;
       --radius-arc: 46px;   /* the half-circle corner */
-      --transition: all 0.15s ease;
+      --transition: background-color 0.15s var(--ease-out, ease), border-color 0.15s var(--ease-out, ease), color 0.15s var(--ease-out, ease), transform 0.15s var(--ease-out, ease), opacity 0.15s var(--ease-out, ease);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -80,7 +80,7 @@
       display: inline-flex; align-items: center; justify-content: center; gap: 10px;
       padding: 14px 28px; border-radius: var(--radius-full); font-weight: 600;
       font-size: 1rem; cursor: pointer; border: none; transition: var(--transition);
-      text-transform: uppercase; letter-spacing: 0.5px;
+      text-transform: uppercase; letter-spacing: 0.03em;
     }
     .btn-pink { background: linear-gradient(135deg, #D45AE8, #E69321); color: #FFF; box-shadow: 0 10px 25px var(--pink-glow); }
     .btn-pink:hover { transform: translateY(-3px); }
@@ -89,7 +89,7 @@
     .pill-tag {
       display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px;
       border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 1.5px; background: rgba(212, 90, 232, 0.15);
+      text-transform: uppercase; letter-spacing: 0.07em; background: rgba(212, 90, 232, 0.15);
       border: 1px solid rgba(212, 90, 232, 0.3); color: var(--pink); margin-bottom: 20px;
     }
 
@@ -270,7 +270,7 @@
       text-align: center;
       padding: 8px 0;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.05em;
     }
     .cal-matrix-day {
       min-height: 64px;
@@ -416,6 +416,7 @@
     }
 
   </style>
+  <link rel="stylesheet" href="/assets/css/isot-motion.css" />
 </head>
 <body>
 
@@ -935,7 +936,7 @@
         const monthEvents = EVENTS_DATA.filter(e => e.monthIdx === currMonthIdx && e.year === currYear);
         html += `
           <div style="margin-top:20px;">
-            <div style="font-size:0.85rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-dim); margin-bottom:14px;">
+            <div style="font-size:0.85rem; font-weight:800; text-transform:uppercase; letter-spacing: 0.05em; color:var(--text-dim); margin-bottom:14px;">
               ${MONTH_NAMES[currMonthIdx]} ${currYear} Events (${monthEvents.length})
             </div>
             ${monthEvents.length ? monthEvents.map(e => renderEventItemHtml(e)).join('') : '<div style="color:var(--text-dim); text-align:center; padding:20px;">No events listed for this month.</div>'}

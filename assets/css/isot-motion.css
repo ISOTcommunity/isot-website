@@ -1,0 +1,42 @@
+/* Shared motion, transparency and press rules for the public pages.
+   Mirrors the app's rules in app/css/app.css so the site and the app behave alike. */
+:root { --ease-out: cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* Press feedback lands on touch-down and never waits for release. */
+.btn-pink:active, .btn-outline:active, .btn-app-install:active, .btn:active {
+  transform: scale(0.96);
+  transition-duration: 0.08s;
+}
+
+/* Hover only where hover exists; on a phone it sticks after a tap. */
+@media (hover: none) {
+  .btn-pink:hover, .btn-outline:hover, .btn-app-install:hover { transform: none; }
+}
+
+/* Decorative mascots bob a few times, then rest. Nothing loops forever. */
+img[style*="animation: float"] { animation-iteration-count: 3 !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+/* Reduced transparency: glass becomes solid. */
+@media (prefers-reduced-transparency: reduce) {
+  nav, header, .navbar, .mobile-menu, .modal, .modal-overlay, [class*="glass"], [class*="card"] {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  nav, header, .navbar, .mobile-menu { background: var(--bg-darker, #0D142C) !important; }
+}
+
+/* More contrast: defined edges. */
+@media (prefers-contrast: more) {
+  :root { --border-light: rgba(246, 247, 249, 0.5); --text-dim: #D3D6DF; }
+  nav, header, .navbar { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+}

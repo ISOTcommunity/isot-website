@@ -10,7 +10,7 @@
 </script>
 
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Game · ISOT App</title>
 
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
@@ -26,8 +26,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="css/app.css" />
   <style>
+    /* Navy like every other card; amber is the accent, not the ground. A brown slab
+       read as a separate mini-app. */
     .bal-card {
-      background: var(--amber-night);
+      background: radial-gradient(circle at 100% 0, rgba(255, 184, 31,.16), transparent 58%), var(--bg-card);
       border: 1px solid rgba(255, 184, 31,.34);
       border-radius: 20px; padding: 22px; margin-bottom: 18px;
     }
@@ -139,6 +141,15 @@
     .section-head img { height: 46px; }
     .board-head img { height: 38px; }
 
+    .you-row { position: sticky; top: 8px; z-index: 2; margin-bottom: 10px; padding: 14px 16px;
+               border-radius: 16px 16px 26px 16px; background: var(--bg-raised);
+               border: 1px solid var(--accent); }
+    .you-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+    .you-rank { font-size: 1.15rem; font-weight: 700; color: #FFF; }
+    .you-rank span { color: var(--pink); }
+    .you-xp { font-size: .9rem; font-weight: 700; color: #FFF; font-variant-numeric: tabular-nums; }
+    .you-next { font-size: .76rem; color: var(--text-muted); margin-top: 8px; }
+    .you-next strong { color: #FFF; }
     .empty-board { display: flex; align-items: center; gap: 14px; margin-top: 24px; padding: 16px;
                    border-radius: 18px; border: 1px dashed rgba(255, 184, 31,.4); background: rgba(255, 184, 31,.05); }
     .empty-board img { height: 56px; }
@@ -149,7 +160,7 @@
 
     .prize { display: flex; align-items: center; gap: 14px; margin-top: 26px; padding: 16px;
              border-radius: 20px; border: 1px solid rgba(255, 184, 31,.45);
-             background: var(--amber-night); }
+             background: radial-gradient(circle at 100% 0, rgba(255, 184, 31,.14), transparent 58%), var(--bg-card); }
     .prize img { height: 74px; flex-shrink: 0; }
     .prize-k { font-size: .62rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #FFB81F; }
     .prize-t { font-size: 1.05rem; font-weight: 700; color: #FFF; margin-top: 3px; line-height: 1.3; }
@@ -496,6 +507,27 @@
       return prize + winner;
     }
 
+    /* Your own place, kept in view above the list. The board only shows the top 10, so
+       if you are outside it we say so rather than invent a rank. */
+    function renderYouRow() {
+      if (!data) return '';
+      const mine = board.find(b => b.is_me);
+      const cost = data.shot_cost;
+      const pct = Math.min(100, Math.round((data.balance / cost) * 100));
+      const toNext = Math.max(0, cost - data.balance);
+      return `
+        <div class="you-row">
+          <div class="you-top">
+            <div class="you-rank">You${mine ? ` <span>#${mine.rank}</span>` : ''}</div>
+            <div class="you-xp">${mine ? mine.points + ' pts this month' : data.balance + ' pts'}</div>
+          </div>
+          <div class="bar" style="margin-top:10px"><div class="bar-fill" style="width:${pct}%"></div></div>
+          <div class="you-next">${toNext > 0
+            ? `<strong>${toNext}</strong> more points to a free shot`
+            : 'Enough for a free shot'}</div>
+        </div>`;
+    }
+
     function renderBoard() {
       if (!board || !board.length) return `
         <div class="empty-board">
@@ -512,6 +544,7 @@
           <img src="${C}char_white_starjumper.png" alt="" />
           <div class="eyebrow" style="margin:0">This month's leaderboard</div>
         </div>
+        ${renderYouRow()}
         <div class="card card-glass" style="padding:4px 16px">
           ${board.map(b => `
             <div class="hrow" style="${b.is_me ? 'background:rgba(127, 74, 255,.08);margin:0 -16px;padding-inline:16px' : ''}">
