@@ -3,7 +3,7 @@
  * Supabase calls are NEVER cached to ensure real-time RLS security.
  */
 
-const CACHE = 'isot-shell-v15';   // v15: Colour System v2.2 + in-house fonts
+const CACHE = 'isot-shell-v16';   // v16: Big in Turin page; v15: Colour System v2.2 + in-house fonts
 
 const SHELL = [
   './',
@@ -26,6 +26,7 @@ const SHELL = [
   'assembly.html',
   'partner.html',
   'gtt.html',
+  'turin-events.html',
   'css/app.css',
   'fonts/moderna.woff2',
   'js/isot.js',

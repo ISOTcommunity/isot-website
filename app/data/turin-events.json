@@ -1,0 +1,36 @@
+{
+  "_readme": "Big events in and around Turin, shown on app/turin-events.html. Edit on GitHub and commit. Past events hide themselves. confirmed:false shows 'Dates not confirmed yet' until you update the dates and set it to true. kind: food | art | music | sport | film | books | city.",
+  "updated": "2026-09-25",
+  "events": [
+    { "start": "2026-09-24", "end": "2026-09-27", "title": "Terra Madre Salone del Gusto", "where": "City centre, Piazza Carlo Felice to Piazza Vittorio", "kind": "food", "confirmed": true, "note": "Slow Food's world food fair, free in the streets this year. Every two years.", "url": "https://2026.terramadresalonedelgusto.com/" },
+    { "start": "2026-10-15", "end": "2026-10-25", "title": "Graphic Days", "where": "Barriera di Milano", "kind": "art", "confirmed": true, "note": "Visual design festival, spreading across the city on 22–23 October.", "url": "https://www.graphicdays.it/" },
+    { "start": "2026-10-23", "end": "2027-01-10", "title": "Luci d'Artista", "where": "Across the city", "kind": "city", "confirmed": false, "note": "Light artworks in the streets and squares every evening. Last year: 24 October to 11 January.", "url": "https://www.lucidartistatorino.org/en/" },
+    { "start": "2026-10-29", "end": "2026-11-01", "title": "Club To Club, 25th anniversary", "where": "Lingotto Fiere and other venues", "kind": "music", "confirmed": true, "note": "Electronic and avant-pop music festival.", "url": "https://clubtoclub.it/" },
+    { "start": "2026-10-30", "end": "2026-11-01", "title": "Artissima", "where": "Oval Lingotto", "kind": "art", "confirmed": true, "note": "International contemporary art fair.", "url": "https://www.artissima.art/" },
+    { "start": "2026-10-30", "end": "2026-11-01", "title": "Paratissima", "where": "Moncalieri", "kind": "art", "confirmed": true, "note": "Independent art fair, the young side of Artissima weekend.", "url": "https://www.paratissima.it/" },
+    { "start": "2026-11-15", "end": "2026-11-22", "title": "Nitto ATP Finals", "where": "Inalpi Arena", "kind": "sport", "confirmed": true, "note": "The world's top eight tennis players.", "url": "https://www.nittoatpfinals.com/en" },
+    { "start": "2026-11-24", "end": "2026-12-02", "title": "Torino Film Festival", "where": "Cinemas across the city, opening at Teatro Regio", "kind": "film", "confirmed": true, "note": "44th edition, with a Marilyn Monroe retrospective.", "url": "https://www.torinofilmfest.org/en/" },
+    { "start": "2026-11-29", "end": "2026-11-29", "title": "Torino City Marathon", "where": "Starts behind Piazza San Carlo", "kind": "sport", "confirmed": true, "note": "Marathon, half marathon and a 5 km fun run open to everyone. Central roads close in the morning.", "url": "https://turismotorino.org/en/visit/events/fiat-torino-city-marathon-la-maratona-di-torino-2026" },
+    { "start": "2027-02-10", "end": "2027-02-14", "title": "CioccolaTò", "where": "Piazza Vittorio Veneto", "kind": "food", "confirmed": true, "note": "Chocolate festival, Belgium as guest country. 10 February is for trade only.", "url": "https://www.cioccola.to.it/" },
+    { "start": "2027-04-23", "end": "2027-04-30", "title": "Torino Jazz Festival", "where": "Across the city", "kind": "music", "confirmed": true, "note": "", "url": "https://www.torinojazzfestival.it/" },
+    { "start": "2027-05-13", "end": "2027-05-17", "title": "Salone del Libro", "where": "Lingotto Fiere", "kind": "books", "confirmed": true, "note": "Italy's biggest book fair. Catalan literature is the guest of honour.", "url": "https://www.salonelibro.it/" },
+    { "start": "2027-06-24", "end": "2027-06-24", "title": "Festa di San Giovanni", "where": "City centre and the Po", "kind": "city", "confirmed": true, "note": "Turin's patron saint's day and a local holiday, with celebrations along the river.", "url": "" },
+    { "start": "2027-06-24", "end": "2027-07-16", "title": "Flowers Festival", "where": "Collegno", "kind": "music", "confirmed": false, "note": "Summer concerts in the Certosa park. Last year: 25 June to 17 July.", "url": "https://flowersfestival.it/" },
+    { "start": "2027-07-02", "end": "2027-07-04", "title": "Kappa FuturFestival", "where": "Parco Dora", "kind": "music", "confirmed": true, "note": "Techno festival. Already sold out.", "url": "https://www.kappafuturfestival.it/en/info" }
+  ],
+  "holidays": [
+    { "date": "2026-11-01", "name": "All Saints' Day" },
+    { "date": "2026-12-08", "name": "Immaculate Conception" },
+    { "date": "2026-12-25", "name": "Christmas Day" },
+    { "date": "2026-12-26", "name": "St Stephen's Day" },
+    { "date": "2027-01-01", "name": "New Year's Day" },
+    { "date": "2027-01-06", "name": "Epiphany" },
+    { "date": "2027-03-28", "name": "Easter Sunday" },
+    { "date": "2027-03-29", "name": "Easter Monday" },
+    { "date": "2027-04-25", "name": "Liberation Day" },
+    { "date": "2027-05-01", "name": "Labour Day" },
+    { "date": "2027-06-02", "name": "Republic Day" },
+    { "date": "2027-06-24", "name": "San Giovanni (Turin only)" },
+    { "date": "2027-08-15", "name": "Ferragosto" }
+  ]
+}
