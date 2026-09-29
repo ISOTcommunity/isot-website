@@ -1378,7 +1378,7 @@
         const res = await db.rpc('log_run', {
           p_route_id: pending.routeId,
           p_seconds: pending.seconds,
-          p_gps_path: pending.path ? JSON.stringify(pending.path) : null
+          p_gps_path: pending.path || null   // an array, not a string: jsonb must receive a JSON array
         });
         data = res.data;
         if (res.error) errMsg = res.error.message;
