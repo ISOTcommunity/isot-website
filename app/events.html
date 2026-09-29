@@ -538,6 +538,24 @@
     let currWeekStart = mondayOf(_now);
     let selectedDateStr = null;
 
+    // Once this month's events are over, open on the month (and week) of the next event
+    // instead of a month with nothing left in it.
+    function openOnNextEvent() {
+      const todayStr = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Rome' });
+      const upcoming = EVENTS_DATA.filter(e => e.date >= todayStr).sort((a, b) => a.date.localeCompare(b.date));
+      if (!upcoming.length) return;
+      const next = upcoming[0];
+
+      if (!upcoming.some(e => e.year === currYear && e.monthIdx === currMonthIdx)) {
+        currYear = next.year;
+        currMonthIdx = next.monthIdx;
+      }
+      const weekEnd = new Date(currWeekStart); weekEnd.setDate(weekEnd.getDate() + 7);
+      if (new Date(next.date + 'T00:00:00') >= weekEnd) {
+        currWeekStart = mondayOf(new Date(next.date + 'T00:00:00'));
+      }
+    }
+
     async function initEventsCalendar() {
       try {
         meProfile = await requireAuth();
@@ -545,6 +563,7 @@
           document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(meProfile, 36);
         }
         await loadCalendar();
+        openOnNextEvent();
         await loadMyRsvps();
       } catch (err) {
         console.error('Events init note:', err);
