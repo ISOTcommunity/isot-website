@@ -108,8 +108,8 @@
       color: var(--on-accent);
       font-size: 0.9rem;
     }
-    .isot-pin.party { background: #FFB81F; box-shadow: 0 0 0 2px rgba(12, 26, 74, 0.9); }
-    .isot-pin.edu { background: #79A3FF; box-shadow: 0 0 0 2px rgba(12, 26, 74, 0.9); }  /* Vivid Blue, text tier */
+    .isot-pin.party { background: #FFB81F; color: var(--black); box-shadow: 0 0 0 2px rgba(12, 26, 74, 0.9); }
+    .isot-pin.edu { background: #79A3FF; color: var(--black); box-shadow: 0 0 0 2px rgba(12, 26, 74, 0.9); }  /* Vivid Blue, text tier */
 
     /* A venue with something on tonight. Two states, not one: "live" is reserved for
        an event that has actually started, so the map never claims a night is running
@@ -353,7 +353,7 @@
         <span id="notifBellBadge" style="display: none; position: absolute; top: -2px; right: -2px; background: var(--accent); color: var(--on-accent); font-size: 0.65rem; font-weight: 700; border-radius: 10px; min-width: 16px; height: 16px; align-items: center; justify-content: center; padding: 0 4px; border: 1.5px solid var(--bg-dark);">0</span>
       </a>
       <div id="headerAvatar" style="cursor: pointer;" data-open-drawer></div>
-      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: var(--on-accent); font-size: 1.3rem; cursor: pointer; padding: 6px;">
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: var(--text-main); font-size: 1.3rem; cursor: pointer; padding: 6px;">
         <i class="fa-solid fa-bars"></i>
       </button>
     </div>
