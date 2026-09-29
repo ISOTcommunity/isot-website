@@ -1,91 +1,152 @@
 /* ISOT Member App — design system
- * Built from the ISOT identity artwork: black ground, flat palette colour, and a
- * grid of circles and half-circles. The wordmark itself is made of them — the "i"
- * dot is a quarter, the S two halves, the O a circle, the T a bar and a quarter.
- * So the geometry is the identity, and it is used here structurally rather than
- * as decoration: avatars are split circles, the spinner is a half, cards carry a
- * single arc corner, section marks are half-discs.
+ * Built from the ISOT identity artwork: flat palette colour and a grid of circles
+ * and half-circles. The wordmark itself is made of them — the "i" dot is a quarter,
+ * the S two halves, the O a circle, the T a bar and a quarter. So the geometry is
+ * the identity, and it is used here structurally rather than as decoration:
+ * avatars are split circles, the spinner is a half, cards carry a single arc
+ * corner, section marks are half-discs. Nothing is lit, glowing or bevelled — the
+ * artwork is flat, so the interface is too.
  */
+
+/* ── Type ────────────────────────────────────────────────────────────
+   MODERNA is ISOT's topic face: headings only, capitals only, letters only.
+   The unicode-range makes that rule structural rather than a convention — the
+   face only ever answers for A–Z, so a digit, a sign or an accented letter in a
+   heading ("ATTIVITÀ", "EVENT 21:30") falls through to the text face on its own.
+
+   Myanmar Sangam MN is the text face. It ships with macOS and iOS, so it is
+   read from the device (local()) and never served from here. It has no accented
+   Latin, so Helvetica Neue — the closest system match — fills à è é ü ñ ş
+   letter by letter. The override values pull its very tall ascent/descent
+   (built for stacked Myanmar script) back to Latin proportions, so text sits
+   centred in buttons and pills instead of riding high. */
+@font-face {
+  font-family: 'ISOT Topic';
+  src: url('../fonts/moderna.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0041-005A;
+}
+@font-face {
+  font-family: 'ISOT Text';
+  src: local('Myanmar Sangam MN'), local('MyanmarSangamMN');
+  font-weight: 400;
+  ascent-override: 94%;
+  descent-override: 26%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'ISOT Text';
+  src: local('Myanmar Sangam MN Bold'), local('MyanmarSangamMN-Bold');
+  font-weight: 700;
+  ascent-override: 94%;
+  descent-override: 26%;
+  line-gap-override: 0%;
+}
 
 :root {
   /* ══════════════════════════════════════════════════════════════════
-     ISOT — built from the identity artwork, not from a UI kit.
-     Black ground, flat palette colour, circles and half-circles.
+     ISOT Colour System v2.2 (21 Sep 2026). Six families, each with a Deep,
+     Vivid, Soft and Night tier, plus Orange and a neutral row. Violet leads.
 
-     Colours are the confirmed system (ISOT-Colour-System.pdf, Aug 2026):
-     11 values in three hue arcs, plus the proposed greens and neutrals.
-     Nothing here is off-palette. The old #EE0979 pink never was on it.
+     Night Blue is the dark ground, per v2.2 ("black only for extremes").
+     Every derived surface below is Night Blue mixed toward Off-white by a
+     stated amount, so nothing here is a hex picked by eye.
      ══════════════════════════════════════════════════════════════════ */
 
-  /* ── Ground ──────────────────────────────────────────────────────
-     Pure black, as in the artwork. Slate #0F172A muddied every hue
-     sitting on it; on black the palette reads at full strength. */
-  --bg-dark:        #000000;
-  --bg-card:        #0E0E13;
-  --bg-darker:      #000000;
-  --bg-raised:      #16161D;
-  --surface-glass:  rgba(16, 16, 21, 0.72);
-  --nav-glass:      rgba(0, 0, 0, 0.80);
+  /* ── Families ────────────────────────────────────────────────────── */
+  --blue-deep:      #1B4CAD;  --blue:      #3D7BFF;  --blue-soft:      #D3E0FF;  --blue-night:      #0C1A4A;
+  --violet-deep:    #4C1FC7;  --violet:    #7F4AFF;  --violet-soft:    #E2D8FF;  --violet-night:    #1D1050;
+  --magenta-deep:   #9E02B6;  --magenta:   #E03CF5;  --magenta-soft:   #F8D6FC;  --magenta-night:   #3B0A4A;
+  --coral-deep:     #AA2709;  --coral:     #FF5A3C;  --coral-soft:     #FFD8CF;  --coral-night:     #3D1109;
+  --amber-deep:     #C9801A;  --amber:     #FFB81F;  --amber-soft:     #FFECBD;  --amber-night:     #3A2405;
+  --green-deep:     #0D7A44;  --green:     #1FD47F;  --green-soft:     #D0F6E2;  --green-night:     #06382A;
+  --orange:         #F55D21;
 
-  /* ── The confirmed palette ───────────────────────────────────── */
-  --c-deep-blue:    #1B4CAD;
-  --c-sky-blue:     #5787EA;
-  --c-slate-blue:   #628DA1;
-  --c-powder-blue:  #7AA4C2;
+  /* ── Neutrals ────────────────────────────────────────────────────── */
+  --black:          #0E0F14;
+  --ink:            #1E232F;
+  --mid-grey:       #6A7181;  /* light backgrounds only: 3.4:1 on Night Blue */
+  --border-grey:    #DCDFE5;
+  --off-white:      #F6F7F9;
+  --milky-white:    #E7DCC9;
 
-  --c-deep-magenta: #9E02B6;
-  --c-orchid:       #D45AE8;
-  --c-mauve:        #A8689E;
+  /* ── Ground & surfaces (Night Blue → Off-white) ───────────────────── */
+  --bg-dark:        #0C1A4A;               /* Night Blue, the page */
+  --bg-darker:      #0D142C;               /* Night Blue 45% toward Black: wells, inputs */
+  --bg-card:        #1A2755;               /* +6% */
+  --bg-raised:      #26325D;               /* +11%: sheets, menus, pressed rows */
+  --surface-glass:  rgba(26, 39, 85, 0.78);
+  --nav-glass:      rgba(12, 26, 74, 0.78);
 
-  --c-brick:        #AA2709;
-  --c-dark-amber:   #C9801A;
-  --c-amber:        #E69321;
-  --c-coral:        #F36C51;
-
-  --c-deep-green:   #109352;
-  --c-bright-green: #43DB8F;
-  --c-muted-green:  #60A482;
-
-  /* In the artwork and the older illustration set. Kept because the
-     wordmark grid needs a pale cool tile and nothing else provides one. */
-  --c-lavender:     #BBC1F9;
+  /* ── Text. Measured against the worst surface, --bg-raised ────────── */
+  --text-main:      #F6F7F9;               /* 12.4:1 */
+  --text-muted:     #B0B5C5;               /*  6.1:1 */
+  --text-dim:       #A6ACBE;               /*  5.5:1 */
+  --text-dark:      #9DA3B7;               /*  4.9:1 — was 3.9:1 */
+  --border-light:   rgba(246, 247, 249, 0.12);
+  --border-strong:  rgba(246, 247, 249, 0.24);
 
   /* ── Accent ──────────────────────────────────────────────────────
-     Bright Orchid. --pink is kept as an alias only because ~200 rules
-     and templates reference it; the name is historical, the value is not. */
-  --orchid:         #D45AE8;
-  --pink:           #D45AE8;
-  --pink-glow:      rgba(212, 90, 232, 0.30);
-  --border-glow:    rgba(212, 90, 232, 0.42);
+     An accent has three jobs and one hex cannot do all of them:
+       --accent       the fill (buttons, chips, the active pill)
+       --on-accent    text sitting ON that fill
+       --pink         accent used AS text or a line on the dark ground
+     Violet #7F4AFF is 3.4:1 on Night Blue — fine as a fill under white text
+     (4.85:1), unreadable as a link. So --pink is Violet lifted halfway to
+     Soft Violet, 4.9:1 on the worst surface. It keeps its historical name
+     because ~200 rules read it. All four are overwritten per member by
+     applyAccent() in js/isot.js; these are the defaults. */
+  --accent:         #7F4AFF;
+  --accent-hover:   #6A36F0;
+  --on-accent:      #FFFFFF;
+  --pink:           #B191FF;
+  --orchid:         #B191FF;
+  --pink-glow:      rgba(127, 74, 255, 0.28);
+  --border-glow:    rgba(246, 247, 249, 0.22);   /* emphasis edge: neutral, not accent */
+  /* Selection is chrome, not brand: a selected filter or segment is a light fill with
+     dark text, the way iOS draws it. The accent is saved for the action on the screen. */
+  --selected-bg:    #F6F7F9;
+  --on-selected:    #0E0F14;
 
+  /* Semantic states. Text uses the tier that passes on --bg-raised. */
+  --red:            #FF7359;               /* Coral, lifted 20% toward Soft: 4.6:1 */
+  --green-text:     #1FD47F;               /* 6.4:1 */
+  --gold:           #FFB81F;               /* Vivid Amber, 7.2:1 */
   --navy:           #1B4CAD;
-  --orange:         #E69321;
-  --gold:           #C9801A;
-  /* Coral, not Brick Red: #AA2709 is L35 and disappears against black. */
-  --red:            #F36C51;
-  --green:          #43DB8F;
 
-  /* ── Identity tokens (geometry, avatars, category marks) ─────── */
-  --id-steel-blue:  #7AA4C2;
-  --id-teal:        #628DA1;
-  --id-amber:       #E69321;
-  --id-deep-orange: #C9801A;
-  --id-terracotta:  #AA2709;
-  --id-mauve:       #A8689E;
-  --id-lavender:    #BBC1F9;
-  --id-indigo:      #1B4CAD;
+  /* Legacy names still read by page styles, pointed at v2.2. */
+  --c-deep-blue:    var(--blue-deep);
+  --c-sky-blue:     #79A3FF;                 /* Vivid Blue lifted 40% to Soft: 5.0:1 as text */
+  --c-slate-blue:   var(--blue-soft);
+  --c-powder-blue:  var(--blue-soft);
+  --c-deep-magenta: var(--magenta-deep);
+  --c-orchid:       #E76AF7;                 /* Vivid Magenta lifted 30% to Soft: 4.6:1 as text */
+  --c-mauve:        var(--magenta-soft);
+  --c-brick:        var(--coral-deep);
+  --c-dark-amber:   var(--amber-deep);
+  --c-amber:        var(--amber);
+  --c-coral:        var(--coral);
+  --c-deep-green:   var(--green-deep);
+  --c-bright-green: var(--green);
+  --c-muted-green:  var(--green-soft);
+  --c-lavender:     var(--violet-soft);
+  --orange-legacy:  var(--orange);
 
-  /* ── Text — the system's neutrals, lifted for a black ground ─── */
-  --text-main:      #F6F7F9;
-  --text-muted:     #B9BFCB;
-  --text-dim:       #8C93A3;
-  --text-dark:      #6A7181;
-  --border-light:   rgba(255, 255, 255, 0.10);
-  --border-strong:  rgba(255, 255, 255, 0.20);
+  /* ── Identity tokens (mosaic tiles, avatars, category marks) ─────── */
+  --id-steel-blue:  var(--blue);
+  --id-teal:        var(--green);
+  --id-amber:       var(--amber);
+  --id-deep-orange: var(--orange);
+  --id-terracotta:  var(--coral);
+  --id-mauve:       var(--magenta);
+  --id-lavender:    var(--violet-soft);
+  --id-indigo:      var(--violet);
 
-  --font-display:   'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-body:      'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-brand:     'Amatic SC', cursive, sans-serif;
+  --font-topic:     'ISOT Topic', 'ISOT Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-display:   'ISOT Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-body:      'ISOT Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-brand:     var(--font-topic);
 
   --radius-sm:      12px;
   --radius-md:      20px;
@@ -95,13 +156,11 @@
      one of the artwork's tiles rather than as a rounded rectangle. */
   --radius-arc:     46px;
 
-  /* Overwritten at runtime by applyAccent(). These are the defaults, so the
-     stylesheet is complete on its own if the script never runs. */
-  --accent-hover:   #DE7BEE;
-  --on-accent:      #0B0B0F;
-
-  --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-spring: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Motion. No curve here overshoots: bounce belongs to motion the user threw,
+     and a tap throws nothing. --ease-out is the settle every transition uses. */
+  --ease-out:       cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-fast: all 0.15s var(--ease-out);
+  --transition-spring: all 0.25s var(--ease-out);
 }
 
 *, *::before, *::after {
@@ -148,8 +207,8 @@ input, select, textarea, [contenteditable] {
   align-items: center;
   justify-content: space-around;
   background: var(--nav-glass);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
   border-top: 1px solid var(--border-light);
   padding-bottom: max(10px, env(safe-area-inset-bottom));
   padding-top: 10px;
@@ -160,9 +219,10 @@ input, select, textarea, [contenteditable] {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  font-size: 0.82rem !important;
-  font-weight: 600;
-  color: var(--text-muted);
+  font-size: 0.75rem !important;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--text-dim);
   transition: var(--transition-fast);
   padding: 6px 14px;
   text-decoration: none;
@@ -170,14 +230,15 @@ input, select, textarea, [contenteditable] {
   border: none;
   cursor: pointer;
 }
-.tab-item.active { color: var(--pink); font-weight: 700; }
-.tab-item svg { width: 25px; height: 25px; stroke-width: 2.2; }
+.tab-item.active { color: var(--pink); }
+.tab-item svg { width: 24px; height: 24px; stroke-width: 2; }
 
 body {
   background-color: var(--bg-dark);
   color: var(--text-main);
   font-family: var(--font-body);
-  line-height: 1.6;
+  font-size: 1rem;
+  line-height: 1.55;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -188,8 +249,8 @@ body {
 /* ---------- Custom Thin Scrollbar ---------- */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: var(--radius-full); }
-::-webkit-scrollbar-thumb:hover { background: var(--pink); }
+::-webkit-scrollbar-thumb { background: rgba(246, 247, 249, 0.18); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
 a { color: inherit; text-decoration: none; }
 
@@ -211,8 +272,8 @@ a { color: inherit; text-decoration: none; }
   padding: 16px 20px;
   border-bottom: 1px solid var(--border-light);
   background: var(--nav-glass);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -221,19 +282,23 @@ a { color: inherit; text-decoration: none; }
 .topbar img { height: 26px; width: auto; }
 
 .topbar-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: #FFF;
+  font-family: var(--font-topic);
+  font-size: 1.15rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  color: var(--text-main);
+  min-width: 0;                /* lets a long venue title wrap inside the bar */
 }
 
 /* ---------- Slide-In Burger Drawer (Apple Glass) ---------- */
 .drawer-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: rgba(13, 20, 44, 0.62);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 3000;
   opacity: 0;
   visibility: hidden;
@@ -252,16 +317,16 @@ a { color: inherit; text-decoration: none; }
   width: min(340px, 85vw);
   height: 100vh;
   height: 100dvh;
-  background: rgba(18, 24, 38, 0.98);
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
+  /* Solid, not glass: a blur behind a 98%-opaque panel costs a full-screen
+     filter every frame and shows nothing. */
+  background: var(--bg-raised);
   border-left: 1px solid var(--border-light);
   z-index: 3001;
   display: flex;
   flex-direction: column;
   transform: translateX(100%);
-  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6);
+  transition: transform 0.32s var(--ease-out);
+  box-shadow: -16px 0 48px rgba(5, 10, 30, 0.55);
   padding-top: max(16px, env(safe-area-inset-top));
 }
 .drawer.open {
@@ -279,7 +344,7 @@ a { color: inherit; text-decoration: none; }
 
 .drawer-user-card {
   padding: 16px 20px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(246, 247, 249, 0.04);
   border-bottom: 1px solid var(--border-light);
   display: flex;
   align-items: center;
@@ -315,10 +380,8 @@ a { color: inherit; text-decoration: none; }
   font-weight: 500;
   transition: var(--transition-fast);
 }
-.drawer-item:hover, .drawer-item:active {
-  background: rgba(255, 255, 255, 0.08);
-  color: #FFF;
-}
+.drawer-item:active { background: rgba(246, 247, 249, 0.08); }
+@media (hover: hover) { .drawer-item:hover { background: rgba(246, 247, 249, 0.06); } }
 .drawer-item i {
   font-size: 1.1rem;
   width: 22px;
@@ -329,24 +392,28 @@ a { color: inherit; text-decoration: none; }
   flex-shrink: 0;
   padding: 16px 20px max(24px, calc(16px + env(safe-area-inset-bottom)));
   border-top: 1px solid var(--border-light);
-  background: rgba(18, 24, 38, 0.98);
+  background: var(--bg-raised);
 }
 
 /* ---------- Typography ---------- */
-h1 {
-  font-size: 2.1rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
+/* Topics — h1, h2 and .topic — are set in MODERNA, in capitals. The face has
+   one weight, so weight is pinned to 400: a synthesised bold would smear its
+   geometry. Capitals want a touch of positive tracking at every size, the
+   opposite of mixed-case display text. */
+h1, h2, .topic {
+  font-family: var(--font-topic);
+  font-weight: 400;
+  text-transform: uppercase;
+  font-synthesis: none;
+  letter-spacing: 0.015em;
+  line-height: 1.05;
 }
-h2 {
-  font-size: 1.35rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
+h1 { font-size: 2.3rem; }
+h2 { font-size: 1.45rem; line-height: 1.1; }
 h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1.08rem;
+  font-weight: 700;
+  line-height: 1.3;
 }
 .muted { color: var(--text-muted); }
 .dim   { color: var(--text-dim); font-size: 0.875rem; }
@@ -358,16 +425,20 @@ h3 {
   width: 9px; height: 4.5px;
   margin-right: 8px;
   vertical-align: 1.5px;
-  background: var(--orchid);
+  background: var(--tone, var(--accent));
   border-radius: 9px 9px 0 0;
 }
+/* The label is neutral; the half-disc beside it carries the colour of whatever the
+   section is about. A coloured label on every section was the loudest thing on the
+   page and said the least. Icons inside a label are dropped: the mark already leads. */
 .eyebrow {
-  color: var(--pink);
-  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
+.eyebrow i { display: none; }
 
 /* ---------- Cards ----------
    One corner opened to a full arc. In the artwork every tile is a square with a
@@ -389,52 +460,75 @@ h3 {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
-.card-glow {
-  border-color: var(--border-glow);
-  box-shadow: 0 0 34px rgba(212, 90, 232, 0.14);
-}
+/* Emphasis by edge, not by light. The artwork has no glow in it. */
+.card-glow { border-color: var(--border-glow); }
 
 /* ---------- Primary Actions (Pink Restraint) ---------- */
+/* ---------- Buttons ----------
+   A rounded rectangle, not a capsule: 12px reads as a tool, a 9999px pill reads as a
+   template. Two sizes only. Labels are sentence case, no arrows — a button already
+   says it goes somewhere. */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  padding: 15px 24px;
+  padding: 0 20px;
   min-height: 48px;
-  border: none;
-  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+  border-radius: 12px;
   font-family: var(--font-body);
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
   cursor: pointer;
   transition: var(--transition-fast);
   touch-action: manipulation;
 }
+/* Compact: rows, toolbars, inline actions. 36px tall, still a 44px hit area vertically
+   in every list row it sits in. */
+.btn-sm {
+  min-height: 36px;
+  padding: 0 14px !important;
+  font-size: 0.82rem !important;
+  border-radius: 10px;
+  gap: 6px;
+  white-space: nowrap;         /* a button wraps as a whole, never mid-label */
+}
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn:active:not(:disabled) { transform: scale(0.98); }
+.btn:focus-visible { outline: 2px solid var(--pink); outline-offset: 3px; }
+.text-pink { color: var(--pink); }
 
 /* Text colour comes from the accent, never a hardcoded #FFF. White measures 1.8:1
    on Bright Green and 2.4:1 on Amber — five of the seven accents would have shipped
    with unreadable button labels. */
 .btn-pink {
-  background: var(--pink);
+  background: var(--accent);
   color: var(--on-accent);
-  box-shadow: 0 4px 18px var(--pink-glow);
+  font-weight: 700;
 }
-.btn-pink:hover:not(:disabled) {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .btn-pink:hover:not(:disabled) { background: var(--accent-hover); }
 }
+/* Secondary: a tonal fill, not an outline. A thin ring on a dark ground reads as
+   unfinished; a quiet surface reads as a control. */
 .btn-outline {
-  background: transparent;
+  background: rgba(246, 247, 249, 0.09);
   color: var(--text-main);
-  border: 1px solid var(--border-light);
+  border-color: transparent;
 }
-.btn-outline:hover:not(:disabled) {
-  border-color: var(--border-strong);
-  background: rgba(255, 255, 255, 0.05);
+/* A state, not an action: you are going. Green is reserved for exactly this. */
+.btn-going {
+  background: rgba(31, 212, 127, 0.14);
+  color: var(--green);
+  border-color: transparent;
+}
+@media (hover: hover) {
+  .btn-outline:hover:not(:disabled) {
+    background: rgba(246, 247, 249, 0.14);
+  }
 }
 .btn-ghost {
   background: transparent;
@@ -467,7 +561,7 @@ h3 {
 .field input:focus, .field select:focus, .field textarea:focus {
   outline: none;
   border-color: var(--pink);
-  box-shadow: 0 0 0 3px rgba(238, 9, 121, 0.15);
+  box-shadow: 0 0 0 3px var(--pink-glow);
 }
 
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
@@ -481,9 +575,9 @@ h3 {
 }
 /* Semantic states come from the palette too. Coral for error rather than a
    generic red: Brick Red #AA2709 is L35 and vanishes against black. */
-.alert-error   { background: rgba(243, 108, 81, 0.13);  border: 1px solid rgba(243, 108, 81, 0.38);  color: #F8A18E; }
-.alert-success { background: rgba(67, 219, 143, 0.12);  border: 1px solid rgba(67, 219, 143, 0.36);  color: #7DE7B4; }
-.alert-info    { background: rgba(238, 9, 121, 0.12);  border: 1px solid var(--border-glow);       color: var(--text-muted); }
+.alert-error   { background: rgba(255, 90, 60, 0.12);   border: 1px solid rgba(255, 90, 60, 0.40);   color: var(--coral-soft); }
+.alert-success { background: rgba(31, 212, 127, 0.11);  border: 1px solid rgba(31, 212, 127, 0.38);  color: var(--green-soft); }
+.alert-info    { background: rgba(127, 74, 255, 0.12);  border: 1px solid var(--border-glow);        color: var(--text-muted); }
 [hidden] { display: none !important; }
 
 /* ---------- Badges ---------- */
@@ -498,15 +592,12 @@ h3 {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.badge-socio       { background: var(--pink);  color: #FFF; }
-.badge-participant { background: rgba(255,255,255,0.1); border: 1px solid var(--border-light); color: var(--text-muted); }
-.badge-staff       { background: var(--gold);  color: var(--bg-dark); }
-.badge-live        { background: var(--green); color: #FFF; animation: pulseGlow 2s infinite; }
-
-@keyframes pulseGlow {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
-}
+/* Text on each fill is whichever of Black / White passes on it — white on
+   Vivid Green was 1.8:1 and white on the old Orchid 3.3:1. */
+.badge-socio       { background: var(--accent); color: var(--on-accent); }
+.badge-participant { background: rgba(246,247,249,0.08); border: 1px solid var(--border-light); color: var(--text-muted); }
+.badge-staff       { background: var(--amber); color: var(--black); }
+.badge-live        { background: var(--green); color: var(--black); }
 
 
 
@@ -522,7 +613,6 @@ h3 {
   justify-content: center;
   vertical-align: middle;
   border: 1px solid var(--border-light);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   flex-shrink: 0;
   text-align: center;
 }
@@ -540,7 +630,7 @@ h3 {
   gap: 0;
   overflow: hidden;
   border-radius: var(--radius-md) var(--radius-md) var(--radius-arc) var(--radius-md);
-  background: #000;
+  background: var(--black);
 }
 .mosaic .tile { aspect-ratio: 1; position: relative; }
 .mosaic .tile i {
@@ -578,7 +668,7 @@ h3 {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: conic-gradient(from 0deg, var(--orchid) 0deg 180deg, transparent 180deg 360deg);
+  background: conic-gradient(from 0deg, var(--accent) 0deg 180deg, transparent 180deg 360deg);
   -webkit-mask: radial-gradient(circle, transparent 42%, #000 43%);
   mask: radial-gradient(circle, transparent 42%, #000 43%);
   animation: spin 0.75s linear infinite;
@@ -588,7 +678,7 @@ h3 {
 /* A solid half-disc, for the gate where a heavier mark suits the pause. */
 .spinner-solid {
   width: 34px; height: 34px; border-radius: 50%;
-  background: conic-gradient(from 0deg, var(--orchid) 0deg 180deg, transparent 180deg 360deg);
+  background: conic-gradient(from 0deg, var(--accent) 0deg 180deg, transparent 180deg 360deg);
   animation: spin 0.9s linear infinite;
   display: inline-block;
 }
@@ -602,13 +692,13 @@ h3 {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: rgba(11, 15, 25, 0.8);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(13, 20, 44, 0.62);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition: opacity 0.28s var(--ease-out), visibility 0.28s;
 }
 
 .modal-backdrop.active {
@@ -620,17 +710,33 @@ h3 {
 .modal-sheet {
   width: 100%;
   max-width: 480px;
-  background: var(--bg-card);
+  background: var(--bg-raised);
   border: 1px solid var(--border-light);
+  border-bottom: none;
   border-top-left-radius: var(--radius-lg);
   border-top-right-radius: var(--radius-lg);
-  padding: 24px 20px max(24px, env(safe-area-inset-bottom)) 20px;
-  box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.8);
+  padding: 26px 20px max(24px, env(safe-area-inset-bottom)) 20px;
+  box-shadow: 0 -18px 48px rgba(5, 10, 30, 0.55);
   transform: translateY(100%);
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.36s var(--ease-out);
   max-height: 88vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  position: relative;
 }
+/* Grabber. It is not decoration: the sheet can be dragged down to dismiss
+   (initSheetGestures in js/isot.js), and this is how you know. */
+.modal-sheet::before {
+  content: '';
+  position: absolute;
+  top: 9px; left: 50%;
+  width: 38px; height: 5px;
+  margin-left: -19px;
+  border-radius: 3px;
+  background: rgba(246, 247, 249, 0.28);
+}
+/* While a finger is on it, the sheet follows 1:1 — no easing in the way. */
+.modal-sheet.is-dragging { transition: none; }
 
 .modal-backdrop.active .modal-sheet {
   transform: translateY(0);
@@ -646,84 +752,135 @@ h3 {
   z-index: 9999;
 }
 
-/* Reduced Motion Kill Switch */
+/* ==========================================================================
+   Colour by content
+   v2.2's own rule: colour follows what a thing IS, not a single brand hue on
+   everything. A tone sets four local values that any component can read:
+     --tone        the family's vivid fill      --on-tone     text on that fill
+     --tone-text   the family as text (passes 5.3:1 on its own night and on cards)
+     --tone-night  the family's dark tint for a card ground
+   Put a tone on <body> for a page's subject, or on a card for one event's category.
+   Violet stays the brand and the member's accent stays the action; tones never
+   replace either.
+   ========================================================================== */
+.tone-violet  { --tone: var(--violet);  --tone-text: #B191FF; --tone-night: var(--violet-night);  --tone-edge: rgba(127, 74, 255, 0.38); --on-tone: #FFFFFF; }
+.tone-magenta { --tone: var(--magenta); --tone-text: #E76AF7; --tone-night: var(--magenta-night); --tone-edge: rgba(224, 60, 245, 0.34); --on-tone: var(--black); }
+.tone-coral   { --tone: var(--coral);   --tone-text: #FF7359; --tone-night: var(--coral-night);   --tone-edge: rgba(255, 90, 60, 0.36);  --on-tone: var(--black); }
+.tone-orange  { --tone: var(--orange);  --tone-text: #F88255; --tone-night: var(--amber-night);   --tone-edge: rgba(245, 93, 33, 0.36);  --on-tone: var(--black); }
+.tone-amber   { --tone: var(--amber);   --tone-text: var(--amber); --tone-night: var(--amber-night); --tone-edge: rgba(255, 184, 31, 0.32); --on-tone: var(--black); }
+.tone-green   { --tone: var(--green);   --tone-text: var(--green); --tone-night: var(--green-night); --tone-edge: rgba(31, 212, 127, 0.32); --on-tone: var(--black); }
+/* Blue's own Night tier IS the page ground, so its card is lifted 14% toward Vivid Blue. */
+.tone-blue    { --tone: var(--blue);    --tone-text: #79A3FF; --tone-night: #132863;               --tone-edge: rgba(61, 123, 255, 0.36); --on-tone: var(--black); }
+
+/* Event categories map onto families (supabase/007_calendar.sql lists the six). */
+.cat-social  { --tone: var(--violet);  --tone-text: #B191FF; --tone-night: var(--violet-night);  --tone-edge: rgba(127, 74, 255, 0.38); --on-tone: #FFFFFF; }
+.cat-party   { --tone: var(--magenta); --tone-text: #E76AF7; --tone-night: var(--magenta-night); --tone-edge: rgba(224, 60, 245, 0.34); --on-tone: var(--black); }
+.cat-karaoke { --tone: var(--coral);   --tone-text: #FF7359; --tone-night: var(--coral-night);   --tone-edge: rgba(255, 90, 60, 0.36);  --on-tone: var(--black); }
+.cat-drinks  { --tone: var(--orange);  --tone-text: #F88255; --tone-night: var(--amber-night);   --tone-edge: rgba(245, 93, 33, 0.36);  --on-tone: var(--black); }
+.cat-career  { --tone: var(--blue);    --tone-text: #79A3FF; --tone-night: #132863;               --tone-edge: rgba(61, 123, 255, 0.36); --on-tone: var(--black); }
+.cat-sports  { --tone: var(--green);   --tone-text: var(--green); --tone-night: var(--green-night); --tone-edge: rgba(31, 212, 127, 0.32); --on-tone: var(--black); }
+
+/* A card in its subject's colour: the Night tint as ground, the family as its edge. */
+.card-tone { background: var(--tone-night, var(--bg-card)); border-color: var(--tone-edge, var(--border-light)); }
+/* A category label: a small half-disc and the name, in the family's text colour. */
+.chip-tone {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--tone-text, var(--text-dim));
+}
+.chip-tone::before {
+  content: ''; width: 9px; height: 4.5px; border-radius: 9px 9px 0 0;
+  background: var(--tone, var(--accent));
+}
+.text-tone { color: var(--tone-text, var(--pink)); }
+/* An icon beside a heading takes the page's subject colour, or steps back to neutral
+   on a page without one. It never borrows the member's accent, which is for actions. */
+h1 .text-pink, h2 .text-pink, h3 .text-pink, .topbar-title .text-pink, .settings-title .text-pink {
+  color: var(--tone-text, var(--text-dim));
+}
+
+/* ==========================================================================
+   Motion
+   Rules, from Apple's fluid-interface guidance:
+   - Feedback lands on press, not release, and never waits on an animation.
+   - Nothing overshoots unless the user threw it. A tap throws nothing.
+   - Only transform and opacity move, so every frame stays on the compositor.
+   - Nothing loops. A pulse that never stops trains people to ignore it.
+   ========================================================================== */
+
+/* Press. Scale on :active, released with a plain settle. */
+.btn, .btn-pink, .btn-outline, .btn-rsvp, .card, .event-card-item, .student-card,
+.tab-item, .filter-pill, .cat-pill-item {
+  transition: transform 0.18s var(--ease-out), background-color 0.18s ease,
+              border-color 0.18s ease, color 0.18s ease;
+}
+.btn:active:not(:disabled), .btn-pink:active:not(:disabled), .btn-outline:active:not(:disabled),
+.btn-rsvp:active, .tab-item:active, .filter-pill:active, .cat-pill-item:active {
+  transform: scale(0.96);
+  transition-duration: 0.08s;
+}
+.card:active, .event-card-item:active, .student-card:active {
+  transform: scale(0.985);
+  transition-duration: 0.08s;
+}
+
+/* Arrival. One short fade for the whole page, no stagger. This is a multi-page
+   app, so whatever runs here runs on every tab switch; the old 5-step stagger
+   held the last block back ~0.7s each time. */
+.shell { animation: shellIn 0.22s var(--ease-out) both; }
+@keyframes shellIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Tab bar. The active tab is marked by colour and a half-disc under the icon,
+   the identity's smallest mark, not by a lift and a glow. */
+.tab-item { position: relative; }
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  top: -11px; left: 50%;              /* 10px bar padding + its 1px top border */
+  width: 20px; height: 10px;
+  margin-left: -10px;
+  border-radius: 0 0 10px 10px;
+  background: var(--accent);
+}
+
+/* Hover exists on pointers that hover. On a phone it sticks after a tap. */
+@media (hover: hover) {
+  .cat-pill-item:hover .cat-pill-img, .cat-box:hover { transform: translateY(-2px); }
+}
+.cat-pill-img, .cat-box { transition: transform 0.2s var(--ease-out); }
+
+/* Reduced motion keeps feedback and drops travel: fades stay, movement goes. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
+  .shell { animation: none; }
 }
 
-/* ==========================================================================
-   Apple-Grade Motion & Fluid Micro-Interactions System
-   ========================================================================== */
-
-/* 1. Tactile Tap Physics for Buttons, Cards & Tabs */
-.btn, .btn-pink, .btn-outline, .btn-rsvp, .card, .event-card-item, .student-card, .tab-item, .filter-pill, .cat-pill-item {
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, background-color 0.2s ease, border-color 0.2s ease;
-  will-change: transform;
+/* Reduced transparency: glass becomes solid. */
+@media (prefers-reduced-transparency: reduce) {
+  .tabbar, .topbar { background: var(--bg-dark); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .card-glass { background: var(--bg-card); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .modal-backdrop, .drawer-backdrop, .wa-backdrop { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(13, 20, 44, 0.88); }
 }
 
-.btn:active, .btn-pink:active, .btn-outline:active, .btn-rsvp:active, .tab-item:active, .filter-pill:active, .cat-pill-item:active {
-  transform: scale(0.95);
-}
-
-.card:active, .event-card-item:active, .student-card:active {
-  transform: scale(0.985);
-}
-
-/* 2. Fluid Page Entrance & Stagger Motion */
-.shell > * {
-  animation: appleFadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.shell > *:nth-child(1) { animation-delay: 0.03s; }
-.shell > *:nth-child(2) { animation-delay: 0.08s; }
-.shell > *:nth-child(3) { animation-delay: 0.13s; }
-.shell > *:nth-child(4) { animation-delay: 0.18s; }
-.shell > *:nth-child(5) { animation-delay: 0.23s; }
-
-@keyframes appleFadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(18px) scale(0.98);
+/* More contrast: solid chrome, defined edges, brighter secondary text. */
+@media (prefers-contrast: more) {
+  :root {
+    --border-light: rgba(246, 247, 249, 0.34);
+    --border-strong: rgba(246, 247, 249, 0.6);
+    --text-muted: #D3D6DF;
+    --text-dim: #C7CBD6;
+    --text-dark: #BCC0CD;
   }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  .tabbar, .topbar { background: var(--bg-darker); backdrop-filter: none; -webkit-backdrop-filter: none; }
 }
-
-/* 3. Ambient Pulsing Neon Glow Effects for Active & Live Badges */
-.badge-live, .btn-rsvp.going {
-  animation: ambientPulse 2.8s ease-in-out infinite alternate;
-}
-
-@keyframes ambientPulse {
-  0% {
-    box-shadow: 0 0 8px rgba(238, 9, 121, 0.25);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(238, 9, 121, 0.65), 0 0 30px rgba(238, 9, 121, 0.25);
-  }
-  100% {
-    box-shadow: 0 0 8px rgba(238, 9, 121, 0.25);
-  }
-}
-
-/* 4. Glass Drawer Slide Entrance */
-.drawer {
-  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-}
-
-/* 5. Smooth Tabbar Active Indicator Bounce */
-.tab-item.active svg {
-  transform: translateY(-2px) scale(1.08);
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-
 
 /* ---------- Show/hide password ----------
    Attached automatically to every input[type=password] by initPasswordToggles()
@@ -753,78 +910,21 @@ h3 {
 .pw-toggle svg { width: 19px; height: 19px; stroke: currentColor; fill: none;
                  stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 
-/* ==========================================================================
-   Apple-Grade 3D Icon System (Volumetric Depth, Rim Lighting & Shadowing)
-   ========================================================================== */
-
-/* 1. Bottom Navigation Bar 3D SVG Icons */
-.tab-item svg {
-  width: 26px;
-  height: 26px;
-  stroke-width: 2.2;
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.45));
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
-  transform: translateZ(0);
-}
-
-.tab-item.active svg {
-  transform: translateY(-4px) scale(1.12);
-  filter: drop-shadow(0 6px 14px rgba(238, 9, 121, 0.65)) drop-shadow(0 2px 4px rgba(255, 255, 255, 0.35));
-}
-
-.tab-item:active svg {
-  transform: translateY(0) scale(0.92);
-}
-
-/* 2. 3D Depth & Drop-Shadows for FontAwesome Icons */
-.btn i, .btn-rsvp i, .eyebrow i, .badge i, .topbar i, .settings-title i, .meta-pill i {
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
-  transition: transform 0.2s ease, filter 0.2s ease;
-}
-
-.btn:hover i, .btn-pink:hover i {
-  transform: scale(1.12);
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
-}
-
-/* 3. 3D Rim Lighting & Volumetric Depth for Category & Member Badges */
-.cat-pill-img, .cat-badge, .cat-box, .geo-avatar {
-  box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.55), inset 0 2px 4px rgba(255, 255, 255, 0.25), inset 0 -2px 6px rgba(0, 0, 0, 0.4);
-  border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
-}
-
-.cat-pill-item:hover .cat-pill-img, .cat-box:hover {
-  transform: translateY(-5px) scale(1.05);
-  box-shadow: 0 16px 32px -4px rgba(238, 9, 121, 0.35), inset 0 2px 6px rgba(255, 255, 255, 0.4);
-}
-
-/* 4. Topbar Bell & Burger Drawer 3D Depth */
-#notifBellBtn i, #burgerBtn i {
-  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.5));
-  transition: transform 0.2s ease, filter 0.2s ease;
-}
-#notifBellBtn:hover i {
-  transform: rotate(15deg) scale(1.15);
-  filter: drop-shadow(0 4px 12px rgba(238, 9, 121, 0.6));
-}
-
-
 /* WhatsApp group prompt. Uses the app's card idiom and the ISOT arc corner; the
    only borrowed colour is WhatsApp's own green on the mark, because that is the
    thing being recognised. */
 .wa-backdrop {
   position: fixed; inset: 0; z-index: 3000;
   display: flex; align-items: center; justify-content: center; padding: 22px;
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  background: rgba(13, 20, 44, 0.62);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
   animation: waIn 0.22s ease;
 }
 .wa-card {
   width: 100%; max-width: 380px; text-align: center;
   background: var(--bg-card); border: 1px solid var(--border-light);
   border-radius: var(--radius-md) var(--radius-md) var(--radius-arc) var(--radius-md);
-  padding: 30px 24px 22px; box-shadow: 0 22px 60px rgba(0, 0, 0, 0.65);
+  padding: 30px 24px 22px; box-shadow: 0 22px 60px rgba(5, 10, 30, 0.55);
 }
 .wa-card .wa-mark { font-size: 2.5rem; color: #25D366; }
 .wa-card h2 { font-size: 1.35rem; margin: 14px 0 8px; }
@@ -838,7 +938,7 @@ h3 {
 /* A dot, not a count. It says "you have not looked at this", and disappears for
    good once you have — nothing here is a notification to be cleared. */
 .newdot {
-  width: 7px; height: 7px; border-radius: 50%; background: var(--pink);
+  width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
   margin-left: auto; flex-shrink: 0; box-shadow: 0 0 0 3px var(--pink-glow);
 }
 
@@ -847,8 +947,8 @@ h3 {
 .hint-card {
   display: flex; gap: 12px; align-items: flex-start;
   padding: 13px 15px; margin-bottom: 16px;
-  background: rgba(212, 90, 232, 0.07);
-  border: 1px solid var(--border-glow);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-md) var(--radius-md) var(--radius-arc) var(--radius-md);
 }
 .hint-card > i { color: var(--pink); font-size: 1rem; margin-top: 2px; }

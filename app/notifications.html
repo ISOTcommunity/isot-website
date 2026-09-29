@@ -25,18 +25,16 @@
   <meta name="apple-mobile-web-app-title" content="ISOT" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#0C1A4A" />
   <!-- Vercel Web Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <link rel="stylesheet" href="css/app.css" />
 </head>
-<body>
+<body class="tone-violet">
 
   <div id="gate"><div class="spinner"></div></div>
 
@@ -58,10 +56,9 @@
 
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
       <div>
-        <div class="eyebrow"><i class="fa-solid fa-bolt"></i> Real-time Updates</div>
         <h1 style="font-size: 1.8rem; margin-top: 4px;">Notifications &amp; Invites</h1>
       </div>
-      <button type="button" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.78rem;" onclick="clearAllNotifications()">
+      <button type="button" class="btn btn-sm btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.78rem;" onclick="clearAllNotifications()">
         <i class="fa-solid fa-trash-can text-pink"></i> Clear All
       </button>
     </div>
@@ -74,7 +71,7 @@
         </div>
         <p class="dim" style="font-size: 0.82rem; margin-top: 4px; line-height: 1.4;" id="pushStatusText">Get instant event reminders &amp; party alerts even when the app is closed.</p>
       </div>
-      <button type="button" id="enablePushBtn" class="btn btn-pink" style="width: auto; padding: 8px 16px; font-size: 0.82rem; white-space: nowrap;" onclick="requestLockScreenPushPermission()">
+      <button type="button" id="enablePushBtn" class="btn btn-sm btn-pink" style="width: auto; padding: 8px 16px; font-size: 0.82rem; white-space: nowrap;" onclick="requestLockScreenPushPermission()">
         <i class="fa-solid fa-bell"></i> Enable
       </button>
     </div>
@@ -276,7 +273,7 @@
     function renderInviteActions(n) {
       const inv = inviteDetail[n.id];
       if (!inv || !inv.title) {
-        return `<a href="events.html" class="btn btn-outline" style="width:auto;padding:5px 14px;font-size:0.78rem;display:inline-flex">
+        return `<a href="events.html" class="btn btn-sm btn-outline" style="width:auto;padding:5px 14px;font-size:0.78rem;display:inline-flex">
                   <i class="fa-solid fa-calendar"></i> Open the calendar
                 </a>`;
       }
@@ -294,13 +291,13 @@
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             ${inv.past
               ? '<span class="dim" style="font-size:0.8rem">This night has already happened.</span>'
-              : `<button type="button" id="notifRsvp_${n.id}" class="btn ${inv.going ? 'btn-outline' : 'btn-pink'}"
+              : `<button type="button" id="notifRsvp_${n.id}" class="btn btn-sm ${inv.going ? 'btn-outline' : 'btn-pink'}"
                         style="width:auto;padding:5px 14px;font-size:0.78rem"
                         onclick="rsvpFromNotification('${n.id}', '${inv.event_id}', '${inv.event_date}')">
                    <i class="fa-solid ${inv.going ? 'fa-circle-check text-green' : 'fa-calendar-plus'}"></i>
                    ${inv.going ? "You're going" : "I'm going"}
                  </button>`}
-            <a href="events.html" class="btn btn-outline" style="width:auto;padding:5px 14px;font-size:0.78rem;display:inline-flex">
+            <a href="events.html" class="btn btn-sm btn-outline" style="width:auto;padding:5px 14px;font-size:0.78rem;display:inline-flex">
               <i class="fa-solid fa-calendar"></i> Calendar
             </a>
           </div>
@@ -317,7 +314,7 @@
             <i class="fa-solid fa-bell-slash text-pink" style="font-size:2.2rem;margin-bottom:12px"></i>
             <h3 style="font-size:1.1rem;color:#FFF;margin-bottom:4px">No notifications yet</h3>
             <p class="dim" style="font-size:0.85rem;margin-bottom:16px">Friend requests and event invites from other students land here.</p>
-            <a href="network.html" class="btn btn-pink" style="width:auto;display:inline-flex;padding:6px 18px;font-size:0.82rem;">
+            <a href="network.html" class="btn btn-sm btn-pink" style="width:auto;display:inline-flex;padding:6px 18px;font-size:0.82rem;">
               <i class="fa-solid fa-users"></i> Discover ISOT students
             </a>
           </div>
@@ -355,10 +352,10 @@
 
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             ${n.type === 'friend_request' ? `
-              <button type="button" class="btn btn-pink" style="width:auto;padding:5px 14px;font-size:0.78rem;" onclick="handleNotifAccept('${n.id}', '${n.actor_id || ''}')">
+              <button type="button" class="btn btn-sm btn-pink" style="width:auto;padding:5px 14px;font-size:0.78rem;" onclick="handleNotifAccept('${n.id}', '${n.actor_id || ''}')">
                 <i class="fa-solid fa-handshake"></i> Accept
               </button>
-              <button type="button" class="btn btn-outline" style="width:auto;padding:5px 14px;font-size:0.78rem;" onclick="handleNotifIgnore('${n.id}', '${n.actor_id || ''}')">
+              <button type="button" class="btn btn-sm btn-outline" style="width:auto;padding:5px 14px;font-size:0.78rem;" onclick="handleNotifIgnore('${n.id}', '${n.actor_id || ''}')">
                 <i class="fa-solid fa-xmark"></i> Ignore
               </button>
             ` : ''}

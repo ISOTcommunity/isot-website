@@ -25,18 +25,16 @@
   <meta name="apple-mobile-web-app-title" content="ISOT" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#000000" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#0C1A4A" />
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <link rel="stylesheet" href="css/app.css" />
 
   <style>
     .position-hero-badge {
-      background: linear-gradient(135deg, rgba(212, 90, 232, 0.2), rgba(255, 106, 0, 0.2));
-      border: 1px solid var(--border-glow);
+      background: var(--tone-night);          /* the page's family: Coral for karaoke */
+      border: 1px solid var(--tone-edge);
       border-radius: 20px;
       padding: 22px;
       text-align: center;
@@ -93,13 +91,13 @@
     .now-on-stage i { color: var(--pink); margin-right: 5px; }
 
     .position-hero-badge.on-mic {
-      background: linear-gradient(135deg, rgba(67, 219, 143, 0.25), rgba(212, 90, 232, 0.25));
-      border-color: #43DB8F;
+      background: var(--green-night);
+      border-color: #1FD47F;
       animation: pulseBorder 2s infinite;
     }
     @keyframes pulseBorder {
-      0%, 100% { box-shadow: 0 0 15px rgba(67, 219, 143, 0.3); }
-      50% { box-shadow: 0 0 30px rgba(67, 219, 143, 0.6); }
+      0%, 100% { box-shadow: none; }
+      50% { box-shadow: none; }
     }
 
     .queue-row {
@@ -114,16 +112,16 @@
       transition: var(--transition-fast);
     }
     .queue-row.playing {
-      border-color: #43DB8F;
-      background: rgba(67, 219, 143, 0.12);
+      border-color: #1FD47F;
+      background: rgba(31, 212, 127, 0.12);
     }
     .queue-row.my-row {
       border-color: var(--pink);
-      background: rgba(212, 90, 232, 0.12);
+      background: rgba(127, 74, 255, 0.12);
     }
   </style>
 </head>
-<body>
+<body class="tone-coral">
 
   <div id="gate"><div class="spinner"></div></div>
 
@@ -131,9 +129,9 @@
   <header class="topbar">
     <a href="home.html" class="topbar-title" style="display: flex; align-items: center; gap: 8px;">
       <i class="fa-solid fa-microphone text-pink"></i>
-      <span>Monday Karaoke @ Rough</span>
+      <span>Karaoke @ Rough</span>
     </a>
-    <a href="songbook.html" class="btn btn-outline"
+    <a href="songbook.html" class="btn btn-sm btn-outline"
        style="width:auto;padding:6px 12px;font-size:0.76rem;display:inline-flex;flex-shrink:0">
       <i class="fa-solid fa-heart text-pink"></i> Songbook
     </a>
@@ -164,7 +162,7 @@
       <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;" id="mySongSub">Queue opens every Monday at 21:00 (9 PM CET)!</p>
       <p class="now-on-stage" id="nowOnStage" hidden></p>
       <div id="scheduleOverrideNotice" style="margin-top: 10px; display: none;">
-        <button type="button" class="btn btn-outline" style="width: auto; padding: 4px 12px; font-size: 0.75rem; border-color: var(--gold); color: var(--gold);" onclick="toggleStaffOverride()">
+        <button type="button" class="btn btn-sm btn-outline" style="width: auto; padding: 4px 12px; font-size: 0.75rem; border-color: var(--gold); color: var(--gold);" onclick="toggleStaffOverride()">
           <i class="fa-solid fa-key"></i> Unlock Queue (Staff Testing Mode)
         </button>
       </div>
@@ -179,7 +177,7 @@
       <p class="dim" style="font-size: 0.85rem; margin-bottom: 14px;">
         Join us live at Rough Bar (San Salvario) every Monday night from 21:00 (9 PM CET) to request your song on stage!
       </p>
-      <a href="partner.html" class="btn btn-outline" style="width: auto; display: inline-flex; padding: 6px 16px; font-size: 0.82rem;">
+      <a href="partner.html" class="btn btn-sm btn-outline" style="width: auto; display: inline-flex; padding: 6px 16px; font-size: 0.82rem;">
         <i class="fa-solid fa-location-dot text-pink"></i> View Venue &amp; Offer
       </a>
     </div>
@@ -218,7 +216,7 @@
     <div class="card card-glass" id="myActiveCard" style="display: none; margin-bottom: 24px; border-color: var(--pink);">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
         <span class="badge badge-socio"><i class="fa-solid fa-user"></i> YOUR QUEUED SONG</span>
-        <button type="button" class="btn btn-ghost" onclick="cancelMySong()" style="color: #F8A18E; padding: 4px 8px; font-size: 0.8rem;">
+        <button type="button" class="btn btn-ghost" onclick="cancelMySong()" style="color: #FFD8CF; padding: 4px 8px; font-size: 0.8rem;">
           <i class="fa-solid fa-trash"></i> Cancel Song
         </button>
       </div>

@@ -20,9 +20,7 @@
   <link rel="icon" href="../assets/favicon.png" sizes="48x48" type="image/png" />
   
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/app.css" />
   <style>
     .avatar { width:64px; height:64px; border-radius:50%; margin:0 auto 14px; display:block; object-fit:cover; }
@@ -84,7 +82,7 @@
             <input type="checkbox" id="cPhotos" required />
             <label for="cPhotos">I agree that ISOT may publish photos from events I appear in, on the website and on Instagram. You can withdraw this at any time by writing to us.</label>
           </div>
-          <p id="photoWarn" class="dim" style="font-size:0.8rem;color:#F8A18E;margin:-4px 0 0 30px" hidden>
+          <p id="photoWarn" class="dim" style="font-size:0.8rem;color:#FFD8CF;margin:-4px 0 0 30px" hidden>
             You need to agree to this to finish setting up your account.
           </p>
 
@@ -95,7 +93,7 @@
           </div>
         </div>
 
-        <button type="submit" class="btn btn-pink" id="submit" style="margin-top:18px">Finish & Open App →</button>
+        <button type="submit" class="btn btn-pink" id="submit" style="margin-top:18px">Finish and open the app</button>
       </form>
 
       <button type="button" class="btn btn-ghost" id="skip" style="margin-top:10px">Skip for now</button>
@@ -162,7 +160,7 @@
       }
       const ok = pwEl.value === cfEl.value;
       matchEl.textContent = ok ? 'Passwords match.' : "Passwords don't match.";
-      matchEl.style.color = ok ? 'var(--green)' : '#F8A18E';
+      matchEl.style.color = ok ? 'var(--green)' : '#FFD8CF';
       matchEl.hidden = !cfEl.value;
       return ok;
     }

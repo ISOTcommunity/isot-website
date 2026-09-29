@@ -25,13 +25,11 @@
   <meta name="apple-mobile-web-app-title" content="ISOT" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#0C1A4A" />
   <!-- Vercel Web Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <link rel="stylesheet" href="css/app.css" />
@@ -61,17 +59,14 @@
       justify-content: center;
       gap: 6px;
     }
-    .view-btn.active {
-      background: var(--pink);
-      color: #FFF;
-      box-shadow: 0 4px 12px rgba(212, 90, 232, 0.3);
-    }
+    .view-btn.active { background: var(--selected-bg); border-color: var(--selected-bg); color: var(--on-selected); }
 
     /* Month Navigation Controls */
     .cal-nav-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
       margin-bottom: 14px;
       background: var(--bg-card);
       border: 1px solid var(--border-light);
@@ -79,25 +74,33 @@
       padding: 10px 14px;
     }
     .cal-nav-btn {
+      flex: 0 0 auto;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      margin: 0;
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--border-light);
       color: #FFF;
-      border-radius: var(--radius-sm);
-      padding: 6px 12px;
-      font-size: 0.85rem;
-      font-weight: 600;
+      border-radius: 50%;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      line-height: 1;
       transition: var(--transition-fast);
     }
+    .cal-nav-btn svg { width: 18px; height: 18px; }
     .cal-nav-btn:hover {
       background: rgba(255, 255, 255, 0.12);
       border-color: var(--pink);
     }
     .cal-month-title {
+      flex: 1;
+      min-width: 0;
+      text-align: center;
       font-size: 1.1rem;
+      line-height: 1.25;
       font-weight: 700;
       color: #FFF;
     }
@@ -142,13 +145,13 @@
       pointer-events: none;
     }
     .cal-matrix-day.has-event {
-      border-color: rgba(212, 90, 232, 0.4);
-      background: rgba(212, 90, 232, 0.12);
+      border-color: rgba(127, 74, 255, 0.4);
+      background: rgba(127, 74, 255, 0.12);
     }
     .cal-matrix-day.selected {
       border-color: var(--pink);
-      background: rgba(212, 90, 232, 0.28);
-      box-shadow: 0 0 14px rgba(212, 90, 232, 0.4);
+      background: rgba(127, 74, 255, 0.28);
+      box-shadow: none;
     }
     .cal-day-num {
       font-size: 0.88rem;
@@ -163,10 +166,11 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--pink);
+      background: var(--tone, var(--accent));   /* the event's category, see .cat-* in app.css */
     }
-    .cal-dot.party { background: #E69321; }
-    .cal-dot.karaoke { background: #E69321; }
+    /* Each event card sits on its category's Night tint with a matching edge, so the
+       list reads as karaoke / party / sport at a glance before a word is read. */
+    .event-card-item[class*="cat-"] { background: var(--tone-night); border-color: var(--tone-edge); }
 
     /* List Event Cards */
     .event-card-item {
@@ -191,7 +195,7 @@
     .event-date-box {
       width: 58px;
       height: 64px;
-      background: rgba(212, 90, 232, 0.12);
+      background: rgba(127, 74, 255, 0.12);
       border: 1px solid var(--border-glow);
       border-radius: 14px;
       display: flex;
@@ -243,7 +247,7 @@
       margin-left: -8px;
       overflow: hidden;
       flex-shrink: 0;
-      background: #0E0E13;
+      background: #1A2755;
     }
     .avatar-stack-item-box:first-child {
       margin-left: 0;
@@ -275,47 +279,13 @@
       color: #FFF;
     }
     .btn-rsvp.going {
-      background: rgba(67, 219, 143, 0.16);
-      border-color: #43DB8F;
-      color: #43DB8F;
-      box-shadow: 0 0 12px rgba(67, 219, 143, 0.25);
+      background: rgba(31, 212, 127, 0.16);
+      border-color: #1FD47F;
+      color: #1FD47F;
+      box-shadow: none;
     }
 
-    /* Modal Sheet for Attendees Profile Cards */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(11, 15, 25, 0.8);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      z-index: 1000;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease;
-    }
-    .modal-backdrop.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .modal-sheet {
-      width: 100%;
-      max-width: 480px;
-      background: var(--bg-darker);
-      border: 1px solid var(--border-glow);
-      border-bottom: none;
-      border-radius: 28px 28px 0 0;
-      padding: 24px;
-      transform: translateY(100%);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    .modal-backdrop.active .modal-sheet {
-      transform: translateY(0);
-    }
+    /* The attendee sheet uses the shared .modal-backdrop / .modal-sheet in app.css. */
 
     .attendee-card {
       display: flex;
@@ -357,10 +327,10 @@
     <div style="display: flex; align-items: center; gap: 12px;">
       <a id="notifBellBtn" href="notifications.html" style="position: relative; cursor: pointer; color: #FFF; font-size: 1.2rem; padding: 4px;" title="Notifications & Invites">
         <i class="fa-solid fa-bell"></i>
-        <span id="notifBellBadge" style="display: none; position: absolute; top: -2px; right: -2px; background: var(--pink); color: #FFF; font-size: 0.65rem; font-weight: 700; border-radius: 10px; min-width: 16px; height: 16px; align-items: center; justify-content: center; padding: 0 4px; border: 1.5px solid var(--bg-dark);">0</span>
+        <span id="notifBellBadge" style="display: none; position: absolute; top: -2px; right: -2px; background: var(--accent); color: var(--on-accent); font-size: 0.65rem; font-weight: 700; border-radius: 10px; min-width: 16px; height: 16px; align-items: center; justify-content: center; padding: 0 4px; border: 1.5px solid var(--bg-dark);">0</span>
       </a>
       <div id="headerAvatar" style="cursor: pointer;" data-open-drawer></div>
-      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: #FFF; font-size: 1.3rem; cursor: pointer; padding: 6px;">
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: var(--text-main); font-size: 1.3rem; cursor: pointer; padding: 6px;">
         <i class="fa-solid fa-bars"></i>
       </button>
     </div>
@@ -369,7 +339,6 @@
   <main class="shell">
 
     <div style="margin-bottom: 16px;">
-      <div class="eyebrow"><i class="fa-solid fa-sparkles"></i> Official Schedule Matrix</div>
       <h1 style="font-size: 1.8rem; margin-top: 4px;">ISOT Calendar</h1>
     </div>
 
@@ -378,7 +347,7 @@
          border-radius:14px 14px 30px 14px;padding:10px 14px;margin-bottom:14px;font-size:0.86rem">
       <i class="fa-solid fa-filter" style="color:var(--pink)"></i>
       <span style="flex:1" id="catFilterLabel"></span>
-      <button type="button" class="btn btn-outline" style="width:auto;padding:4px 12px;font-size:0.76rem"
+      <button type="button" class="btn btn-sm btn-outline" style="width:auto;padding:4px 12px;font-size:0.76rem"
               onclick="clearCategory()">Show all</button>
     </div>
 
@@ -692,7 +661,7 @@
             <i class="fa-solid fa-user-group text-pink" style="font-size:1.8rem;margin-bottom:10px"></i>
             <h4 style="font-size:1rem;color:#FFF;margin-bottom:4px">No Connected Friends Yet</h4>
             <p class="dim" style="font-size:0.82rem;margin-bottom:14px">Connect with students in the ISOT Network first to invite them to events!</p>
-            <a href="network.html" class="btn btn-pink" style="width:auto;display:inline-flex;padding:6px 16px;font-size:0.82rem;">
+            <a href="network.html" class="btn btn-sm btn-pink" style="width:auto;display:inline-flex;padding:6px 16px;font-size:0.82rem;">
               <i class="fa-solid fa-users"></i> Go to ISOT Network 🌐
             </a>
           </div>
@@ -711,7 +680,7 @@
                   <div class="dim" style="font-size:0.75rem">${escapeHtml(f.nationality || 'Turin Student')} • ${escapeHtml(f.university || 'UniTo')}</div>
                 </div>
               </div>
-              <button type="button" id="btnInvite_${key}" class="btn ${isAlreadyInvited ? 'btn-outline' : 'btn-pink'}" style="width:auto;padding:6px 14px;font-size:0.78rem;" onclick="sendSingleFriendInvite('${f.id}', '${escapeHtml(f.full_name)}', '${escapeHtml(eventTitle)}', '${eventId}', '${key}', '${eventDate}')">
+              <button type="button" id="btnInvite_${key}" class="btn btn-sm ${isAlreadyInvited ? 'btn-outline' : 'btn-pink'}" style="width:auto;padding:6px 14px;font-size:0.78rem;" onclick="sendSingleFriendInvite('${f.id}', '${escapeHtml(f.full_name)}', '${escapeHtml(eventTitle)}', '${eventId}', '${key}', '${eventDate}')">
                 ${isAlreadyInvited ? '<i class="fa-solid fa-check text-green"></i> Invited' : '<i class="fa-solid fa-envelope"></i> Invite 💌'}
               </button>
             </div>
@@ -839,12 +808,12 @@
 
       let html = `
         <div class="cal-nav-header">
-          <button type="button" class="cal-nav-btn" onclick="changeMonth(-1)" ${currMonthIdx <= 7 ? 'disabled style="opacity:0.4"' : ''}>
-            <i class="fa-solid fa-chevron-left"></i> Prev Month
+          <button type="button" class="cal-nav-btn" onclick="changeMonth(-1)" aria-label="Previous month" ${currMonthIdx <= 7 ? 'disabled style="opacity:0.4"' : ''}>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M15 19l-7-7 7-7"/></svg>
           </button>
           <div class="cal-month-title">${MONTH_NAMES[currMonthIdx]} ${currYear}</div>
-          <button type="button" class="cal-nav-btn" onclick="changeMonth(1)" ${currMonthIdx >= 11 ? 'disabled style="opacity:0.4"' : ''}>
-            Next Month <i class="fa-solid fa-chevron-right"></i>
+          <button type="button" class="cal-nav-btn" onclick="changeMonth(1)" aria-label="Next month" ${currMonthIdx >= 11 ? 'disabled style="opacity:0.4"' : ''}>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M9 5l7 7-7 7"/></svg>
           </button>
         </div>
 
@@ -877,7 +846,7 @@
 
         let dotsHtml = '';
         if (hasEvents) {
-          dotsHtml = '<div class="cal-event-dots">' + dayEvents.map(e => `<span class="cal-dot ${e.cat}"></span>`).join('') + '</div>';
+          dotsHtml = '<div class="cal-event-dots">' + dayEvents.map(e => `<span class="cal-dot cat-${e.cat}"></span>`).join('') + '</div>';
         }
 
         html += `
@@ -931,12 +900,12 @@
 
       let html = `
         <div class="cal-nav-header">
-          <button type="button" class="cal-nav-btn" onclick="changeWeek(-7)">
-            <i class="fa-solid fa-chevron-left"></i> Prev Week
+          <button type="button" class="cal-nav-btn" onclick="changeWeek(-7)" aria-label="Previous week">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M15 19l-7-7 7-7"/></svg>
           </button>
           <div class="cal-month-title">${startStr} – ${endStr}</div>
-          <button type="button" class="cal-nav-btn" onclick="changeWeek(7)">
-            Next Week <i class="fa-solid fa-chevron-right"></i>
+          <button type="button" class="cal-nav-btn" onclick="changeWeek(7)" aria-label="Next week">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M9 5l7 7-7 7"/></svg>
           </button>
         </div>
       `;
@@ -1048,7 +1017,7 @@
         : '';
 
       const headline = item.headline
-        ? `<div class="eyebrow" style="margin:12px 0 0;color:var(--pink)">${escapeHtml(item.headline)}</div>`
+        ? `<div class="eyebrow" style="margin:12px 0 0;">${escapeHtml(item.headline)}</div>`
         : '';
 
       // Whitespace preserved: the programme is written as lines and reads as a list.
@@ -1059,7 +1028,7 @@
         : '';
 
       return `
-        <div class="event-card-item">
+        <div class="event-card-item cat-${item.cat}">
           ${featured}
           ${headline}
           <div class="event-card-top">
@@ -1073,23 +1042,23 @@
                   <div style="width:24px;height:24px;border-radius:6px;overflow:hidden;display:inline-flex;align-items:center;justify-content:center">
                     <img src="${item.logo}" alt="" style="width:100%;height:100%;object-fit:cover;${item.cat === 'karaoke' ? 'transform:scale(1.85);' : ''}" />
                   </div>
-                  <span class="badge badge-socio">Perks</span>
-                  ${item.special ? `<span class="badge badge-live">${item.special}</span>` : ''}
+                  <span class="chip-tone">${escapeHtml(CATEGORY_NAMES[item.cat] || 'Social')}</span>
                 </div>
                 <span class="dim" style="font-size:0.75rem">${item.time}</span>
               </div>
               <a href="event.html?e=${item.eventId}&d=${item.date}" style="text-decoration:none">
                 <h2 style="font-size:1.05rem;color:#FFF;margin-bottom:4px">${escapeHtml(item.title)}</h2>
               </a>
-              <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-                ${item.link ? `<a href="${item.link}" class="btn btn-pink" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Join Song Queue</a>` : `<a href="profile.html" class="btn btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Show Member Card</a>`}
+              ${item.special ? `<div style="font-size:0.86rem;color:var(--text-muted);line-height:1.45">${escapeHtml(item.special)}</div>` : ''}
+              <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap">
+                ${item.link ? `<a href="${item.link}" class="btn btn-sm btn-pink" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Join Song Queue</a>` : `<a href="profile.html" class="btn btn-sm btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Show Member Card</a>`}
                 ${item.registerUrl ? `
                   <a href="${escapeHtml(item.registerUrl)}" target="_blank" rel="noopener noreferrer"
-                     class="btn btn-pink" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">
+                     class="btn btn-sm btn-pink" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i>
                     ${escapeHtml(item.registerLabel || 'Register')}
                   </a>` : ''}
-                <button type="button" class="btn btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex" onclick="openInviteModal('${escapeHtml(item.title)}', '${item.eventId}', '${item.date}')">
+                <button type="button" class="btn btn-sm btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex" onclick="openInviteModal('${escapeHtml(item.title)}', '${item.eventId}', '${item.date}')">
                   <i class="fa-solid fa-paper-plane text-pink"></i> Invite Friends
                 </button>
               </div>

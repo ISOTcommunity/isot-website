@@ -20,19 +20,17 @@
   <meta name="apple-mobile-web-app-title" content="ISOT" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#0C1A4A" />
   <script defer src="/_vercel/insights/script.js"></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="css/app.css" />
 
   <style>
     .gtt-hero {
-      background: linear-gradient(145deg, rgba(87,135,234,0.14), rgba(14,14,19,0.9));
-      border: 1px solid rgba(87,135,234,0.3);
+      background: var(--blue-night);
+      border: 1px solid rgba(61, 123, 255,0.3);
       border-radius: 24px;
       padding: 18px;
       margin-bottom: 18px;
@@ -43,7 +41,7 @@
     .gtt-hero .hero-icon {
       width: 48px; height: 48px; flex-shrink: 0;
       border-radius: 14px;
-      background: rgba(87,135,234,0.18); color: var(--c-sky-blue);
+      background: rgba(61, 123, 255,0.18); color: var(--c-sky-blue);
       display: inline-flex; align-items: center; justify-content: center;
       font-size: 1.3rem;
     }
@@ -51,10 +49,10 @@
       display: inline-flex; align-items: center; justify-content: center; line-height: 1; margin: 0; padding: 0;
     }
     .gtt-hero.is-alert {
-      background: linear-gradient(145deg, rgba(243,108,81,0.16), rgba(14,14,19,0.9));
-      border-color: rgba(243,108,81,0.45);
+      background: var(--coral-night);
+      border-color: rgba(255, 90, 60,0.45);
     }
-    .gtt-hero.is-alert .hero-icon { background: rgba(243,108,81,0.18); color: var(--red); }
+    .gtt-hero.is-alert .hero-icon { background: rgba(255, 90, 60,0.18); color: var(--red); }
 
     .strike {
       display: flex; gap: 12px;
@@ -64,7 +62,7 @@
       border: 1px solid var(--border-light);
       margin-bottom: 10px;
     }
-    .strike.gtt { border-color: rgba(243,108,81,0.35); }
+    .strike.gtt { border-color: rgba(255, 90, 60,0.35); }
     .strike-date {
       width: 52px; flex-shrink: 0; text-align: center;
       border-radius: 12px; padding: 6px 0;
@@ -73,7 +71,7 @@
     }
     .strike-date .d { font-size: 1.3rem; font-weight: 800; color: #FFF; font-variant-numeric: tabular-nums; }
     .strike-date .m { font-size: 0.66rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
-    .strike-date.soon { background: rgba(243,108,81,0.16); }
+    .strike-date.soon { background: rgba(255, 90, 60,0.16); }
     .strike-date.soon .m { color: var(--red); }
     .strike-body { flex: 1; min-width: 0; }
     .strike-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -108,7 +106,7 @@
     .link-row .link-arrow { margin-left: auto; color: var(--text-dim); }
   </style>
 </head>
-<body>
+<body class="tone-blue">
 
   <div id="gate"><div class="spinner"></div></div>
 
@@ -147,22 +145,22 @@
 
     <div class="eyebrow" style="margin:0 0 10px">Useful</div>
     <a class="link-row" href="https://www.google.com/maps/dir/?api=1&travelmode=transit" target="_blank" rel="noopener">
-      <div class="link-icon" style="background:rgba(67,219,143,0.16);color:var(--green)"><i class="fa-solid fa-route"></i></div>
+      <div class="link-icon" style="background:rgba(31, 212, 127,0.16);color:var(--green)"><i class="fa-solid fa-route"></i></div>
       <div style="min-width:0"><div class="link-title">Plan a trip</div><div class="link-sub">Buses, trams and metro in Google Maps</div></div>
       <span class="link-arrow">↗</span>
     </a>
     <a class="link-row" href="../turin-public-transport-gtt-student-pass.html">
-      <div class="link-icon" style="background:rgba(212,90,232,0.16);color:var(--pink)"><i class="fa-solid fa-ticket"></i></div>
+      <div class="link-icon" style="background:rgba(127, 74, 255,0.16);color:var(--pink)"><i class="fa-solid fa-ticket"></i></div>
       <div style="min-width:0"><div class="link-title">Tickets &amp; student pass</div><div class="link-sub">ISOT guide to GTT fares for students</div></div>
       <span class="link-arrow">→</span>
     </a>
     <a class="link-row" href="https://www.gtt.to.it" target="_blank" rel="noopener">
-      <div class="link-icon" style="background:rgba(87,135,234,0.16);color:var(--c-sky-blue)"><i class="fa-solid fa-bus"></i></div>
+      <div class="link-icon" style="background:rgba(61, 123, 255,0.16);color:var(--c-sky-blue)"><i class="fa-solid fa-bus"></i></div>
       <div style="min-width:0"><div class="link-title">GTT official site</div><div class="link-sub">Timetables, service changes, news</div></div>
       <span class="link-arrow">↗</span>
     </a>
     <a class="link-row" href="https://scioperi.mit.gov.it/mit2/public/scioperi" target="_blank" rel="noopener">
-      <div class="link-icon" style="background:rgba(230,147,33,0.16);color:var(--c-amber)"><i class="fa-solid fa-landmark"></i></div>
+      <div class="link-icon" style="background:rgba(255, 184, 31,0.16);color:var(--c-amber)"><i class="fa-solid fa-landmark"></i></div>
       <div style="min-width:0"><div class="link-title">Official strike register</div><div class="link-sub">Ministry of Transport, all of Italy</div></div>
       <span class="link-arrow">↗</span>
     </a>

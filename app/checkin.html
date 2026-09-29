@@ -20,9 +20,7 @@
   <link rel="icon" href="../assets/favicon.png" sizes="48x48" type="image/png" />
   
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/app.css" />
   <style>
     .mark { font-size:3.2rem; line-height:1; margin-bottom:14px; }
@@ -42,7 +40,7 @@
         <div class="spinner" style="margin:0 auto 14px"></div>
         <p class="muted" style="font-size:0.92rem">Checking you in…</p>
       </div>
-      <a href="home.html" class="btn btn-ghost" style="margin-top:18px">Go to App Home →</a>
+      <a href="home.html" class="btn btn-ghost" style="margin-top:18px">Go to Home</a>
     </div>
   </main>
 
@@ -84,7 +82,7 @@
     }
 
     if (err) {
-      render('!', '#F8A18E', "Couldn't check you in", err.message || String(err));
+      render('!', '#FFD8CF', "Couldn't check you in", err.message || String(err));
       return;
     }
 

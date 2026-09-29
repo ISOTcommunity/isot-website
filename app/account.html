@@ -25,13 +25,11 @@
   <meta name="apple-mobile-web-app-title" content="ISOT" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#0C1A4A" />
   <!-- Vercel Web Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <link rel="stylesheet" href="css/app.css" />
@@ -89,7 +87,7 @@
     }
   </style>
 </head>
-<body>
+<body class="tone-violet">
 
   <div id="gate"><div class="spinner"></div></div>
 
@@ -115,7 +113,7 @@
     <div class="avatar-preview-box" style="text-align: center; position: relative;">
       <div style="position: relative; width: 92px; height: 92px; margin: 0 auto; cursor: pointer;" onclick="document.getElementById('avatarFileInput').click()" title="Tap to choose photo &amp; crop">
         <div id="avatarContainer" style="width: 100%; height: 100%;"></div>
-        <div style="position: absolute; bottom: 0; right: 0; background: var(--pink); color: #FFF; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-dark); font-size: 0.75rem; box-shadow: 0 4px 10px rgba(212,90,232,0.4);">
+        <div style="position: absolute; bottom: 0; right: 0; background: var(--accent); color: var(--on-accent); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-dark); font-size: 0.75rem; box-shadow: none;">
           <i class="fa-solid fa-camera"></i>
         </div>
       </div>
@@ -214,15 +212,15 @@
     </div>
 
     <!-- Section 5: Account Danger Zone -->
-    <div class="settings-section-card" style="border-color: rgba(243, 108, 81, 0.3);">
-      <div class="settings-title" style="color: #F8A18E;"><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone</div>
+    <div class="settings-section-card" style="border-color: rgba(255, 90, 60, 0.3);">
+      <div class="settings-title" style="color: #FFD8CF;"><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone</div>
 
       <p class="dim" style="font-size: 0.85rem; margin-bottom: 14px;">
         Exercising your GDPR Art. 17 right to erasure deletes your profile and check-in history. Accounting records are retained per Cod. Civ. 2220.
       </p>
 
       <div style="display: flex; flex-direction: column; gap: 10px;">
-        <button type="button" class="btn btn-outline" onclick="signOut()" style="color: #F8A18E; border-color: rgba(243, 108, 81, 0.3);">
+        <button type="button" class="btn btn-outline" onclick="signOut()" style="color: #FFD8CF; border-color: rgba(255, 90, 60, 0.3);">
           <i class="fa-solid fa-right-from-bracket" style="margin-right: 6px;"></i> Sign Out of App
         </button>
       </div>
@@ -613,16 +611,16 @@
 
       <p class="dim" style="font-size:0.8rem;margin-bottom:12px">Drag to pan photo, use slider to zoom, and rotate to fit perfectly in the circular guide.</p>
 
-      <div style="position:relative;width:260px;height:260px;margin:0 auto 16px auto;border-radius:50%;overflow:hidden;border:2.5px solid var(--pink);box-shadow:0 0 24px rgba(212,90,232,0.35);background:#000;touch-action:none;" id="cropCanvasWrapper">
+      <div style="position:relative;width:260px;height:260px;margin:0 auto 16px auto;border-radius:50%;overflow:hidden;border:2.5px solid var(--pink);box-shadow: none;background:#000;touch-action:none;" id="cropCanvasWrapper">
         <canvas id="cropCanvas" width="260" height="260" style="width:100%;height:100%;cursor:grab;"></canvas>
       </div>
 
       <!-- Controls: Rotate & Zoom -->
       <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:14px">
-        <button type="button" class="btn btn-outline" style="width:auto;padding:6px 16px;font-size:0.8rem;" onclick="rotateCropImage(-90)">
+        <button type="button" class="btn btn-sm btn-outline" style="width:auto;padding:6px 16px;font-size:0.8rem;" onclick="rotateCropImage(-90)">
           <i class="fa-solid fa-rotate-left"></i> Rotate -90°
         </button>
-        <button type="button" class="btn btn-outline" style="width:auto;padding:6px 16px;font-size:0.8rem;" onclick="rotateCropImage(90)">
+        <button type="button" class="btn btn-sm btn-outline" style="width:auto;padding:6px 16px;font-size:0.8rem;" onclick="rotateCropImage(90)">
           <i class="fa-solid fa-rotate-right"></i> Rotate +90°
         </button>
       </div>

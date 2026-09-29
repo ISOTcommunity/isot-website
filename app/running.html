@@ -11,7 +11,7 @@
 </script>
 
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Running Club · ISOT Community</title>
 
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
@@ -20,12 +20,10 @@
   <meta name="apple-mobile-web-app-title" content="ISOT" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#0C1A4A" />
   <script defer src="/_vercel/insights/script.js"></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="vendor/leaflet.css" />
   <link rel="stylesheet" href="css/app.css" />
@@ -36,12 +34,12 @@
       width: 100%;
       border-radius: 20px;
       border: 1px solid var(--border-glow);
-      box-shadow: 0 12px 32px rgba(212, 90, 232, 0.2);
+      box-shadow: 0 0 0 2px rgba(12, 26, 74, 0.9);
       margin-bottom: 20px;
     }
     
     .leaflet-control-attribution {
-      background: rgba(11, 15, 25, 0.6) !important;
+      background: rgba(13, 20, 44, 0.6) !important;
       color: var(--text-dim) !important;
       font-size: 0.65rem !important;
       border-radius: 6px 0 0 0;
@@ -91,7 +89,7 @@
       height: 100%;
       width: 0%;
       border-radius: 9999px;
-      background: linear-gradient(90deg, var(--c-sky-blue), var(--green));
+      background: var(--green);
       transition: width 0.6s ease;
     }
     .run-progress-lbl {
@@ -110,13 +108,13 @@
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background: var(--pink);
+      background: var(--accent);
       border: 2px solid #FFF;
-      box-shadow: 0 0 14px rgba(212, 90, 232, 0.7);
+      box-shadow: 0 0 0 2px rgba(12, 26, 74, 0.9);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #FFF;
+      color: var(--on-accent);
       font-size: 0.7rem;
     }
     .isot-pin i { display: inline-flex; align-items: center; justify-content: center; line-height: 1; margin: 0; padding: 0; }
@@ -130,8 +128,8 @@
       margin: -4px 0 16px;
       padding: 9px 14px;
       border-radius: 14px;
-      background: rgba(212, 90, 232, 0.08);
-      border: 1px solid rgba(212, 90, 232, 0.25);
+      background: rgba(127, 74, 255, 0.08);
+      border: 1px solid rgba(127, 74, 255, 0.25);
       font-size: 0.78rem;
       color: var(--text-muted);
       font-weight: 600;
@@ -145,7 +143,7 @@
     #confirmSheet .modal-sheet { max-width: 420px; }
     .confirm-actions { display: flex; gap: 10px; margin-top: 18px; }
     .confirm-actions .btn { flex: 1; padding: 13px; }
-    .btn-danger { background: var(--red); color: #FFF; }
+    .btn-danger { background: var(--coral-deep); color: #FFF; }   /* white on Deep Coral: 6.9:1 */
 
     /* Streak Card */
     .streak-card {
@@ -155,8 +153,8 @@
       gap: 12px;
       padding: 14px 18px;
       border-radius: 20px;
-      background: linear-gradient(145deg, rgba(212,90,232,0.12), rgba(14,14,19,0.8));
-      border: 1px solid rgba(212,90,232,0.28);
+      background: var(--violet-night);
+      border: 1px solid rgba(127, 74, 255,0.28);
       margin-bottom: 18px;
     }
 
@@ -203,13 +201,13 @@
       align-items: center;
       justify-content: center;
       font-size: 0.75rem;
-      box-shadow: 0 0 16px rgba(87,135,234,0.9);
+      box-shadow: 0 0 0 3px rgba(12, 26, 74, 0.9);
       animation: runnerPulse 1.8s infinite;
     }
     @keyframes runnerPulse {
-      0% { box-shadow: 0 0 0 0 rgba(87,135,234, 0.7); }
-      70% { box-shadow: 0 0 0 14px rgba(87,135,234, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(87,135,234, 0); }
+      0% { box-shadow: 0 0 0 0 rgba(61, 123, 255, 0.7); }
+      70% { box-shadow: 0 0 0 14px rgba(61, 123, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(61, 123, 255, 0); }
     }
 
     /* Run Completion Modal */
@@ -255,7 +253,7 @@
       text-align: left;
       cursor: pointer;
       touch-action: manipulation;
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease, background-color 0.2s ease;
+      transition: transform 0.18s var(--ease-out), border-color 0.2s ease, background-color 0.2s ease;
     }
     .mode-option + .mode-option { margin-top: 10px; }
     .mode-option:active { transform: scale(0.97); }
@@ -294,7 +292,7 @@
       content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
       background: var(--route-color, var(--pink));
     }
-    .route-item.done { border-color: rgba(67, 219, 143, 0.35); }
+    .route-item.done { border-color: rgba(31, 212, 127, 0.35); }
     .route-item .route-title { font-size: 1.02rem; font-weight: 700; color: #FFF; line-height: 1.3; }
     .route-item .route-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 0.76rem; color: var(--text-muted); font-weight: 600; margin-top: 6px; font-variant-numeric: tabular-nums; }
     .route-item .route-meta i { color: var(--text-dim); margin-right: 4px; }
@@ -335,7 +333,7 @@
     .start-sub:active { color: var(--text-main); }
   </style>
 </head>
-<body>
+<body class="tone-green">
 
   <div id="gate"><div class="spinner"></div></div>
 
@@ -359,7 +357,6 @@
     <div id="alertBox"></div>
 
     <div style="margin-bottom: 14px;">
-      <div class="eyebrow"><i class="fa-solid fa-fire text-pink"></i> ISOT Athletics &amp; Outdoor</div>
       <h1 style="font-size: 1.75rem; margin-top: 4px;">Turin Running Club</h1>
       <p style="color: var(--text-dim); font-size: 0.88rem; margin-top: 4px;">Run anywhere with GPS, or race one of the ISOT routes. Earn game points, beat your records, and climb the club leaderboard.</p>
     </div>
@@ -367,7 +364,7 @@
     <!-- Weekly Streak Banner -->
     <div class="streak-card" id="streakBanner">
       <div style="display:flex; align-items:center; gap:12px;">
-        <div style="width:42px; height:42px; border-radius:12px; background:rgba(212,90,232,0.16); color:var(--pink); display:flex; align-items:center; justify-content:center; font-size:1.25rem;">
+        <div style="width:42px; height:42px; border-radius:12px; background:rgba(127, 74, 255,0.16); color:var(--pink); display:flex; align-items:center; justify-content:center; font-size:1.25rem;">
           <i class="fa-solid fa-fire"></i>
         </div>
         <div>
@@ -384,7 +381,7 @@
     <!-- GPS Timer & Live Tracker Card -->
     <div class="route-card" id="timerCard" style="border:1px solid var(--border-glow); position:relative;">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-        <span class="badge" style="background:rgba(67,219,143,0.15); color:var(--green); border:1px solid rgba(67,219,143,0.3);">
+        <span class="badge" style="background:rgba(31, 212, 127,0.15); color:var(--green); border:1px solid rgba(31, 212, 127,0.3);">
           <i class="fa-solid fa-stopwatch"></i> Run Timer &amp; GPS
         </span>
         <span id="gpsStatusBadge" role="status" aria-live="polite" style="font-size:0.75rem; color:var(--text-dim); font-weight:600; display:flex; align-items:center; gap:5px;">
@@ -450,6 +447,17 @@
       </div>
     </div>
 
+    <!-- All my runs -->
+    <div class="route-card" id="myRunsCard">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+        <div class="eyebrow" style="margin:0;"><i class="fa-solid fa-clock-rotate-left text-pink"></i> My Run History</div>
+        <span id="myRunsTotal" style="font-size:0.75rem; color:var(--text-dim); font-weight:600;"></span>
+      </div>
+      <div id="myRunsList">
+        <div class="dim" style="text-align:center; padding:12px;"><div class="spinner"></div></div>
+      </div>
+    </div>
+
     <!-- Route Leaderboard Card -->
     <div class="route-card" id="leaderboardCard">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
@@ -499,7 +507,7 @@
         <button type="button" class="sheet-close" onclick="closeStartSheet()" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <button type="button" class="mode-option" onclick="chooseFreeRun()">
-        <div class="mode-icon" style="background:rgba(87,135,234,0.16); color:var(--c-sky-blue);"><i class="fa-solid fa-location-arrow"></i></div>
+        <div class="mode-icon" style="background:rgba(61, 123, 255,0.16); color:var(--c-sky-blue);"><i class="fa-solid fa-location-arrow"></i></div>
         <div>
           <div class="mode-title">Free run</div>
           <div class="mode-sub">Run anywhere. GPS tracks your distance, pace and trail on the map.</div>
@@ -507,7 +515,7 @@
         <i class="fa-solid fa-chevron-right mode-arrow"></i>
       </button>
       <button type="button" class="mode-option" onclick="chooseIsotRoute()">
-        <div class="mode-icon" style="background:rgba(212,90,232,0.16); color:var(--pink);"><i class="fa-solid fa-route"></i></div>
+        <div class="mode-icon" style="background:rgba(127, 74, 255,0.16); color:var(--pink);"><i class="fa-solid fa-route"></i></div>
         <div>
           <div class="mode-title">ISOT route</div>
           <div class="mode-sub">Pick one of the club routes and race the leaderboard for a personal record.</div>
@@ -547,7 +555,7 @@
   <!-- Run Result Celebration Modal -->
   <div id="runResultModal" class="run-modal-backdrop" style="display:none;">
     <div class="run-modal">
-      <div style="width:58px; height:58px; border-radius:50%; background:rgba(67,219,143,0.18); color:var(--green); display:inline-flex; align-items:center; justify-content:center; font-size:1.6rem; margin-bottom:12px;">
+      <div style="width:58px; height:58px; border-radius:50%; background:rgba(31, 212, 127,0.18); color:var(--green); display:inline-flex; align-items:center; justify-content:center; font-size:1.6rem; margin-bottom:12px;">
         <i class="fa-solid fa-flag-checkered"></i>
       </div>
       <h2 id="modalTitle" style="font-size:1.45rem; color:#FFF; margin-bottom:4px;">Run Completed!</h2>
@@ -565,17 +573,20 @@
       </div>
 
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px;">
-        <div style="background:rgba(212,90,232,0.08); border:1px solid rgba(212,90,232,0.25); border-radius:14px; padding:10px;">
-          <div id="modalPointsEarned" style="font-size:1.25rem; font-weight:800; color:var(--pink); font-variant-numeric:tabular-nums;">+5</div>
+        <div style="background:rgba(127, 74, 255,0.08); border:1px solid rgba(127, 74, 255,0.25); border-radius:14px; padding:10px;">
+          <div id="modalPointsEarned" style="font-size:1.25rem; font-weight:800; color:var(--pink); font-variant-numeric:tabular-nums;">+0</div>
           <div style="font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; font-weight:600; margin-top:2px;">Game Points</div>
           <div id="modalKmPoints" style="display:none; font-size:0.68rem; color:var(--text-muted); margin-top:3px; font-variant-numeric:tabular-nums;"></div>
         </div>
-        <div style="background:rgba(67,219,143,0.08); border:1px solid rgba(67,219,143,0.25); border-radius:14px; padding:10px;">
+        <div style="background:rgba(31, 212, 127,0.08); border:1px solid rgba(31, 212, 127,0.25); border-radius:14px; padding:10px;">
           <div id="modalStreakWeeks" style="font-size:1.25rem; font-weight:800; color:var(--green); font-variant-numeric:tabular-nums;">1w</div>
           <div style="font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; font-weight:600; margin-top:2px;">Weekly Streak</div>
         </div>
       </div>
 
+      <button type="button" class="btn btn-secondary" onclick="shareRun(lastRunResult)" style="width:100%; justify-content:center; padding:12px; font-weight:700; margin-bottom:10px;">
+        <i class="fa-solid fa-share-nodes"></i> Share my run
+      </button>
       <button type="button" class="btn btn-pink" onclick="closeRunModal()" style="width:100%; justify-content:center; padding:12px; font-weight:700;">
         Continue
       </button>
@@ -605,12 +616,45 @@
     // Run Tracker State
     let isRunning = false;
     let runStartTime = null;
+    let isPaused = false;
+    let pausedMs = 0;
+    let pauseStartedAt = null;
+    let resumeSegment = false;
+
+    function activeSeconds() {
+      const now = isPaused ? pauseStartedAt : Date.now();
+      return Math.max(1, Math.round((now - runStartTime - pausedMs) / 1000));
+    }
+
+    function togglePause() {
+      const btn = document.getElementById('btnPauseRun');
+      if (!isPaused) {
+        isPaused = true;
+        pauseStartedAt = Date.now();
+        btn.innerHTML = '<i class="fa-solid fa-play"></i> Resume';
+        document.getElementById('timerSub').dataset.prev = document.getElementById('timerSub').textContent;
+        document.getElementById('timerSub').textContent = 'Paused';
+        document.getElementById('timerDisplay').style.opacity = '0.45';
+      } else {
+        pausedMs += Date.now() - pauseStartedAt;
+        isPaused = false;
+        pauseStartedAt = null;
+        resumeSegment = true; // distance moved while paused must not count
+        btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
+        document.getElementById('timerSub').textContent = document.getElementById('timerSub').dataset.prev || '';
+        document.getElementById('timerDisplay').style.opacity = '';
+      }
+      haptic(20);
+      updateClock();
+    }
     let timerInterval = null;
     let elapsedSeconds = 0;
 
     // GPS State
     let gpsWatchId = null;
     let lastPosition = null;
+    let gpsRejects = 0;
+    const MAX_RUN_SPEED = 7; // m/s (~25 km/h) — anything faster is a GPS jump
     let gpsTrailCoords = [];
     let runnerMarker = null;
     let runnerTrailPolyline = null;
@@ -676,7 +720,13 @@
       map = L.map('runMap', { zoomControl: false, attributionControl: false });
       L.control.attribution({ prefix: false, position: 'bottomright' }).addAttribution('&copy; OSM').addTo(map);
       map.setView([45.0703, 7.6869], 13);
-      isotBasemap(map);
+      // Run page only: OpenStreetMap's standard style shows footpaths, park trails and
+      // buildings, which the app-wide dark basemap leaves out. Other map pages keep isotBasemap.
+      document.body.classList.remove('map-dark');
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
 
       resetTimerCard();
       setFocusRoute(focusRoute, { load: false });
@@ -695,6 +745,7 @@
 
       await loadLastRunTrail();
       loadRouteData(focusRoute.id);
+      loadMyRuns();
 
       // A run that failed to save last time is still waiting in this browser
       const leftover = readPendingRun();
@@ -839,26 +890,47 @@
       clearLastRunTrail();
       if (!coords || coords.length < 2) return;
 
-      currentPolyline = L.polyline(coords, {
-        color: '#5787EA', weight: 4, opacity: 0.85, dashArray: '6, 8',
-        lineCap: 'round', lineJoin: 'round'
-      }).addTo(map);
+      currentPolyline = makeTrail(coords).addTo(map);
 
-      const startPin = L.divIcon({
-        className: 'isot-pin-wrapper',
-        html: `<div class="isot-pin" style="background:#22C55E;box-shadow:0 0 14px rgba(34,197,94,0.7);"><i class="fa-solid fa-play"></i></div>`,
-        iconSize: [28, 28], iconAnchor: [14, 14]
+      const dot = (bg) => L.divIcon({
+        className: '',
+        html: `<div style="width:14px;height:14px;border-radius:50%;background:${bg};border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.5);"></div>`,
+        iconSize: [14, 14], iconAnchor: [7, 7]
       });
-      currentMarkers.push(L.marker(coords[0], { icon: startPin }).addTo(map));
-
-      const finishPin = L.divIcon({
-        className: 'isot-pin-wrapper',
-        html: `<div class="isot-pin" style="background:var(--pink);"><i class="fa-solid fa-flag-checkered"></i></div>`,
-        iconSize: [28, 28], iconAnchor: [14, 14]
-      });
-      currentMarkers.push(L.marker(coords[coords.length - 1], { icon: finishPin }).addTo(map).bindPopup(label || 'Last run'));
+      currentMarkers.push(L.marker(coords[0], { icon: dot('#1FD47F'), interactive: false }).addTo(map));
+      currentMarkers.push(L.marker(coords[coords.length - 1], { icon: dot('#111') }).addTo(map).bindPopup(label || 'Last run'));
 
       map.fitBounds(currentPolyline.getBounds(), { padding: [40, 40], maxZoom: 17 });
+    }
+
+    // Strava-style trail: dark casing under a bold solid line, lightly smoothed
+    const TRAIL_COLOR = (getComputedStyle(document.documentElement).getPropertyValue('--pink') || '').trim() || '#FC4C02';
+
+    function smoothPath(coords) {
+      if (coords.length < 3) return coords.map(c => [c[0], c[1]]);
+      const out = [[coords[0][0], coords[0][1]]];
+      for (let i = 1; i < coords.length - 1; i++) {
+        out.push([
+          (coords[i - 1][0] + 2 * coords[i][0] + coords[i + 1][0]) / 4,
+          (coords[i - 1][1] + 2 * coords[i][1] + coords[i + 1][1]) / 4
+        ]);
+      }
+      const last = coords[coords.length - 1];
+      out.push([last[0], last[1]]);
+      return out;
+    }
+
+    function makeTrail(coords) {
+      const pts = smoothPath(coords);
+      return L.featureGroup([
+        L.polyline(pts, { color: '#000', weight: 8, opacity: 0.35, lineCap: 'round', lineJoin: 'round', smoothFactor: 1.5, interactive: false }),
+        L.polyline(pts, { color: TRAIL_COLOR, weight: 4.5, opacity: 1, lineCap: 'round', lineJoin: 'round', smoothFactor: 1.5, interactive: false })
+      ]);
+    }
+
+    function setTrail(group, coords) {
+      const pts = smoothPath(coords);
+      group.eachLayer(l => l.setLatLngs(pts));
     }
 
     async function loadLastRunTrail() {
@@ -893,7 +965,7 @@
       let pbHtml = '';
       if (data.personal_best_seconds) {
         pbHtml = `
-          <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(212,90,232,0.08);border:1px solid rgba(212,90,232,0.25);border-radius:16px;padding:12px 16px;margin-bottom:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(127, 74, 255,0.08);border:1px solid rgba(127, 74, 255,0.25);border-radius:16px;padding:12px 16px;margin-bottom:14px;">
             <div>
               <div style="font-size:0.72rem;color:var(--pink);font-weight:700;text-transform:uppercase;letter-spacing:0.1em;">
                 <i class="fa-solid fa-medal"></i> Personal Record
@@ -967,14 +1039,14 @@
       lbEl.innerHTML = `
         <div style="background:rgba(255,255,255,0.03);border-radius:18px;border:1px solid var(--border-light);padding:4px 16px;">
           ${data.map(b => `
-            <div class="lb-row" style="${b.is_me ? 'background:rgba(212,90,232,0.1);margin:0 -16px;padding-inline:16px;' : ''}">
+            <div class="lb-row" style="${b.is_me ? 'background:rgba(127, 74, 255,0.1);margin:0 -16px;padding-inline:16px;' : ''}">
               <div class="lb-rank" style="color:${medalColor(b.rank)};">${b.rank}</div>
               <div style="width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0;">
                 ${renderUserAvatarHtml({ full_name: b.name, avatar_url: b.avatar_url, member_code: b.member_code }, 32)}
               </div>
               <div style="flex:1;min-width:0;font-size:0.88rem;color:#FFF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                 ${escapeHtml(b.name)}
-                ${b.is_me ? '<span class="badge" style="background:rgba(212,90,232,0.2);color:var(--pink);font-size:0.68rem;padding:2px 6px;margin-left:4px">you</span>' : ''}
+                ${b.is_me ? '<span class="badge" style="background:rgba(127, 74, 255,0.2);color:var(--pink);font-size:0.68rem;padding:2px 6px;margin-left:4px">you</span>' : ''}
               </div>
               <div style="text-align:right;">
                 <div class="lb-time">${formatDuration(b.duration_seconds)}</div>
@@ -999,8 +1071,8 @@
       if (streakWeeks > 0) {
         titleEl.textContent = `${streakWeeks}-Week Running Streak`;
         subEl.textContent = streakWeeks === 1 ? '1 week completed! Keep running to grow your streak.' : `${streakWeeks} consecutive weeks with at least one run!`;
-        banner.style.background = 'linear-gradient(145deg, rgba(212,90,232,0.16), rgba(14,14,19,0.85))';
-        banner.style.borderColor = 'rgba(212,90,232,0.4)';
+        banner.style.background = 'var(--violet-night)';
+        banner.style.borderColor = 'rgba(127, 74, 255,0.4)';
       } else {
         titleEl.textContent = 'Weekly Running Streak';
         subEl.textContent = 'Log a run this week to start your running streak!';
@@ -1017,9 +1089,11 @@
       isRunning = true;
       activeRoute = route;
       runStartTime = Date.now();
+      isPaused = false; pausedMs = 0; pauseStartedAt = null; resumeSegment = false;
       elapsedSeconds = 0;
       totalDistanceMeters = 0;
       lastPosition = null;
+      gpsRejects = 0;
       gpsTrailCoords = [];
 
       // Update Timer Card UI
@@ -1042,8 +1116,11 @@
 
       // Controls
       document.getElementById('timerControls').innerHTML = `
+        <button type="button" id="btnPauseRun" class="btn btn-secondary" style="width:100%;justify-content:center;padding:13px;font-size:1rem;font-weight:700;margin-bottom:10px;">
+          <i class="fa-solid fa-pause"></i> Pause
+        </button>
         <div style="display:flex;gap:10px;">
-          <button type="button" id="btnFinishRun" class="btn" style="flex:2;justify-content:center;padding:13px;font-size:1rem;font-weight:700;background:var(--green);color:#0B0B0F;">
+          <button type="button" id="btnFinishRun" class="btn" style="flex:2;justify-content:center;padding:13px;font-size:1rem;font-weight:700;background:var(--green);color:#0E0F14;">
             <i class="fa-solid fa-flag-checkered"></i> Finish &amp; Log Run
           </button>
           <button type="button" id="btnCancelRun" class="btn btn-secondary" style="flex:1;justify-content:center;padding:13px;">
@@ -1051,6 +1128,7 @@
           </button>
         </div>
       `;
+      document.getElementById('btnPauseRun').addEventListener('click', togglePause);
       document.getElementById('btnFinishRun').addEventListener('click', finishRun);
       document.getElementById('btnCancelRun').addEventListener('click', confirmCancelRun);
       document.getElementById('timerCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1065,7 +1143,7 @@
 
     function updateClock() {
       if (!runStartTime) return;
-      elapsedSeconds = Math.max(1, Math.round((Date.now() - runStartTime) / 1000));
+      elapsedSeconds = activeSeconds();
       document.getElementById('timerDisplay').textContent = formatDuration(elapsedSeconds);
 
       // Update Pace
@@ -1120,21 +1198,39 @@
       const badge = document.getElementById('gpsStatusBadge');
       badge.innerHTML = `<i class="fa-solid fa-satellite-dish" style="color:var(--green)"></i> GPS Active (±${Math.round(acc)}m)`;
 
-      // Only accurate fixes (< 45 m) enter the trail. The database re-measures the saved
-      // trail with the same 2.5-60 m step rule to pay km points, so what is counted here
-      // is exactly what gets paid.
-      if (acc < 45) {
-        if (lastPosition) {
-          const d = haversineMeters(lastPosition.lat, lastPosition.lng, lat, lng);
-          if (d >= 2.5 && d <= 60) {
+      // Steps are judged by speed, not a fixed distance cap: after a GPS gap the next fix
+      // is far away but legitimately so. lastPosition only advances on an accepted step,
+      // so jitter below the noise floor accumulates instead of being dropped.
+      // The database re-measures the saved [lat,lng,t] trail with the same rule.
+      const t = pos.timestamp || Date.now();
+      if (acc < 40 && !isPaused) {
+        if (resumeSegment) {
+          // First fix after a pause: new segment, flagged so the server skips the gap too
+          resumeSegment = false;
+          gpsRejects = 0;
+          lastPosition = { lat, lng, t };
+          gpsTrailCoords.push([lat, lng, t, 1]);
+        } else if (!lastPosition) {
+          lastPosition = { lat, lng, t };
+          gpsTrailCoords.push([lat, lng, t]);
+        } else {
+          const d  = haversineMeters(lastPosition.lat, lastPosition.lng, lat, lng);
+          const dt = Math.max(0.001, (t - lastPosition.t) / 1000);
+          const minStep = Math.max(3, acc * 0.4);
+          if (d >= minStep && d / dt <= MAX_RUN_SPEED) {
             totalDistanceMeters += d;
+            lastPosition = { lat, lng, t };
+            gpsTrailCoords.push([lat, lng, t]);
+            gpsRejects = 0;
             document.getElementById('liveDistance').textContent = `${(totalDistanceMeters / 1000).toFixed(2)} km`;
             updateProgress();
             updateKmPoints();
+          } else if (d >= minStep && ++gpsRejects >= 5) {
+            // The anchor itself was probably a bad fix — re-anchor without adding distance
+            lastPosition = { lat, lng, t };
+            gpsRejects = 0;
           }
         }
-        lastPosition = { lat, lng };
-        gpsTrailCoords.push([lat, lng]);
       }
 
       // Update or create Runner Pin on map; the map follows the runner
@@ -1148,16 +1244,10 @@
         if (!map.getBounds().pad(-0.25).contains([lat, lng])) map.panTo([lat, lng]);
       }
 
-      // Draw breadcrumb trail
       if (!runnerTrailPolyline) {
-        runnerTrailPolyline = L.polyline(gpsTrailCoords, {
-          color: '#5787EA',
-          weight: 4,
-          opacity: 0.85,
-          dashArray: '6, 8'
-        }).addTo(map);
+        runnerTrailPolyline = makeTrail(gpsTrailCoords).addTo(map);
       } else {
-        runnerTrailPolyline.setLatLngs(gpsTrailCoords);
+        setTrail(runnerTrailPolyline, gpsTrailCoords);
       }
     }
 
@@ -1226,7 +1316,7 @@
     async function finishRun() {
       if (!isRunning) return;
 
-      const finalSeconds = Math.max(1, Math.round((Date.now() - runStartTime) / 1000));
+      const finalSeconds = activeSeconds();
 
       if (finalSeconds < 15) {
         const ok = await askConfirm({
@@ -1305,10 +1395,13 @@
       if (runnerMarker) { map.removeLayer(runnerMarker); runnerMarker = null; }
       if (pending.path) drawTrailOnMap(pending.path, `Your run · ${formatDuration(pending.seconds)}`);
 
+      loadMyRuns();
+
       // A route run becomes the one the stats cards show
       if (route) { myRouteIds.add(route.id); setFocusRoute(route, { load: false }); }
 
       showRunResultModal({
+        path: pending.path,
         route,
         seconds: pending.seconds,
         meters: pending.meters || 0,
@@ -1321,7 +1414,7 @@
 
     function showSavingState() {
       document.getElementById('timerControls').innerHTML = `
-        <button type="button" class="btn" disabled style="width:100%;padding:13px;font-size:1rem;font-weight:700;background:var(--green);color:#0B0B0F;">
+        <button type="button" class="btn" disabled style="width:100%;padding:13px;font-size:1rem;font-weight:700;background:var(--green);color:#0E0F14;">
           <span class="spinner"></span> Saving your run...
         </button>`;
     }
@@ -1356,6 +1449,8 @@
       document.getElementById('timerCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    let lastRunResult = null;
+
     function showRunResultModal(res) {
       const km = (res.meters / 1000).toFixed(2);
       document.getElementById('modalTitle').textContent = res.route ? 'Run Completed!' : 'Free Run Completed!';
@@ -1365,7 +1460,14 @@
         ? `${km} km${res.route ? ` of ${res.route.distance}` : ''}`
         : '';
       document.getElementById('modalPbBadge').style.display = res.isPb ? 'block' : 'none';
-      document.getElementById('modalPointsEarned').textContent = `+${res.points ?? 5}`;
+      document.getElementById('modalPointsEarned').textContent = `+${res.points ?? 0}`;
+      lastRunResult = {
+        path: res.path || null,
+        seconds: res.seconds,
+        km: (res.meters || 0) / 1000,
+        title: res.route ? res.route.name : 'Free run',
+        date: new Date().toISOString()
+      };
       document.getElementById('modalStreakWeeks').textContent = `${res.streak ?? 1}w`;
       const kmEl = document.getElementById('modalKmPoints');
       if (res.kmPoints > 0) {
@@ -1391,6 +1493,236 @@
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
+    // ── My Run History ───────────────────────────────────────────────────────
+    async function loadMyRuns() {
+      const list = document.getElementById('myRunsList');
+      const { data, error } = await db.rpc('my_runs', { p_limit: 50 });
+      if (error) {
+        list.innerHTML = `<div class="dim" style="padding:8px;font-size:0.85rem;">Could not load your runs.</div>`;
+        return;
+      }
+      const runs = data || [];
+      const totalKm = runs.reduce((s, r) => s + (Number(r.distance_km) || 0), 0);
+      document.getElementById('myRunsTotal').textContent =
+        runs.length ? `${runs.length} run${runs.length > 1 ? 's' : ''} · ${totalKm.toFixed(1)} km` : '';
+
+      if (!runs.length) {
+        list.innerHTML = `<div class="dim" style="padding:8px;font-size:0.85rem;">No runs yet — your runs will show up here.</div>`;
+        return;
+      }
+
+      const routeName = (id) => {
+        if (id === FREE_RUN_ID) return 'Free run';
+        const r = (typeof ROUTES !== 'undefined') && ROUTES.find(x => x.id === id);
+        return r ? r.shortName || r.name : id;
+      };
+
+      list.innerHTML = runs.map(r => {
+        const km = Number(r.distance_km) || 0;
+        const pace = km >= 0.1 ? formatDuration(Math.round(r.duration_seconds / km)) + ' /km' : '--';
+        return `
+          <div style="display:flex;align-items:center;gap:6px;border-top:1px solid var(--border);">
+          <button type="button" class="my-run-row" data-id="${escapeHtml(String(r.id))}" ${r.has_path ? '' : 'disabled'}
+            style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;text-align:left;background:transparent;border:none;padding:11px 2px;font-family:inherit;color:inherit;cursor:${r.has_path ? 'pointer' : 'default'};">
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:0.9rem;font-weight:700;color:#fff;">${escapeHtml(routeName(r.route_id))}</div>
+              <div style="font-size:0.74rem;color:var(--text-dim);margin-top:2px;">${formatDate(r.recorded_at)}</div>
+            </div>
+            <div style="text-align:right;font-variant-numeric:tabular-nums;">
+              <div style="font-size:0.9rem;font-weight:700;color:var(--pink);">${km.toFixed(2)} km</div>
+              <div style="font-size:0.74rem;color:var(--text-dim);margin-top:2px;">${formatDuration(r.duration_seconds)} · ${pace}</div>
+            </div>
+            ${r.has_path ? '<i class="fa-solid fa-map-location-dot" style="color:var(--text-dim);font-size:0.85rem;"></i>' : ''}
+          </button>
+          <button type="button" class="my-run-share" data-id="${escapeHtml(String(r.id))}" aria-label="Share this run"
+            style="background:transparent;border:none;color:var(--pink);padding:10px 8px;cursor:pointer;font-size:0.95rem;">
+            <i class="fa-solid fa-share-nodes"></i>
+          </button>
+          </div>`;
+      }).join('');
+
+      list.querySelectorAll('.my-run-row:not([disabled])').forEach(btn => {
+        btn.addEventListener('click', () => showRunOnMap(btn.dataset.id));
+      });
+      list.querySelectorAll('.my-run-share').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const r = runs.find(x => String(x.id) === btn.dataset.id);
+          if (!r) return;
+          let path = null;
+          if (r.has_path) {
+            const { data } = await db.rpc('my_run_path', { p_run_id: r.id });
+            path = data && data.gps_path;
+          }
+          shareRun({ path, seconds: r.duration_seconds, km: Number(r.distance_km) || 0,
+                     title: routeName(r.route_id), date: r.recorded_at });
+        });
+      });
+    }
+
+    async function showRunOnMap(runId) {
+      if (isRunning) return;
+      const { data, error } = await db.rpc('my_run_path', { p_run_id: runId });
+      if (error || !data || !data.gps_path) return;
+      drawTrailOnMap(data.gps_path, `${formatDate(data.recorded_at)} · ${formatDuration(data.duration_seconds)}`);
+      document.getElementById('runMap').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // ── Share a run as an image (trail + stats), Strava-style ────────────────
+    function loadTile(url) {
+      return new Promise(res => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => res(img);
+        img.onerror = () => res(null);
+        img.src = url;
+      });
+    }
+
+    async function renderShareCard(run) {
+      const W = 1080, H = 1350, MAP_H = 1000;
+      const c = document.createElement('canvas');
+      c.width = W; c.height = H;
+      const g = c.getContext('2d');
+      const pink = TRAIL_COLOR;
+      const font = (w, px) => `${w} ${px}px Outfit, system-ui, sans-serif`;
+
+      g.fillStyle = '#0E0F14'; g.fillRect(0, 0, W, H);
+      g.fillStyle = '#1b1b22'; g.fillRect(0, 0, W, MAP_H);
+
+      const pts = smoothPath((run.path || []).map(p => [p[0], p[1]]));
+      if (pts.length >= 2) {
+        // Web Mercator, 256-px tiles. Fit the trail with a fractional zoom: fetch tiles at
+        // the integer zoom Z and scale them by S so the trail fills the frame.
+        const merc = (lat, lng) => {
+          const r = lat * Math.PI / 180;
+          return [(lng + 180) / 360 * 256, (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * 256];
+        };
+        const m0 = pts.map(p => merc(p[0], p[1]));
+        const xs0 = m0.map(p => p[0]), ys0 = m0.map(p => p[1]);
+        const availW = W - 2 * 150, availH = MAP_H - 2 * 150 - 120;
+        const spanX = Math.max(Math.max(...xs0) - Math.min(...xs0), 1e-9);
+        const spanY = Math.max(Math.max(...ys0) - Math.min(...ys0), 1e-9);
+        const zf = Math.min(17.5, Math.log2(Math.min(availW / spanX, availH / spanY)));
+        const Z = Math.max(3, Math.min(18, Math.floor(zf)));
+        const S = Math.pow(2, zf - Z);
+        const k = Math.pow(2, Z);
+        const cx = (Math.min(...xs0) + Math.max(...xs0)) / 2 * k;
+        const cy = (Math.min(...ys0) + Math.max(...ys0)) / 2 * k;
+        const left = cx - (W / 2) / S;
+        const top  = cy - (MAP_H / 2 + 40) / S; // shift down to clear the header
+
+        g.save();
+        g.beginPath(); g.rect(0, 0, W, MAP_H); g.clip();
+
+        const jobs = [];
+        const viewW = W / S, viewH = MAP_H / S;
+        for (let tx = Math.floor(left / 256); tx <= Math.floor((left + viewW) / 256); tx++) {
+          for (let ty = Math.floor(top / 256); ty <= Math.floor((top + viewH) / 256); ty++) {
+            const url = `https://tile.openstreetmap.org/${Z}/${tx}/${ty}.png`;
+            jobs.push(loadTile(url).then(img => img && g.drawImage(img, (tx * 256 - left) * S, (ty * 256 - top) * S, 256 * S + 1, 256 * S + 1)));
+          }
+        }
+        await Promise.all(jobs);
+
+        const P = m0.map(p => [(p[0] * k - left) * S, (p[1] * k - top) * S]);
+        const stroke = (color, width) => {
+          g.beginPath(); g.moveTo(P[0][0], P[0][1]);
+          for (let q = 1; q < P.length; q++) g.lineTo(P[q][0], P[q][1]);
+          g.strokeStyle = color; g.lineWidth = width; g.lineCap = 'round'; g.lineJoin = 'round'; g.stroke();
+        };
+        stroke('rgba(0,0,0,0.55)', 20);
+        stroke(pink, 11);
+        const dot = (p, fill) => { g.beginPath(); g.arc(p[0], p[1], 15, 0, Math.PI * 2); g.fillStyle = fill; g.fill(); g.lineWidth = 6; g.strokeStyle = '#fff'; g.stroke(); };
+        dot(P[0], '#1FD47F');
+        dot(P[P.length - 1], '#111');
+        g.restore();
+      } else {
+        g.fillStyle = 'rgba(255,255,255,0.35)'; g.font = font(500, 34); g.textAlign = 'center';
+        g.fillText('No GPS trail for this run', W / 2, MAP_H / 2);
+        g.textAlign = 'left';
+      }
+
+      // Header over the map, on a fade so it stays readable
+      const topFade = g.createLinearGradient(0, 0, 0, 340);
+      topFade.addColorStop(0, 'rgba(11,11,15,0.95)'); topFade.addColorStop(0.7, 'rgba(11,11,15,0.8)'); topFade.addColorStop(1, 'rgba(11,11,15,0)');
+      g.fillStyle = topFade; g.fillRect(0, 0, W, 340);
+      const botFade = g.createLinearGradient(0, MAP_H - 160, 0, MAP_H);
+      botFade.addColorStop(0, 'rgba(11,11,15,0)'); botFade.addColorStop(1, 'rgba(11,11,15,1)');
+      g.fillStyle = botFade; g.fillRect(0, MAP_H - 160, W, 160);
+
+      g.fillStyle = pink; g.font = font(700, 32);
+      g.fillText('ISOT RUNNING CLUB', 70, 95);
+      g.fillStyle = '#fff'; g.font = font(700, 56);
+      g.fillText(run.title || 'Run', 70, 165);
+      g.fillStyle = 'rgba(255,255,255,0.65)'; g.font = font(500, 30);
+      g.fillText(new Date(run.date || Date.now()).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' }), 70, 212);
+
+      g.fillStyle = 'rgba(255,255,255,0.4)'; g.font = font(400, 18); g.textAlign = 'right';
+      g.fillText('© OpenStreetMap contributors', W - 24, MAP_H - 16);
+      g.textAlign = 'left';
+
+      // Stats
+      const pace = run.km >= 0.1 ? formatDuration(Math.round(run.seconds / run.km)).replace(/^0/, '') + ' /km' : '--';
+      const stats = [['Distance', `${run.km.toFixed(2)} km`], ['Time', formatDuration(run.seconds)], ['Pace', pace]];
+      const colW = (W - 140) / 3;
+      stats.forEach(([label, val], k) => {
+        const x = 70 + k * colW;
+        g.fillStyle = 'rgba(255,255,255,0.5)'; g.font = font(600, 26);
+        g.fillText(label.toUpperCase(), x, 1095);
+        g.fillStyle = '#fff'; g.font = font(800, 54);
+        g.fillText(val, x, 1160);
+      });
+
+      g.fillStyle = 'rgba(255,255,255,0.35)'; g.font = font(500, 26);
+      g.fillText('isotcommunity.com', 70, H - 60);
+      g.fillStyle = pink; g.font = font(700, 26); g.textAlign = 'right';
+      g.fillText('Live globally, run locally.', W - 70, H - 60);
+      g.textAlign = 'left';
+      return c;
+    }
+
+    async function shareRun(run) {
+      if (!run) return;
+      const ov = document.createElement('div');
+      ov.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;';
+      ov.innerHTML = `
+        <div id="sharePreview" style="width:min(88vw,380px);aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:#15151d;display:flex;align-items:center;justify-content:center;">
+          <div class="spinner"></div>
+        </div>
+        <div style="display:flex;gap:10px;width:min(88vw,380px);">
+          <button type="button" id="shareGo" class="btn btn-pink" disabled style="flex:2;justify-content:center;padding:12px;font-weight:700;"><i class="fa-solid fa-share-nodes"></i> Share</button>
+          <button type="button" id="shareClose" class="btn btn-secondary" style="flex:1;justify-content:center;padding:12px;">Close</button>
+        </div>`;
+      document.body.appendChild(ov);
+      const close = () => ov.remove();
+      ov.querySelector('#shareClose').onclick = close;
+      ov.addEventListener('click', e => { if (e.target === ov) close(); });
+
+      const canvas = await renderShareCard(run);
+      const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+      if (!blob || !ov.isConnected) return;
+      const url = URL.createObjectURL(blob);
+      ov.querySelector('#sharePreview').innerHTML = `<img src="${url}" alt="Run share image" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+
+      const file = new File([blob], 'isot-run.png', { type: 'image/png' });
+      const text = `I ran ${run.km.toFixed(2)} km in ${formatDuration(run.seconds)} with the ISOT Running Club 🏃`;
+      const go = ov.querySelector('#shareGo');
+      go.disabled = false;
+      go.onclick = async () => {
+        try {
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], text });
+            return;
+          }
+        } catch (e) {
+          if (e && e.name === 'AbortError') return;
+        }
+        const a = document.createElement('a');
+        a.href = url; a.download = 'isot-run.png';
+        document.body.appendChild(a); a.click(); a.remove();
+      };
+    }
+
     function formatDuration(sec) {
       if (!sec || sec < 0) return '00:00';
       const s = Math.floor(sec % 60);
