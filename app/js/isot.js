@@ -100,7 +100,6 @@ function applyAccent(key) {
   r.setProperty('--orchid', a.text);
   r.setProperty('--pink', a.text);             // historical name: the accent as text
   r.setProperty('--pink-glow', rgbaFrom(a.hex, 0.28));
-  r.setProperty('--border-glow', rgbaFrom(a.text, 0.45));
   return a;
 }
 

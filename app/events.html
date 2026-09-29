@@ -59,11 +59,7 @@
       justify-content: center;
       gap: 6px;
     }
-    .view-btn.active {
-      background: var(--accent);
-      color: var(--on-accent);
-      box-shadow: none;
-    }
+    .view-btn.active { background: var(--selected-bg); border-color: var(--selected-bg); color: var(--on-selected); }
 
     /* Month Navigation Controls */
     .cal-nav-header {
@@ -170,10 +166,11 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--accent);
+      background: var(--tone, var(--accent));   /* the event's category, see .cat-* in app.css */
     }
-    .cal-dot.party { background: #FFB81F; }
-    .cal-dot.karaoke { background: #FFB81F; }
+    /* Each event card sits on its category's Night tint with a matching edge, so the
+       list reads as karaoke / party / sport at a glance before a word is read. */
+    .event-card-item[class*="cat-"] { background: var(--tone-night); border-color: var(--tone-edge); }
 
     /* List Event Cards */
     .event-card-item {
@@ -342,7 +339,6 @@
   <main class="shell">
 
     <div style="margin-bottom: 16px;">
-      <div class="eyebrow"><i class="fa-solid fa-sparkles"></i> Official Schedule Matrix</div>
       <h1 style="font-size: 1.8rem; margin-top: 4px;">ISOT Calendar</h1>
     </div>
 
@@ -351,7 +347,7 @@
          border-radius:14px 14px 30px 14px;padding:10px 14px;margin-bottom:14px;font-size:0.86rem">
       <i class="fa-solid fa-filter" style="color:var(--pink)"></i>
       <span style="flex:1" id="catFilterLabel"></span>
-      <button type="button" class="btn btn-outline" style="width:auto;padding:4px 12px;font-size:0.76rem"
+      <button type="button" class="btn btn-sm btn-outline" style="width:auto;padding:4px 12px;font-size:0.76rem"
               onclick="clearCategory()">Show all</button>
     </div>
 
@@ -665,7 +661,7 @@
             <i class="fa-solid fa-user-group text-pink" style="font-size:1.8rem;margin-bottom:10px"></i>
             <h4 style="font-size:1rem;color:#FFF;margin-bottom:4px">No Connected Friends Yet</h4>
             <p class="dim" style="font-size:0.82rem;margin-bottom:14px">Connect with students in the ISOT Network first to invite them to events!</p>
-            <a href="network.html" class="btn btn-pink" style="width:auto;display:inline-flex;padding:6px 16px;font-size:0.82rem;">
+            <a href="network.html" class="btn btn-sm btn-pink" style="width:auto;display:inline-flex;padding:6px 16px;font-size:0.82rem;">
               <i class="fa-solid fa-users"></i> Go to ISOT Network 🌐
             </a>
           </div>
@@ -684,7 +680,7 @@
                   <div class="dim" style="font-size:0.75rem">${escapeHtml(f.nationality || 'Turin Student')} • ${escapeHtml(f.university || 'UniTo')}</div>
                 </div>
               </div>
-              <button type="button" id="btnInvite_${key}" class="btn ${isAlreadyInvited ? 'btn-outline' : 'btn-pink'}" style="width:auto;padding:6px 14px;font-size:0.78rem;" onclick="sendSingleFriendInvite('${f.id}', '${escapeHtml(f.full_name)}', '${escapeHtml(eventTitle)}', '${eventId}', '${key}', '${eventDate}')">
+              <button type="button" id="btnInvite_${key}" class="btn btn-sm ${isAlreadyInvited ? 'btn-outline' : 'btn-pink'}" style="width:auto;padding:6px 14px;font-size:0.78rem;" onclick="sendSingleFriendInvite('${f.id}', '${escapeHtml(f.full_name)}', '${escapeHtml(eventTitle)}', '${eventId}', '${key}', '${eventDate}')">
                 ${isAlreadyInvited ? '<i class="fa-solid fa-check text-green"></i> Invited' : '<i class="fa-solid fa-envelope"></i> Invite 💌'}
               </button>
             </div>
@@ -850,7 +846,7 @@
 
         let dotsHtml = '';
         if (hasEvents) {
-          dotsHtml = '<div class="cal-event-dots">' + dayEvents.map(e => `<span class="cal-dot ${e.cat}"></span>`).join('') + '</div>';
+          dotsHtml = '<div class="cal-event-dots">' + dayEvents.map(e => `<span class="cal-dot cat-${e.cat}"></span>`).join('') + '</div>';
         }
 
         html += `
@@ -1021,7 +1017,7 @@
         : '';
 
       const headline = item.headline
-        ? `<div class="eyebrow" style="margin:12px 0 0;color:var(--pink)">${escapeHtml(item.headline)}</div>`
+        ? `<div class="eyebrow" style="margin:12px 0 0;">${escapeHtml(item.headline)}</div>`
         : '';
 
       // Whitespace preserved: the programme is written as lines and reads as a list.
@@ -1032,7 +1028,7 @@
         : '';
 
       return `
-        <div class="event-card-item">
+        <div class="event-card-item cat-${item.cat}">
           ${featured}
           ${headline}
           <div class="event-card-top">
@@ -1046,23 +1042,23 @@
                   <div style="width:24px;height:24px;border-radius:6px;overflow:hidden;display:inline-flex;align-items:center;justify-content:center">
                     <img src="${item.logo}" alt="" style="width:100%;height:100%;object-fit:cover;${item.cat === 'karaoke' ? 'transform:scale(1.85);' : ''}" />
                   </div>
-                  <span class="badge badge-socio">Perks</span>
-                  ${item.special ? `<span class="badge badge-live">${item.special}</span>` : ''}
+                  <span class="chip-tone">${escapeHtml(CATEGORY_NAMES[item.cat] || 'Social')}</span>
                 </div>
                 <span class="dim" style="font-size:0.75rem">${item.time}</span>
               </div>
               <a href="event.html?e=${item.eventId}&d=${item.date}" style="text-decoration:none">
                 <h2 style="font-size:1.05rem;color:#FFF;margin-bottom:4px">${escapeHtml(item.title)}</h2>
               </a>
-              <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-                ${item.link ? `<a href="${item.link}" class="btn btn-pink" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Join Song Queue</a>` : `<a href="profile.html" class="btn btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Show Member Card</a>`}
+              ${item.special ? `<div style="font-size:0.86rem;color:var(--text-muted);line-height:1.45">${escapeHtml(item.special)}</div>` : ''}
+              <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap">
+                ${item.link ? `<a href="${item.link}" class="btn btn-sm btn-pink" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Join Song Queue</a>` : `<a href="profile.html" class="btn btn-sm btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">Show Member Card</a>`}
                 ${item.registerUrl ? `
                   <a href="${escapeHtml(item.registerUrl)}" target="_blank" rel="noopener noreferrer"
-                     class="btn btn-pink" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">
+                     class="btn btn-sm btn-pink" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i>
                     ${escapeHtml(item.registerLabel || 'Register')}
                   </a>` : ''}
-                <button type="button" class="btn btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex" onclick="openInviteModal('${escapeHtml(item.title)}', '${item.eventId}', '${item.date}')">
+                <button type="button" class="btn btn-sm btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex" onclick="openInviteModal('${escapeHtml(item.title)}', '${item.eventId}', '${item.date}')">
                   <i class="fa-solid fa-paper-plane text-pink"></i> Invite Friends
                 </button>
               </div>

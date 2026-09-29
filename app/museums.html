@@ -60,7 +60,7 @@
       flex-shrink: 0;
       padding: 9px 16px;
       border-radius: 9999px;
-      background: rgba(30, 41, 59, 0.8);
+      background: rgba(246, 247, 249, 0.06);
       border: 1px solid var(--border-light);
       color: var(--text-muted);
       font-size: 0.84rem;
@@ -71,12 +71,7 @@
       gap: 8px;
       transition: all 0.2s ease;
     }
-    .filter-btn.active {
-      background: var(--accent);
-      border-color: transparent;
-      color: var(--on-accent);
-      box-shadow: none;
-    }
+    .filter-btn.active { background: var(--selected-bg); border-color: var(--selected-bg); color: var(--on-selected); }
 
     .museum-card {
       background: var(--bg-card);
@@ -111,7 +106,7 @@
     }
   </style>
 </head>
-<body>
+<body class="tone-blue">
 
   <div id="gate"><div class="spinner"></div></div>
 
@@ -133,7 +128,6 @@
   <main class="shell" style="padding-top:18px;padding-bottom:96px">
 
     <div style="margin-bottom: 16px;">
-      <div class="eyebrow"><i class="fa-solid fa-[#F55D21] fa-ticket"></i> Student Culture &amp; Heritage</div>
       <h1 style="font-size: 1.8rem; margin-top: 4px;">Turin Museums &amp; Student Discounts</h1>
       <p style="color: var(--text-dim); font-size: 0.88rem; margin-top: 4px;">Explore world-class culture, €2 student rates, and free admission days.</p>
     </div>

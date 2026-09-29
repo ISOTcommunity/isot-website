@@ -307,7 +307,7 @@
         <i class="fa-solid fa-bell"></i>
         <span id="notifBellBadge" style="display: none; position: absolute; top: -2px; right: -2px; background: var(--accent); color: var(--on-accent); font-size: 0.65rem; font-weight: 700; border-radius: 10px; min-width: 16px; height: 16px; align-items: center; justify-content: center; padding: 0 4px; border: 1.5px solid var(--bg-dark);">0</span>
       </a>
-      <a href="profile.html" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">My Card <i class="fa-solid fa-qrcode"></i></a>
+      <a href="profile.html" class="btn btn-sm btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">My Card <i class="fa-solid fa-qrcode"></i></a>
       <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: var(--text-main); font-size: 1.3rem; cursor: pointer; padding: 6px 8px; display: flex; align-items: center;">
         <i class="fa-solid fa-bars"></i>
       </button>
@@ -748,14 +748,14 @@
 
       el.hidden = false;
       el.innerHTML = `
-        <div class="card card-glass ${lead.poster ? 'card-glow' : ''}" style="padding:0;overflow:hidden">
+        <div class="card card-tone cat-${lead.cat || 'social'}" style="padding:0;overflow:hidden">
           ${lead.poster ? `
             <a href="event.html?e=${lead.eventId}&d=${lead.date}" style="display:block">
               <img src="${escapeHtml(lead.poster)}" alt="${escapeHtml(lead.title)} poster"
                    style="width:100%;display:block" />
             </a>` : ''}
           <div style="padding:16px 18px 18px">
-            <div class="eyebrow" style="color:var(--pink)">
+            <div class="eyebrow" style="">
               ${escapeHtml(label(lead))}${lead.headline ? ' · ' + escapeHtml(lead.headline) : ''}
             </div>
             <a href="event.html?e=${lead.eventId}&d=${lead.date}" style="text-decoration:none">
@@ -766,7 +766,7 @@
               ${lead.goingCount ? ' · ' + lead.goingCount + ' going' : ''}
             </div>
             <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
-              <button type="button" class="btn ${userRsvps[lead.id] ? 'btn-outline' : 'btn-pink'}"
+              <button type="button" class="btn btn-sm ${userRsvps[lead.id] ? 'btn-outline' : 'btn-pink'}"
                       style="width:auto;padding:8px 16px;font-size:0.84rem"
                       onclick="toggleFeaturedRsvp('${lead.id}')">
                 <i class="fa-solid ${userRsvps[lead.id] ? 'fa-circle-check text-green' : 'fa-calendar-plus'}"></i>
@@ -774,11 +774,11 @@
               </button>
               ${lead.registerUrl ? `
                 <a href="${escapeHtml(lead.registerUrl)}" target="_blank" rel="noopener noreferrer"
-                   class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:0.84rem;display:inline-flex">
+                   class="btn btn-sm btn-outline" style="width:auto;padding:8px 16px;font-size:0.84rem;display:inline-flex">
                   <i class="fa-solid fa-arrow-up-right-from-square"></i>
                   ${escapeHtml(lead.registerLabel || 'Register')}
                 </a>` : `
-                <a href="events.html" class="btn btn-outline"
+                <a href="events.html" class="btn btn-sm btn-outline"
                    style="width:auto;padding:8px 16px;font-size:0.84rem;display:inline-flex">
                   All events
                 </a>`}
@@ -789,15 +789,15 @@
         ${rest.length ? `
         <div class="card card-glass" style="margin-top:10px;padding:4px 16px">
           ${rest.map(e => `
-            <div style="display:flex;align-items:center;gap:12px;padding:11px 0;
+            <div class="cat-${e.cat || 'social'}" style="display:flex;align-items:center;gap:12px;padding:11px 0;
                         border-bottom:1px solid var(--border-light);cursor:pointer"
                  onclick="if(!event.target.closest('button')) location.href='event.html?e=${e.eventId}&d=${e.date}'">
               ${e.poster
                 ? `<img src="${escapeHtml(e.poster)}" alt="" loading="lazy"
                         style="width:34px;height:44px;object-fit:cover;border-radius:6px 6px 12px 6px;flex-shrink:0" />`
                 : `<div style="width:34px;height:44px;border-radius:6px 6px 12px 6px;flex-shrink:0;
-                               background:rgba(255,255,255,0.06);display:flex;align-items:center;
-                               justify-content:center;color:var(--text-dark);font-size:0.7rem">
+                               background:var(--tone-night);border:1px solid var(--tone-edge);display:flex;align-items:center;
+                               justify-content:center;color:var(--tone-text);font-weight:700;font-size:0.8rem">
                      ${escapeHtml(e.dayNum)}
                    </div>`}
               <div style="flex:1;min-width:0">
@@ -806,10 +806,10 @@
                   ${escapeHtml(label(e))} · ${escapeHtml(e.time)} · ${escapeHtml(e.venueName || '')}
                 </div>
               </div>
-              <button type="button" class="btn ${userRsvps[e.id] ? 'btn-outline' : 'btn-pink'}"
+              <button type="button" class="btn btn-sm ${userRsvps[e.id] ? 'btn-going' : 'btn-outline'}"
                       style="width:auto;padding:5px 12px;font-size:0.74rem;flex-shrink:0"
                       onclick="toggleFeaturedRsvp('${e.id}')">
-                ${userRsvps[e.id] ? 'Going' : "I'm in"}
+                ${userRsvps[e.id] ? '<i class="fa-solid fa-check" aria-hidden="true"></i> Going' : "I'm in"}
               </button>
             </div>`).join('')}
         </div>` : ''}`;

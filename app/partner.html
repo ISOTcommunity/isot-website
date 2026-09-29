@@ -190,7 +190,7 @@
       align-items:center; justify-content:center; line-height:1;
     }
     .lbtn .lbl { font-weight:700; font-size:0.72rem; }
-    .lbtn.on { background:var(--accent); border-color:var(--pink); color:var(--on-accent,#0E0F14); font-weight:600; }
+    .lbtn.on { background: var(--selected-bg); border-color: var(--selected-bg); color: var(--on-selected); font-weight:600; }
 
     .score-strip {
       display: flex; align-items: center; gap: 14px;
@@ -362,7 +362,6 @@
   <main class="shell">
 
     <div style="margin-bottom: 16px;">
-      <div class="eyebrow"><i class="fa-solid fa-map-location-dot"></i> Retina HD Turin Map</div>
       <h1 style="font-size: 1.8rem; margin-top: 4px;">Explore Partner Spots</h1>
     </div>
 
@@ -776,7 +775,7 @@
               ${on.live ? 'Happening now' : 'Tonight'} — ${escapeHtml(on.title)}${on.time ? ' · ' + escapeHtml(on.time) : ''}
             </div>
           </div>
-          ${on.eventId ? `<a href="event.html?e=${on.eventId}&d=${on.date}" class="btn btn-pink"
+          ${on.eventId ? `<a href="event.html?e=${on.eventId}&d=${on.date}" class="btn btn-sm btn-pink"
              style="width:auto;padding:6px 14px;font-size:0.78rem;flex-shrink:0">Open</a>` : ''}
           <button type="button" aria-label="Dismiss"
                   style="background:transparent;border:none;color:var(--text-dim);font-size:1rem;cursor:pointer;padding:4px"
@@ -1551,11 +1550,11 @@
 
           <div class="venue-card-actions">
             <a href="https://maps.google.com/?q=${q}" target="_blank" rel="noopener"
-               class="btn btn-pink" style="width:auto;padding:6px 14px;font-size:0.8rem">
+               class="btn btn-sm btn-pink" style="width:auto;padding:6px 14px;font-size:0.8rem">
               <i class="fa-solid fa-diamond-turn-right"></i> Google Maps
             </a>
             <a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener"
-               class="btn btn-outline" style="width:auto;padding:6px 14px;font-size:0.8rem">
+               class="btn btn-sm btn-outline" style="width:auto;padding:6px 14px;font-size:0.8rem">
               <i class="fa-solid fa-location-arrow"></i> Apple Maps
             </a>
           </div>

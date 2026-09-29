@@ -84,12 +84,7 @@
       white-space: nowrap;
       transition: var(--transition-fast);
     }
-    .filter-pill.active {
-      background: var(--accent);
-      border-color: var(--pink);
-      color: var(--on-accent);
-      box-shadow: none;
-    }
+    .filter-pill.active { background: var(--selected-bg); border-color: var(--selected-bg); color: var(--on-selected); }
 
     .student-card {
       background: var(--bg-card);
@@ -152,9 +147,9 @@
       font-size: 0.78rem;
       font-weight: 600;
       border-radius: var(--radius-full);
-      border: 1px solid var(--pink);
-      background: var(--accent);
-      color: var(--on-accent);
+      border: 1px solid transparent;
+      background: rgba(246, 247, 249, 0.08);
+      color: var(--pink);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -177,7 +172,7 @@
     }
   </style>
 </head>
-<body>
+<body class="tone-violet">
 
   <div id="gate"><div class="spinner"></div></div>
 
@@ -202,7 +197,6 @@
   <main class="shell">
 
     <div style="margin-bottom: 16px;">
-      <div class="eyebrow"><i class="fa-solid fa-earth-americas"></i> Turin Student Community</div>
       <h1 style="font-size: 1.8rem; margin-top: 4px;">Connect &amp; Make Friends</h1>
     </div>
 
@@ -415,7 +409,7 @@
             <i class="fa-solid fa-users text-pink" style="font-size:2rem;margin-bottom:10px"></i>
             <h3 style="font-size:1.1rem;color:#FFF;margin-bottom:4px">Nobody to show yet</h3>
             <p class="dim" style="font-size:0.85rem;margin-bottom:14px">No members match that search. Share the app with the people you meet at events and they will appear here.</p>
-            <button type="button" class="btn btn-pink" style="width:auto;display:inline-flex;padding:6px 16px;font-size:0.82rem;" onclick="navigator.clipboard.writeText('https://isotcommunity.com'); alert('Community web app link copied!')">
+            <button type="button" class="btn btn-sm btn-pink" style="width:auto;display:inline-flex;padding:6px 16px;font-size:0.82rem;" onclick="navigator.clipboard.writeText('https://isotcommunity.com'); alert('Community web app link copied!')">
               <i class="fa-solid fa-share-nodes"></i> Share Web App Link
             </button>
           </div>
@@ -542,13 +536,13 @@
             </div>
 
             <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button type="button" id="invRsvp_${i}" class="btn ${n.going ? 'btn-outline' : 'btn-pink'}"
+              <button type="button" id="invRsvp_${i}" class="btn btn-sm ${n.going ? 'btn-outline' : 'btn-pink'}"
                       style="width:auto;padding:6px 14px;font-size:0.8rem"
                       onclick="rsvpFromInvite(${i}, '${n.event_id}', '${n.event_date}')">
                 <i class="fa-solid ${n.going ? 'fa-circle-check text-green' : 'fa-calendar-plus'}"></i>
                 ${n.going ? "You're going" : "I'm going"}
               </button>
-              <a href="events.html" class="btn btn-outline" style="width:auto;padding:6px 14px;font-size:0.8rem;display:inline-flex">
+              <a href="events.html" class="btn btn-sm btn-outline" style="width:auto;padding:6px 14px;font-size:0.8rem;display:inline-flex">
                 <i class="fa-solid fa-calendar"></i> Calendar
               </a>
             </div>

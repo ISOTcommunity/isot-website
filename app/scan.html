@@ -111,7 +111,7 @@
       font-family:inherit; font-size:.8rem; font-weight:600;
       background:transparent; border:1px solid rgba(255,255,255,.18); color:var(--text-muted);
       display:inline-flex; align-items:center; justify-content:center; gap:7px; }
-    .smode.on { background:var(--accent); border-color:var(--pink); color:var(--on-accent,#0E0F14); }
+    .smode.on { background: var(--selected-bg); border-color: var(--selected-bg); color: var(--on-selected); }
     .scan-event { position:fixed; top:56px; left:0; right:0; z-index:60;
       display:flex; gap:10px; align-items:center; padding:8px 12px;
       background:rgba(0,0,0,.62); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
@@ -165,7 +165,7 @@
   <!-- Manual Code Entry Fallback Bar -->
   <form class="manual-bar" onsubmit="submitManualCode(event)">
     <input type="text" id="manualInput" placeholder="Code, or search a name" autocomplete="off" />
-    <button type="submit" class="btn btn-pink" style="width: auto; padding: 0 16px;"><i class="fa-solid fa-arrow-right"></i></button>
+    <button type="submit" class="btn btn-sm btn-pink" style="width: auto; padding: 0 16px;"><i class="fa-solid fa-arrow-right"></i></button>
   </form>
 
   <!-- Name matches, for people who have not got the app open. A queue does not wait
@@ -313,7 +313,7 @@
           <div style="font-size:.84rem;opacity:.75;line-height:1.5">
             Allow camera access for isotcommunity.com in your browser settings, then reload.
             You can also type the member's name below.</div>
-          <button type="button" onclick="location.reload()" class="btn btn-pink"
+          <button type="button" onclick="location.reload()" class="btn btn-sm btn-pink"
                   style="width:auto;margin-top:14px;padding:8px 18px">Try again</button></div>`;
       });
     }

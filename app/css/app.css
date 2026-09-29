@@ -103,7 +103,11 @@
   --pink:           #B191FF;
   --orchid:         #B191FF;
   --pink-glow:      rgba(127, 74, 255, 0.28);
-  --border-glow:    rgba(177, 145, 255, 0.45);
+  --border-glow:    rgba(246, 247, 249, 0.22);   /* emphasis edge: neutral, not accent */
+  /* Selection is chrome, not brand: a selected filter or segment is a light fill with
+     dark text, the way iOS draws it. The accent is saved for the action on the screen. */
+  --selected-bg:    #F6F7F9;
+  --on-selected:    #0E0F14;
 
   /* Semantic states. Text uses the tier that passes on --bg-raised. */
   --red:            #FF7359;               /* Coral, lifted 20% toward Soft: 4.6:1 */
@@ -421,16 +425,20 @@ h3 {
   width: 9px; height: 4.5px;
   margin-right: 8px;
   vertical-align: 1.5px;
-  background: var(--accent);
+  background: var(--tone, var(--accent));
   border-radius: 9px 9px 0 0;
 }
+/* The label is neutral; the half-disc beside it carries the colour of whatever the
+   section is about. A coloured label on every section was the loudest thing on the
+   page and said the least. Icons inside a label are dropped: the mark already leads. */
 .eyebrow {
-  color: var(--pink);
-  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
+.eyebrow i { display: none; }
 
 /* ---------- Cards ----------
    One corner opened to a full arc. In the artwork every tile is a square with a
@@ -456,22 +464,38 @@ h3 {
 .card-glow { border-color: var(--border-glow); }
 
 /* ---------- Primary Actions (Pink Restraint) ---------- */
+/* ---------- Buttons ----------
+   A rounded rectangle, not a capsule: 12px reads as a tool, a 9999px pill reads as a
+   template. Two sizes only. Labels are sentence case, no arrows — a button already
+   says it goes somewhere. */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  padding: 15px 24px;
+  padding: 0 20px;
   min-height: 48px;
-  border: none;
-  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+  border-radius: 12px;
   font-family: var(--font-body);
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
   cursor: pointer;
   transition: var(--transition-fast);
   touch-action: manipulation;
+}
+/* Compact: rows, toolbars, inline actions. 36px tall, still a 44px hit area vertically
+   in every list row it sits in. */
+.btn-sm {
+  min-height: 36px;
+  padding: 0 14px !important;
+  font-size: 0.82rem !important;
+  border-radius: 10px;
+  gap: 6px;
+  white-space: nowrap;         /* a button wraps as a whole, never mid-label */
 }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn:focus-visible { outline: 2px solid var(--pink); outline-offset: 3px; }
@@ -488,15 +512,22 @@ h3 {
 @media (hover: hover) {
   .btn-pink:hover:not(:disabled) { background: var(--accent-hover); }
 }
+/* Secondary: a tonal fill, not an outline. A thin ring on a dark ground reads as
+   unfinished; a quiet surface reads as a control. */
 .btn-outline {
-  background: transparent;
+  background: rgba(246, 247, 249, 0.09);
   color: var(--text-main);
-  border: 1px solid var(--border-light);
+  border-color: transparent;
+}
+/* A state, not an action: you are going. Green is reserved for exactly this. */
+.btn-going {
+  background: rgba(31, 212, 127, 0.14);
+  color: var(--green);
+  border-color: transparent;
 }
 @media (hover: hover) {
   .btn-outline:hover:not(:disabled) {
-    border-color: var(--border-strong);
-    background: rgba(246, 247, 249, 0.05);
+    background: rgba(246, 247, 249, 0.14);
   }
 }
 .btn-ghost {
@@ -722,6 +753,53 @@ h3 {
 }
 
 /* ==========================================================================
+   Colour by content
+   v2.2's own rule: colour follows what a thing IS, not a single brand hue on
+   everything. A tone sets four local values that any component can read:
+     --tone        the family's vivid fill      --on-tone     text on that fill
+     --tone-text   the family as text (passes 5.3:1 on its own night and on cards)
+     --tone-night  the family's dark tint for a card ground
+   Put a tone on <body> for a page's subject, or on a card for one event's category.
+   Violet stays the brand and the member's accent stays the action; tones never
+   replace either.
+   ========================================================================== */
+.tone-violet  { --tone: var(--violet);  --tone-text: #B191FF; --tone-night: var(--violet-night);  --tone-edge: rgba(127, 74, 255, 0.38); --on-tone: #FFFFFF; }
+.tone-magenta { --tone: var(--magenta); --tone-text: #E76AF7; --tone-night: var(--magenta-night); --tone-edge: rgba(224, 60, 245, 0.34); --on-tone: var(--black); }
+.tone-coral   { --tone: var(--coral);   --tone-text: #FF7359; --tone-night: var(--coral-night);   --tone-edge: rgba(255, 90, 60, 0.36);  --on-tone: var(--black); }
+.tone-orange  { --tone: var(--orange);  --tone-text: #F88255; --tone-night: var(--amber-night);   --tone-edge: rgba(245, 93, 33, 0.36);  --on-tone: var(--black); }
+.tone-amber   { --tone: var(--amber);   --tone-text: var(--amber); --tone-night: var(--amber-night); --tone-edge: rgba(255, 184, 31, 0.32); --on-tone: var(--black); }
+.tone-green   { --tone: var(--green);   --tone-text: var(--green); --tone-night: var(--green-night); --tone-edge: rgba(31, 212, 127, 0.32); --on-tone: var(--black); }
+/* Blue's own Night tier IS the page ground, so its card is lifted 14% toward Vivid Blue. */
+.tone-blue    { --tone: var(--blue);    --tone-text: #79A3FF; --tone-night: #132863;               --tone-edge: rgba(61, 123, 255, 0.36); --on-tone: var(--black); }
+
+/* Event categories map onto families (supabase/007_calendar.sql lists the six). */
+.cat-social  { --tone: var(--violet);  --tone-text: #B191FF; --tone-night: var(--violet-night);  --tone-edge: rgba(127, 74, 255, 0.38); --on-tone: #FFFFFF; }
+.cat-party   { --tone: var(--magenta); --tone-text: #E76AF7; --tone-night: var(--magenta-night); --tone-edge: rgba(224, 60, 245, 0.34); --on-tone: var(--black); }
+.cat-karaoke { --tone: var(--coral);   --tone-text: #FF7359; --tone-night: var(--coral-night);   --tone-edge: rgba(255, 90, 60, 0.36);  --on-tone: var(--black); }
+.cat-drinks  { --tone: var(--orange);  --tone-text: #F88255; --tone-night: var(--amber-night);   --tone-edge: rgba(245, 93, 33, 0.36);  --on-tone: var(--black); }
+.cat-career  { --tone: var(--blue);    --tone-text: #79A3FF; --tone-night: #132863;               --tone-edge: rgba(61, 123, 255, 0.36); --on-tone: var(--black); }
+.cat-sports  { --tone: var(--green);   --tone-text: var(--green); --tone-night: var(--green-night); --tone-edge: rgba(31, 212, 127, 0.32); --on-tone: var(--black); }
+
+/* A card in its subject's colour: the Night tint as ground, the family as its edge. */
+.card-tone { background: var(--tone-night, var(--bg-card)); border-color: var(--tone-edge, var(--border-light)); }
+/* A category label: a small half-disc and the name, in the family's text colour. */
+.chip-tone {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--tone-text, var(--text-dim));
+}
+.chip-tone::before {
+  content: ''; width: 9px; height: 4.5px; border-radius: 9px 9px 0 0;
+  background: var(--tone, var(--accent));
+}
+.text-tone { color: var(--tone-text, var(--pink)); }
+/* An icon beside a heading takes the page's subject colour, or steps back to neutral
+   on a page without one. It never borrows the member's accent, which is for actions. */
+h1 .text-pink, h2 .text-pink, h3 .text-pink, .topbar-title .text-pink, .settings-title .text-pink {
+  color: var(--tone-text, var(--text-dim));
+}
+
+/* ==========================================================================
    Motion
    Rules, from Apple's fluid-interface guidance:
    - Feedback lands on press, not release, and never waits on an animation.
@@ -869,8 +947,8 @@ h3 {
 .hint-card {
   display: flex; gap: 12px; align-items: flex-start;
   padding: 13px 15px; margin-bottom: 16px;
-  background: rgba(127, 74, 255, 0.10);
-  border: 1px solid var(--border-glow);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-md) var(--radius-md) var(--radius-arc) var(--radius-md);
 }
 .hint-card > i { color: var(--pink); font-size: 1rem; margin-top: 2px; }

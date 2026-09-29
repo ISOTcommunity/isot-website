@@ -81,7 +81,7 @@
                       border: 1px solid rgba(255, 90, 60,.35); }
   </style>
 </head>
-<body>
+<body class="tone-coral">
 
   <div id="gate"><div class="spinner"></div></div>
 
@@ -140,13 +140,13 @@
           <div class="dim" style="font-size:0.8rem" id="nightPace">Pace: 5 min a song (estimated)</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button type="button" id="btnOpenNight" class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:0.85rem" onclick="openNight()">
+          <button type="button" id="btnOpenNight" class="btn btn-sm btn-outline" style="width:auto;padding:8px 16px;font-size:0.85rem" onclick="openNight()">
             <i class="fa-solid fa-play"></i> Start the night
           </button>
-          <button type="button" id="btnPauseNight" class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:0.85rem" onclick="togglePause()" hidden>
+          <button type="button" id="btnPauseNight" class="btn btn-sm btn-outline" style="width:auto;padding:8px 16px;font-size:0.85rem" onclick="togglePause()" hidden>
             <i class="fa-solid fa-pause"></i> Pause
           </button>
-          <button type="button" id="btnCloseNight" class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:0.85rem" onclick="closeNight()" hidden>
+          <button type="button" id="btnCloseNight" class="btn btn-sm btn-outline" style="width:auto;padding:8px 16px;font-size:0.85rem" onclick="closeNight()" hidden>
             <i class="fa-solid fa-flag-checkered"></i> End
           </button>
         </div>
@@ -178,7 +178,7 @@
       <h3 style="font-size: 1rem; margin-bottom: 12px;"><i class="fa-solid fa-plus text-pink" style="margin-right: 6px;"></i> Add Walk-Up Singer</h3>
       <form id="manualAddForm" onsubmit="addManualSinger(event)" style="display: flex; gap: 10px;">
         <input type="text" id="walkupSong" placeholder="Song & Singer (e.g. Volare - Marco)" required style="flex: 1;" />
-        <button type="submit" class="btn btn-outline" style="width: auto; padding: 0 16px;">Add</button>
+        <button type="submit" class="btn btn-sm btn-outline" style="width: auto; padding: 0 16px;">Add</button>
       </form>
     </div>
 
@@ -398,10 +398,10 @@
             <div class="dim" style="font-size:0.85rem">Artist: ${escapeHtml(item.artist_name || 'Original Artist')} • Performed by ${escapeHtml(item.singer_name || 'Member')}</div>
           </div>
           <div style="display:flex;gap:6px">
-            <button type="button" onclick="playNow('${item.id}')" class="btn btn-outline" style="width:auto;padding:8px 12px;font-size:0.8rem;color:var(--green);border-color:rgba(31, 212, 127,0.4)">
+            <button type="button" onclick="playNow('${item.id}')" class="btn btn-sm btn-outline" style="width:auto;padding:8px 12px;font-size:0.8rem;color:var(--green);border-color:rgba(31, 212, 127,0.4)">
               <i class="fa-solid fa-play"></i> Play
             </button>
-            <button type="button" onclick="removeSlot('${item.id}')" class="btn btn-outline" style="width:auto;padding:8px 12px;font-size:0.8rem;color:#FFD8CF;border-color:rgba(255, 90, 60,0.4)">
+            <button type="button" onclick="removeSlot('${item.id}')" class="btn btn-sm btn-outline" style="width:auto;padding:8px 12px;font-size:0.8rem;color:#FFD8CF;border-color:rgba(255, 90, 60,0.4)">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>

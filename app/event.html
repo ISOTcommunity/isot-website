@@ -88,7 +88,7 @@
       <div class="card card-glass ${ev.poster_url ? 'card-glow' : ''}" style="padding:0;overflow:hidden">
         ${ev.poster_url ? `<img class="poster" src="${escapeHtml(ev.poster_url)}" alt="${escapeHtml(ev.title)} poster" />` : ''}
         <div style="padding:18px">
-          ${ev.headline ? `<div class="eyebrow" style="color:var(--pink)">${escapeHtml(ev.headline)}</div>` : ''}
+          ${ev.headline ? `<div class="eyebrow" style="">${escapeHtml(ev.headline)}</div>` : ''}
           <h1 style="font-size:1.5rem;color:#FFF;margin:4px 0 12px">${escapeHtml(ev.title)}</h1>
 
           <div class="fact"><i class="fa-solid fa-calendar-day"></i><div><b>${escapeHtml(when)}</b></div></div>
@@ -107,19 +107,19 @@
                      : (ev.description ? `<div class="programme">${escapeHtml(ev.description)}</div>` : '')}
 
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px">
-            <button type="button" id="rsvpBtn" class="btn ${going ? 'btn-outline' : 'btn-pink'}"
+            <button type="button" id="rsvpBtn" class="btn btn-sm ${going ? 'btn-outline' : 'btn-pink'}"
                     style="width:auto;padding:9px 18px;font-size:0.86rem" onclick="toggle()">
               <i class="fa-solid ${going ? 'fa-circle-check text-green' : 'fa-calendar-plus'}"></i>
               ${going ? "You're going" : "I'm going"}
             </button>
             ${ev.register_url ? `
               <a href="${escapeHtml(ev.register_url)}" target="_blank" rel="noopener noreferrer"
-                 class="btn btn-outline" style="width:auto;padding:9px 18px;font-size:0.86rem;display:inline-flex">
+                 class="btn btn-sm btn-outline" style="width:auto;padding:9px 18px;font-size:0.86rem;display:inline-flex">
                 <i class="fa-solid fa-arrow-up-right-from-square"></i>
                 ${escapeHtml(ev.register_label || 'Register')}
               </a>` : ''}
             ${ev.has_karaoke ? `
-              <a href="karaoke.html" class="btn btn-outline"
+              <a href="karaoke.html" class="btn btn-sm btn-outline"
                  style="width:auto;padding:9px 18px;font-size:0.86rem;display:inline-flex">
                 <i class="fa-solid fa-microphone"></i> Song queue
               </a>` : ''}

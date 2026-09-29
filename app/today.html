@@ -96,7 +96,7 @@
       transition: border-color .15s, background .15s;
     }
     .vote-btn:hover:not(:disabled) { border-color: var(--pink); }
-    .vote-btn.on { background: var(--accent); border-color: var(--pink); color: var(--on-accent); }
+    .vote-btn.on { background: var(--selected-bg); border-color: var(--selected-bg); color: var(--on-selected); }
     .vote-btn:disabled { opacity: .45; cursor: default; }
     .vote-n   { font-size: 1.15rem; font-weight: 700; line-height: 1; }
     .vote-lbl { font-size: .56rem; letter-spacing: .09em; text-transform: uppercase;
@@ -151,7 +151,7 @@
     .hint { font-size: .74rem; color: var(--text-dim); margin-top: 5px; line-height: 1.45; }
   </style>
 </head>
-<body>
+<body class="tone-violet">
 
   <div id="gate"><div class="spinner"></div></div>
 
@@ -414,7 +414,7 @@
           </div>
           ${w.description ? `<div class="prop-desc">${escapeHtml(w.description)}</div>` : ''}
           ${w.lat ? `<a href="https://www.google.com/maps/dir/?api=1&destination=${w.lat},${w.lng}"
-             target="_blank" rel="noopener" class="btn btn-outline"
+             target="_blank" rel="noopener" class="btn btn-sm btn-outline"
              style="width:auto;padding:6px 14px;font-size:.78rem;margin-top:12px;display:inline-flex">
              Directions &rarr;</a>` : ''}
 
@@ -428,7 +428,7 @@
             ${canPost ? `
               <form class="chat-form" id="chatForm" autocomplete="off">
                 <input type="text" id="chatInput" maxlength="600" placeholder="Say something…" />
-                <button type="submit" class="btn btn-pink" style="width:auto;padding:0 16px;">
+                <button type="submit" class="btn btn-sm btn-pink" style="width:auto;padding:0 16px;">
                   <i class="fa-solid fa-paper-plane"></i>
                 </button>
               </form>` : `<p class="dim" style="font-size:.78rem">This day is over — chat is read-only.</p>`}

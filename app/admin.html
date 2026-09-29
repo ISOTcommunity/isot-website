@@ -38,7 +38,7 @@
     .nav::-webkit-scrollbar { display:none; }
     .navbtn { padding:7px 15px; border-radius:20px; font-size:0.82rem; cursor:pointer; white-space:nowrap;
               background:transparent; border:1px solid var(--border-light); color:var(--text-muted); font-family:inherit; }
-    .navbtn.on { background:var(--accent); border-color:var(--pink); color: var(--on-accent); font-weight:600; }
+    .navbtn.on { background: var(--selected-bg); border-color: var(--selected-bg); color: var(--on-selected); font-weight:600; }
 
     .sub { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
     .subbtn { padding:5px 12px; border-radius:16px; font-size:0.76rem; cursor:pointer;
@@ -936,9 +936,9 @@ Motto: "Live globally, connect locally."
         <div id="saveNote" style="display:none;margin-bottom:10px"></div>
 
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button type="button" class="btn btn-pink" style="width:auto;padding:11px 22px" id="saveBtn"
+          <button type="button" class="btn btn-sm btn-pink" style="width:auto;padding:11px 22px" id="saveBtn"
                   onclick="saveEvent()">${isNew ? 'Create event' : 'Save changes'}</button>
-          <button type="button" class="btn btn-outline" style="width:auto;padding:11px 20px"
+          <button type="button" class="btn btn-sm btn-outline" style="width:auto;padding:11px 20px"
                   onclick="setEventsView('schedule')">Cancel</button>
         </div>
       </div>`;
