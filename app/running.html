@@ -417,6 +417,7 @@
           <div class="stat-lbl">Target</div>
         </div>
       </div>
+      <div id="liveSteps" style="display:none;text-align:center;margin:-6px 0 14px;font-size:0.8rem;color:var(--text-dim);font-weight:600;font-variant-numeric:tabular-nums;"></div>
       <div id="runProgress" class="run-progress" style="display:none;">
         <div class="run-progress-track"><div id="runProgressBar" class="run-progress-bar"></div></div>
         <div class="run-progress-lbl"><span id="runProgressPct">0% of route</span><span id="runProgressLeft"></span></div>
@@ -1085,6 +1086,70 @@
       }
     }
 
+    // ── Step counter (phone motion sensor) ───────────────────────────────────
+    // Peak detection on acceleration magnitude above a slow-moving gravity baseline.
+    // Only runs while the page is open, same as GPS. Steps also gate GPS: once the
+    // sensor has proven it works, GPS movement with no steps behind it is drift.
+    let stepCount = 0, motionEvents = 0, motionListening = false;
+    let accBase = 9.81, accArmed = true, lastStepAt = 0;
+    let stepTimes = [];
+
+    function onMotion(e) {
+      const a = e.accelerationIncludingGravity;
+      if (!a || a.x == null) return;
+      motionEvents++;
+      const mag = Math.sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
+      accBase += (mag - accBase) * 0.05;
+      const dyn = mag - accBase;
+      const now = Date.now();
+      if (accArmed && dyn > 1.8 && now - lastStepAt > 260) {
+        accArmed = false;
+        lastStepAt = now;
+        if (!isPaused) {
+          stepCount++;
+          stepTimes.push(now);
+          if (stepTimes.length > 400) stepTimes = stepTimes.slice(-200);
+          updateSteps();
+        }
+      } else if (!accArmed && dyn < 0.6) {
+        accArmed = true;
+      }
+    }
+
+    function startMotion() {
+      stepCount = 0; motionEvents = 0; accBase = 9.81; accArmed = true; lastStepAt = 0; stepTimes = [];
+      document.getElementById('liveSteps').style.display = 'none';
+      if (typeof DeviceMotionEvent === 'undefined') return;
+      const listen = () => { window.addEventListener('devicemotion', onMotion); motionListening = true; };
+      // iOS asks once; the request has to happen inside the tap that starts the run
+      if (typeof DeviceMotionEvent.requestPermission === 'function') {
+        DeviceMotionEvent.requestPermission().then(st => { if (st === 'granted') listen(); }).catch(() => {});
+      } else {
+        listen();
+      }
+    }
+
+    function stopMotion() {
+      if (motionListening) window.removeEventListener('devicemotion', onMotion);
+      motionListening = false;
+    }
+
+    function stepsBetween(t0, t1) {
+      let n = 0;
+      for (let i = stepTimes.length - 1; i >= 0 && stepTimes[i] >= t0; i--) if (stepTimes[i] <= t1) n++;
+      return n;
+    }
+    // The sensor has shown it can see this runner's steps
+    function stepsTrusted() { return motionEvents > 50 && stepCount >= 20; }
+    function cadenceSpm() { const now = Date.now(); return stepsBetween(now - 10000, now) * 6; }
+
+    function updateSteps() {
+      const el = document.getElementById('liveSteps');
+      el.style.display = 'block';
+      const spm = cadenceSpm();
+      el.textContent = `${stepCount.toLocaleString()} steps${spm ? ` · ${spm} spm` : ''}`;
+    }
+
     // ── GPS Timer & Tracker ──────────────────────────────────────────────────
     // route = a club route object, or null for a free run
     function startRun(route) {
@@ -1094,6 +1159,7 @@
       activeRoute = route;
       runStartTime = Date.now();
       isPaused = false; pausedMs = 0; pauseStartedAt = null; resumeSegment = false;
+      startMotion();
       elapsedSeconds = 0;
       totalDistanceMeters = 0;
       lastPosition = null;
@@ -1207,7 +1273,11 @@
       // so jitter below the noise floor accumulates instead of being dropped.
       // The database re-measures the saved [lat,lng,t] trail with the same rule.
       const t = pos.timestamp || Date.now();
-      if (acc < 40 && !isPaused) {
+      // Under arcades and tall streets accuracy drops; if the step counter confirms the
+      // runner is moving, a looser fix is still worth keeping.
+      const moving = stepsTrusted() && stepsBetween(t - 4000, t + 1000) >= 4;
+      const maxAcc = moving ? 60 : 40;
+      if (acc < maxAcc && !isPaused) {
         if (resumeSegment) {
           // First fix after a pause: new segment, flagged so the server skips the gap too
           resumeSegment = false;
@@ -1221,7 +1291,12 @@
           const d  = haversineMeters(lastPosition.lat, lastPosition.lng, lat, lng);
           const dt = Math.max(0.001, (t - lastPosition.t) / 1000);
           const minStep = Math.max(3, acc * 0.4);
-          if (d >= minStep && d / dt <= MAX_RUN_SPEED) {
+          const standing = stepsTrusted() && stepsBetween(t - 5000, t + 1000) === 0;
+          if (standing) {
+            // Proven sensor, zero steps: the fix wandered, the runner didn't. Drop the drift.
+            lastPosition = { lat, lng, t };
+            gpsRejects = 0;
+          } else if (d >= minStep && d / dt <= MAX_RUN_SPEED) {
             totalDistanceMeters += d;
             lastPosition = { lat, lng, t };
             gpsTrailCoords.push([lat, lng, t]);
@@ -1307,6 +1382,8 @@
       clearInterval(timerInterval);
       timerInterval = null;
       stopGpsTracking();
+      stopMotion();
+      document.getElementById('liveSteps').style.display = 'none';
       releaseWakeLock();
 
       // Clear map runner layers, restore last saved trail
@@ -1337,6 +1414,7 @@
       clearInterval(timerInterval);
       timerInterval = null;
       stopGpsTracking();
+      stopMotion();
       releaseWakeLock();
       haptic([40, 60, 40]);
 
@@ -1344,6 +1422,7 @@
         routeId: activeRoute ? activeRoute.id : FREE_RUN_ID,
         seconds: finalSeconds,
         meters: totalDistanceMeters,
+        steps: motionEvents > 0 ? stepCount : null,
         path: gpsTrailCoords.length >= 2 ? gpsTrailCoords.slice() : null,
         at: Date.now()
       };
@@ -1375,11 +1454,18 @@
 
       let data = null, errMsg = null;
       try {
-        const res = await db.rpc('log_run', {
+        const args = {
           p_route_id: pending.routeId,
           p_seconds: pending.seconds,
-          p_gps_path: pending.path || null   // an array, not a string: jsonb must receive a JSON array
-        });
+          p_gps_path: pending.path || null,   // an array, not a string: jsonb must receive a JSON array
+          p_steps: Number.isFinite(pending.steps) ? pending.steps : null
+        };
+        let res = await db.rpc('log_run', args);
+        // Database without migration 069 has no p_steps yet: save the run without it
+        if (res.error && /p_steps|PGRST202|Could not find the function/i.test(res.error.message || res.error.code || '')) {
+          delete args.p_steps;
+          res = await db.rpc('log_run', args);
+        }
         data = res.data;
         if (res.error) errMsg = res.error.message;
       } catch (err) {
@@ -1409,6 +1495,7 @@
         route,
         seconds: pending.seconds,
         meters: pending.meters || 0,
+        steps: Number.isFinite(pending.steps) ? pending.steps : null,
         isPb: !!(route && data && data.is_personal_best),
         points: data ? data.points_earned : null,
         kmPoints: data && Number.isFinite(data.km_points) ? data.km_points : null,
@@ -1460,15 +1547,17 @@
       document.getElementById('modalTitle').textContent = res.route ? 'Run Completed!' : 'Free Run Completed!';
       document.getElementById('modalRouteName').textContent = res.route ? res.route.name : 'Your own route around Turin';
       document.getElementById('modalRunTime').textContent = formatDuration(res.seconds);
-      document.getElementById('modalDistance').textContent = res.meters > 50
-        ? `${km} km${res.route ? ` of ${res.route.distance}` : ''}`
-        : '';
+      const parts = [];
+      if (res.meters > 50) parts.push(`${km} km${res.route ? ` of ${res.route.distance}` : ''}`);
+      if (res.steps > 0) parts.push(`${res.steps.toLocaleString()} steps`);
+      document.getElementById('modalDistance').textContent = parts.join(' · ');
       document.getElementById('modalPbBadge').style.display = res.isPb ? 'block' : 'none';
       document.getElementById('modalPointsEarned').textContent = `+${res.points ?? 0}`;
       lastRunResult = {
         path: res.path || null,
         seconds: res.seconds,
         km: (res.meters || 0) / 1000,
+        steps: res.steps || null,
         title: res.route ? res.route.name : 'Free run',
         date: new Date().toISOString()
       };
@@ -1530,7 +1619,7 @@
             style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;text-align:left;background:transparent;border:none;padding:11px 2px;font-family:inherit;color:inherit;cursor:${r.has_path ? 'pointer' : 'default'};">
             <div style="flex:1;min-width:0;">
               <div style="font-size:0.9rem;font-weight:700;color:#fff;">${escapeHtml(routeName(r.route_id))}</div>
-              <div style="font-size:0.74rem;color:var(--text-dim);margin-top:2px;">${formatDate(r.recorded_at)}</div>
+              <div style="font-size:0.74rem;color:var(--text-dim);margin-top:2px;">${formatDate(r.recorded_at)}${r.steps > 0 ? ` · ${Number(r.steps).toLocaleString()} steps` : ''}</div>
             </div>
             <div style="text-align:right;font-variant-numeric:tabular-nums;">
               <div style="font-size:0.9rem;font-weight:700;color:var(--pink);">${km.toFixed(2)} km</div>
@@ -1558,7 +1647,7 @@
             path = data && data.gps_path;
           }
           shareRun({ path, seconds: r.duration_seconds, km: Number(r.distance_km) || 0,
-                     title: routeName(r.route_id), date: r.recorded_at });
+                     steps: r.steps || null, title: routeName(r.route_id), date: r.recorded_at });
         });
       });
     }
@@ -1676,6 +1765,12 @@
         g.fillStyle = '#fff'; g.font = font(800, 54);
         g.fillText(val, x, 1160);
       });
+
+      if (run.steps > 0) {
+        const spm = run.seconds > 0 ? Math.round(run.steps / (run.seconds / 60)) : 0;
+        g.fillStyle = 'rgba(255,255,255,0.6)'; g.font = font(600, 28);
+        g.fillText(`${Number(run.steps).toLocaleString()} steps${spm ? ` · ${spm} spm avg` : ''}`, 70, 1215);
+      }
 
       g.fillStyle = 'rgba(255,255,255,0.35)'; g.font = font(500, 26);
       g.fillText('isotcommunity.com', 70, H - 60);
