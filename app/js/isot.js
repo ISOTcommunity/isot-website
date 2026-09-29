@@ -18,21 +18,10 @@ const db = isConfigured() && window.supabase
   ? window.supabase.createClient(ISOT_CONFIG.SUPABASE_URL, ISOT_CONFIG.SUPABASE_ANON_KEY)
   : null;
 
-/* ---------------------------------------------------------------
- * Double-Tap Zoom Prevention (Mobile Webview & Safari)
- * ------------------------------------------------------------- */
-(function preventDoubleTapZoom() {
-  let lastTouch = 0;
-  document.addEventListener('touchend', (e) => {
-    const now = Date.now();
-    if (now - lastTouch <= 300) {
-      const inField = e.target && e.target.closest &&
-        e.target.closest('input, textarea, select, [contenteditable], .no-tap-guard');
-      if (!inField) e.preventDefault();
-    }
-    lastTouch = now;
-  }, { passive: false });
-})();
+/* Double-tap zoom is prevented by `touch-action: manipulation` in app.css, which
+ * also removes the tap delay. A touchend handler used to do it too, by cancelling
+ * any tap within 300ms of the previous one — which also swallowed the second tap
+ * of every quick double press on a stepper, a like, or a +/- control. */
 
 /* ---------------------------------------------------------------
  * PWA Home Screen Installation Analytics & Detection
@@ -68,23 +57,28 @@ const db = isConfigured() && window.supabase
 /* ---------------------------------------------------------------
  * Member accent
  *
- * Seven options, all from the confirmed ISOT palette — a picker is not a licence
- * to go off-palette.
+ * Seven options, all from ISOT Colour System v2.2 — a picker is not a licence to
+ * go off-palette.
  *
- * Each carries its own text colour, because white does not survive on most of them.
- * White on Bright Green #43DB8F measures 1.8:1 and on Amber #E69321 2.4:1, against
- * the 4.5:1 that button text at this size needs. Shipping one hardcoded #FFF would
- * have made five of the seven choices unreadable, so `on` is computed from the
- * accent's luminance, not chosen by eye.
+ * Each carries its own text colour, because white does not survive on most of them:
+ * white on Vivid Green measures 1.95:1 and on Yellow 1.7:1, against the 4.5:1 that
+ * button text at this size needs. `on` is picked by measured contrast, not by eye.
  * ------------------------------------------------------------- */
+// Keys are ids stored in profiles.accent and whitelisted by a CHECK constraint
+// (supabase/020_member_accent.sql), so they stay as they were; what each key paints
+// moved to Colour System v2.2. `orchid` is the default and now paints Violet; `sky`
+// paints Orange, the one v2.2 colour the old seven had no slot for.
+//   hex   the fill              text  the accent as text on the Night Blue ground
+//   hover the pressed fill      on    text colour on the fill
+// Every `text` passes 4.5:1 on --bg-raised; every `on` passes 4.5:1 on its `hex`.
 const ACCENTS = {
-  orchid:  { name: 'Bright Orchid', hex: '#D45AE8', hover: '#DE7BEE', on: '#0B0B0F' },
-  magenta: { name: 'Deep Magenta',  hex: '#9E02B6', hover: '#B913D2', on: '#FFFFFF' },
-  blue:    { name: 'Deep Blue',     hex: '#1B4CAD', hover: '#2A61C9', on: '#FFFFFF' },
-  sky:     { name: 'Sky Blue',      hex: '#5787EA', hover: '#7BA1F0', on: '#0B0B0F' },
-  amber:   { name: 'Amber',         hex: '#E69321', hover: '#EFA745', on: '#0B0B0F' },
-  coral:   { name: 'Coral',         hex: '#F36C51', hover: '#F68871', on: '#0B0B0F' },
-  green:   { name: 'Bright Green',  hex: '#43DB8F', hover: '#66E4A5', on: '#0B0B0F' },
+  orchid:  { name: 'Violet',   hex: '#7F4AFF', text: '#B191FF', hover: '#6A36F0', on: '#FFFFFF' },
+  magenta: { name: 'Magenta',  hex: '#E03CF5', text: '#E76AF7', hover: '#E55BF6', on: '#0E0F14' },
+  blue:    { name: 'Blue',     hex: '#3D7BFF', text: '#79A3FF', hover: '#5B8FFF', on: '#0E0F14' },
+  sky:     { name: 'Orange',   hex: '#F55D21', text: '#F88255', hover: '#F77644', on: '#0E0F14' },
+  amber:   { name: 'Yellow',   hex: '#FFB81F', text: '#FFB81F', hover: '#FFC23F', on: '#0E0F14' },
+  coral:   { name: 'Coral',    hex: '#FF5A3C', text: '#FF7359', hover: '#FF7359', on: '#0E0F14' },
+  green:   { name: 'Green',    hex: '#1FD47F', text: '#1FD47F', hover: '#42DB93', on: '#0E0F14' },
 };
 
 const DEFAULT_ACCENT = 'orchid';
@@ -100,12 +94,13 @@ function rgbaFrom(hex, alpha) {
 function applyAccent(key) {
   const a = ACCENTS[key] || ACCENTS[DEFAULT_ACCENT];
   const r = document.documentElement.style;
-  r.setProperty('--orchid', a.hex);
-  r.setProperty('--pink', a.hex);              // historical alias, ~200 rules use it
+  r.setProperty('--accent', a.hex);
   r.setProperty('--accent-hover', a.hover);
   r.setProperty('--on-accent', a.on);
-  r.setProperty('--pink-glow', rgbaFrom(a.hex, 0.30));
-  r.setProperty('--border-glow', rgbaFrom(a.hex, 0.42));
+  r.setProperty('--orchid', a.text);
+  r.setProperty('--pink', a.text);             // historical name: the accent as text
+  r.setProperty('--pink-glow', rgbaFrom(a.hex, 0.28));
+  r.setProperty('--border-glow', rgbaFrom(a.text, 0.45));
   return a;
 }
 
@@ -140,24 +135,39 @@ async function saveAccent(key) {
 /* ---------------------------------------------------------------
  * Identity Palette for Deterministic Geometry Avatars
  * ------------------------------------------------------------- */
-/* The confirmed ISOT palette (ISOT-Colour-System.pdf, Aug 2026). The previous list
- * was the older illustration set, and several of its values were near-misses rather
- * than matches — #A8689E against Dusty Mauve #A8689E, #AA2709 against Brick Red
- * #AA2709. Close enough to look like typos, far enough to be different colours. */
+/* ISOT Colour System v2.2 (21 Sep 2026), Deep and Vivid tiers. Soft and Night are
+ * left out: an avatar is a small mark on a Night Blue ground and has to stand off it. */
 const IDENTITY_PALETTE = [
   '#1B4CAD', // Deep Blue
-  '#5787EA', // Sky Blue
-  '#628DA1', // Slate Blue
-  '#7AA4C2', // Powder Blue
+  '#3D7BFF', // Vivid Blue
+  '#4C1FC7', // Deep Violet
+  '#7F4AFF', // Violet
   '#9E02B6', // Deep Magenta
-  '#D45AE8', // Bright Orchid
-  '#A8689E', // Dusty Mauve
-  '#AA2709', // Brick Red
-  '#C9801A', // Dark Amber
-  '#E69321', // Amber
-  '#F36C51', // Coral
-  '#BBC1F9', // Lavender — in the artwork, and the only pale cool tile
+  '#E03CF5', // Vivid Magenta
+  '#AA2709', // Deep Coral
+  '#FF5A3C', // Vivid Coral
+  '#C9801A', // Deep Amber
+  '#FFB81F', // Yellow
+  '#0D7A44', // Deep Green
+  '#F55D21', // Orange
 ];
+
+/* Relative luminance, for picking the initial's colour on a split avatar. */
+function luminanceOf(hex) {
+  const c = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
+    .map(v => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
+
+/* The initial crosses both halves, so it takes whichever of White / Black has the
+ * better WORST contrast across the two, rather than white with a shadow under it. */
+function initialColourFor(c1, c2) {
+  const ratio = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+  const l1 = luminanceOf(c1), l2 = luminanceOf(c2), lk = luminanceOf('#0E0F14');
+  const w = Math.min(ratio(1, l1), ratio(1, l2));
+  const k = Math.min(ratio(lk, l1), ratio(lk, l2));
+  return w >= k ? '#FFFFFF' : '#0E0F14';
+}
 
 /**
  * Renders user photo avatar if profile.avatar_url exists, otherwise renders crisp centered Initials / User Icon
@@ -181,6 +191,7 @@ function renderUserAvatarHtml(profile, size = 44) {
   const index = Math.abs(hash) % IDENTITY_PALETTE.length;
   const color1 = IDENTITY_PALETTE[index];
   const color2 = IDENTITY_PALETTE[(index + 3) % IDENTITY_PALETTE.length];
+  const ink = initialColourFor(color1, color2);
 
   const fontSize = Math.max(12, Math.round(s * 0.42));
 
@@ -190,7 +201,7 @@ function renderUserAvatarHtml(profile, size = 44) {
   const split = `linear-gradient(to bottom, ${color1} 0 50%, ${color2} 50% 100%)`;
 
   return `
-    <div class="geo-avatar" style="width:${s}px;height:${s}px;border-radius:50%;background:${split};display:inline-flex;align-items:center;justify-content:center;color:#FFF;font-weight:700;font-size:${fontSize}px;border:1px solid rgba(255,255,255,0.16);flex-shrink:0;user-select:none;text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,0.45);">
+    <div class="geo-avatar" style="width:${s}px;height:${s}px;border-radius:50%;background:${split};display:inline-flex;align-items:center;justify-content:center;color:${ink};font-weight:700;font-size:${fontSize}px;border:1px solid rgba(246,247,249,0.16);flex-shrink:0;user-select:none;text-transform:uppercase;">
       ${initial}
     </div>
   `;
@@ -624,9 +635,9 @@ async function ensureRewardsChip() {
 
   chip.style.cssText = `display:inline-flex;align-items:center;gap:6px;text-decoration:none;
     padding:4px 10px;border-radius:999px;font-size:0.78rem;font-weight:700;line-height:1;
-    border:1px solid ${has ? 'rgba(67,219,143,.45)' : 'rgba(243,108,81,.45)'};
-    background:${has ? 'rgba(67,219,143,.14)' : 'rgba(243,108,81,.12)'};
-    color:${has ? '#8FD99A' : '#F8A18E'};white-space:nowrap`;
+    border:1px solid ${has ? 'rgba(31,212,127,.45)' : 'rgba(255,90,60,.45)'};
+    background:${has ? 'rgba(31,212,127,.14)' : 'rgba(255,90,60,.12)'};
+    color:${has ? 'var(--green-soft)' : 'var(--coral-soft)'};white-space:nowrap`;
 
   // Same glass either way, so the colour is doing the talking rather than the icon
   // changing shape underneath them.
@@ -730,7 +741,7 @@ function initBurgerMenu(profile) {
       <div class="drawer-section-title">App Navigation</div>
       <a href="home.html" class="drawer-item">
         <i class="fa-solid fa-house"></i>
-        <span>App Hub</span>
+        <span>Home</span>
       </a>
       <a href="explore.html" class="drawer-item">
         <i class="fa-solid fa-compass"></i>
@@ -791,7 +802,7 @@ function initBurgerMenu(profile) {
     </div>
 
     <div class="drawer-footer">
-      <button type="button" class="btn btn-outline" id="drawerSignOutBtn" style="width:100%;color:#F8A18E;border-color:rgba(243,108,81,0.3)">
+      <button type="button" class="btn btn-outline" id="drawerSignOutBtn" style="width:100%;color:var(--coral-soft);border-color:rgba(255,90,60,0.4)">
         <i class="fa-solid fa-right-from-bracket" style="margin-right:8px"></i> Sign Out
       </button>
     </div>
@@ -1209,13 +1220,11 @@ function initCookieConsentBanner() {
     max-width: 440px;
     margin: 0 auto;
     z-index: 99999;
-    background: rgba(15, 23, 42, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(212, 90, 232, 0.4);
-    border-radius: 20px;
+    background: var(--bg-raised, #26325D);
+    border: 1px solid var(--border-strong, rgba(246, 247, 249, 0.24));
+    border-radius: 20px 20px 46px 20px;
     padding: 18px 20px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+    box-shadow: 0 12px 40px rgba(5, 10, 30, 0.55);
     color: #F6F7F9;
     font-family: var(--font-body, sans-serif);
     font-size: 0.85rem;
@@ -1224,15 +1233,15 @@ function initCookieConsentBanner() {
 
   banner.innerHTML = `
     <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px">
-      <span style="font-size:1.4rem">🛡️</span>
+      <i class="fa-solid fa-shield-halved" aria-hidden="true" style="font-size:1.2rem;color:var(--pink);margin-top:2px"></i>
       <div>
         <div style="font-weight:700;color:#FFF;font-size:0.92rem;margin-bottom:2px">Privacy &amp; Cookie Preferences</div>
-        <div style="color:#B9BFCB">We use essential session storage and anonymized cookieless analytics to secure your profile and improve student integration.</div>
+        <div style="color:var(--text-muted)">We use essential session storage and anonymized cookieless analytics to secure your profile and improve student integration.</div>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:10px;justify-content:flex-end">
-      <a href="/privacy.html" target="_blank" style="color:#D45AE8;font-weight:600;font-size:0.8rem;text-decoration:none;padding:6px 10px;">Privacy Policy ➔</a>
-      <button type="button" id="acceptCookieBtn" style="background:#D45AE8;color:#FFF;border:none;border-radius:9999px;padding:8px 18px;font-weight:600;font-size:0.82rem;cursor:pointer;box-shadow:0 4px 12px rgba(212,90,232,0.4)">
+      <a href="/privacy.html" target="_blank" style="color:var(--pink);font-weight:700;font-size:0.8rem;text-decoration:none;padding:6px 10px;">Privacy Policy</a>
+      <button type="button" id="acceptCookieBtn" style="background:var(--accent);color:var(--on-accent);border:none;border-radius:9999px;padding:10px 18px;min-height:44px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit">
         Got It / Accept
       </button>
     </div>
@@ -1249,14 +1258,135 @@ function initCookieConsentBanner() {
   });
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    initPasswordToggles();
-    initCookieConsentBanner();
-  });
-} else {
+/* ---------------------------------------------------------------
+ * Drag a sheet down to dismiss it
+ *
+ * Every .modal-sheet in the app, including ones created later, through one
+ * delegated listener. The rules are Apple's fluid-interface ones:
+ *   - The sheet follows the finger 1:1 from where it was grabbed, after an 8px
+ *     threshold that keeps taps on buttons inside the sheet working.
+ *   - Pulling UP past the top resists (rubber-band) instead of stopping dead.
+ *   - On release the decision uses momentum, not position: the release velocity
+ *     projects where the sheet would coast to, and that point decides dismiss or
+ *     snap back. A short fast flick dismisses; a long slow drag can still return.
+ *   - The finish carries the finger's speed: the transition's length is set so the
+ *     ease-out curve starts at the velocity the finger let go with, so there is no
+ *     seam between dragging and animating.
+ * Dismissing goes through the backdrop's own click handler, so each page's close
+ * logic (resetting state, resolving a confirm as "no") runs exactly as on a tap.
+ * Touch only: with a mouse the backdrop, the close button and Escape already work.
+ * ------------------------------------------------------------- */
+function initSheetGestures() {
+  const THRESHOLD = 8;
+  // The initial slope of cubic-bezier(0.22, 1, 0.36, 1) is 1 / 0.22: the curve
+  // starts 4.5x faster than linear, so duration = 4.5 x distance / velocity.
+  const EASE_SLOPE = 1 / 0.22;
+  const project = (v, d = 0.99) => (v / 1000) * d / (1 - d);
+  const rubber = (x, dim) => (x * dim * 0.55) / (dim + 0.55 * Math.abs(x));
+
+  let g = null;
+
+  document.addEventListener('touchstart', (e) => {
+    const sheet = e.target.closest && e.target.closest('.modal-sheet');
+    if (!sheet || e.touches.length !== 1) { g = null; return; }
+    const backdrop = sheet.closest('.modal-backdrop');
+    if (!backdrop || !backdrop.classList.contains('active')) { g = null; return; }
+    if (e.target.closest('input, textarea, select, [contenteditable], .no-sheet-drag')) { g = null; return; }
+    const t = e.touches[0];
+    g = { sheet, backdrop, x0: t.clientX, y0: t.clientY, dragging: false, offset: 0,
+          h: sheet.offsetHeight, hist: [{ y: t.clientY, t: e.timeStamp }] };
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!g) return;
+    const t = e.touches[0];
+    const dx = t.clientX - g.x0, dy = t.clientY - g.y0;
+
+    if (!g.dragging) {
+      if (Math.abs(dx) < THRESHOLD && Math.abs(dy) < THRESHOLD) return;
+      // Only a downward, mostly vertical pull that starts with the sheet scrolled
+      // to its top is a dismiss. Anything else is the sheet's own scrolling.
+      if (dy <= 0 || Math.abs(dx) > Math.abs(dy) || g.sheet.scrollTop > 0) { g = null; return; }
+      g.dragging = true;
+      g.y0 += THRESHOLD;            // measure from here, so the sheet does not jump 8px
+      g.sheet.classList.add('is-dragging');
+    }
+
+    e.preventDefault();
+    const raw = t.clientY - g.y0;
+    g.offset = raw >= 0 ? raw : rubber(raw, g.h);
+    g.sheet.style.transform = `translateY(${g.offset}px)`;
+    g.hist.push({ y: t.clientY, t: e.timeStamp });
+    if (g.hist.length > 6) g.hist.shift();
+  }, { passive: false });
+
+  const end = (e) => {
+    if (!g) return;
+    const s = g;
+    g = null;
+    if (!s.dragging) return;
+
+    // Velocity over the last ~100ms of samples, in px/s. Positive is downward.
+    const last = s.hist[s.hist.length - 1];
+    const first = s.hist.find(p => last.t - p.t <= 100) || s.hist[0];
+    const dt = Math.max(1, last.t - first.t);
+    const v = e.type === 'touchcancel' ? 0 : ((last.y - first.y) / dt) * 1000;
+
+    const dismiss = s.offset + project(v) > s.h * 0.35;
+    const distance = dismiss ? s.h - s.offset : Math.abs(s.offset);
+    const speed = Math.max(Math.abs(v), 600);
+    const dur = Math.min(0.4, Math.max(0.16, (EASE_SLOPE * distance) / speed));
+
+    s.sheet.classList.remove('is-dragging');
+    s.sheet.style.transitionDuration = `${dur}s`;
+    s.sheet.style.transform = '';
+    if (dismiss) s.backdrop.click();
+    s.sheet.addEventListener('transitionend', function clear() {
+      s.sheet.style.transitionDuration = '';
+      s.sheet.removeEventListener('transitionend', clear);
+    });
+  };
+  document.addEventListener('touchend', end);
+  document.addEventListener('touchcancel', end);
+}
+
+/* ---------------------------------------------------------------
+ * Tab bar: where am I
+ *
+ * Six pages with a tab bar (account, profile, network, notifications, karaoke, gtt)
+ * belong to no tab, and used to show none selected, so the bar could not answer
+ * "where am I". As in an iOS tab app, a page reached from a tab keeps that tab
+ * selected: tab pages record themselves for this session, other pages show the
+ * last one recorded, and Home when there is none.
+ * ------------------------------------------------------------- */
+function initTabMemory() {
+  const bar = document.querySelector('.tabbar');
+  if (!bar) return;
+  const own = bar.querySelector('.tab-item.active');
+  if (own) {
+    own.setAttribute('aria-current', 'page');
+    try { sessionStorage.setItem('isot_tab', own.getAttribute('href')); } catch (e) { /* private mode */ }
+    return;
+  }
+  let last = null;
+  try { last = sessionStorage.getItem('isot_tab'); } catch (e) { /* private mode */ }
+  const items = [...bar.querySelectorAll('.tab-item')];
+  const pick = items.find(a => a.getAttribute('href') === last) ||
+               items.find(a => a.getAttribute('href') === 'home.html');
+  if (pick) pick.classList.add('active');
+}
+
+function initChrome() {
   initPasswordToggles();
   initCookieConsentBanner();
+  initSheetGestures();
+  initTabMemory();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initChrome);
+} else {
+  initChrome();
 }
 
 /* ── Basemap ──────────────────────────────────────────────────────────────

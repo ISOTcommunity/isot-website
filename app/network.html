@@ -25,13 +25,11 @@
   <meta name="apple-mobile-web-app-title" content="ISOT" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#0C1A4A" />
   <!-- Vercel Web Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <link rel="stylesheet" href="css/app.css" />
@@ -54,7 +52,7 @@
     }
     .search-box-wrapper input:focus {
       border-color: var(--pink);
-      box-shadow: 0 0 14px rgba(212, 90, 232, 0.25);
+      box-shadow: none;
     }
     .search-icon {
       position: absolute;
@@ -87,10 +85,10 @@
       transition: var(--transition-fast);
     }
     .filter-pill.active {
-      background: var(--pink);
+      background: var(--accent);
       border-color: var(--pink);
-      color: #FFF;
-      box-shadow: 0 4px 12px rgba(212, 90, 232, 0.3);
+      color: var(--on-accent);
+      box-shadow: none;
     }
 
     .student-card {
@@ -119,7 +117,7 @@
       overflow: hidden;
       flex-shrink: 0;
       border: 1.5px solid var(--pink);
-      background: #0E0E13;
+      background: #1A2755;
     }
     .student-meta-pills {
       display: flex;
@@ -155,8 +153,8 @@
       font-weight: 600;
       border-radius: var(--radius-full);
       border: 1px solid var(--pink);
-      background: var(--pink);
-      color: #FFF;
+      background: var(--accent);
+      color: var(--on-accent);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -164,7 +162,7 @@
       transition: var(--transition-fast);
     }
     .btn-connect:hover {
-      box-shadow: 0 0 14px rgba(212, 90, 232, 0.4);
+      box-shadow: none;
     }
     .btn-connect.requested {
       background: rgba(255, 255, 255, 0.08);
@@ -172,10 +170,10 @@
       color: var(--text-muted);
     }
     .btn-connect.connected {
-      background: rgba(67, 219, 143, 0.16);
-      border-color: #43DB8F;
-      color: #43DB8F;
-      box-shadow: 0 0 12px rgba(67, 219, 143, 0.25);
+      background: rgba(31, 212, 127, 0.16);
+      border-color: #1FD47F;
+      color: #1FD47F;
+      box-shadow: none;
     }
   </style>
 </head>
@@ -192,10 +190,10 @@
     <div style="display: flex; align-items: center; gap: 12px;">
       <a id="notifBellBtn" href="notifications.html" style="position: relative; cursor: pointer; color: #FFF; font-size: 1.2rem; padding: 4px;" title="Notifications & Invites">
         <i class="fa-solid fa-bell"></i>
-        <span id="notifBellBadge" style="display: none; position: absolute; top: -2px; right: -2px; background: var(--pink); color: #FFF; font-size: 0.65rem; font-weight: 700; border-radius: 10px; min-width: 16px; height: 16px; align-items: center; justify-content: center; padding: 0 4px; border: 1.5px solid var(--bg-dark);">0</span>
+        <span id="notifBellBadge" style="display: none; position: absolute; top: -2px; right: -2px; background: var(--accent); color: var(--on-accent); font-size: 0.65rem; font-weight: 700; border-radius: 10px; min-width: 16px; height: 16px; align-items: center; justify-content: center; padding: 0 4px; border: 1.5px solid var(--bg-dark);">0</span>
       </a>
       <div id="headerAvatar" style="cursor: pointer;" data-open-drawer></div>
-      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: #FFF; font-size: 1.3rem; cursor: pointer; padding: 6px;">
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: var(--on-accent); font-size: 1.3rem; cursor: pointer; padding: 6px;">
         <i class="fa-solid fa-bars"></i>
       </button>
     </div>

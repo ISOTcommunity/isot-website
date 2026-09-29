@@ -25,13 +25,11 @@
   <meta name="apple-mobile-web-app-title" content="ISOT" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#0C1A4A" />
   <!-- Vercel Web Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <link rel="stylesheet" href="css/app.css" />
@@ -62,9 +60,9 @@
       gap: 6px;
     }
     .view-btn.active {
-      background: var(--pink);
-      color: #FFF;
-      box-shadow: 0 4px 12px rgba(212, 90, 232, 0.3);
+      background: var(--accent);
+      color: var(--on-accent);
+      box-shadow: none;
     }
 
     /* Month Navigation Controls */
@@ -151,13 +149,13 @@
       pointer-events: none;
     }
     .cal-matrix-day.has-event {
-      border-color: rgba(212, 90, 232, 0.4);
-      background: rgba(212, 90, 232, 0.12);
+      border-color: rgba(127, 74, 255, 0.4);
+      background: rgba(127, 74, 255, 0.12);
     }
     .cal-matrix-day.selected {
       border-color: var(--pink);
-      background: rgba(212, 90, 232, 0.28);
-      box-shadow: 0 0 14px rgba(212, 90, 232, 0.4);
+      background: rgba(127, 74, 255, 0.28);
+      box-shadow: none;
     }
     .cal-day-num {
       font-size: 0.88rem;
@@ -172,10 +170,10 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--pink);
+      background: var(--accent);
     }
-    .cal-dot.party { background: #E69321; }
-    .cal-dot.karaoke { background: #E69321; }
+    .cal-dot.party { background: #FFB81F; }
+    .cal-dot.karaoke { background: #FFB81F; }
 
     /* List Event Cards */
     .event-card-item {
@@ -200,7 +198,7 @@
     .event-date-box {
       width: 58px;
       height: 64px;
-      background: rgba(212, 90, 232, 0.12);
+      background: rgba(127, 74, 255, 0.12);
       border: 1px solid var(--border-glow);
       border-radius: 14px;
       display: flex;
@@ -252,7 +250,7 @@
       margin-left: -8px;
       overflow: hidden;
       flex-shrink: 0;
-      background: #0E0E13;
+      background: #1A2755;
     }
     .avatar-stack-item-box:first-child {
       margin-left: 0;
@@ -284,47 +282,13 @@
       color: #FFF;
     }
     .btn-rsvp.going {
-      background: rgba(67, 219, 143, 0.16);
-      border-color: #43DB8F;
-      color: #43DB8F;
-      box-shadow: 0 0 12px rgba(67, 219, 143, 0.25);
+      background: rgba(31, 212, 127, 0.16);
+      border-color: #1FD47F;
+      color: #1FD47F;
+      box-shadow: none;
     }
 
-    /* Modal Sheet for Attendees Profile Cards */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(11, 15, 25, 0.8);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      z-index: 1000;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease;
-    }
-    .modal-backdrop.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .modal-sheet {
-      width: 100%;
-      max-width: 480px;
-      background: var(--bg-darker);
-      border: 1px solid var(--border-glow);
-      border-bottom: none;
-      border-radius: 28px 28px 0 0;
-      padding: 24px;
-      transform: translateY(100%);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    .modal-backdrop.active .modal-sheet {
-      transform: translateY(0);
-    }
+    /* The attendee sheet uses the shared .modal-backdrop / .modal-sheet in app.css. */
 
     .attendee-card {
       display: flex;
@@ -366,10 +330,10 @@
     <div style="display: flex; align-items: center; gap: 12px;">
       <a id="notifBellBtn" href="notifications.html" style="position: relative; cursor: pointer; color: #FFF; font-size: 1.2rem; padding: 4px;" title="Notifications & Invites">
         <i class="fa-solid fa-bell"></i>
-        <span id="notifBellBadge" style="display: none; position: absolute; top: -2px; right: -2px; background: var(--pink); color: #FFF; font-size: 0.65rem; font-weight: 700; border-radius: 10px; min-width: 16px; height: 16px; align-items: center; justify-content: center; padding: 0 4px; border: 1.5px solid var(--bg-dark);">0</span>
+        <span id="notifBellBadge" style="display: none; position: absolute; top: -2px; right: -2px; background: var(--accent); color: var(--on-accent); font-size: 0.65rem; font-weight: 700; border-radius: 10px; min-width: 16px; height: 16px; align-items: center; justify-content: center; padding: 0 4px; border: 1.5px solid var(--bg-dark);">0</span>
       </a>
       <div id="headerAvatar" style="cursor: pointer;" data-open-drawer></div>
-      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: #FFF; font-size: 1.3rem; cursor: pointer; padding: 6px;">
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: var(--on-accent); font-size: 1.3rem; cursor: pointer; padding: 6px;">
         <i class="fa-solid fa-bars"></i>
       </button>
     </div>

@@ -25,13 +25,11 @@
   <meta name="apple-mobile-web-app-title" content="ISOT" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#0C1A4A" />
   <!-- Vercel Web Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <link rel="stylesheet" href="css/app.css" />
@@ -43,7 +41,7 @@
       margin-bottom: 24px;
     }
     .wallet-card {
-      background: linear-gradient(145deg, #0E0E13, #000000);
+      background: var(--violet-night);
       border: 1px solid var(--border-strong);
       border-radius: 28px;
       padding: 28px 24px;
@@ -59,7 +57,7 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: radial-gradient(circle at 50% 50%, rgba(212, 90, 232, 0.08), transparent 60%);
+      background: none;
       pointer-events: none;
     }
     .wallet-header {
@@ -93,19 +91,19 @@
       align-items: center;
       gap: 8px;
       padding: 6px 16px;
-      background: rgba(67, 219, 143, 0.12);
-      border: 1px solid rgba(67, 219, 143, 0.35);
+      background: rgba(31, 212, 127, 0.12);
+      border: 1px solid rgba(31, 212, 127, 0.35);
       border-radius: var(--radius-full);
       font-size: 0.8rem;
       font-weight: 600;
-      color: #7DE7B4;
+      color: #D0F6E2;
       margin-top: 8px;
     }
     .clock-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #43DB8F;
+      background: #1FD47F;
       animation: pulseGlow 1.5s infinite;
     }
 
@@ -341,7 +339,7 @@
       const container = document.getElementById('qrCode');
       container.innerHTML = `
         <div style="padding:22px 16px;text-align:center;max-width:180px">
-          <i class="fa-solid fa-triangle-exclamation" style="color:#F8A18E;font-size:1.6rem"></i>
+          <i class="fa-solid fa-triangle-exclamation" style="color:#FFD8CF;font-size:1.6rem"></i>
           <div style="color:#FFF;font-weight:600;font-size:0.86rem;margin-top:8px">Card not available</div>
           <div class="dim" style="font-size:0.74rem;margin-top:4px">Reload, or show this to a volunteer:<br />${escapeHtml(reason)}</div>
         </div>`;

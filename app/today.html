@@ -22,12 +22,10 @@
   <meta name="apple-mobile-web-app-title" content="ISOT" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#0C1A4A" />
   <script defer src="/_vercel/insights/script.js"></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <link rel="stylesheet" href="css/app.css" />
@@ -43,12 +41,12 @@
       background: var(--bg-card); border: 1px solid var(--border-light);
       text-align: center; cursor: pointer; transition: border-color .15s, background .15s;
     }
-    .day-pill.on { border-color: var(--pink); background: rgba(212,90,232,.12); }
+    .day-pill.on { border-color: var(--pink); background: rgba(127, 74, 255,.12); }
     .day-pill-dow { font-size: .62rem; font-weight: 700; letter-spacing: .1em;
                     text-transform: uppercase; color: var(--text-dim); }
     .day-pill.on .day-pill-dow { color: var(--pink); }
     .day-pill-num { font-size: 1.05rem; font-weight: 700; color: #FFF; margin-top: 2px; }
-    .day-pill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--pink);
+    .day-pill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent);
                     margin: 4px auto 0; }
 
     /* Status banner */
@@ -57,7 +55,7 @@
       border: 1px solid var(--border-light); background: var(--bg-card);
       display: flex; align-items: center; gap: 11px;
     }
-    .status-bar.live   { border-color: rgba(67,219,143,.35); background: rgba(67,219,143,.10); }
+    .status-bar.live   { border-color: rgba(31, 212, 127,.35); background: rgba(31, 212, 127,.10); }
     .status-bar.closed { border-color: rgba(255,255,255,.10); }
     .status-ico { font-size: 1.05rem; flex-shrink: 0; }
     .status-txt { font-size: .84rem; line-height: 1.45; color: var(--text-muted); }
@@ -66,8 +64,8 @@
     /* Winner */
     .winner {
       border-radius: 18px; padding: 18px; margin-bottom: 18px;
-      border: 1px solid rgba(67,219,143,.35);
-      background: linear-gradient(150deg, rgba(67,219,143,.12), var(--bg-card));
+      border: 1px solid rgba(31, 212, 127,.35);
+      background: var(--green-night);
     }
     .winner-tag {
       font-size: .6rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase;
@@ -83,7 +81,7 @@
       background: var(--bg-card); border: 1px solid var(--border-light);
       display: flex; gap: 12px; align-items: flex-start;
     }
-    .prop.mine  { border-color: rgba(212,90,232,.30); }
+    .prop.mine  { border-color: rgba(127, 74, 255,.30); }
     .prop.lost  { opacity: .5; }
     .prop-body  { flex: 1; min-width: 0; }
     .prop-title { font-size: .96rem; font-weight: 700; color: #FFF; line-height: 1.3; }
@@ -98,7 +96,7 @@
       transition: border-color .15s, background .15s;
     }
     .vote-btn:hover:not(:disabled) { border-color: var(--pink); }
-    .vote-btn.on { background: var(--pink); border-color: var(--pink); color: #FFF; }
+    .vote-btn.on { background: var(--accent); border-color: var(--pink); color: var(--on-accent); }
     .vote-btn:disabled { opacity: .45; cursor: default; }
     .vote-n   { font-size: 1.15rem; font-weight: 700; line-height: 1; }
     .vote-lbl { font-size: .56rem; letter-spacing: .09em; text-transform: uppercase;
@@ -129,7 +127,7 @@
     }
     .chat-form input:focus {
       outline: none; border-color: var(--pink);
-      box-shadow: 0 0 0 3px rgba(212, 90, 232, 0.15);
+      box-shadow: 0 0 0 3px rgba(127, 74, 255, 0.15);
     }
     .chat-form button { flex: 0 0 auto; width: auto; padding: 0 16px; min-height: 44px; }
 
@@ -212,10 +210,6 @@
     <a href="events.html" class="tab-item">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
       Calendar
-    </a>
-    <a href="today.html" class="tab-item active">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-      Today
     </a>
     <a href="partner.html" class="tab-item">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
@@ -533,7 +527,7 @@
                 ${mine ? ' &middot; <span style="color:var(--pink)">yours</span>' : ''}
               </div>
               ${p.description ? `<div class="prop-desc">${escapeHtml(p.description)}</div>` : ''}
-              ${waiting ? `<div style="font-size:.74rem;color:#E8C870;margin-top:6px">
+              ${waiting ? `<div style="font-size:.74rem;color:#FFECBD;margin-top:6px">
                   <i class="fa-solid fa-hourglass-half"></i>
                   Waiting for the board — nobody else can see it yet.</div>` : ''}
             </div>
@@ -616,8 +610,8 @@
               ${droppedPin ? `
                 <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;
                             border-radius:10px;margin-bottom:8px;
-                            background:rgba(67,219,143,.10);border:1px solid rgba(67,219,143,.32)">
-                  <i class="fa-solid fa-location-dot" style="color:#43DB8F"></i>
+                            background:rgba(31, 212, 127,.10);border:1px solid rgba(31, 212, 127,.32)">
+                  <i class="fa-solid fa-location-dot" style="color:#1FD47F"></i>
                   <div style="font-size:.8rem;line-height:1.35">
                     <strong style="color:#FFF">Pinned on the map</strong><br>
                     <span class="dim" style="font-size:.72rem">

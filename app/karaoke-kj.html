@@ -19,22 +19,20 @@
   <link rel="icon" href="../assets/favicon.png" sizes="48x48" type="image/png" />
   
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <link rel="stylesheet" href="css/app.css" />
 
   <style>
     .kj-hero-card {
-      background: linear-gradient(135deg, #0E0E13, #000000);
+      background: var(--magenta-night);
       border: 2px solid var(--pink);
       border-radius: 24px;
       padding: 24px;
       text-align: center;
       margin-bottom: 24px;
-      box-shadow: 0 12px 30px rgba(212, 90, 232, 0.2);
+      box-shadow: none;
     }
     .kj-song-card {
       background: var(--bg-card);
@@ -49,8 +47,8 @@
       transition: var(--transition-fast);
     }
     .kj-song-card.now-playing {
-      border-color: #43DB8F;
-      background: rgba(67, 219, 143, 0.12);
+      border-color: #1FD47F;
+      background: rgba(31, 212, 127, 0.12);
     }
     .big-tap-btn {
       min-height: 52px;
@@ -67,7 +65,7 @@
     }
     #scanModal.open { display: flex; }
     .scan-sheet {
-      background: #0E0E13; border-radius: 24px 24px 0 0;
+      background: #1A2755; border-radius: 24px 24px 0 0;
       padding: 20px 20px 32px; width: 100%; max-width: 500px;
       border-top: 1px solid rgba(255,255,255,.1);
     }
@@ -77,10 +75,10 @@
       font-weight: 700; font-size: .95rem; display: none;
       align-items: center; gap: 10px;
     }
-    #scanResult.ok  { display: flex; background: rgba(67,219,143,.15); color: #43DB8F;
-                      border: 1px solid rgba(67,219,143,.35); }
-    #scanResult.err { display: flex; background: rgba(243,108,81,.15); color: #F36C51;
-                      border: 1px solid rgba(243,108,81,.35); }
+    #scanResult.ok  { display: flex; background: rgba(31, 212, 127,.15); color: #1FD47F;
+                      border: 1px solid rgba(31, 212, 127,.35); }
+    #scanResult.err { display: flex; background: rgba(255, 90, 60,.15); color: #FF5A3C;
+                      border: 1px solid rgba(255, 90, 60,.35); }
   </style>
 </head>
 <body>
@@ -166,7 +164,7 @@
            nobody tapped Next — not because a song ran long. Nothing on screen showed
            that anything was stale, so there was nothing to notice. -->
       <div id="onStageClock" style="margin-top:12px;font-variant-numeric:tabular-nums;font-size:2rem;font-weight:700;color:var(--pink);line-height:1" hidden>0:00</div>
-      <div id="staleNudge" style="margin-top:10px;padding:10px 14px;border-radius:12px;background:rgba(230,147,33,0.13);border:1px solid rgba(230,147,33,0.4);color:#F0C078;font-size:0.86rem" hidden></div>
+      <div id="staleNudge" style="margin-top:10px;padding:10px 14px;border-radius:12px;background:rgba(255, 184, 31,0.13);border:1px solid rgba(255, 184, 31,0.4);color:#FFECBD;font-size:0.86rem" hidden></div>
 
       <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: center;">
         <button type="button" onclick="markDoneAndNext()" class="btn btn-pink big-tap-btn" id="nextBtn" style="flex: 1;">
@@ -353,7 +351,7 @@
         nudge.innerHTML = '<b>Still on stage after ' + Math.floor(secs / 60) + ' minutes.</b>' +
           '<br />If they have finished, tap <b>Mark Sung &amp; Next Singer</b> — everyone waiting ' +
           'is being told a time that assumes the queue is moving.';
-        clock.style.color = '#F0C078';
+        clock.style.color = '#FFECBD';
       } else {
         nudge.hidden = true;
         clock.style.color = 'var(--pink)';
@@ -400,10 +398,10 @@
             <div class="dim" style="font-size:0.85rem">Artist: ${escapeHtml(item.artist_name || 'Original Artist')} • Performed by ${escapeHtml(item.singer_name || 'Member')}</div>
           </div>
           <div style="display:flex;gap:6px">
-            <button type="button" onclick="playNow('${item.id}')" class="btn btn-outline" style="width:auto;padding:8px 12px;font-size:0.8rem;color:var(--green);border-color:rgba(67,219,143,0.4)">
+            <button type="button" onclick="playNow('${item.id}')" class="btn btn-outline" style="width:auto;padding:8px 12px;font-size:0.8rem;color:var(--green);border-color:rgba(31, 212, 127,0.4)">
               <i class="fa-solid fa-play"></i> Play
             </button>
-            <button type="button" onclick="removeSlot('${item.id}')" class="btn btn-outline" style="width:auto;padding:8px 12px;font-size:0.8rem;color:#F8A18E;border-color:rgba(243,108,81,0.4)">
+            <button type="button" onclick="removeSlot('${item.id}')" class="btn btn-outline" style="width:auto;padding:8px 12px;font-size:0.8rem;color:#FFD8CF;border-color:rgba(255, 90, 60,0.4)">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>

@@ -19,52 +19,50 @@
   <meta name="apple-mobile-web-app-title" content="ISOT" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#0C1A4A" />
   <script defer src="/_vercel/insights/script.js"></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="css/app.css" />
   <style>
     .bal-card {
-      background: linear-gradient(150deg, rgba(212,175,80,.13), var(--bg-card));
-      border: 1px solid rgba(212,175,80,.34);
+      background: var(--amber-night);
+      border: 1px solid rgba(255, 184, 31,.34);
       border-radius: 20px; padding: 22px; margin-bottom: 18px;
     }
     .bal-n { font-size: 3rem; font-weight: 700; color: #FFF; line-height: 1;
              font-variant-numeric: tabular-nums; }
     .bal-l { font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
-             color: var(--gold, #D4AF50); font-weight: 700; margin-top: 6px; }
+             color: var(--gold, #FFB81F); font-weight: 700; margin-top: 6px; }
 
     /* Early bird */
     .eb {
       border-radius: 18px; padding: 16px; margin-bottom: 18px;
       border: 1px solid var(--border-light); background: var(--bg-card);
     }
-    .eb.live { border-color: rgba(67,219,143,.45);
-               background: linear-gradient(150deg, rgba(67,219,143,.12), var(--bg-card)); }
+    .eb.live { border-color: rgba(31, 212, 127,.45);
+               background: var(--green-night); }
     .eb-tag { font-size: .62rem; font-weight: 700; letter-spacing: .13em;
               text-transform: uppercase; margin-bottom: 7px; }
 
     /* Token */
     .tok { border-radius: 20px; overflow: hidden; margin-bottom: 14px;
-           border: 1px solid rgba(212,175,80,.4); background: var(--bg-card); }
+           border: 1px solid rgba(255, 184, 31,.4); background: var(--bg-card); }
     .tok-poster { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
     .tok-body { padding: 16px; }
     .tok-kind { font-size: 1.15rem; font-weight: 700; color: #FFF; }
     .tok-note { font-size: .82rem; color: var(--text-muted); margin-top: 3px; }
-    .tok-exp  { font-size: .72rem; color: var(--gold, #D4AF50); margin-top: 8px; font-weight: 600; }
+    .tok-exp  { font-size: .72rem; color: var(--gold, #FFB81F); margin-top: 8px; font-weight: 600; }
 
     /* Burnt proof — the bit a screenshot cannot fake */
     .burnt {
       border-radius: 20px; padding: 22px 18px; margin-bottom: 14px; text-align: center;
-      border: 1px solid rgba(243,108,81,.45);
-      background: linear-gradient(150deg, rgba(243,108,81,.14), var(--bg-card));
+      border: 1px solid rgba(255, 90, 60,.45);
+      background: var(--coral-night);
     }
     .burnt-stamp {
-      font-size: 1.5rem; font-weight: 700; letter-spacing: .16em; color: #F8A18E;
+      font-size: 1.5rem; font-weight: 700; letter-spacing: .16em; color: #FFD8CF;
       text-transform: uppercase;
     }
     .burnt-clock {
@@ -72,7 +70,7 @@
       font-variant-numeric: tabular-nums; letter-spacing: .02em;
     }
     .burnt-date { font-size: .88rem; color: var(--text-muted); margin-top: 2px; }
-    .burnt-since { font-size: .76rem; color: #F8A18E; margin-top: 10px; font-weight: 600; }
+    .burnt-since { font-size: .76rem; color: #FFD8CF; margin-top: 10px; font-weight: 600; }
     .burnt-who { font-size: .82rem; color: var(--text-muted); margin-top: 12px;
                  border-top: 1px solid var(--border-light); padding-top: 12px; }
     .burnt-who strong { color: #FFF; }
@@ -82,12 +80,12 @@
     .live-clock {
       width: 100%; margin-top: 10px;
       min-height: 48px; padding: 8px 16px; border-radius: var(--radius-sm);
-      background: rgba(67,219,143,.14); border: 1px solid rgba(67,219,143,.45);
+      background: rgba(31, 212, 127,.14); border: 1px solid rgba(31, 212, 127,.45);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       gap: 1px;
     }
     .lc-time {
-      font-size: 1.45rem; font-weight: 700; color: #8FD99A; line-height: 1;
+      font-size: 1.45rem; font-weight: 700; color: #1FD47F; line-height: 1;
       font-variant-numeric: tabular-nums; letter-spacing: .03em;
     }
     .lc-date { font-size: .66rem; color: rgba(143,217,154,.75); font-weight: 600; }
@@ -95,17 +93,17 @@
     .bar { height: 8px; border-radius: 99px; background: rgba(255,255,255,.07);
            margin-top: 16px; overflow: hidden; }
     .bar-fill { height: 100%; border-radius: 99px;
-                background: linear-gradient(90deg, #D4AF50, #43DB8F); transition: width .6s ease; }
+                background: var(--amber); transition: width .6s var(--ease-out); }
 
     .rule { display: flex; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--border-light); }
     .rule:last-child { border-bottom: none; }
     .rule-ico { width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
-                background: rgba(212,175,80,.12); color: #D4AF50;
+                background: rgba(255, 184, 31,.12); color: #FFB81F;
                 display: flex; align-items: center; justify-content: center; font-size: .9rem; }
     .rule-body { flex: 1; min-width: 0; }
     .rule-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
     .rule-title { font-size: .92rem; font-weight: 700; color: #FFF; }
-    .rule-pts { font-size: .82rem; font-weight: 700; color: #8FD99A; white-space: nowrap; }
+    .rule-pts { font-size: .82rem; font-weight: 700; color: #1FD47F; white-space: nowrap; }
     .rule-txt { font-size: .78rem; color: var(--text-muted); line-height: 1.5; margin-top: 3px; }
     .rule-prog { font-size: .72rem; color: var(--text-dim); margin-top: 6px; }
     .rule-prog strong { color: #FFF; }
@@ -124,7 +122,7 @@
                    pointer-events: none; animation: sway 3.2s ease-in-out infinite; transform-origin: bottom center; }
     .hero-mark { height: 18px; filter: brightness(0) invert(1); opacity: .85; display: block; }
     .hero-kicker { font-size: .66rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
-                   color: #D4AF50; margin: 6px 0 14px; }
+                   color: #FFB81F; margin: 6px 0 14px; }
     @keyframes sway { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
     @media (prefers-reduced-motion: reduce) { .hero-dancer { animation: none; } }
 
@@ -132,7 +130,7 @@
                 /* Lavender, not near-black: the singer and the twins are dark figures and
                    vanished on the card colour. Light enough for them, dark enough for the
                    white characters. */
-                background: radial-gradient(circle at 50% 55%, rgba(196,189,224,.42), rgba(155,143,212,.16));
+                background: var(--violet-night);
                 display: flex; align-items: center; justify-content: center; overflow: hidden; }
     .rule-art img { max-width: 50px; max-height: 50px; object-fit: contain; }
     .rule { align-items: center; }
@@ -142,7 +140,7 @@
     .board-head img { height: 38px; }
 
     .empty-board { display: flex; align-items: center; gap: 14px; margin-top: 24px; padding: 16px;
-                   border-radius: 18px; border: 1px dashed rgba(212,175,80,.4); background: rgba(212,175,80,.05); }
+                   border-radius: 18px; border: 1px dashed rgba(255, 184, 31,.4); background: rgba(255, 184, 31,.05); }
     .empty-board img { height: 56px; }
 
     a.rule { text-decoration: none; color: inherit; cursor: pointer; transition: background .15s; }
@@ -150,13 +148,13 @@
     .rule-go { color: var(--text-dim); font-size: .75rem; flex-shrink: 0; align-self: center; }
 
     .prize { display: flex; align-items: center; gap: 14px; margin-top: 26px; padding: 16px;
-             border-radius: 20px; border: 1px solid rgba(212,175,80,.45);
-             background: linear-gradient(135deg, rgba(212,175,80,.18), rgba(155,143,212,.10)); }
+             border-radius: 20px; border: 1px solid rgba(255, 184, 31,.45);
+             background: var(--amber-night); }
     .prize img { height: 74px; flex-shrink: 0; }
-    .prize-k { font-size: .62rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #D4AF50; }
+    .prize-k { font-size: .62rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #FFB81F; }
     .prize-t { font-size: 1.05rem; font-weight: 700; color: #FFF; margin-top: 3px; line-height: 1.3; }
     .winner-card { margin-top: 12px; padding: 14px 16px; border-radius: 18px;
-                   border: 1px solid rgba(67,219,143,.35); background: rgba(67,219,143,.07); }
+                   border: 1px solid rgba(31, 212, 127,.35); background: rgba(31, 212, 127,.07); }
     .winner-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
   </style>
 </head>
@@ -262,8 +260,8 @@
       const base = 'border:none;border-radius:14px;padding:5px 10px;font-size:.72rem;font-weight:700;font-family:inherit;flex-shrink:0;';
       if (st === 'connected') return `<span style="${base}color:var(--green);background:transparent;padding-inline:4px" title="Friends"><i class="fa-solid fa-user-check"></i></span>`;
       if (st === 'sent')      return `<span style="${base}color:var(--text-dim);background:rgba(255,255,255,.06)">Requested</span>`;
-      if (st === 'incoming')  return `<button type="button" data-accept-friend="${b.profile_id}" style="${base}background:var(--green);color:#0B0B0F;cursor:pointer">Accept</button>`;
-      return `<button type="button" data-add-friend="${b.profile_id}" aria-label="Add ${escapeHtml(b.name)} as friend" style="${base}background:rgba(212,90,232,.15);color:var(--pink);cursor:pointer"><i class="fa-solid fa-user-plus"></i> Add</button>`;
+      if (st === 'incoming')  return `<button type="button" data-accept-friend="${b.profile_id}" style="${base}background:var(--green);color:#0E0F14;cursor:pointer">Accept</button>`;
+      return `<button type="button" data-add-friend="${b.profile_id}" aria-label="Add ${escapeHtml(b.name)} as friend" style="${base}background:rgba(127, 74, 255,.15);color:var(--pink);cursor:pointer"><i class="fa-solid fa-user-plus"></i> Add</button>`;
     }
 
     document.addEventListener('click', async (e) => {
@@ -352,7 +350,7 @@
             </button>`
           : data.balance >= cost ? `
             <div class="dim" style="font-size:.76rem;margin-top:12px;line-height:1.5">
-              <i class="fa-solid fa-lock" style="color:#D4AF50"></i>
+              <i class="fa-solid fa-lock" style="color:#FFB81F"></i>
               Trading opens during <strong style="color:#FFF">Monday karaoke at Rough</strong>.
             </div>` : ''}
         </div>
@@ -482,7 +480,7 @@
 
       const winner = w.length ? `
         <div class="winner-card">
-          <div class="prize-k" style="color:#8FD99A">${escapeHtml(last.month)} winner${w.length > 1 ? 's' : ''}</div>
+          <div class="prize-k" style="color:#1FD47F">${escapeHtml(last.month)} winner${w.length > 1 ? 's' : ''}</div>
           ${w.map(x => `
             <div class="winner-row">
               <div style="width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0">
@@ -508,7 +506,7 @@
               Get scanned at the next night and you are number one.</div>
           </div>
         </div>`;
-      const medal = n => n === 1 ? '#D4AF50' : n === 2 ? '#C4BDE0' : n === 3 ? '#C9A46A' : 'var(--text-dim)';
+      const medal = n => n === 1 ? '#FFB81F' : n === 2 ? '#C4BDE0' : n === 3 ? '#C9A46A' : 'var(--text-dim)';
       return `
         <div class="board-head">
           <img src="${C}char_white_starjumper.png" alt="" />
@@ -516,7 +514,7 @@
         </div>
         <div class="card card-glass" style="padding:4px 16px">
           ${board.map(b => `
-            <div class="hrow" style="${b.is_me ? 'background:rgba(212,90,232,.08);margin:0 -16px;padding-inline:16px' : ''}">
+            <div class="hrow" style="${b.is_me ? 'background:rgba(127, 74, 255,.08);margin:0 -16px;padding-inline:16px' : ''}">
               <div style="width:22px;font-weight:700;color:${medal(b.rank)};font-variant-numeric:tabular-nums">${b.rank}</div>
               <div style="width:30px;height:30px;border-radius:50%;overflow:hidden;flex-shrink:0">
                 ${renderUserAvatarHtml({ full_name: b.name, avatar_url: b.avatar_url, member_code: b.member_code }, 30)}
@@ -545,7 +543,7 @@
       }
       if (!eb.window_open) {
         return `<div class="eb">
-          <div class="eb-tag" style="color:var(--gold,#D4AF50)">Tonight's free shot</div>
+          <div class="eb-tag" style="color:var(--gold,#FFB81F)">Tonight's free shot</div>
           <div style="font-size:.88rem;color:var(--text-muted);line-height:1.5">
             You are on the list. Open this page between
             <strong style="color:#FFF">${escapeHtml(eb.opens)}</strong> and
@@ -654,7 +652,7 @@
       wrap.innerHTML = `
         <div style="max-width:420px;width:100%;text-align:center">
           <div style="font-size:.68rem;font-weight:700;letter-spacing:.14em;
-                      text-transform:uppercase;color:var(--gold,#D4AF50);margin-bottom:10px">
+                      text-transform:uppercase;color:var(--gold,#FFB81F);margin-bottom:10px">
             Hand the phone over</div>
           <h2 style="font-size:1.5rem;color:#FFF;margin-bottom:14px">Bartender taps below</h2>
 

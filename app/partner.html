@@ -25,13 +25,11 @@
   <meta name="apple-mobile-web-app-title" content="ISOT" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#0C1A4A" />
   <!-- Vercel Web Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <link rel="stylesheet" href="vendor/leaflet.css" />
@@ -48,7 +46,7 @@
       position: absolute; left: 50%; top: 50%; z-index: 500;
       transform: translate(-50%, -100%);
       pointer-events: none;                 /* never eat a map drag */
-      font-size: 2rem; color: #43DB8F;
+      font-size: 2rem; color: #1FD47F;
       filter: drop-shadow(0 3px 6px rgba(0,0,0,.65));
       animation: pinHover 1.8s ease-in-out infinite;
     }
@@ -62,7 +60,7 @@
       /* Bottom, not top: the layer filter bar floats over the top of the map and the hint
          disappeared behind it. */
       position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 500;
-      background: rgba(8,8,8,.86); border: 1px solid rgba(67,219,143,.4);
+      background: rgba(8,8,8,.86); border: 1px solid rgba(31, 212, 127,.4);
       color: #E9F7EE; font-size: .78rem; font-weight: 600;
       padding: 7px 14px; border-radius: 999px; white-space: nowrap;
       backdrop-filter: blur(8px); pointer-events: none;
@@ -85,7 +83,7 @@
       border-radius: 20px 20px var(--radius-arc) 20px;
       overflow: hidden;
       border: 1px solid var(--border-glow);
-      box-shadow: 0 8px 24px rgba(212, 90, 232, 0.15);
+      box-shadow: 0 0 0 2px rgba(12, 26, 74, 0.9);
     }
 
     /* The filter bar sits on the map rather than above it: it belongs to the map, and
@@ -101,33 +99,33 @@
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      background: var(--pink);
+      background: var(--accent);
       border: 2px solid #FFF;
-      box-shadow: 0 0 16px rgba(212, 90, 232, 0.7);
+      box-shadow: 0 0 0 2px rgba(12, 26, 74, 0.9);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #FFF;
+      color: var(--on-accent);
       font-size: 0.9rem;
     }
-    .isot-pin.party { background: #E69321; box-shadow: 0 0 16px rgba(255, 106, 0, 0.7); }
-    .isot-pin.edu { background: #5787EA; box-shadow: 0 0 16px rgba(87, 135, 234, 0.65); }  /* Sky Blue */
+    .isot-pin.party { background: #FFB81F; box-shadow: 0 0 0 2px rgba(12, 26, 74, 0.9); }
+    .isot-pin.edu { background: #79A3FF; box-shadow: 0 0 0 2px rgba(12, 26, 74, 0.9); }  /* Vivid Blue, text tier */
 
     /* A venue with something on tonight. Two states, not one: "live" is reserved for
        an event that has actually started, so the map never claims a night is running
        at three in the afternoon. */
     .isot-pin.tonight {
-      background: var(--pink);
-      box-shadow: 0 0 0 3px rgba(212, 90, 232, 0.35), 0 0 20px rgba(212, 90, 232, 0.8);
+      background: var(--accent);
+      box-shadow: 0 0 0 3px rgba(127, 74, 255, 0.35), 0 0 0 5px rgba(12, 26, 74, 0.9);
     }
     .isot-pin.live {
-      background: var(--pink);
+      background: var(--accent);
       animation: pinPulse 1.6s ease-out infinite;
     }
     @keyframes pinPulse {
-      0%   { box-shadow: 0 0 0 0 rgba(212, 90, 232, 0.85), 0 0 20px rgba(212, 90, 232, 0.9); }
-      70%  { box-shadow: 0 0 0 18px rgba(212, 90, 232, 0),  0 0 20px rgba(212, 90, 232, 0.9); }
-      100% { box-shadow: 0 0 0 0 rgba(212, 90, 232, 0),     0 0 20px rgba(212, 90, 232, 0.9); }
+      0%   { box-shadow: 0 0 0 0 rgba(127, 74, 255, 0.85); }
+      70%  { box-shadow: 0 0 0 18px rgba(127, 74, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(127, 74, 255, 0); }
     }
     /* Someone at a bar should not have to tap a pin to find out a night is on. */
     .pin-label {
@@ -141,8 +139,8 @@
       letter-spacing: 0.04em;
       padding: 3px 9px;
       border-radius: 999px;
-      background: var(--pink);
-      color: var(--on-accent, #0B0B0F);
+      background: var(--accent);
+      color: var(--on-accent, #0E0F14);
       box-shadow: 0 3px 10px rgba(0,0,0,0.5);
     }
     .pin-label .dot {
@@ -192,7 +190,7 @@
       align-items:center; justify-content:center; line-height:1;
     }
     .lbtn .lbl { font-weight:700; font-size:0.72rem; }
-    .lbtn.on { background:var(--pink); border-color:var(--pink); color:var(--on-accent,#0B0B0F); font-weight:600; }
+    .lbtn.on { background:var(--accent); border-color:var(--pink); color:var(--on-accent,#0E0F14); font-weight:600; }
 
     .score-strip {
       display: flex; align-items: center; gap: 14px;
@@ -225,7 +223,7 @@
     /* Map credit — required by the OSM/CARTO licence, so it stays, but it does not
        need to be a white bar across the map. Muted to sit inside the dark theme. */
     .leaflet-control-attribution {
-      background: rgba(11, 15, 25, 0.55) !important;
+      background: rgba(13, 20, 44, 0.55) !important;
       color: var(--text-dark) !important;
       font-size: 9px !important;
       padding: 1px 5px !important;
@@ -242,18 +240,18 @@
     .leaflet-bar, .leaflet-control-zoom { border:none !important; box-shadow:none !important; }
     .leaflet-control-zoom a {
       width:34px; height:34px; line-height:32px;
-      background:rgba(10,10,14,.78) !important; color:var(--text) !important;
+      background:rgba(12, 26, 74,.78) !important; color:var(--text) !important;
       border:1px solid rgba(255,255,255,.11) !important;
       backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
       font-size:1.15rem; font-weight:400;
     }
     .leaflet-control-zoom a:first-child { border-radius:10px 10px 0 0 !important; }
     .leaflet-control-zoom a:last-child  { border-radius:0 0 10px 10px !important; border-top:none !important; }
-    .leaflet-control-zoom a:hover { background:rgba(212,90,232,.22) !important; }
+    .leaflet-control-zoom a:hover { background:rgba(127, 74, 255,.22) !important; }
     .leaflet-control-zoom a.leaflet-disabled { opacity:.4; }
 
     .leaflet-control-scale-line {
-      background:rgba(10,10,14,.72) !important; color:var(--text-muted) !important;
+      background:rgba(12, 26, 74,.72) !important; color:var(--text-muted) !important;
       border:1px solid rgba(255,255,255,.14) !important; border-top:none !important;
       border-radius:0 0 7px 7px; font-size:.66rem; padding:1px 6px;
       backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
@@ -263,10 +261,10 @@
     .compass-btn {
       width:34px; height:34px; border-radius:50%; cursor:pointer; display:flex;
       align-items:center; justify-content:center; margin-bottom:7px;
-      background:rgba(10,10,14,.78); border:1px solid rgba(255,255,255,.11);
+      background:rgba(12, 26, 74,.78); border:1px solid rgba(255,255,255,.11);
       backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
     }
-    .compass-btn:hover { background:rgba(212,90,232,.22); }
+    .compass-btn:hover { background:rgba(127, 74, 255,.22); }
     .compass-btn svg { display:block; transition:transform .18s ease; }
     @media (prefers-reduced-motion:reduce){ .compass-btn svg{ transition:none; } }
 
@@ -278,13 +276,13 @@
       font-weight:800; font-size:0.82rem; border:2px solid rgba(0,0,0,0.55);
       box-shadow:0 3px 10px rgba(0,0,0,0.6); }
     .stop-pin > span { transform:rotate(45deg); }
-    .stop-pin.todo    { background:#1A1A22; color:var(--text-muted); border-color:rgba(255,255,255,0.28); }
-    .stop-pin.done    { background:var(--green,#4ED88A); color:#07120C; }
-    .stop-pin.current { background:var(--pink); color:var(--on-accent); }
+    .stop-pin.todo    { background:#26325D; color:var(--text-muted); border-color:rgba(255,255,255,0.28); }
+    .stop-pin.done    { background:var(--green,#1FD47F); color:#06382A; }
+    .stop-pin.current { background:var(--accent); color:var(--on-accent); }
 
     #tourBanner { display:flex; align-items:center; gap:13px; text-decoration:none;
       padding:14px 16px; margin-bottom:14px;
-      border:1px solid var(--border-light); background:rgba(212,90,232,0.07);
+      border:1px solid var(--border-light); background:rgba(127, 74, 255,0.07);
       border-radius:var(--radius-md) var(--radius-md) var(--radius-arc) var(--radius-md); }
     #tourBanner .tb-ico { font-size:1.3rem; color:var(--pink); }
     #tourBanner .tb-name { font-weight:700; font-size:0.98rem; color:var(--text); }
@@ -301,25 +299,25 @@
        but it is a bar with a deal, not a mensa. */
     .ref-pin.mensa_alt { background:#2A2418; color:#C9A46A; border-style:dashed; }
     .ref-pin.museum { background:#2C2036; color:#C79BE0; }
-    .ref-pin.sport  { background:#1E3620; color:#8FD99A; }
+    .ref-pin.sport  { background:#06382A; color:#1FD47F; }
     /* Today's confirmed activity. Not a filterable layer — one pin, always on top,
        because on the day it runs it is the most relevant thing on the map. */
     .ref-pin.today {
-      background:#43DB8F; color:#06240F; border-color:#43DB8F;
-      box-shadow:0 0 0 3px rgba(67,219,143,.28);
+      background:#1FD47F; color:#06240F; border-color:#1FD47F;
+      box-shadow:0 0 0 3px rgba(31, 212, 127,.28);
       animation:todayPulse 2.4s ease-in-out infinite;
     }
     /* Approved and collecting votes. Gold, not green: it is a candidate, not a plan, and
        the two must not be mistaken for each other at a glance. The number IS the pin —
        how many are going is the thing that decides it. */
     .ref-pin.voting {
-      background:#D4AF50; color:#241A05; border-color:#E8C870;
-      box-shadow:0 0 0 3px rgba(212,175,80,.22);
+      background:#FFB81F; color:#3A2405; border-color:#FFECBD;
+      box-shadow:0 0 0 3px rgba(255, 184, 31,.22);
       font-weight:800; font-size:0.78rem;
     }
     @keyframes todayPulse {
-      0%,100% { box-shadow:0 0 0 3px rgba(67,219,143,.28); }
-      50%     { box-shadow:0 0 0 8px rgba(67,219,143,.06); }
+      0%,100% { box-shadow:0 0 0 3px rgba(31, 212, 127,.28); }
+      50%     { box-shadow:0 0 0 8px rgba(31, 212, 127,.06); }
     }
     @media (prefers-reduced-motion: reduce) { .ref-pin.today { animation:none; } }
 
@@ -352,10 +350,10 @@
     <div style="display: flex; align-items: center; gap: 12px;">
       <a id="notifBellBtn" href="notifications.html" style="position: relative; cursor: pointer; color: #FFF; font-size: 1.2rem; padding: 4px;" title="Notifications & Invites">
         <i class="fa-solid fa-bell"></i>
-        <span id="notifBellBadge" style="display: none; position: absolute; top: -2px; right: -2px; background: var(--pink); color: #FFF; font-size: 0.65rem; font-weight: 700; border-radius: 10px; min-width: 16px; height: 16px; align-items: center; justify-content: center; padding: 0 4px; border: 1.5px solid var(--bg-dark);">0</span>
+        <span id="notifBellBadge" style="display: none; position: absolute; top: -2px; right: -2px; background: var(--accent); color: var(--on-accent); font-size: 0.65rem; font-weight: 700; border-radius: 10px; min-width: 16px; height: 16px; align-items: center; justify-content: center; padding: 0 4px; border: 1.5px solid var(--bg-dark);">0</span>
       </a>
       <div id="headerAvatar" style="cursor: pointer;" data-open-drawer></div>
-      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: #FFF; font-size: 1.3rem; cursor: pointer; padding: 6px;">
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: var(--on-accent); font-size: 1.3rem; cursor: pointer; padding: 6px;">
         <i class="fa-solid fa-bars"></i>
       </button>
     </div>
@@ -585,7 +583,7 @@
         options: { position: 'bottomright' },
         onAdd(m) {
           const el = L.DomUtil.create('div', 'compass-btn');
-          el.innerHTML = '<svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 L15.6 12 L12 10.2 L8.4 12 Z" fill="#D45AE8"/><path d="M12 22 L8.4 12 L12 13.8 L15.6 12 Z" fill="#6E6E7C"/></svg>';
+          el.innerHTML = '<svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 L15.6 12 L12 10.2 L8.4 12 Z" fill="#B191FF"/><path d="M12 22 L8.4 12 L12 13.8 L15.6 12 Z" fill="#6E6E7C"/></svg>';
           el.title = 'Face north';
           el.setAttribute('role', 'button');
           el.setAttribute('tabindex', '0');
@@ -892,7 +890,7 @@
           }).addTo(todayLayer).bindPopup(`
             <div style="min-width:210px">
               <div style="font-size:0.66rem;font-weight:700;letter-spacing:0.1em;
-                          text-transform:uppercase;color:${won ? '#43DB8F' : '#D4AF50'}">
+                          text-transform:uppercase;color:${won ? '#1FD47F' : '#FFB81F'}">
                 ${won ? `Today &middot; ${r.votes} coming`
                       : `Voting &middot; ${r.votes} of ${r.vote_floor} needed`}</div>
               <div style="font-weight:700;font-size:0.98rem;margin-top:3px">${escapeHtml(r.title)}</div>
@@ -901,13 +899,13 @@
               ${r.description ? `<div style="font-size:0.8rem;margin-top:7px;line-height:1.5">${escapeHtml(r.description)}</div>` : ''}
               ${won
                 ? `<a href="today.html" style="display:inline-block;margin-top:9px;
-                       font-size:0.8rem;color:#43DB8F;text-decoration:none">
+                       font-size:0.8rem;color:#1FD47F;text-decoration:none">
                      Open the chat &rarr;</a>`
                 : `<button type="button" onclick="voteFromMap('${r.id}')"
                         style="margin-top:10px;width:100%;padding:7px 0;border-radius:8px;
                                border:none;cursor:pointer;font-weight:700;font-size:0.8rem;
-                               background:${r.i_voted ? '#2B2B36' : '#D4AF50'};
-                               color:${r.i_voted ? '#C4BDE0' : '#241A05'}">
+                               background:${r.i_voted ? '#2B2B36' : '#FFB81F'};
+                               color:${r.i_voted ? '#C4BDE0' : '#3A2405'}">
                      ${r.i_voted ? 'You are going — tap to withdraw' : 'Count me in'}
                    </button>`}
             </div>`);
@@ -965,18 +963,18 @@
           }).bindPopup(`
             <div style="min-width:190px">
               <div style="font-weight:700;font-size:0.95rem">${escapeHtml(p.name)}</div>
-              ${p.operator ? `<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:#D45AE8;margin-top:2px">${escapeHtml(p.operator)}</div>` : ''}
+              ${p.operator ? `<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--pink);margin-top:2px">${escapeHtml(p.operator)}</div>` : ''}
               ${p.address ? `<div style="font-size:0.8rem;margin-top:6px;opacity:0.75">${escapeHtml(p.address)}</div>` : ''}
               ${p.note ? `<div style="font-size:0.8rem;margin-top:7px;line-height:1.5">${escapeHtml(p.note)}</div>` : ''}
               <div style="display:flex;gap:14px;align-items:center;margin-top:9px;flex-wrap:wrap">
                 <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}"
                    target="_blank" rel="noopener"
-                   style="font-size:0.8rem;color:#D45AE8;text-decoration:none">
+                   style="font-size:0.8rem;color:var(--pink);text-decoration:none">
                   Directions &rarr;</a>
                 <!-- Straight from the pin into the proposal sheet with this place already
                      chosen, so "let's go here" is one tap from looking at the map. -->
                 <a href="today.html?place=${p.id}"
-                   style="font-size:0.8rem;color:#8FD99A;text-decoration:none">
+                   style="font-size:0.8rem;color:#1FD47F;text-decoration:none">
                   Propose an activity &rarr;</a>
               </div>
             </div>`));
@@ -1006,7 +1004,7 @@
 
         LAYER.running.group.addLayer(
           L.polyline(pts, { color: '#000', weight: 8, opacity: 0.45, lineJoin: 'round', lineCap: 'round' }));
-        const col = rt.color || '#43DB8F';
+        const col = rt.color || '#1FD47F';
         LAYER.running.group.addLayer(
           L.polyline(pts, { color: col, weight: 3.5, opacity: 0.92, lineJoin: 'round', lineCap: 'round' })
             .bindPopup(`<div style="min-width:170px">
@@ -1069,7 +1067,7 @@
       // Dark casing under the bright line so the route reads over pale piazze and
       // dark parks alike.
       LAYER.tour.group.addLayer(L.polyline(pts, { color: '#000', weight: 11, opacity: 0.5, lineJoin: 'round', lineCap: 'round' }));
-      LAYER.tour.group.addLayer(L.polyline(pts, { color: '#D45AE8', weight: 5, opacity: 0.95, lineJoin: 'round', lineCap: 'round' }));
+      LAYER.tour.group.addLayer(L.polyline(pts, { color: '#B191FF', weight: 5, opacity: 0.95, lineJoin: 'round', lineCap: 'round' }));
 
       stops.forEach((s, i) => {
         const cls = s.done ? 'done' : (s.current ? 'current' : 'todo');
@@ -1329,7 +1327,7 @@
             ${trailData.stops.map(st => `
               <div style="display:flex;gap:11px;align-items:baseline;padding:7px 0;border-top:1px solid var(--border-light)">
                 <span style="width:20px;flex-shrink:0;font-weight:700;font-size:0.8rem;
-                  color:${st.done ? 'var(--green,#43DB8F)' : (st.current ? 'var(--pink)' : 'var(--text-dim)')}">
+                  color:${st.done ? 'var(--green,#1FD47F)' : (st.current ? 'var(--pink)' : 'var(--text-dim)')}">
                   ${st.done ? '\u2713' : st.position}</span>
                 <span style="flex:1;font-size:0.9rem;${st.done ? 'color:var(--text-muted)' : ''}">
                   ${escapeHtml(st.name)}</span>
@@ -1343,9 +1341,9 @@
       else if (activeLayer === 'running') {
         html = shell('Running routes', RUNNING_ROUTES.length, RUNNING_ROUTES.map((rt, i) => `
           <a class="card card-glass run-row" href="running.html"
-             style="display:block;text-decoration:none;color:inherit;margin-bottom:12px;border-left-color:${rt.color || '#43DB8F'}">
+             style="display:block;text-decoration:none;color:inherit;margin-bottom:12px;border-left-color:${rt.color || '#1FD47F'}">
             <div style="display:flex;align-items:baseline;gap:10px">
-              <span style="width:22px;flex-shrink:0;font-weight:800;font-size:0.8rem;color:${rt.color || '#43DB8F'}">${i + 1}</span>
+              <span style="width:22px;flex-shrink:0;font-weight:800;font-size:0.8rem;color:${rt.color || '#1FD47F'}">${i + 1}</span>
               <div style="flex:1;min-width:0">
                 <div style="font-weight:700;font-size:1rem">${escapeHtml(rt.shortName)}</div>
                 <div style="color:var(--text-muted);font-size:0.84rem;line-height:1.5;margin-top:3px">
@@ -1382,7 +1380,7 @@
                           border-top:1px solid var(--border-light)">
                   <div style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:0.92rem">
                     <i class="fa-solid ${r.name.startsWith('Table') ? 'fa-table-tennis-paddle-ball' : 'fa-basketball-ball'}"
-                       style="color:#8FD99A;font-size:0.8rem"></i>
+                       style="color:#1FD47F;font-size:0.8rem"></i>
                     ${escapeHtml(r.name.replace(/ — .*/, ''))}
                   </div>
                   ${r.note ? `<div class="dim" style="font-size:0.78rem;margin-top:3px;margin-left:19px">${escapeHtml(r.note)}</div>` : ''}

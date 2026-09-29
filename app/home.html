@@ -25,13 +25,11 @@
   <meta name="apple-mobile-web-app-title" content="ISOT" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#0C1A4A" />
   <!-- Vercel Web Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <link rel="stylesheet" href="css/app.css" />
@@ -106,8 +104,8 @@
       align-items: center;
       gap: 10px;
       padding: 12px 20px;
-      background: rgba(67, 219, 143, 0.15);
-      border: 1px solid rgba(67, 219, 143, 0.4);
+      background: rgba(31, 212, 127, 0.15);
+      border: 1px solid rgba(31, 212, 127, 0.4);
       border-radius: var(--radius-md);
       margin: 16px 0;
     }
@@ -147,7 +145,7 @@
       margin-left: -8px;
       overflow: hidden;
       flex-shrink: 0;
-      background: #0E0E13;
+      background: #1A2755;
     }
     .avatar-stack-item-box:first-child {
       margin-left: 0;
@@ -179,47 +177,13 @@
       color: #FFF;
     }
     .btn-rsvp.going {
-      background: rgba(67, 219, 143, 0.16);
-      border-color: #43DB8F;
-      color: #43DB8F;
-      box-shadow: 0 0 12px rgba(67, 219, 143, 0.25);
+      background: rgba(31, 212, 127, 0.16);
+      border-color: #1FD47F;
+      color: #1FD47F;
+      box-shadow: none;
     }
 
-    /* Modal Sheet for Attendees Profile Cards */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(11, 15, 25, 0.8);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      z-index: 1000;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease;
-    }
-    .modal-backdrop.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .modal-sheet {
-      width: 100%;
-      max-width: 480px;
-      background: var(--bg-darker);
-      border: 1px solid var(--border-glow);
-      border-bottom: none;
-      border-radius: 28px 28px 0 0;
-      padding: 24px;
-      transform: translateY(100%);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    .modal-backdrop.active .modal-sheet {
-      transform: translateY(0);
-    }
+    /* The attendee sheet uses the shared .modal-backdrop / .modal-sheet in app.css. */
 
     .attendee-card {
       display: flex;
@@ -249,8 +213,8 @@
 
     /* ── Featured one-off night. Revealed by script only while the night is on. ── */
     .featured-night-card {
-      background: linear-gradient(135deg, rgba(212, 90, 232, 0.14) 0%, rgba(36, 54, 115, 0.4) 100%);
-      border: 1px solid rgba(212, 90, 232, 0.45);
+      background: var(--violet-night);
+      border: 1px solid rgba(127, 74, 255, 0.45);
       border-radius: 24px;
       overflow: hidden;
       margin-bottom: 24px;
@@ -277,7 +241,7 @@
       width: 30px; height: 30px; flex-shrink: 0; border-radius: 9px;
       display: inline-flex; align-items: center; justify-content: center;
       line-height: 1; margin: 0; padding: 0;
-      background: rgba(212, 90, 232, 0.15); color: var(--pink); font-size: 0.82rem;
+      background: rgba(127, 74, 255, 0.15); color: var(--pink); font-size: 0.82rem;
     }
   
     /* Today in Turin: weather report, weather advice, GTT strike status */
@@ -305,11 +269,11 @@
       background: rgba(255,255,255,0.05); border: 1px solid var(--border-light);
     }
     .tit-tip i { width: 20px; height: 20px; flex-shrink: 0; font-size: 0.95rem; }
-    .tit-tip-rain, .tit-tip-snow { background: rgba(87,135,234,0.14); border-color: rgba(87,135,234,0.4); }
+    .tit-tip-rain, .tit-tip-snow { background: rgba(61, 123, 255,0.14); border-color: rgba(61, 123, 255,0.4); }
     .tit-tip-rain i, .tit-tip-snow i { color: var(--c-sky-blue); }
     .tit-tip-jacket, .tit-tip-cold { background: rgba(187,193,249,0.10); border-color: rgba(187,193,249,0.32); }
     .tit-tip-jacket i, .tit-tip-cold i { color: var(--c-lavender); }
-    .tit-tip-hot { background: rgba(230,147,33,0.12); border-color: rgba(230,147,33,0.4); }
+    .tit-tip-hot { background: rgba(255, 184, 31,0.12); border-color: rgba(255, 184, 31,0.4); }
     .tit-tip-hot i { color: var(--c-amber); }
     .tit-gtt {
       display: flex; align-items: center; gap: 10px;
@@ -341,10 +305,10 @@
     <div style="display: flex; align-items: center; gap: 12px;">
       <a id="notifBellBtn" href="notifications.html" style="position: relative; cursor: pointer; color: #FFF; font-size: 1.2rem; padding: 4px;" title="Notifications & Invites">
         <i class="fa-solid fa-bell"></i>
-        <span id="notifBellBadge" style="display: none; position: absolute; top: -2px; right: -2px; background: var(--pink); color: #FFF; font-size: 0.65rem; font-weight: 700; border-radius: 10px; min-width: 16px; height: 16px; align-items: center; justify-content: center; padding: 0 4px; border: 1.5px solid var(--bg-dark);">0</span>
+        <span id="notifBellBadge" style="display: none; position: absolute; top: -2px; right: -2px; background: var(--accent); color: var(--on-accent); font-size: 0.65rem; font-weight: 700; border-radius: 10px; min-width: 16px; height: 16px; align-items: center; justify-content: center; padding: 0 4px; border: 1.5px solid var(--bg-dark);">0</span>
       </a>
       <a href="profile.html" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 0.8rem;">My Card <i class="fa-solid fa-qrcode"></i></a>
-      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: #FFF; font-size: 1.3rem; cursor: pointer; padding: 6px 8px; display: flex; align-items: center;">
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: var(--on-accent); font-size: 1.3rem; cursor: pointer; padding: 6px 8px; display: flex; align-items: center;">
         <i class="fa-solid fa-bars"></i>
       </button>
     </div>
@@ -367,7 +331,7 @@
 
         <!-- Live Headcount Counter -->
         <div class="headcount-badge">
-          <i class="fa-solid fa-users-viewfinder" style="font-size: 1.4rem; color: #43DB8F;"></i>
+          <i class="fa-solid fa-users-viewfinder" style="font-size: 1.4rem; color: #1FD47F;"></i>
           <div style="text-align: left;">
             <div style="font-size: 1.4rem; font-weight: 800; color: #FFF; line-height: 1;" id="headcountNum">–</div>
             <div style="font-size: 0.75rem; color: var(--text-muted);">Checked in tonight</div>
@@ -418,7 +382,7 @@
              Tapping through goes to real events, not a hardcoded panel. -->
         <div class="categories-strip">
           <div class="cat-pill-item" onclick="location.href='events.html?cat=karaoke'">
-            <div class="cat-pill-img" style="position:relative; background:#0E0E13;"><img src="../assets/characters/char_karaoke_singer.png" alt="Karaoke Night" style="object-fit:contain; padding:4px;" /></div>
+            <div class="cat-pill-img" style="position:relative; background:#1A2755;"><img src="../assets/characters/char_karaoke_singer.png" alt="Karaoke Night" style="object-fit:contain; padding:4px;" /></div>
             <span class="cat-pill-label">Karaoke Night</span>
           </div>
 
@@ -428,7 +392,7 @@
           </div>
 
           <div class="cat-pill-item" onclick="location.href='events.html?cat=party'">
-            <div class="cat-pill-img" style="position:relative; background:#0E0E13;"><img src="../assets/characters/char_dancer_1.png" alt="Party & Nightlife" style="object-fit:contain; padding:4px;" /></div>
+            <div class="cat-pill-img" style="position:relative; background:#1A2755;"><img src="../assets/characters/char_dancer_1.png" alt="Party & Nightlife" style="object-fit:contain; padding:4px;" /></div>
             <span class="cat-pill-label">Party &amp; Nightlife</span>
           </div>
 
@@ -438,7 +402,7 @@
           </div>
 
           <div class="cat-pill-item" onclick="location.href='events.html?cat=sports'">
-            <div class="cat-pill-img" style="position:relative; background:#0E0E13;"><img src="../assets/characters/char_cat_wizards.png" alt="Sports & Trips" style="object-fit:contain; padding:2px;" /></div>
+            <div class="cat-pill-img" style="position:relative; background:#1A2755;"><img src="../assets/characters/char_cat_wizards.png" alt="Sports & Trips" style="object-fit:contain; padding:2px;" /></div>
             <span class="cat-pill-label">Sports &amp; Trips</span>
           </div>
         </div>
@@ -449,7 +413,7 @@
       <div class="action-grid">
         <a href="profile.html" class="action-tile">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="cat-badge" style="background: rgba(212, 90, 232, 0.15); border-color: var(--pink); color: var(--pink);">
+            <div class="cat-badge" style="background: rgba(127, 74, 255, 0.15); border-color: var(--pink); color: var(--pink);">
               <i class="fa-solid fa-qrcode" style="font-size: 1.2rem;"></i>
             </div>
             <div>
@@ -492,9 +456,9 @@
         <a href="rewards.html" class="action-tile">
           <div style="display: flex; align-items: center; gap: 10px;">
             <div style="width:38px;height:38px;border-radius:10px;flex-shrink:0;
-                        background:rgba(212,175,80,.15);border:1px solid rgba(212,175,80,.35);
+                        background:rgba(255, 184, 31,.15);border:1px solid rgba(255, 184, 31,.35);
                         display:flex;align-items:center;justify-content:center">
-              <i class="fa-solid fa-martini-glass-citrus" style="color:#D4AF50"></i>
+              <i class="fa-solid fa-martini-glass-citrus" style="color:#FFB81F"></i>
             </div>
             <div>
               <div style="font-weight: 700; color: #FFF; font-size: 0.95rem;">The Game</div>
@@ -507,9 +471,9 @@
         <a href="network.html" class="action-tile">
           <div style="display: flex; align-items: center; gap: 10px;">
             <div style="width:38px;height:38px;border-radius:10px;flex-shrink:0;
-                        background:rgba(155,143,212,.15);border:1px solid rgba(155,143,212,.35);
+                        background:rgba(127, 74, 255,.15);border:1px solid rgba(127, 74, 255,.35);
                         display:flex;align-items:center;justify-content:center">
-              <i class="fa-solid fa-user-group" style="color:#9B8FD4"></i>
+              <i class="fa-solid fa-user-group" style="color:#B191FF"></i>
             </div>
             <div>
               <div style="font-weight: 700; color: #FFF; font-size: 0.95rem;">Network</div>
@@ -959,7 +923,7 @@
       if (error) {
         numEl.textContent = '–';
         if (listEl) listEl.innerHTML =
-          `<div class="dim" style="font-size:0.82rem;padding:8px 0;color:#F8A18E">Could not load check-ins: ${escapeHtml(error.message)}</div>`;
+          `<div class="dim" style="font-size:0.82rem;padding:8px 0;color:#FFD8CF">Could not load check-ins: ${escapeHtml(error.message)}</div>`;
         return;
       }
 
@@ -1009,7 +973,7 @@
           </div>
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0;">
-          ${isIOS ? '' : '<button id="installBtn" style="background:var(--pink);color:#fff;border:none;border-radius:20px;padding:7px 16px;font-size:0.82rem;font-weight:700;font-family:inherit;cursor:pointer;">Install</button>'}
+          ${isIOS ? '' : '<button id="installBtn" style="background:var(--accent);color: var(--on-accent);border:none;border-radius:20px;padding:7px 16px;font-size:0.82rem;font-weight:700;font-family:inherit;cursor:pointer;">Install</button>'}
           <button id="installDismiss" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);border:none;border-radius:20px;padding:7px 12px;font-size:0.82rem;font-family:inherit;cursor:pointer;">Not now</button>
         </div>
       `;

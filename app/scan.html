@@ -19,9 +19,7 @@
   <link rel="icon" href="../assets/favicon.png" sizes="48x48" type="image/png" />
   
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <link rel="stylesheet" href="css/app.css" />
@@ -85,14 +83,14 @@
       justify-content: center;
       padding: 30px;
       text-align: center;
-      animation: springUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: resultIn 0.26s var(--ease-out);
     }
     .result-valid {
-      background: rgba(67, 219, 143, 0.96);
+      background: rgba(31, 212, 127, 0.96);
       color: #FFFFFF;
     }
     .result-used {
-      background: rgba(255, 106, 0, 0.96);
+      background: rgba(245, 93, 33, 0.96);
       color: #FFFFFF;
     }
     .result-neutral {
@@ -100,7 +98,7 @@
       color: #FFFFFF;
     }
 
-    @keyframes springUp {
+    @keyframes resultIn {
       from { transform: scale(0.85); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
     }
@@ -113,7 +111,7 @@
       font-family:inherit; font-size:.8rem; font-weight:600;
       background:transparent; border:1px solid rgba(255,255,255,.18); color:var(--text-muted);
       display:inline-flex; align-items:center; justify-content:center; gap:7px; }
-    .smode.on { background:var(--pink); border-color:var(--pink); color:var(--on-accent,#0B0B0F); }
+    .smode.on { background:var(--accent); border-color:var(--pink); color:var(--on-accent,#0E0F14); }
     .scan-event { position:fixed; top:56px; left:0; right:0; z-index:60;
       display:flex; gap:10px; align-items:center; padding:8px 12px;
       background:rgba(0,0,0,.62); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
@@ -122,7 +120,7 @@
     .scan-count { font-size:.82rem; font-weight:700; color:var(--pink);
       font-variant-numeric:tabular-nums; white-space:nowrap; }
     .scan-search { position:fixed; left:0; right:0; bottom:64px; z-index:60;
-      max-height:44vh; overflow-y:auto; background:rgba(10,10,14,.94);
+      max-height:44vh; overflow-y:auto; background:rgba(12, 26, 74,.94);
       backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
       border-top:1px solid rgba(255,255,255,.12); }
     .sres { display:flex; gap:11px; align-items:center; width:100%; text-align:left;
@@ -132,8 +130,8 @@
     .sres .sub { display:block; font-size:.74rem; color:var(--text-dim); margin-top:2px; }
     .sres .tag { margin-left:auto; font-size:.7rem; font-weight:700; padding:3px 9px;
       border-radius:999px; white-space:nowrap; }
-    .sres .tag.in { background:rgba(67,219,143,.16); color:#43DB8F; }
-    .sres .tag.new { background:rgba(212,90,232,.16); color:var(--pink); }
+    .sres .tag.in { background:rgba(31, 212, 127,.16); color:#1FD47F; }
+    .sres .tag.new { background:rgba(127, 74, 255,.16); color:var(--pink); }
   </style>
 </head>
 <body>

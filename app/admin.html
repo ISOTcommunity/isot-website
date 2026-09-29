@@ -7,16 +7,14 @@
   <title>ISOT Admin</title>
 
   <link rel="icon" href="logo.png" type="image/png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/app.css" />
   <style>
     .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr)); gap:10px; }
     .stat { background:var(--bg-card); border:1px solid var(--border-light); border-radius:14px; padding:14px 16px; }
     .stat .n { font-size:1.8rem; font-weight:700; color:#FFF; line-height:1; font-variant-numeric:tabular-nums; }
     .stat .l { font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.07em; margin-top:6px; }
-    .stat.bad  .n { color:#F8A18E; }
+    .stat.bad  .n { color:#FFD8CF; }
     .stat.good .n { color:var(--green); }
 
     .row { display:flex; gap:12px; padding:11px 0; border-bottom:1px solid var(--border-light); align-items:center; }
@@ -27,12 +25,12 @@
     .tag { font-size:0.62rem; text-transform:uppercase; letter-spacing:0.07em; padding:2px 8px;
            border-radius:10px; background:rgba(255,255,255,0.07); color:var(--text-dim); white-space:nowrap; }
     .tag.pink { background:var(--pink-glow); color:#FFF; }
-    .tag.gold { background:rgba(212,175,80,0.18); color:var(--gold); }
+    .tag.gold { background:rgba(255, 184, 31,0.18); color:var(--gold); }
 
     .prob { display:flex; gap:12px; padding:13px 14px; border-radius:12px; margin-bottom:8px; align-items:flex-start; }
-    .prob.critical { background:rgba(243,108,81,0.10); border-left:3px solid #F36C51; }
-    .prob.warning  { background:rgba(212,175,80,0.10); border-left:3px solid var(--gold); }
-    .prob.ok       { background:rgba(67,219,143,0.09); border-left:3px solid var(--green); }
+    .prob.critical { background:rgba(255, 90, 60,0.10); border-left:3px solid #FF5A3C; }
+    .prob.warning  { background:rgba(255, 184, 31,0.10); border-left:3px solid var(--gold); }
+    .prob.ok       { background:rgba(31, 212, 127,0.09); border-left:3px solid var(--green); }
 
     /* Section nav — horizontally scrollable on a phone rather than wrapping to
        three ragged lines. */
@@ -40,7 +38,7 @@
     .nav::-webkit-scrollbar { display:none; }
     .navbtn { padding:7px 15px; border-radius:20px; font-size:0.82rem; cursor:pointer; white-space:nowrap;
               background:transparent; border:1px solid var(--border-light); color:var(--text-muted); font-family:inherit; }
-    .navbtn.on { background:var(--pink); border-color:var(--pink); color:#FFF; font-weight:600; }
+    .navbtn.on { background:var(--accent); border-color:var(--pink); color: var(--on-accent); font-weight:600; }
 
     .sub { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
     .subbtn { padding:5px 12px; border-radius:16px; font-size:0.76rem; cursor:pointer;
@@ -56,7 +54,7 @@
       text-align:center; cursor:pointer; background:var(--bg-darker);
       transition:border-color .15s ease, background .15s ease;
     }
-    .drop:hover, .drop.over { border-color:var(--pink); background:rgba(212,90,232,0.06); }
+    .drop:hover, .drop.over { border-color:var(--pink); background:rgba(127, 74, 255,0.06); }
     .drop i { font-size:1.5rem; color:var(--text-dim); margin-bottom:8px; display:block; }
     .drop .hint { font-size:0.78rem; color:var(--text-dim); }
     .drop img { max-width:190px; width:100%; border-radius:10px; display:block; margin:0 auto 10px; }
@@ -153,7 +151,7 @@
   }
 
   function fail(msg) {
-    return `<div class="prob critical"><i class="fa-solid fa-triangle-exclamation" style="color:#F8A18E;margin-top:3px"></i>
+    return `<div class="prob critical"><i class="fa-solid fa-triangle-exclamation" style="color:#FFD8CF;margin-top:3px"></i>
             <div><b style="color:#FFF">Could not load this</b>
             <div class="dim" style="font-size:0.82rem">${escapeHtml(msg)}</div></div></div>`;
   }
@@ -193,7 +191,7 @@
       html += probs.data.map(p => `
         <div class="prob ${escapeHtml(p.severity)}">
           <i class="fa-solid ${p.severity === 'critical' ? 'fa-triangle-exclamation' : 'fa-circle-exclamation'}"
-             style="margin-top:3px;color:${p.severity === 'critical' ? '#F8A18E' : 'var(--gold)'}"></i>
+             style="margin-top:3px;color:${p.severity === 'critical' ? '#FFD8CF' : 'var(--gold)'}"></i>
           <div><b style="color:#FFF">${escapeHtml(p.problem)}</b>
           <div class="dim" style="font-size:0.82rem">${escapeHtml(p.detail || '')}</div></div>
         </div>`).join('');
@@ -470,8 +468,8 @@ BRAND RULES — these are not suggestions
 
 COLOUR  (black + gold + lavender only, NO teal/green)
   Background      #080808
-  Accent / times  #D4AF50   gold
-  Secondary       #9B8FD4   lavender
+  Accent / times  #FFB81F   gold
+  Secondary       #B191FF   lavender
   Text            #FFFFFF
 
 TYPE
@@ -565,11 +563,11 @@ Motto: "Live globally, connect locally."
     rows.forEach(r => { (byDay[r.activity_date] ||= []).push(r); });
 
     const STATUS = {
-      pending:   ['Waiting for you', '#E8C870'],
+      pending:   ['Waiting for you', '#FFECBD'],
       confirmed: ['Confirmed', 'var(--green)'],
       open:      ['On the ballot', 'var(--pink)'],
       lost:      ['Did not win', 'var(--text-dim)'],
-      hidden:    ['Rejected',  '#F36C51'],
+      hidden:    ['Rejected',  '#FF5A3C'],
     };
 
     // Anything waiting on the board goes to the top, ahead of the day grouping: it is a
@@ -578,7 +576,7 @@ Motto: "Live globally, connect locally."
     const queueHtml = waiting.length ? `
       <div style="border:1px solid rgba(232,200,112,.4);background:rgba(232,200,112,.07);
                   border-radius:16px;padding:14px 16px;margin-bottom:22px">
-        <div class="eyebrow" style="color:#E8C870;margin-bottom:10px">
+        <div class="eyebrow" style="color:#FFECBD;margin-bottom:10px">
           <i class="fa-solid fa-hourglass-half"></i>
           ${waiting.length} waiting for approval
         </div>
@@ -591,7 +589,7 @@ Motto: "Live globally, connect locally."
               ${escapeHtml(d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',timeZone:'UTC'}))}
               · ${String(r.start_time).slice(0,5)}
               ${r.place_name ? ' · ' + escapeHtml(r.place_name) : ''}
-              ${r.is_pinned ? ' · <span style="color:#E8C870">dropped pin</span>' : ''}
+              ${r.is_pinned ? ' · <span style="color:#FFECBD">dropped pin</span>' : ''}
             </div>
             <div class="dim" style="font-size:0.72rem;margin-top:2px">
               by ${escapeHtml(r.proposer_name || 'Unknown')}</div>
@@ -630,7 +628,7 @@ Motto: "Live globally, connect locally."
                     <div class="dim" style="font-size:0.75rem;margin-top:3px">
                       ${String(r.start_time).slice(0,5)}
                       ${r.place_name ? ' · ' + escapeHtml(r.place_name) : ''}
-                      ${r.is_pinned ? ' · <span style="color:#E8C870">dropped pin</span>' : ''}
+                      ${r.is_pinned ? ' · <span style="color:#FFECBD">dropped pin</span>' : ''}
                     </div>
                     <div class="dim" style="font-size:0.72rem;margin-top:2px">
                       by ${escapeHtml(r.proposer_name || 'Unknown')}
@@ -742,7 +740,7 @@ Motto: "Live globally, connect locally."
       if (feedView === 'signups') return `
         <div class="row"><div class="when">${escapeHtml(ago(r.at))}</div>
         <div class="grow"><b>${escapeHtml(r.email || '—')}</b> · ${escapeHtml(r.outcome)}
-        ${r.detail ? `<div style="color:#F8A18E;font-size:0.78rem">${escapeHtml(r.detail)}</div>` : ''}</div>
+        ${r.detail ? `<div style="color:#FFD8CF;font-size:0.78rem">${escapeHtml(r.detail)}</div>` : ''}</div>
         <span class="tag${r.outcome === 'failed' ? '' : ''}">${escapeHtml(r.source)}</span></div>`;
 
       return `

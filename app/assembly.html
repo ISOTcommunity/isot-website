@@ -19,9 +19,7 @@
   <link rel="icon" href="../assets/favicon.png" sizes="48x48" type="image/png" />
   
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <link rel="stylesheet" href="css/app.css" />
@@ -58,7 +56,7 @@
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
         <button onclick="vote('favor')" class="btn btn-pink" style="background: var(--green);"><i class="fa-solid fa-thumbs-up"></i> In Favor</button>
-        <button onclick="vote('against')" class="btn btn-outline" style="color: var(--red); border-color: rgba(243,108,81,0.4);"><i class="fa-solid fa-thumbs-down"></i> Against</button>
+        <button onclick="vote('against')" class="btn btn-outline" style="color: var(--red); border-color: rgba(255, 90, 60,0.4);"><i class="fa-solid fa-thumbs-down"></i> Against</button>
       </div>
     </div>
 
