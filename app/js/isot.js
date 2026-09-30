@@ -857,6 +857,10 @@ function initBurgerMenu(profile) {
         <i class="fa-solid fa-compass"></i>
         <span>Explore</span>
       </a>
+      <a href="budget.html" class="drawer-item" data-newdot="budget">
+        <i class="fa-solid fa-wallet"></i>
+        <span>Budget Builder</span>
+      </a>
       <a href="turin-events.html" class="drawer-item" data-newdot="bigturin">
         <i class="fa-solid fa-city"></i>
         <span>Big in Turin</span>
@@ -886,10 +890,6 @@ function initBurgerMenu(profile) {
       <a href="partner.html" class="drawer-item">
         <i class="fa-solid fa-map-location-dot"></i>
         <span>Map</span>
-      </a>
-      <a href="budget.html" class="drawer-item" data-newdot="budget">
-        <i class="fa-solid fa-wallet"></i>
-        <span>Budget Builder</span>
       </a>
       <a href="../blog.html" class="drawer-item">
         <i class="fa-solid fa-book-open"></i>
