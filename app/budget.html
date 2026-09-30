@@ -101,6 +101,22 @@
     .tip:first-of-type { border-top: none; }
     .tip i { color: var(--gold); margin-top: 3px; }
     .tip a { color: var(--c-sky-blue); }
+    .ai-steps { margin: 0 0 12px; padding-left: 20px; font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; }
+    .ai-steps li { margin-bottom: 4px; }
+    .ai-box {
+      width: 100%; box-sizing: border-box; min-height: 110px; resize: vertical;
+      background: var(--bg-darker); color: var(--text-main);
+      border: 1px solid var(--border-light); border-radius: 14px;
+      padding: 12px; font: 0.8rem/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .ai-box:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .ai-privacy { font-size: 0.74rem; color: var(--text-dim); line-height: 1.5; background: rgba(255, 184, 31, 0.08);
+      border: 1px solid rgba(255, 184, 31, 0.25); border-radius: 12px; padding: 10px 12px; margin: 0 0 12px; }
+    .ai-msg { font-size: 0.8rem; margin: 8px 0 0; line-height: 1.45; }
+    .ai-preview { margin-top: 12px; }
+    .ai-preview table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .ai-preview td { padding: 6px 2px; border-top: 1px solid var(--border-light); }
+    .ai-preview td:last-child { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
     .disclaimer { font-size: 0.72rem; color: var(--text-dim); line-height: 1.5; text-align: center; margin: 4px 8px 20px; }
   </style>
 </head>
@@ -132,6 +148,23 @@
         Your numbers stay on this phone only.
       </p>
     </div>
+
+    <!-- Fill with AI -->
+    <section class="b-card">
+      <h2><i class="fa-solid fa-wand-magic-sparkles"></i> Fill it in with AI</h2>
+      <p class="b-hint">Let ChatGPT, Gemini or Claude read your bank statement and fill this page for you.</p>
+      <ol class="ai-steps">
+        <li>Tap <strong>Copy prompt</strong>.</li>
+        <li>Open your AI app, paste the prompt and attach your bank statement (PDF, CSV or screenshots). Revolut: Account → Statement.</li>
+        <li>Copy the AI's whole answer and paste it below.</li>
+      </ol>
+      <p class="ai-privacy"><i class="fa-solid fa-shield-halved"></i> Your statement goes to the AI company you choose, not to ISOT. Cover your name and IBAN first if you like. ISOT never sees your bank data; the result stays on this phone.</p>
+      <button type="button" class="btn btn-pink" id="aiCopy" style="width:100%;justify-content:center;margin-bottom:12px"><i class="fa-solid fa-copy"></i> Copy prompt</button>
+      <textarea class="ai-box" id="aiPaste" placeholder="Paste the AI's answer here…" aria-label="Paste the AI's answer"></textarea>
+      <button type="button" class="btn btn-secondary" id="aiRead" style="width:100%;justify-content:center;margin-top:10px">Check the answer</button>
+      <div class="ai-msg" id="aiMsg" role="status"></div>
+      <div class="ai-preview" id="aiPreview" hidden></div>
+    </section>
 
     <!-- Money in -->
     <section class="b-card">
@@ -349,6 +382,117 @@
         </div>`;
     }
 
+    // ── Fill with AI: prompt out, JSON back ──────────────────────────────────
+    const AI_FIELDS = {
+      family: 'Money from family',
+      job: 'Salary from a job (after tax)',
+      otherIn: 'Any other income: grants, freelance, refunds from uni',
+      rent: 'Rent or dorm fee',
+      bills: 'Electricity, gas, wifi, condo fees',
+      food: 'Supermarkets (Esselunga, Carrefour, Lidl, Pam, Coop, Conad...), bakeries, canteen/mensa',
+      transport: 'GTT, metro, trains (Trenitalia, Italo), bike or scooter sharing, taxis. Spread a yearly pass over 12 months',
+      phone: 'Phone and internet plans (Iliad, Ho., WindTre, TIM, Vodafone...)',
+      health: 'Pharmacy, doctors, health insurance, SSN registration (spread yearly costs over 12 months)',
+      permesso: 'Permesso di soggiorno, post office kit, marca da bollo, Questura fees (spread over 12 months)',
+      fees: 'University tuition fees (spread over 12 months)',
+      study: 'Books, printing, stationery, laptop and study software',
+      flights: 'Flights and long trips home (Ryanair, Wizz, ITA, easyJet...), spread over 12 months',
+      fun: 'Bars, restaurants, delivery (Glovo, Deliveroo, Just Eat), nights out, cinema, shopping, subscriptions (Spotify, Netflix)',
+      save: 'Money moved into savings or investments (Revolut vaults, savings accounts, trading apps)',
+    };
+    const AI_PROMPT = `You are helping an international student in Turin, Italy, build a monthly budget.
+
+I have attached my bank statement(s). Read every transaction and work out my AVERAGE PER MONTH in euros for each category below, over the whole period the statements cover.
+
+Rules:
+- Ignore top-ups, transfers between my own accounts, currency exchanges and card refunds: they are not income or spending.
+- If money arrives from a person or account that looks like family, count it as "family".
+- If something is paid once a year (GTT yearly pass, permesso, insurance, tuition), divide it by 12.
+- If an amount is in another currency, convert it to euros at a normal rate.
+- If you are not sure where something goes, put it in the closest category and mention it in "notes".
+- If I receive the EDISU scholarship, put the full YEARLY amount in "edisu_year" (not in "otherIn").
+- Round to whole euros. Use 0 for anything that does not appear.
+
+Categories:
+${Object.entries(AI_FIELDS).map(([k, v]) => `- ${k}: ${v}`).join('\n')}
+- edisu_year: EDISU scholarship, full amount per year
+
+Reply with ONLY this JSON inside one code block, no other text:
+\`\`\`json
+{
+  "months_covered": 0,
+  ${[...Object.keys(AI_FIELDS), 'edisu_year'].map(k => `"${k}": 0`).join(',\n  ')},
+  "notes": "short notes on anything unclear"
+}
+\`\`\``;
+
+    let aiParsed = null;
+
+    function parseAiAnswer(text) {
+      const m = text.match(/\{[\s\S]*\}/);
+      if (!m) throw new Error('No data block found. Paste the whole answer, including the part between { and }.');
+      let obj;
+      try { obj = JSON.parse(m[0].replace(/,\s*([}\]])/g, '$1')); }
+      catch (_) { throw new Error('The answer is not in the right format. Ask the AI: "Reply with only the JSON block, please."'); }
+      const out = {};
+      for (const k of [...Object.keys(AI_FIELDS), 'edisu_year']) {
+        const v = Number(String(obj[k] ?? 0).replace(/[^0-9.\-]/g, ''));
+        if (!Number.isFinite(v) || v < 0 || v > 200000) throw new Error(`"${k}" doesn't look like a real amount (${obj[k]}).`);
+        out[k] = Math.round(v);
+      }
+      out.months = Number(obj.months_covered) || null;
+      out.notes = typeof obj.notes === 'string' ? obj.notes.slice(0, 500) : '';
+      return out;
+    }
+
+    function labelFor(k) {
+      if (k === 'edisu_year') return 'EDISU scholarship (per year)';
+      const item = [...INCOME, ...COSTS].find(i => i.id === k);
+      return item ? item.label : k;
+    }
+
+    function showAiPreview(d) {
+      const rows = [...Object.keys(AI_FIELDS), 'edisu_year'].filter(k => d[k] > 0)
+        .map(k => `<tr><td>${escapeHtml(labelFor(k))}</td><td>${eur(d[k])}${k === 'edisu_year' ? ' / yr' : ' / mo'}</td></tr>`).join('');
+      $('aiPreview').innerHTML = `
+        <div style="font-size:0.84rem;font-weight:700;margin-bottom:4px">Here's what the AI found${d.months ? ` (${d.months} month${d.months > 1 ? 's' : ''} of statements)` : ''}:</div>
+        <table>${rows || '<tr><td>Nothing found</td><td></td></tr>'}</table>
+        ${d.notes ? `<p class="rule-note" style="margin-top:8px"><strong>AI notes:</strong> ${escapeHtml(d.notes)}</p>` : ''}
+        <p class="rule-note" style="margin-top:8px">Check the numbers: AIs make mistakes. Applying replaces what's on this page; you can still edit any line after.</p>
+        <button type="button" class="btn btn-pink" id="aiApply" style="width:100%;justify-content:center;margin-top:10px"><i class="fa-solid fa-check"></i> Apply to my budget</button>`;
+      $('aiPreview').hidden = false;
+      $('aiApply').addEventListener('click', applyAi);
+    }
+
+    function applyAi() {
+      if (!aiParsed) return;
+      for (const k of Object.keys(AI_FIELDS)) {
+        $('v_' + k).value = aiParsed[k] || '';
+        $('p_' + k).value = 'month';
+      }
+      if (aiParsed.edisu_year > 0) {
+        $('hasEdisu').checked = true;
+        $('edisuYear').value = aiParsed.edisu_year;
+        if (!$('edisuMonths').value) $('edisuMonths').value = 12;
+      }
+      render();
+      $('aiPreview').hidden = true;
+      $('aiPaste').value = '';
+      $('aiMsg').innerHTML = '<span class="ok"><i class="fa-solid fa-circle-check"></i> Done. Scroll down to see your month.</span>';
+      document.querySelector('[aria-live="polite"]').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    async function copyPrompt() {
+      try {
+        await navigator.clipboard.writeText(AI_PROMPT);
+      } catch (_) {
+        const ta = document.createElement('textarea');
+        ta.value = AI_PROMPT; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+      }
+      $('aiMsg').innerHTML = '<span class="ok"><i class="fa-solid fa-circle-check"></i> Prompt copied. Paste it into your AI app with your statement.</span>';
+    }
+
     function render() {
       const hasEdisu = $('hasEdisu').checked;
       $('edisuBox').hidden = !hasEdisu;
@@ -454,6 +598,18 @@
       $('incomeRows').innerHTML = INCOME.map(rowHtml).join('');
       $('costRows').innerHTML = COSTS.map(rowHtml).join('');
       load();
+      $('aiCopy').addEventListener('click', copyPrompt);
+      $('aiRead').addEventListener('click', () => {
+        $('aiPreview').hidden = true;
+        try {
+          aiParsed = parseAiAnswer($('aiPaste').value);
+          $('aiMsg').textContent = '';
+          showAiPreview(aiParsed);
+        } catch (e) {
+          aiParsed = null;
+          $('aiMsg').innerHTML = `<span class="bad"><i class="fa-solid fa-triangle-exclamation"></i> ${escapeHtml(e.message)}</span>`;
+        }
+      });
       document.querySelector('main').addEventListener('input', render);
       document.querySelector('main').addEventListener('change', render);
       $('housingType').addEventListener('change', () => {
