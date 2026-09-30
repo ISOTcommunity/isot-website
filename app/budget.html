@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-N2S3FL84RT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-N2S3FL84RT');
+</script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Budget Builder · ISOT Community</title>
+
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="../assets/favicon.png" sizes="48x48" type="image/png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-title" content="ISOT" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0C1A4A" />
+  <script defer src="/_vercel/insights/script.js"></script>
+
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/app.css" />
+
+  <style>
+    .b-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 22px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .b-card h2 { font-size: 1.05rem; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+    .b-card h2 i { color: var(--pink); font-size: 0.95rem; }
+    .b-hint { font-size: 0.78rem; color: var(--text-dim); line-height: 1.45; margin: 0 0 12px; }
+
+    .row {
+      display: grid; grid-template-columns: 1fr 108px 78px; gap: 8px; align-items: center;
+      padding: 8px 0; border-top: 1px solid var(--border-light);
+    }
+    .row:first-of-type { border-top: none; }
+    .row label { font-size: 0.86rem; color: var(--text-main); line-height: 1.3; }
+    .row label small { display: block; font-size: 0.7rem; color: var(--text-dim); margin-top: 2px; }
+    .money {
+      position: relative;
+    }
+    .money span { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 0.85rem; pointer-events: none; }
+    .money input, .row select, .field select {
+      width: 100%; box-sizing: border-box;
+      background: var(--bg-darker); color: var(--text-main);
+      border: 1px solid var(--border-light); border-radius: 12px;
+      padding: 10px 8px 10px 24px; font: inherit; font-size: 0.9rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .row select, .field select { padding-left: 8px; font-size: 0.8rem; }
+    .money input:focus, .row select:focus, .field select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+    .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--border-light); }
+    .toggle .t-text { font-size: 0.86rem; }
+    .toggle .t-text small { display: block; font-size: 0.72rem; color: var(--text-dim); margin-top: 2px; }
+    .switch { position: relative; width: 48px; height: 28px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .switch .knob { position: absolute; inset: 0; border-radius: 999px; background: var(--bg-raised); transition: background .2s; cursor: pointer; }
+    .switch .knob::after { content: ''; position: absolute; left: 3px; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: transform .2s; }
+    .switch input:checked + .knob { background: var(--accent); }
+    .switch input:checked + .knob::after { transform: translateX(20px); }
+    .switch input:focus-visible + .knob { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .field { margin: 6px 0 4px; }
+    .field label { display: block; font-size: 0.78rem; color: var(--text-dim); margin-bottom: 6px; }
+
+    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+    .sum-box { background: var(--bg-darker); border-radius: 16px; padding: 12px 10px; text-align: center; }
+    .sum-box .v { font-size: 1.15rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .sum-box .l { font-size: 0.66rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 3px; font-weight: 700; }
+
+    .stack { display: flex; height: 16px; border-radius: 999px; overflow: hidden; background: var(--bg-darker); margin: 4px 0 8px; }
+    .stack div { height: 100%; }
+    .legend { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; }
+    .legend span { display: inline-flex; align-items: center; gap: 5px; }
+    .legend i { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
+
+    .rule { padding: 12px 0; border-top: 1px solid var(--border-light); }
+    .rule:first-of-type { border-top: none; }
+    .rule-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+    .rule-name { font-size: 0.9rem; font-weight: 700; }
+    .rule-val { font-size: 0.9rem; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .bar { position: relative; height: 10px; border-radius: 999px; background: var(--bg-darker); margin: 8px 0 6px; overflow: hidden; }
+    .bar .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; }
+    .bar .band { position: absolute; top: 0; bottom: 0; background: rgba(31, 212, 127, 0.22); border-left: 2px solid var(--green); border-right: 2px solid var(--green); }
+    .rule-note { font-size: 0.76rem; color: var(--text-dim); line-height: 1.45; }
+    .ok { color: var(--green); } .warn { color: var(--gold); } .bad { color: var(--red); }
+
+    .big-num { font-size: 1.6rem; font-weight: 800; font-variant-numeric: tabular-nums; margin: 4px 0; }
+    .tip { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid var(--border-light); font-size: 0.82rem; line-height: 1.45; color: var(--text-muted); }
+    .tip:first-of-type { border-top: none; }
+    .tip i { color: var(--gold); margin-top: 3px; }
+    .tip a { color: var(--c-sky-blue); }
+    .disclaimer { font-size: 0.72rem; color: var(--text-dim); line-height: 1.5; text-align: center; margin: 4px 8px 20px; }
+  </style>
+</head>
+<body class="tone-violet">
+
+  <div id="gate"><div class="spinner"></div></div>
+
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display:flex;align-items:center;gap:8px">
+      <i class="fa-solid fa-wallet text-pink"></i>
+      <span>Budget</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div id="headerAvatar" style="cursor:pointer" data-open-drawer></div>
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background:transparent;border:none;color:#FFF;font-size:1.3rem;cursor:pointer;padding:6px">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="shell" style="padding-top:18px;padding-bottom:96px">
+
+    <div style="margin-bottom: 16px;">
+      <div class="eyebrow">Student money in Turin</div>
+      <h1 style="font-size: 1.75rem; margin-top: 4px;">Budget Builder</h1>
+      <p style="color: var(--text-dim); font-size: 0.88rem; margin-top: 4px;">
+        Put in what comes in and what goes out. You get a monthly plan checked against simple rules,
+        adjusted for students: EDISU, dorms, the GTT pass, the permesso and flights home.
+        Your numbers stay on this phone only.
+      </p>
+    </div>
+
+    <!-- Money in -->
+    <section class="b-card">
+      <h2><i class="fa-solid fa-arrow-down"></i> Money in</h2>
+      <p class="b-hint">What actually reaches your account, after tax. Pick "per year" for anything paid once or twice a year.</p>
+      <div id="incomeRows"></div>
+
+      <div class="toggle">
+        <div class="t-text">I have the EDISU scholarship
+          <small>Enter the full yearly amount. The app spreads it over the months it has to cover.</small>
+        </div>
+        <label class="switch"><input type="checkbox" id="hasEdisu"><span class="knob"></span></label>
+      </div>
+      <div id="edisuBox" hidden>
+        <div class="row">
+          <label>EDISU scholarship<small>Yearly amount on your notice</small></label>
+          <div class="money"><span>€</span><input type="number" inputmode="decimal" min="0" id="edisuYear" placeholder="0"></div>
+          <div style="font-size:0.75rem;color:var(--text-dim)">per year</div>
+        </div>
+        <div class="row">
+          <label>Months it has to last<small>Usually the academic year</small></label>
+          <div class="money"><span>#</span><input type="number" inputmode="numeric" min="1" max="12" id="edisuMonths" placeholder="12"></div>
+          <div></div>
+        </div>
+        <div class="toggle">
+          <div class="t-text">I live in an EDISU residence
+            <small>The dorm fee is often taken out of the scholarship. Put the dorm fee under Housing either way; the maths is the same.</small>
+          </div>
+          <label class="switch"><input type="checkbox" id="edisuDorm"><span class="knob"></span></label>
+        </div>
+        <div class="toggle">
+          <div class="t-text">I get EDISU canteen meals
+            <small>If your meals are covered or cheap, your food line can be much lower.</small>
+          </div>
+          <label class="switch"><input type="checkbox" id="edisuMeals"><span class="knob"></span></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Money out -->
+    <section class="b-card">
+      <h2><i class="fa-solid fa-arrow-up"></i> Money out</h2>
+      <div class="field">
+        <label for="housingType">Where do you live?</label>
+        <select id="housingType">
+          <option value="shared">Shared flat, own room</option>
+          <option value="edisu">EDISU residence</option>
+          <option value="studio">Studio / own flat</option>
+          <option value="family">With family or friends</option>
+        </select>
+      </div>
+      <p class="b-hint" style="margin-top:10px">Essentials first, then the rest. Leave anything you don't pay at 0.</p>
+      <div id="costRows"></div>
+    </section>
+
+    <!-- Results -->
+    <section class="b-card" aria-live="polite">
+      <h2><i class="fa-solid fa-chart-simple"></i> Your month</h2>
+      <div class="summary">
+        <div class="sum-box"><div class="v" id="sIn">€0</div><div class="l">In</div></div>
+        <div class="sum-box"><div class="v" id="sOut">€0</div><div class="l">Out</div></div>
+        <div class="sum-box"><div class="v" id="sLeft">€0</div><div class="l">Left</div></div>
+      </div>
+      <div class="stack" id="stack"></div>
+      <div class="legend" id="legend"></div>
+    </section>
+
+    <section class="b-card">
+      <h2><i class="fa-solid fa-list-check"></i> The rules</h2>
+      <p class="b-hint">Starting points, not laws. The green band is the target.</p>
+      <div id="rules"></div>
+    </section>
+
+    <section class="b-card">
+      <h2><i class="fa-solid fa-life-ring"></i> Emergency fund</h2>
+      <p class="b-hint">3 to 6 months of essentials, kept somewhere safe and easy to reach, plus a ticket home in case you ever need it fast.</p>
+      <div class="big-num" id="efRange">€0</div>
+      <div class="row" style="grid-template-columns:1fr 108px">
+        <label>Already saved<small>Money you could reach this week</small></label>
+        <div class="money"><span>€</span><input type="number" inputmode="decimal" min="0" id="efSaved" placeholder="0"></div>
+      </div>
+      <div class="bar"><div class="fill" id="efFill" style="background:var(--green)"></div></div>
+      <div class="rule-note" id="efNote"></div>
+    </section>
+
+    <section class="b-card">
+      <h2><i class="fa-solid fa-flag-checkered"></i> Your freedom number</h2>
+      <p class="b-hint">Monthly spending × 300. Invested, that sum could cover this lifestyle for good. The point is that <strong>spending</strong>, not income, sets it: every euro you don't need to spend brings it closer.</p>
+      <div class="big-num" id="freedom">€0</div>
+      <div class="rule-note" id="freedomNote"></div>
+    </section>
+
+    <section class="b-card">
+      <h2><i class="fa-solid fa-lightbulb"></i> Tips for you</h2>
+      <div id="tips"></div>
+    </section>
+
+    <div style="display:flex;gap:10px;margin-bottom:14px">
+      <button type="button" class="btn btn-secondary" id="resetBtn" style="flex:1;justify-content:center">Start over</button>
+    </div>
+    <p class="disclaimer">A planning tool, not financial advice. Check real prices and your EDISU notice before you rely on any number.</p>
+  </main>
+
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="tabbar">
+    <a href="home.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </a>
+    <a href="events.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Calendar
+    </a>
+    <a href="partner.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+      Map
+    </a>
+    <a href="rewards.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+      Game
+    </a>
+    <a href="running.html" class="tab-item">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      Run
+    </a>
+  </nav>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+
+  <script>
+    // group: which rule bucket a line counts towards
+    const INCOME = [
+      { id: 'family', label: 'Family support', hint: 'What arrives from home', per: 'month' },
+      { id: 'job', label: 'Part-time job', hint: 'After tax', per: 'month' },
+      { id: 'otherIn', label: 'Other scholarship or income', hint: 'Uni grants, freelance, anything else', per: 'month' },
+    ];
+    const COSTS = [
+      { id: 'rent', label: 'Rent or dorm fee', hint: 'Your share only', per: 'month', group: 'housing' },
+      { id: 'bills', label: 'Bills', hint: 'Electricity, gas, wifi, condo fees', per: 'month', group: 'housing' },
+      { id: 'food', label: 'Groceries & canteen', hint: 'Mensa, supermarket', per: 'month', group: 'essential' },
+      { id: 'transport', label: 'GTT pass & transport', hint: 'The student pass is yearly: pick "per year"', per: 'year', group: 'essential' },
+      { id: 'phone', label: 'Phone & internet', hint: 'Italian SIM plan', per: 'month', group: 'essential' },
+      { id: 'health', label: 'Health cover', hint: 'SSN registration or private insurance', per: 'year', group: 'essential' },
+      { id: 'permesso', label: 'Permesso di soggiorno', hint: 'Renewal fees and stamps', per: 'year', group: 'essential' },
+      { id: 'fees', label: 'University fees', hint: '0 if EDISU exempts you', per: 'year', group: 'essential' },
+      { id: 'study', label: 'Books & study', hint: 'Books, printing, laptop fund', per: 'month', group: 'essential' },
+      { id: 'flights', label: 'Flights home', hint: 'Trips home in a year', per: 'year', group: 'other' },
+      { id: 'fun', label: 'Fun money', hint: 'Nights out, trips, eating out', per: 'month', group: 'fun' },
+      { id: 'save', label: 'Saving & investing', hint: 'Set aside every month', per: 'month', group: 'save' },
+    ];
+    const GROUPS = {
+      housing:   { label: 'Housing',    color: '#3D7BFF' },
+      essential: { label: 'Essentials', color: '#1FD47F' },
+      other:     { label: 'Flights',    color: '#FF5A3C' },
+      fun:       { label: 'Fun',        color: '#FFB81F' },
+      save:      { label: 'Saving',     color: '#B191FF' },
+    };
+    const KEY = 'isot-budget-v1';
+
+    const $ = id => document.getElementById(id);
+    const eur = n => (n < 0 ? '−' : '') + '€' + Math.round(Math.abs(n)).toLocaleString('en-GB');
+    const pct = (a, b) => b > 0 ? a / b * 100 : 0;
+
+    function rowHtml(item) {
+      return `
+        <div class="row">
+          <label for="v_${item.id}">${item.label}<small>${item.hint}</small></label>
+          <div class="money"><span>€</span><input type="number" inputmode="decimal" min="0" id="v_${item.id}" placeholder="0"></div>
+          <select id="p_${item.id}" aria-label="${item.label}: per month or per year">
+            <option value="month"${item.per === 'month' ? ' selected' : ''}>/ month</option>
+            <option value="year"${item.per === 'year' ? ' selected' : ''}>/ year</option>
+          </select>
+        </div>`;
+    }
+
+    function monthly(id) {
+      const v = parseFloat($('v_' + id).value) || 0;
+      return $('p_' + id).value === 'year' ? v / 12 : v;
+    }
+
+    function readState() {
+      const st = { v: {}, p: {} };
+      [...INCOME, ...COSTS].forEach(i => { st.v[i.id] = $('v_' + i.id).value; st.p[i.id] = $('p_' + i.id).value; });
+      ['edisuYear', 'edisuMonths', 'efSaved'].forEach(id => { st[id] = $(id).value; });
+      ['hasEdisu', 'edisuDorm', 'edisuMeals'].forEach(id => { st[id] = $(id).checked; });
+      st.housingType = $('housingType').value;
+      return st;
+    }
+    function save() { try { localStorage.setItem(KEY, JSON.stringify(readState())); } catch (_) {} }
+    function load() {
+      let st = null;
+      try { st = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (_) {}
+      if (!st) return;
+      [...INCOME, ...COSTS].forEach(i => {
+        if (st.v && st.v[i.id] != null) $('v_' + i.id).value = st.v[i.id];
+        if (st.p && st.p[i.id]) $('p_' + i.id).value = st.p[i.id];
+      });
+      ['edisuYear', 'edisuMonths', 'efSaved'].forEach(id => { if (st[id] != null) $(id).value = st[id]; });
+      ['hasEdisu', 'edisuDorm', 'edisuMeals'].forEach(id => { $(id).checked = !!st[id]; });
+      if (st.housingType) $('housingType').value = st.housingType;
+    }
+
+    function ruleHtml({ name, value, valueText, bandFrom, bandTo, max, status, note }) {
+      const scale = v => Math.max(0, Math.min(100, v / max * 100));
+      const col = status === 'ok' ? 'var(--green)' : status === 'warn' ? 'var(--gold)' : 'var(--red)';
+      return `
+        <div class="rule">
+          <div class="rule-top"><span class="rule-name">${name}</span><span class="rule-val ${status}">${valueText}</span></div>
+          <div class="bar">
+            <div class="band" style="left:${scale(bandFrom)}%;width:${scale(bandTo) - scale(bandFrom)}%"></div>
+            <div class="fill" style="width:${scale(value)}%;background:${col};opacity:.85"></div>
+          </div>
+          <div class="rule-note">${note}</div>
+        </div>`;
+    }
+
+    function render() {
+      const hasEdisu = $('hasEdisu').checked;
+      $('edisuBox').hidden = !hasEdisu;
+      const edisuMonths = Math.min(12, Math.max(1, parseInt($('edisuMonths').value, 10) || 12));
+      const edisuMonthly = hasEdisu ? (parseFloat($('edisuYear').value) || 0) / edisuMonths : 0;
+
+      const income = INCOME.reduce((s, i) => s + monthly(i.id), 0) + edisuMonthly;
+      const byGroup = { housing: 0, essential: 0, other: 0, fun: 0, save: 0 };
+      COSTS.forEach(c => { byGroup[c.group] += monthly(c.id); });
+      const spending = byGroup.housing + byGroup.essential + byGroup.other + byGroup.fun;   // saving is not spending
+      const out = spending + byGroup.save;
+      const left = income - out;
+      const essentials = byGroup.housing + byGroup.essential;
+
+      $('sIn').textContent = eur(income);
+      $('sOut').textContent = eur(out);
+      $('sLeft').textContent = eur(left);
+      $('sLeft').className = 'v ' + (left < 0 ? 'bad' : left < income * 0.03 ? 'warn' : 'ok');
+
+      // stacked bar of where the money goes (share of income, or of spending if over)
+      const base = Math.max(income, out) || 1;
+      $('stack').innerHTML = Object.entries(byGroup).filter(([, v]) => v > 0)
+        .map(([g, v]) => `<div style="width:${v / base * 100}%;background:${GROUPS[g].color}" title="${GROUPS[g].label}"></div>`).join('');
+      $('legend').innerHTML = Object.entries(byGroup).filter(([, v]) => v > 0)
+        .map(([g, v]) => `<span><i style="background:${GROUPS[g].color}"></i>${GROUPS[g].label} ${eur(v)}</span>`).join('');
+
+      // rules
+      const rules = [];
+      if (income > 0) {
+        const h = pct(byGroup.housing, income);
+        rules.push(ruleHtml({
+          name: 'Housing ≈ 30–35%', value: h, valueText: `${Math.round(h)}% · ${eur(byGroup.housing)}`, bandFrom: 0, bandTo: 35, max: 70,
+          status: h <= 35 ? 'ok' : h <= 45 ? 'warn' : 'bad',
+          note: h <= 35 ? `Good. Your housing target is up to ${eur(income * 0.35)} a month.`
+            : `Target is ${eur(income * 0.30)}–${eur(income * 0.35)}. A shared room, an EDISU residence or a room further out on a metro or tram line usually brings it down.`
+        }));
+        const e = pct(essentials, income);
+        rules.push(ruleHtml({
+          name: 'Essentials ≈ 50%', value: e, valueText: `${Math.round(e)}% · ${eur(essentials)}`, bandFrom: 0, bandTo: 50, max: 100,
+          status: e <= 55 ? 'ok' : e <= 70 ? 'warn' : 'bad',
+          note: e <= 55 ? 'Rent, food, transport, bills and insurance are under control.'
+            : 'On a student income this often lands at 60–70%. That can be fine for now; the fixes are housing and food, where the big numbers are.'
+        }));
+        const f = pct(byGroup.fun, income);
+        rules.push(ruleHtml({
+          name: 'Fun money 5–10%', value: f, valueText: `${Math.round(f)}% · ${eur(byGroup.fun)}`, bandFrom: 5, bandTo: 10, max: 25,
+          status: f >= 5 && f <= 10 ? 'ok' : f <= 15 ? 'warn' : 'bad',
+          note: f < 5 ? `Guilt-free is allowed: up to ${eur(income * 0.10)} a month. Decide the amount before you spend it.`
+            : f <= 10 ? 'Decided in advance, spent without guilt. That\'s the trick.'
+            : `Try to cap it at ${eur(income * 0.10)}. Your ISOT card gets you discounts at partner bars, so the same nights cost less.`
+        }));
+        const s = pct(byGroup.save, income);
+        const step = s < 5 ? 5 : s < 10 ? 10 : 20;
+        rules.push(ruleHtml({
+          name: 'Save & invest: 5% → 10% → 20%', value: s, valueText: `${Math.round(s)}% · ${eur(byGroup.save)}`, bandFrom: 10, bandTo: 20, max: 30,
+          status: s >= 10 ? 'ok' : s >= 5 ? 'warn' : 'bad',
+          note: s >= 20 ? 'Excellent. 20% is a strong goal and you\'re there.'
+            : `Next step: ${step}%, which is ${eur(income * step / 100)} a month. The habit matters more than the number.`
+        }));
+      }
+      $('rules').innerHTML = rules.length ? rules.join('')
+        : '<p class="rule-note">Add what comes in each month to see the checks.</p>';
+
+      // emergency fund: 3–6 months of essentials, plus a flight home
+      const flightBuffer = monthly('flights') * 12 / 2;   // roughly one trip
+      const efLow = essentials * 3 + flightBuffer, efHigh = essentials * 6 + flightBuffer;
+      const saved = parseFloat($('efSaved').value) || 0;
+      $('efRange').textContent = essentials > 0 ? `${eur(efLow)} – ${eur(efHigh)}` : '€0';
+      $('efFill').style.width = efLow > 0 ? Math.min(100, saved / efLow * 100) + '%' : '0%';
+      $('efNote').textContent = essentials <= 0 ? 'Fill in your costs to see your target.'
+        : saved >= efHigh ? 'Fully covered. Anything more can go to investing.'
+        : saved >= efLow ? `Minimum covered. ${eur(efHigh - saved)} more for the full 6 months.`
+        : byGroup.save > 0 ? `${eur(efLow - saved)} to go. At ${eur(byGroup.save)} a month that's about ${Math.ceil((efLow - saved) / byGroup.save)} months.`
+        : `${eur(efLow - saved)} to go. Start with any amount: even €20 a month builds the habit.`;
+
+      // freedom number
+      $('freedom').textContent = eur(spending * 300);
+      $('freedomNote').textContent = spending > 0
+        ? `Spend ${eur(Math.max(0, spending - 100))} a month instead of ${eur(spending)} and it drops by ${eur(100 * 300)}. (300 = 25 years × 12 months.)`
+        : 'Fill in your costs to see it.';
+
+      // tips
+      const tips = [];
+      if (hasEdisu) tips.push(`EDISU pays the scholarship in instalments, not every month. When a payment lands, split it over the months until the next one (about ${eur(edisuMonthly)} a month) and don't spend it early. <a href="../edisu-scholarship-and-housing-turin-guide.html">EDISU guide</a>`);
+      if (hasEdisu && $('edisuDorm').checked) tips.push('In an EDISU residence the fee is often deducted before you receive the scholarship. Count the full scholarship above and the dorm fee under Housing, so the percentages stay honest.');
+      if ($('edisuMeals').checked || $('housingType').value === 'edisu') tips.push('EDISU canteens are the cheapest hot meal in town. <a href="../turin-student-canteens.html">Canteens guide</a>');
+      if (monthly('transport') === 0) tips.push('Moving around by bus, tram or metro? The yearly GTT student pass is usually far cheaper than single tickets. <a href="../turin-public-transport-gtt-student-pass.html">GTT student pass</a>');
+      if (monthly('permesso') === 0) tips.push('Non-EU? Put the permesso di soggiorno renewal in as a yearly cost so it doesn\'t surprise you. <a href="../permesso-di-soggiorno-turin-guide.html">Permesso guide</a>');
+      if (monthly('health') === 0) tips.push('Health cover is a yearly cost for most international students: SSN registration or private insurance. <a href="../healthcare-tessera-sanitaria-turin.html">Healthcare guide</a>');
+      if (income > 0 && left > income * 0.05) tips.push(`${eur(left)} a month has no job yet. Money without a plan tends to disappear: move part of it to the emergency fund or to saving, and decide the rest before the month starts.`);
+      if (income > 0 && left < 0) tips.push(`You're ${eur(-left)} a month over. Cut fun money first, then housing and food. Never cut the emergency fund to zero.`);
+      if (byGroup.fun > 0) tips.push('Show your ISOT member card at partner bars for discounts, and more partners are coming. <a href="profile.html">My card</a>');
+      $('tips').innerHTML = tips.length ? tips.map(t => `<div class="tip"><i class="fa-solid fa-lightbulb"></i><div>${t}</div></div>`).join('')
+        : '<p class="rule-note">Looking good. Come back after your next payment.</p>';
+
+      save();
+    }
+
+    async function initBudget() {
+      const me = await requireAuth();
+      document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(me, 36);
+      $('incomeRows').innerHTML = INCOME.map(rowHtml).join('');
+      $('costRows').innerHTML = COSTS.map(rowHtml).join('');
+      load();
+      document.querySelector('main').addEventListener('input', render);
+      document.querySelector('main').addEventListener('change', render);
+      $('housingType').addEventListener('change', () => {
+        if ($('housingType').value === 'edisu') { $('hasEdisu').checked = true; $('edisuDorm').checked = true; }
+        render();
+      });
+      $('resetBtn').addEventListener('click', () => {
+        if (!confirm('Clear all your numbers?')) return;
+        try { localStorage.removeItem(KEY); } catch (_) {}
+        location.reload();
+      });
+      render();
+      const gate = document.getElementById('gate'); if (gate) gate.remove();
+    }
+
+    document.addEventListener('DOMContentLoaded', initBudget);
+  </script>
+</body>
+</html>
