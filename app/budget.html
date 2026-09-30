@@ -450,6 +450,7 @@
     async function initBudget() {
       const me = await requireAuth();
       document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(me, 36);
+      markSeen('budget');
       $('incomeRows').innerHTML = INCOME.map(rowHtml).join('');
       $('costRows').innerHTML = COSTS.map(rowHtml).join('');
       load();

@@ -887,6 +887,10 @@ function initBurgerMenu(profile) {
         <i class="fa-solid fa-map-location-dot"></i>
         <span>Map</span>
       </a>
+      <a href="budget.html" class="drawer-item" data-newdot="budget">
+        <i class="fa-solid fa-wallet"></i>
+        <span>Budget Builder</span>
+      </a>
       <a href="../blog.html" class="drawer-item">
         <i class="fa-solid fa-book-open"></i>
         <span>Turin Student Guides</span>
