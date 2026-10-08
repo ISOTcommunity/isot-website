@@ -1,0 +1,3582 @@
+[
+  {
+    "file": "account.html",
+    "errors": [],
+    "url": "/app/account.html",
+    "gate": false,
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 17.3125,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "ACCOUNT SETTINGS\n0\nT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 71.625,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [
+      {
+        "text": "Home",
+        "active": true
+      },
+      {
+        "text": "Calendar",
+        "active": false
+      },
+      {
+        "text": "Map",
+        "active": false
+      },
+      {
+        "text": "Game",
+        "active": false
+      },
+      {
+        "text": "Run",
+        "active": false
+      }
+    ],
+    "small": [
+      {
+        "text": "ACCOUNT SETTINGS",
+        "x": 20,
+        "y": 16,
+        "w": 198.875,
+        "h": 38.625,
+        "right": 218.875
+      },
+      {
+        "text": "0",
+        "x": 234.875,
+        "y": 24.0625,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 283.796875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 17.3125,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "",
+        "x": 309,
+        "y": 1093.984375,
+        "w": 36,
+        "h": 36,
+        "right": 345
+      },
+      {
+        "text": "",
+        "x": 309,
+        "y": 1185.8125,
+        "w": 36,
+        "h": 36,
+        "right": 345
+      },
+      {
+        "text": "",
+        "x": 39,
+        "y": 2190.453125,
+        "w": 20,
+        "h": 20,
+        "right": 59
+      },
+      {
+        "text": "",
+        "x": 39,
+        "y": 2275.3125,
+        "w": 20,
+        "h": 20,
+        "right": 59
+      },
+      {
+        "text": "",
+        "x": 353.390625,
+        "y": 871,
+        "w": 15.609375,
+        "h": 24,
+        "right": 369
+      },
+      {
+        "text": "",
+        "x": 73.8125,
+        "y": 1234.65625,
+        "w": 113.34375,
+        "h": 36,
+        "right": 187.15625
+      },
+      {
+        "text": "",
+        "x": 199.15625,
+        "y": 1234.65625,
+        "w": 117.015625,
+        "h": 36,
+        "right": 316.171875
+      },
+      {
+        "text": "",
+        "x": 87.8125,
+        "y": 1284.65625,
+        "w": 214.375,
+        "h": 16,
+        "right": 302.1875
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "admin.html",
+    "errors": [],
+    "url": "/app/admin.html",
+    "gate": false,
+    "title": "OVERVIEW",
+    "burger": {
+      "text": "",
+      "x": 358,
+      "y": 27.171875,
+      "w": 12,
+      "h": 12,
+      "right": 370
+    },
+    "topbar": {
+      "text": "Home\nISOT ADMIN",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 67.34375,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [],
+    "small": [
+      {
+        "text": "Home",
+        "x": 20,
+        "y": 16,
+        "w": 66.671875,
+        "h": 34.34375,
+        "right": 86.671875
+      },
+      {
+        "text": "ISOT ADMIN",
+        "x": 168.3125,
+        "y": 23.515625,
+        "w": 108.046875,
+        "h": 19.3125,
+        "right": 276.359375
+      },
+      {
+        "text": "",
+        "x": 358,
+        "y": 27.171875,
+        "w": 12,
+        "h": 12,
+        "right": 370
+      },
+      {
+        "text": "Overview",
+        "x": 18,
+        "y": 165.75,
+        "w": 83.65625,
+        "h": 31,
+        "right": 101.65625
+      },
+      {
+        "text": "Members",
+        "x": 107.65625,
+        "y": 165.75,
+        "w": 84.015625,
+        "h": 31,
+        "right": 191.671875
+      },
+      {
+        "text": "Activity",
+        "x": 197.671875,
+        "y": 165.75,
+        "w": 73.75,
+        "h": 31,
+        "right": 271.421875
+      },
+      {
+        "text": "Proposals",
+        "x": 277.421875,
+        "y": 165.75,
+        "w": 86.421875,
+        "h": 31,
+        "right": 363.84375
+      },
+      {
+        "text": "Graphics",
+        "x": 369.84375,
+        "y": 165.75,
+        "w": 82.109375,
+        "h": 31,
+        "right": 451.953125
+      },
+      {
+        "text": "Events",
+        "x": 457.953125,
+        "y": 165.75,
+        "w": 70.28125,
+        "h": 31,
+        "right": 528.234375
+      },
+      {
+        "text": "Venues",
+        "x": 534.234375,
+        "y": 165.75,
+        "w": 73.765625,
+        "h": 31,
+        "right": 608
+      },
+      {
+        "text": "",
+        "x": 689.5,
+        "y": 39.78125,
+        "w": 12,
+        "h": 12,
+        "right": 701.5
+      }
+    ],
+    "overflow": [
+      {
+        "text": "Graphics",
+        "x": 369.84375,
+        "y": 165.75,
+        "w": 82.109375,
+        "h": 31,
+        "right": 451.953125
+      }
+    ],
+    "brokenImages": []
+  },
+  {
+    "file": "assembly.html",
+    "errors": [],
+    "url": "/app/assembly.html",
+    "gate": false,
+    "title": "GENERAL ASSEMBLY MOTIONS",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 20.84375,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "Home\nGENERAL ASSEMBLY\nMEMBER VOTING",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 78.6875,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [],
+    "small": [
+      {
+        "text": "Home",
+        "x": 20,
+        "y": 21.671875,
+        "w": 74.875,
+        "h": 34.34375,
+        "right": 94.875
+      },
+      {
+        "text": "GENERAL ASSEMBLY",
+        "x": 110.875,
+        "y": 19.53125,
+        "w": 109.78125,
+        "h": 38.625,
+        "right": 220.65625
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 20.84375,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "budget.html",
+    "errors": [],
+    "url": "/app/budget.html",
+    "gate": false,
+    "title": "BUDGET BUILDER",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 16,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "BUDGET\n0\nT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 69,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [
+      {
+        "text": "Home",
+        "active": true
+      },
+      {
+        "text": "Calendar",
+        "active": false
+      },
+      {
+        "text": "Map",
+        "active": false
+      },
+      {
+        "text": "Game",
+        "active": false
+      },
+      {
+        "text": "Run",
+        "active": false
+      }
+    ],
+    "small": [
+      {
+        "text": "BUDGET",
+        "x": 20,
+        "y": 24.34375,
+        "w": 96.0625,
+        "h": 19.3125,
+        "right": 116.0625
+      },
+      {
+        "text": "0",
+        "x": 230.875,
+        "y": 22.75,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 279.796875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 16,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "EN",
+        "x": 298.09375,
+        "y": 88,
+        "w": 38.96875,
+        "h": 27.84375,
+        "right": 337.0625
+      },
+      {
+        "text": "IT",
+        "x": 337.0625,
+        "y": 88,
+        "w": 33.9375,
+        "h": 27.84375,
+        "right": 371
+      },
+      {
+        "text": "/ month\n/ year",
+        "x": 277,
+        "y": 928.5,
+        "w": 78,
+        "h": 43,
+        "right": 355
+      },
+      {
+        "text": "/ month\n/ year",
+        "x": 277,
+        "y": 992.296875,
+        "w": 78,
+        "h": 43,
+        "right": 355
+      },
+      {
+        "text": "/ month\n/ year",
+        "x": 277,
+        "y": 1066.15625,
+        "w": 78,
+        "h": 43,
+        "right": 355
+      },
+      {
+        "text": "/ month\n/ year",
+        "x": 277,
+        "y": 1141.109375,
+        "w": 78,
+        "h": 43,
+        "right": 355
+      },
+      {
+        "text": "/ month\n/ year",
+        "x": 277,
+        "y": 1208.796875,
+        "w": 78,
+        "h": 43,
+        "right": 355
+      },
+      {
+        "text": "/ month\n/ year",
+        "x": 277,
+        "y": 1560.375,
+        "w": 78,
+        "h": 43,
+        "right": 355
+      },
+      {
+        "text": "/ month\n/ year",
+        "x": 277,
+        "y": 1625.28125,
+        "w": 78,
+        "h": 43,
+        "right": 355
+      },
+      {
+        "text": "/ month\n/ year",
+        "x": 277,
+        "y": 1692.96875,
+        "w": 78,
+        "h": 43,
+        "right": 355
+      },
+      {
+        "text": "/ month\n/ year",
+        "x": 277,
+        "y": 1769.59375,
+        "w": 78,
+        "h": 43,
+        "right": 355
+      },
+      {
+        "text": "/ month\n/ year",
+        "x": 277,
+        "y": 1843.4375,
+        "w": 78,
+        "h": 43,
+        "right": 355
+      },
+      {
+        "text": "/ month\n/ year",
+        "x": 277,
+        "y": 1908.34375,
+        "w": 78,
+        "h": 43,
+        "right": 355
+      },
+      {
+        "text": "/ month\n/ year",
+        "x": 277,
+        "y": 1983.3125,
+        "w": 78,
+        "h": 43,
+        "right": 355
+      },
+      {
+        "text": "/ month\n/ year",
+        "x": 277,
+        "y": 2057.15625,
+        "w": 78,
+        "h": 43,
+        "right": 355
+      },
+      {
+        "text": "/ month\n/ year",
+        "x": 277,
+        "y": 2122.0625,
+        "w": 78,
+        "h": 43,
+        "right": 355
+      },
+      {
+        "text": "/ month\n/ year",
+        "x": 277,
+        "y": 2186.96875,
+        "w": 78,
+        "h": 43,
+        "right": 355
+      },
+      {
+        "text": "/ month\n/ year",
+        "x": 277,
+        "y": 2251.875,
+        "w": 78,
+        "h": 43,
+        "right": 355
+      },
+      {
+        "text": "/ month\n/ year",
+        "x": 277,
+        "y": 2317.890625,
+        "w": 78,
+        "h": 43,
+        "right": 355
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "checkin.html",
+    "errors": [],
+    "url": "/app/checkin.html",
+    "gate": false,
+    "title": "NO CHECK-IN CODE",
+    "burger": {
+      "text": "",
+      "x": 358,
+      "y": 27.171875,
+      "w": 12,
+      "h": 12,
+      "right": 370
+    },
+    "topbar": {
+      "text": "Home\nCHECK IN",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 67.34375,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [],
+    "small": [
+      {
+        "text": "Home",
+        "x": 20,
+        "y": 16,
+        "w": 66.671875,
+        "h": 34.34375,
+        "right": 86.671875
+      },
+      {
+        "text": "CHECK IN",
+        "x": 184.15625,
+        "y": 23.515625,
+        "w": 76.375,
+        "h": 19.3125,
+        "right": 260.53125
+      },
+      {
+        "text": "",
+        "x": 358,
+        "y": 27.171875,
+        "w": 12,
+        "h": 12,
+        "right": 370
+      },
+      {
+        "text": "",
+        "x": 689.5,
+        "y": 39.78125,
+        "w": 12,
+        "h": 12,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "complete-profile.html",
+    "errors": [],
+    "url": "/app/complete-profile.html",
+    "gate": false,
+    "title": "ALMOST THERE",
+    "burger": {
+      "text": "",
+      "x": 358,
+      "y": 27.171875,
+      "w": 12,
+      "h": 12,
+      "right": 370
+    },
+    "topbar": {
+      "text": "Home\nISOT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 67.34375,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [],
+    "small": [
+      {
+        "text": "Home",
+        "x": 20,
+        "y": 16,
+        "w": 66.671875,
+        "h": 34.34375,
+        "right": 86.671875
+      },
+      {
+        "text": "ISOT",
+        "x": 200.8125,
+        "y": 23.515625,
+        "w": 43.046875,
+        "h": 19.3125,
+        "right": 243.859375
+      },
+      {
+        "text": "",
+        "x": 358,
+        "y": 27.171875,
+        "w": 12,
+        "h": 12,
+        "right": 370
+      },
+      {
+        "text": "",
+        "x": 41,
+        "y": 563.765625,
+        "w": 19,
+        "h": 19,
+        "right": 60
+      },
+      {
+        "text": "",
+        "x": 41,
+        "y": 717.171875,
+        "w": 19,
+        "h": 19,
+        "right": 60
+      },
+      {
+        "text": "",
+        "x": 689.5,
+        "y": 39.78125,
+        "w": 12,
+        "h": 12,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": [
+      null
+    ]
+  },
+  {
+    "file": "dashboard.html",
+    "errors": [],
+    "url": "/app/admin.html",
+    "gate": false,
+    "title": "OVERVIEW",
+    "burger": {
+      "text": "",
+      "x": 358,
+      "y": 27.171875,
+      "w": 12,
+      "h": 12,
+      "right": 370
+    },
+    "topbar": {
+      "text": "Home\nISOT ADMIN",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 67.34375,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [],
+    "small": [
+      {
+        "text": "Home",
+        "x": 20,
+        "y": 16,
+        "w": 66.671875,
+        "h": 34.34375,
+        "right": 86.671875
+      },
+      {
+        "text": "ISOT ADMIN",
+        "x": 168.3125,
+        "y": 23.515625,
+        "w": 108.046875,
+        "h": 19.3125,
+        "right": 276.359375
+      },
+      {
+        "text": "",
+        "x": 358,
+        "y": 27.171875,
+        "w": 12,
+        "h": 12,
+        "right": 370
+      },
+      {
+        "text": "Overview",
+        "x": 18,
+        "y": 165.75,
+        "w": 83.65625,
+        "h": 31,
+        "right": 101.65625
+      },
+      {
+        "text": "Members",
+        "x": 107.65625,
+        "y": 165.75,
+        "w": 84.015625,
+        "h": 31,
+        "right": 191.671875
+      },
+      {
+        "text": "Activity",
+        "x": 197.671875,
+        "y": 165.75,
+        "w": 73.75,
+        "h": 31,
+        "right": 271.421875
+      },
+      {
+        "text": "Proposals",
+        "x": 277.421875,
+        "y": 165.75,
+        "w": 86.421875,
+        "h": 31,
+        "right": 363.84375
+      },
+      {
+        "text": "Graphics",
+        "x": 369.84375,
+        "y": 165.75,
+        "w": 82.109375,
+        "h": 31,
+        "right": 451.953125
+      },
+      {
+        "text": "Events",
+        "x": 457.953125,
+        "y": 165.75,
+        "w": 70.28125,
+        "h": 31,
+        "right": 528.234375
+      },
+      {
+        "text": "Venues",
+        "x": 534.234375,
+        "y": 165.75,
+        "w": 73.765625,
+        "h": 31,
+        "right": 608
+      },
+      {
+        "text": "",
+        "x": 689.5,
+        "y": 39.78125,
+        "w": 12,
+        "h": 12,
+        "right": 701.5
+      }
+    ],
+    "overflow": [
+      {
+        "text": "Graphics",
+        "x": 369.84375,
+        "y": 165.75,
+        "w": 82.109375,
+        "h": 31,
+        "right": 451.953125
+      }
+    ],
+    "brokenImages": []
+  },
+  {
+    "file": "event.html",
+    "errors": [],
+    "url": "/app/event.html",
+    "gate": false,
+    "title": "NOT FOUND",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 16,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "Home\nEVENT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 69,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [],
+    "small": [
+      {
+        "text": "Home",
+        "x": 20,
+        "y": 16.828125,
+        "w": 74.875,
+        "h": 34.34375,
+        "right": 94.875
+      },
+      {
+        "text": "EVENT",
+        "x": 190.21875,
+        "y": 24.34375,
+        "w": 54.25,
+        "h": 19.3125,
+        "right": 244.46875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 16,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "events.html",
+    "errors": [],
+    "url": "/app/events.html",
+    "gate": false,
+    "title": "ISOT CALENDAR",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 17.3125,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "ISOT CALENDAR\n0\nT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 71.625,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [
+      {
+        "text": "Home",
+        "active": false
+      },
+      {
+        "text": "Calendar",
+        "active": true
+      },
+      {
+        "text": "Map",
+        "active": false
+      },
+      {
+        "text": "Game",
+        "active": false
+      },
+      {
+        "text": "Run",
+        "active": false
+      }
+    ],
+    "small": [
+      {
+        "text": "ISOT CALENDAR",
+        "x": 20,
+        "y": 16,
+        "w": 158.0625,
+        "h": 38.625,
+        "right": 178.0625
+      },
+      {
+        "text": "0",
+        "x": 194.0625,
+        "y": 24.0625,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 242.984375
+      },
+      {
+        "text": "",
+        "x": 254.984375,
+        "y": 16.4375,
+        "w": 24.8125,
+        "h": 37.75,
+        "right": 279.796875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 17.3125,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "List",
+        "x": 23,
+        "y": 146.859375,
+        "w": 67.796875,
+        "h": 31,
+        "right": 90.796875
+      },
+      {
+        "text": "Weekly",
+        "x": 94.796875,
+        "y": 146.859375,
+        "w": 88.53125,
+        "h": 31,
+        "right": 183.328125
+      },
+      {
+        "text": "Monthly",
+        "x": 187.328125,
+        "y": 146.859375,
+        "w": 94.03125,
+        "h": 31,
+        "right": 281.359375
+      },
+      {
+        "text": "Going",
+        "x": 285.359375,
+        "y": 146.859375,
+        "w": 88.890625,
+        "h": 31,
+        "right": 374.25
+      },
+      {
+        "text": "",
+        "x": 33,
+        "y": 209.859375,
+        "w": 40,
+        "h": 40,
+        "right": 73
+      },
+      {
+        "text": "",
+        "x": 317,
+        "y": 209.859375,
+        "w": 40,
+        "h": 40,
+        "right": 357
+      },
+      {
+        "text": "",
+        "x": 352.1875,
+        "y": 879.359375,
+        "w": 16.8125,
+        "h": 26,
+        "right": 369
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "explore.html",
+    "errors": [],
+    "url": "/app/explore.html",
+    "gate": false,
+    "title": "EXPLORE ISOT LIFE",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 16,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "Home\nEXPLORE",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 69,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [],
+    "small": [
+      {
+        "text": "Home",
+        "x": 20,
+        "y": 16.828125,
+        "w": 74.875,
+        "h": 34.34375,
+        "right": 94.875
+      },
+      {
+        "text": "EXPLORE",
+        "x": 179.125,
+        "y": 24.34375,
+        "w": 76.421875,
+        "h": 19.3125,
+        "right": 255.546875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 16,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "forgot.html",
+    "errors": [],
+    "url": "/app/forgot.html",
+    "gate": false,
+    "title": "FORGOT YOUR PASSWORD?",
+    "burger": null,
+    "topbar": null,
+    "start": null,
+    "tabs": [],
+    "small": [
+      {
+        "text": "Sign in",
+        "x": 225.5,
+        "y": 415.90625,
+        "w": 40.703125,
+        "h": 17,
+        "right": 266.203125
+      },
+      {
+        "text": "\u2190 isotcommunity.com",
+        "x": 130.796875,
+        "y": 486.71875,
+        "w": 128.40625,
+        "h": 17,
+        "right": 259.203125
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "gtt.html",
+    "errors": [],
+    "url": "/app/gtt.html",
+    "gate": false,
+    "title": "GTT & STRIKES",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 16,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "GTT & STRIKES\n0\nT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 69,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [
+      {
+        "text": "Home",
+        "active": true
+      },
+      {
+        "text": "Calendar",
+        "active": false
+      },
+      {
+        "text": "Map",
+        "active": false
+      },
+      {
+        "text": "Game",
+        "active": false
+      },
+      {
+        "text": "Run",
+        "active": false
+      }
+    ],
+    "small": [
+      {
+        "text": "GTT & STRIKES",
+        "x": 20,
+        "y": 24.34375,
+        "w": 155.015625,
+        "h": 19.3125,
+        "right": 175.015625
+      },
+      {
+        "text": "0",
+        "x": 230.875,
+        "y": 22.75,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 279.796875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 16,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "home.html",
+    "errors": [],
+    "url": "/app/home.html",
+    "gate": false,
+    "burger": {
+      "text": "",
+      "x": 335.796875,
+      "y": 32.078125,
+      "w": 34.203125,
+      "h": 32.796875,
+      "right": 370
+    },
+    "topbar": {
+      "text": "T\nHello, Test\nBoard\n0\nMy Card",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 97.96875,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [
+      {
+        "text": "Home",
+        "active": true
+      },
+      {
+        "text": "Calendar",
+        "active": false
+      },
+      {
+        "text": "Map",
+        "active": false
+      },
+      {
+        "text": "Game",
+        "active": false
+      },
+      {
+        "text": "Run",
+        "active": false
+      }
+    ],
+    "small": [
+      {
+        "text": "0",
+        "x": 131.765625,
+        "y": 37.234375,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 180.6875
+      },
+      {
+        "text": "",
+        "x": 192.6875,
+        "y": 29.609375,
+        "w": 24.8125,
+        "h": 37.75,
+        "right": 217.5
+      },
+      {
+        "text": "My Card",
+        "x": 229.5,
+        "y": 30.484375,
+        "w": 94.296875,
+        "h": 36,
+        "right": 323.796875
+      },
+      {
+        "text": "",
+        "x": 335.796875,
+        "y": 32.078125,
+        "w": 34.203125,
+        "h": 32.796875,
+        "right": 370
+      },
+      {
+        "text": "GTT: no strikes announced for the next days",
+        "x": 33,
+        "y": 136.96875,
+        "w": 324,
+        "h": 29,
+        "right": 357
+      },
+      {
+        "text": "See all \u2192",
+        "x": 321.53125,
+        "y": 194.96875,
+        "w": 50.46875,
+        "h": 19.34375,
+        "right": 372
+      },
+      {
+        "text": "",
+        "x": 352.1875,
+        "y": 879.359375,
+        "w": 16.8125,
+        "h": 26,
+        "right": 369
+      },
+      {
+        "text": "Install",
+        "x": 217.703125,
+        "y": 720.921875,
+        "w": 65.171875,
+        "h": 29,
+        "right": 282.875
+      },
+      {
+        "text": "Not now",
+        "x": 290.875,
+        "y": 720.921875,
+        "w": 70.125,
+        "h": 29,
+        "right": 361
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [
+      {
+        "text": "Sports & Trips",
+        "x": 386,
+        "y": 222.8125,
+        "w": 80,
+        "h": 93.625,
+        "right": 466
+      }
+    ],
+    "brokenImages": [
+      "../assets/icon-192.png"
+    ]
+  },
+  {
+    "file": "index.html",
+    "errors": [],
+    "url": "/app/index.html",
+    "gate": false,
+    "title": "EVERYTHING ISOT,\nON YOUR PHONE.",
+    "burger": null,
+    "topbar": null,
+    "start": null,
+    "tabs": [],
+    "small": [
+      {
+        "text": "\u2190 isotcommunity.com",
+        "x": 22,
+        "y": 1403.5,
+        "w": 128.40625,
+        "h": 17,
+        "right": 150.40625
+      }
+    ],
+    "overflow": [
+      {
+        "text": "Career\n& Workshops",
+        "x": 364,
+        "y": 1030.53125,
+        "w": 104,
+        "h": 142.78125,
+        "right": 468
+      },
+      {
+        "text": "",
+        "x": 364,
+        "y": 1030.53125,
+        "w": 104,
+        "h": 104,
+        "right": 468
+      },
+      {
+        "text": "Career\n& Workshops",
+        "x": 364,
+        "y": 1142.53125,
+        "w": 104,
+        "h": 30.78125,
+        "right": 468
+      }
+    ],
+    "brokenImages": []
+  },
+  {
+    "file": "karaoke-kj.html",
+    "errors": [],
+    "url": "/app/karaoke-kj.html",
+    "gate": false,
+    "title": "NO SONG PLAYING",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 20.84375,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "Home\nKJ HOST CONTROLLER\n0\nVOLUNTEER BOOTH",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 78.6875,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [],
+    "small": [
+      {
+        "text": "Home",
+        "x": 20,
+        "y": 21.671875,
+        "w": 74.875,
+        "h": 34.34375,
+        "right": 94.875
+      },
+      {
+        "text": "KJ HOST CONTROLLER",
+        "x": 110.875,
+        "y": 19.53125,
+        "w": 39.5625,
+        "h": 38.625,
+        "right": 150.4375
+      },
+      {
+        "text": "0",
+        "x": 166.4375,
+        "y": 27.59375,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 215.359375
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 20.84375,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "Start the night",
+        "x": 231.984375,
+        "y": 248.84375,
+        "w": 125.015625,
+        "h": 36,
+        "right": 357
+      },
+      {
+        "text": "",
+        "x": 41,
+        "y": 652.515625,
+        "w": 244.796875,
+        "h": 36,
+        "right": 285.796875
+      },
+      {
+        "text": "Add",
+        "x": 295.796875,
+        "y": 652.515625,
+        "w": 53.203125,
+        "h": 36,
+        "right": 349
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "karaoke.html",
+    "errors": [],
+    "url": "/app/karaoke.html",
+    "gate": false,
+    "title": "MONDAY KARAOKE @ ROUGH",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 26.96875,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "KARAOKE @ ROUGH\nSongbook\n0\nT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 90.9375,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [
+      {
+        "text": "Home",
+        "active": true
+      },
+      {
+        "text": "Calendar",
+        "active": false
+      },
+      {
+        "text": "Map",
+        "active": false
+      },
+      {
+        "text": "Game",
+        "active": false
+      },
+      {
+        "text": "Run",
+        "active": false
+      }
+    ],
+    "small": [
+      {
+        "text": "Songbook",
+        "x": 113.78125,
+        "y": 26.96875,
+        "w": 105.09375,
+        "h": 36,
+        "right": 218.875
+      },
+      {
+        "text": "0",
+        "x": 234.875,
+        "y": 33.71875,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 283.796875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 26.96875,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "Songbook",
+        "x": 234.03125,
+        "y": 126.9375,
+        "w": 57.34375,
+        "h": 16,
+        "right": 291.375
+      },
+      {
+        "text": "\u00d7",
+        "x": 342.65625,
+        "y": 124.9375,
+        "w": 13.34375,
+        "h": 16,
+        "right": 356
+      },
+      {
+        "text": "View Venue & Offer",
+        "x": 117.4375,
+        "y": 605.234375,
+        "w": 155.125,
+        "h": 36,
+        "right": 272.5625
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "login.html",
+    "errors": [],
+    "url": "/app/login.html",
+    "gate": false,
+    "title": "WELCOME BACK",
+    "burger": null,
+    "topbar": null,
+    "start": null,
+    "tabs": [],
+    "small": [
+      {
+        "text": "Forgot?",
+        "x": 307.578125,
+        "y": 315.671875,
+        "w": 41.421875,
+        "h": 19.34375,
+        "right": 349
+      },
+      {
+        "text": "",
+        "x": 307,
+        "y": 349.5,
+        "w": 36,
+        "h": 36,
+        "right": 343
+      },
+      {
+        "text": "Join ISOT Free",
+        "x": 220.1875,
+        "y": 588.84375,
+        "w": 91.8125,
+        "h": 17,
+        "right": 312
+      },
+      {
+        "text": " Back to isotcommunity.com",
+        "x": 108.46875,
+        "y": 659.65625,
+        "w": 173.0625,
+        "h": 17,
+        "right": 281.53125
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "monitor.html",
+    "errors": [],
+    "url": "/app/admin.html",
+    "gate": false,
+    "title": "OVERVIEW",
+    "burger": {
+      "text": "",
+      "x": 358,
+      "y": 27.171875,
+      "w": 12,
+      "h": 12,
+      "right": 370
+    },
+    "topbar": {
+      "text": "Home\nISOT ADMIN",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 67.34375,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [],
+    "small": [
+      {
+        "text": "Home",
+        "x": 20,
+        "y": 16,
+        "w": 66.671875,
+        "h": 34.34375,
+        "right": 86.671875
+      },
+      {
+        "text": "ISOT ADMIN",
+        "x": 168.3125,
+        "y": 23.515625,
+        "w": 108.046875,
+        "h": 19.3125,
+        "right": 276.359375
+      },
+      {
+        "text": "",
+        "x": 358,
+        "y": 27.171875,
+        "w": 12,
+        "h": 12,
+        "right": 370
+      },
+      {
+        "text": "Overview",
+        "x": 18,
+        "y": 165.75,
+        "w": 83.65625,
+        "h": 31,
+        "right": 101.65625
+      },
+      {
+        "text": "Members",
+        "x": 107.65625,
+        "y": 165.75,
+        "w": 84.015625,
+        "h": 31,
+        "right": 191.671875
+      },
+      {
+        "text": "Activity",
+        "x": 197.671875,
+        "y": 165.75,
+        "w": 73.75,
+        "h": 31,
+        "right": 271.421875
+      },
+      {
+        "text": "Proposals",
+        "x": 277.421875,
+        "y": 165.75,
+        "w": 86.421875,
+        "h": 31,
+        "right": 363.84375
+      },
+      {
+        "text": "Graphics",
+        "x": 369.84375,
+        "y": 165.75,
+        "w": 82.109375,
+        "h": 31,
+        "right": 451.953125
+      },
+      {
+        "text": "Events",
+        "x": 457.953125,
+        "y": 165.75,
+        "w": 70.28125,
+        "h": 31,
+        "right": 528.234375
+      },
+      {
+        "text": "Venues",
+        "x": 534.234375,
+        "y": 165.75,
+        "w": 73.765625,
+        "h": 31,
+        "right": 608
+      },
+      {
+        "text": "",
+        "x": 689.5,
+        "y": 39.78125,
+        "w": 12,
+        "h": 12,
+        "right": 701.5
+      }
+    ],
+    "overflow": [
+      {
+        "text": "Graphics",
+        "x": 369.84375,
+        "y": 165.75,
+        "w": 82.109375,
+        "h": 31,
+        "right": 451.953125
+      }
+    ],
+    "brokenImages": []
+  },
+  {
+    "file": "museums.html",
+    "errors": [],
+    "url": "/app/museums.html",
+    "gate": false,
+    "title": "TURIN MUSEUMS & STUDENT DISCOUNTS",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 26.953125,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "TURIN MUSEUMS GUIDE\n0\nT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 90.9375,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [
+      {
+        "text": "Home",
+        "active": false
+      },
+      {
+        "text": "Calendar",
+        "active": false
+      },
+      {
+        "text": "Map",
+        "active": true
+      },
+      {
+        "text": "Game",
+        "active": false
+      },
+      {
+        "text": "Run",
+        "active": false
+      }
+    ],
+    "small": [
+      {
+        "text": "0",
+        "x": 190.171875,
+        "y": 33.71875,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 239.09375
+      },
+      {
+        "text": "",
+        "x": 251.09375,
+        "y": 26.703125,
+        "w": 28.703125,
+        "h": 36.515625,
+        "right": 279.796875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 26.953125,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "All (8)",
+        "x": 18,
+        "y": 237.03125,
+        "w": 94.46875,
+        "h": 35,
+        "right": 112.46875
+      },
+      {
+        "text": "Must-See Top 3",
+        "x": 122.46875,
+        "y": 237.03125,
+        "w": 155.453125,
+        "h": 35,
+        "right": 277.921875
+      },
+      {
+        "text": "\u20ac2 Student Rate",
+        "x": 287.921875,
+        "y": 237.03125,
+        "w": 158.703125,
+        "h": 35,
+        "right": 446.625
+      },
+      {
+        "text": "Cinema & Art",
+        "x": 456.625,
+        "y": 237.03125,
+        "w": 140.09375,
+        "h": 35,
+        "right": 596.71875
+      },
+      {
+        "text": "Cars & Design",
+        "x": 606.71875,
+        "y": 237.03125,
+        "w": 147.328125,
+        "h": 35,
+        "right": 754.046875
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [
+      {
+        "text": "\u20ac2 Student Rate",
+        "x": 287.921875,
+        "y": 237.03125,
+        "w": 158.703125,
+        "h": 35,
+        "right": 446.625
+      },
+      {
+        "text": "",
+        "x": 355,
+        "y": 321.03125,
+        "w": 256,
+        "h": 256,
+        "right": 611
+      },
+      {
+        "text": "",
+        "x": 355,
+        "y": 65.03125,
+        "w": 256,
+        "h": 256,
+        "right": 611
+      },
+      {
+        "text": "",
+        "x": 355,
+        "y": 577.03125,
+        "w": 256,
+        "h": 256,
+        "right": 611
+      }
+    ],
+    "brokenImages": [
+      "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/12/1472/2135",
+      "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/12/1471/2135",
+      "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/12/1472/2134",
+      "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/12/1472/2136",
+      "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/12/1473/2135",
+      "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/12/1471/2134",
+      "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/12/1471/2136",
+      "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/12/1473/2134",
+      "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/12/1473/2136"
+    ]
+  },
+  {
+    "file": "network.html",
+    "errors": [],
+    "url": "/app/network.html",
+    "gate": false,
+    "title": "CONNECT & MAKE FRIENDS",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 17.3125,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "ISOT NETWORK\n0\nT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 71.625,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [
+      {
+        "text": "Home",
+        "active": true
+      },
+      {
+        "text": "Calendar",
+        "active": false
+      },
+      {
+        "text": "Map",
+        "active": false
+      },
+      {
+        "text": "Game",
+        "active": false
+      },
+      {
+        "text": "Run",
+        "active": false
+      }
+    ],
+    "small": [
+      {
+        "text": "ISOT NETWORK",
+        "x": 20,
+        "y": 16,
+        "w": 158.0625,
+        "h": 38.625,
+        "right": 178.0625
+      },
+      {
+        "text": "0",
+        "x": 194.0625,
+        "y": 24.0625,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 242.984375
+      },
+      {
+        "text": "",
+        "x": 254.984375,
+        "y": 16.4375,
+        "w": 24.8125,
+        "h": 37.75,
+        "right": 279.796875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 17.3125,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "All Students",
+        "x": 18,
+        "y": 230.09375,
+        "w": 104.671875,
+        "h": 29,
+        "right": 122.671875
+      },
+      {
+        "text": "My Friends (0)",
+        "x": 130.671875,
+        "y": 230.09375,
+        "w": 116.78125,
+        "h": 29,
+        "right": 247.453125
+      },
+      {
+        "text": "Pending Requests (0)",
+        "x": 255.453125,
+        "y": 230.09375,
+        "w": 160.875,
+        "h": 29,
+        "right": 416.328125
+      },
+      {
+        "text": "My Invites (0)",
+        "x": 424.328125,
+        "y": 230.09375,
+        "w": 111.109375,
+        "h": 29,
+        "right": 535.4375
+      },
+      {
+        "text": "UniTo",
+        "x": 543.4375,
+        "y": 230.09375,
+        "w": 65.3125,
+        "h": 29,
+        "right": 608.75
+      },
+      {
+        "text": "PoliTo",
+        "x": 616.75,
+        "y": 230.09375,
+        "w": 68.15625,
+        "h": 29,
+        "right": 684.90625
+      },
+      {
+        "text": "Share Web App Link",
+        "x": 113.984375,
+        "y": 464.140625,
+        "w": 162.015625,
+        "h": 36,
+        "right": 276
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [
+      {
+        "text": "Pending Requests (0)",
+        "x": 255.453125,
+        "y": 230.09375,
+        "w": 160.875,
+        "h": 29,
+        "right": 416.328125
+      },
+      {
+        "text": "0",
+        "x": 389.9375,
+        "y": 237.09375,
+        "w": 7.125,
+        "h": 15,
+        "right": 397.0625
+      }
+    ],
+    "brokenImages": []
+  },
+  {
+    "file": "notifications.html",
+    "errors": [],
+    "url": "/app/notifications.html",
+    "gate": false,
+    "title": "NOTIFICATIONS & INVITES",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 16,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "ACTIVITY CENTER\n0\nT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 69,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [
+      {
+        "text": "Home",
+        "active": true
+      },
+      {
+        "text": "Calendar",
+        "active": false
+      },
+      {
+        "text": "Map",
+        "active": false
+      },
+      {
+        "text": "Game",
+        "active": false
+      },
+      {
+        "text": "Run",
+        "active": false
+      }
+    ],
+    "small": [
+      {
+        "text": "ACTIVITY CENTER",
+        "x": 20,
+        "y": 24.34375,
+        "w": 171.765625,
+        "h": 19.3125,
+        "right": 191.765625
+      },
+      {
+        "text": "0",
+        "x": 230.875,
+        "y": 22.75,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 279.796875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 16,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "Clear All",
+        "x": 276.515625,
+        "y": 103.234375,
+        "w": 95.484375,
+        "h": 36,
+        "right": 372
+      },
+      {
+        "text": "Enable",
+        "x": 266.875,
+        "y": 207,
+        "w": 86.125,
+        "h": 36,
+        "right": 353
+      },
+      {
+        "text": "Discover ISOT students",
+        "x": 102.890625,
+        "y": 465.71875,
+        "w": 184.203125,
+        "h": 36,
+        "right": 287.09375
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "partner.html",
+    "errors": [],
+    "url": "/app/partner.html",
+    "gate": false,
+    "title": "EXPLORE PARTNER SPOTS",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 17.3125,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "PARTNER NETWORK\n0\nT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 71.625,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [
+      {
+        "text": "Home",
+        "active": false
+      },
+      {
+        "text": "Calendar",
+        "active": false
+      },
+      {
+        "text": "Map",
+        "active": true
+      },
+      {
+        "text": "Game",
+        "active": false
+      },
+      {
+        "text": "Run",
+        "active": false
+      }
+    ],
+    "small": [
+      {
+        "text": "PARTNER NETWORK",
+        "x": 20,
+        "y": 16,
+        "w": 158.0625,
+        "h": 38.625,
+        "right": 178.0625
+      },
+      {
+        "text": "0",
+        "x": 194.0625,
+        "y": 24.0625,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 242.984375
+      },
+      {
+        "text": "",
+        "x": 254.984375,
+        "y": 16.4375,
+        "w": 24.8125,
+        "h": 37.75,
+        "right": 279.796875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 17.3125,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "+",
+        "x": 331,
+        "y": 427.625,
+        "w": 30,
+        "h": 30,
+        "right": 361
+      },
+      {
+        "text": "\u2212",
+        "x": 331,
+        "y": 457.625,
+        "w": 30,
+        "h": 30,
+        "right": 361
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [
+      {
+        "text": "",
+        "x": 203,
+        "y": 103.859375,
+        "w": 256,
+        "h": 256,
+        "right": 459
+      },
+      {
+        "text": "",
+        "x": 203,
+        "y": 359.859375,
+        "w": 256,
+        "h": 256,
+        "right": 459
+      }
+    ],
+    "brokenImages": [
+      "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/13/2944/4270",
+      "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/13/2944/4271",
+      "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/13/2945/4270",
+      "https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/13/2945/4271"
+    ]
+  },
+  {
+    "file": "profile.html",
+    "errors": [],
+    "url": "/app/profile.html",
+    "gate": false,
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 16,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "ISOT MEMBER CARD\n0\nM",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 69,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [
+      {
+        "text": "Home",
+        "active": true
+      },
+      {
+        "text": "Calendar",
+        "active": false
+      },
+      {
+        "text": "Map",
+        "active": false
+      },
+      {
+        "text": "Game",
+        "active": false
+      },
+      {
+        "text": "Run",
+        "active": false
+      }
+    ],
+    "small": [
+      {
+        "text": "ISOT MEMBER CARD",
+        "x": 20,
+        "y": 24.34375,
+        "w": 171.921875,
+        "h": 19.3125,
+        "right": 191.921875
+      },
+      {
+        "text": "0",
+        "x": 234.875,
+        "y": 22.75,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 283.796875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 16,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "reset.html",
+    "errors": [],
+    "url": "/app/reset.html",
+    "gate": false,
+    "title": "SET A NEW PASSWORD",
+    "burger": null,
+    "topbar": null,
+    "start": null,
+    "tabs": [],
+    "small": [
+      {
+        "text": "\u2190 isotcommunity.com",
+        "x": 130.796875,
+        "y": 302.640625,
+        "w": 128.40625,
+        "h": 17,
+        "right": 259.203125
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "rewards.html",
+    "errors": [],
+    "url": "/app/rewards.html",
+    "gate": false,
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 16,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "THE GAME\n0\nT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 69,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [
+      {
+        "text": "Home",
+        "active": false
+      },
+      {
+        "text": "Calendar",
+        "active": false
+      },
+      {
+        "text": "Map",
+        "active": false
+      },
+      {
+        "text": "Game",
+        "active": true
+      },
+      {
+        "text": "Run",
+        "active": false
+      }
+    ],
+    "small": [
+      {
+        "text": "THE GAME",
+        "x": 20,
+        "y": 24.34375,
+        "w": 116.0625,
+        "h": 19.3125,
+        "right": 136.0625
+      },
+      {
+        "text": "0",
+        "x": 230.875,
+        "y": 22.75,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 279.796875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 16,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "running.html",
+    "errors": [],
+    "url": "/app/running.html",
+    "gate": false,
+    "title": "TURIN RUNNING CLUB",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 17.296875,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "ISOT RUNNING CLUB\n0\nT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 71.625,
+      "right": 390
+    },
+    "start": {
+      "text": "Start Run",
+      "x": 39,
+      "y": 813.828125,
+      "w": 312,
+      "h": 48,
+      "right": 351
+    },
+    "tabs": [
+      {
+        "text": "Home",
+        "active": false
+      },
+      {
+        "text": "Calendar",
+        "active": false
+      },
+      {
+        "text": "Map",
+        "active": false
+      },
+      {
+        "text": "Game",
+        "active": false
+      },
+      {
+        "text": "Run",
+        "active": true
+      }
+    ],
+    "small": [
+      {
+        "text": "ISOT RUNNING CLUB",
+        "x": 20,
+        "y": 16,
+        "w": 154.171875,
+        "h": 38.625,
+        "right": 174.171875
+      },
+      {
+        "text": "0",
+        "x": 190.171875,
+        "y": 24.0625,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 239.09375
+      },
+      {
+        "text": "",
+        "x": 251.09375,
+        "y": 17.046875,
+        "w": 28.703125,
+        "h": 36.515625,
+        "right": 279.796875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 17.296875,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "",
+        "x": 323,
+        "y": 326.4375,
+        "w": 38,
+        "h": 38,
+        "right": 361
+      },
+      {
+        "text": "",
+        "x": 323,
+        "y": 370.4375,
+        "w": 38,
+        "h": 38,
+        "right": 361
+      },
+      {
+        "text": "N",
+        "x": 323,
+        "y": 414.4375,
+        "w": 38,
+        "h": 38,
+        "right": 361
+      },
+      {
+        "text": "Browse the 6 ISOT routes",
+        "x": 39,
+        "y": 873.828125,
+        "w": 312,
+        "h": 27,
+        "right": 351
+      },
+      {
+        "text": "Valentino & Po Loop",
+        "x": 197.046875,
+        "y": 939.828125,
+        "w": 174.953125,
+        "h": 31,
+        "right": 372
+      },
+      {
+        "text": "",
+        "x": 333,
+        "y": 894.640625,
+        "w": 36,
+        "h": 36,
+        "right": 369
+      },
+      {
+        "text": "",
+        "x": 333,
+        "y": 882.640625,
+        "w": 36,
+        "h": 36,
+        "right": 369
+      },
+      {
+        "text": "",
+        "x": 42,
+        "y": 1101.796875,
+        "w": 159.328125,
+        "h": 42,
+        "right": 201.328125
+      },
+      {
+        "text": "",
+        "x": 209.328125,
+        "y": 1101.796875,
+        "w": 92.671875,
+        "h": 42,
+        "right": 302
+      },
+      {
+        "text": "",
+        "x": 310,
+        "y": 1101.796875,
+        "w": 42,
+        "h": 42,
+        "right": 352
+      },
+      {
+        "text": "",
+        "x": 42,
+        "y": 1336.296875,
+        "w": 159.328125,
+        "h": 42,
+        "right": 201.328125
+      },
+      {
+        "text": "",
+        "x": 209.328125,
+        "y": 1336.296875,
+        "w": 92.671875,
+        "h": 42,
+        "right": 302
+      },
+      {
+        "text": "",
+        "x": 310,
+        "y": 1336.296875,
+        "w": 42,
+        "h": 42,
+        "right": 352
+      },
+      {
+        "text": "",
+        "x": 42,
+        "y": 1552.25,
+        "w": 159.328125,
+        "h": 42,
+        "right": 201.328125
+      },
+      {
+        "text": "",
+        "x": 209.328125,
+        "y": 1552.25,
+        "w": 92.671875,
+        "h": 42,
+        "right": 302
+      },
+      {
+        "text": "",
+        "x": 310,
+        "y": 1552.25,
+        "w": 42,
+        "h": 42,
+        "right": 352
+      },
+      {
+        "text": "",
+        "x": 42,
+        "y": 1786.75,
+        "w": 159.328125,
+        "h": 42,
+        "right": 201.328125
+      },
+      {
+        "text": "",
+        "x": 209.328125,
+        "y": 1786.75,
+        "w": 92.671875,
+        "h": 42,
+        "right": 302
+      }
+    ],
+    "overflow": [
+      {
+        "text": "",
+        "x": 216,
+        "y": 320.4375,
+        "w": 256,
+        "h": 256,
+        "right": 472
+      },
+      {
+        "text": "",
+        "x": 216,
+        "y": 64.4375,
+        "w": 256,
+        "h": 256,
+        "right": 472
+      },
+      {
+        "text": "",
+        "x": 216,
+        "y": 576.4375,
+        "w": 256,
+        "h": 256,
+        "right": 472
+      }
+    ],
+    "brokenImages": [
+      "https://tile.openstreetmap.org/13/4270/2944.png",
+      "https://tile.openstreetmap.org/13/4271/2944.png",
+      "https://tile.openstreetmap.org/13/4270/2943.png",
+      "https://tile.openstreetmap.org/13/4271/2943.png",
+      "https://tile.openstreetmap.org/13/4270/2945.png",
+      "https://tile.openstreetmap.org/13/4271/2945.png"
+    ]
+  },
+  {
+    "file": "scan.html",
+    "errors": [],
+    "url": "/app/scan.html",
+    "gate": false,
+    "title": "\u00a0",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 16,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "Home\nISOT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 69,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [],
+    "small": [
+      {
+        "text": "Home",
+        "x": 20,
+        "y": 16.828125,
+        "w": 74.875,
+        "h": 34.34375,
+        "right": 94.875
+      },
+      {
+        "text": "ISOT",
+        "x": 195.8125,
+        "y": 24.34375,
+        "w": 43.046875,
+        "h": 19.3125,
+        "right": 238.859375
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 16,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "Door check-in",
+        "x": 12,
+        "y": 10,
+        "w": 180,
+        "h": 35,
+        "right": 192
+      },
+      {
+        "text": "Bar discount",
+        "x": 198,
+        "y": 10,
+        "w": 180,
+        "h": 35,
+        "right": 378
+      },
+      {
+        "text": "Nothing on tonight",
+        "x": 12,
+        "y": 64,
+        "w": 345.6875,
+        "h": 37,
+        "right": 357.6875
+      },
+      {
+        "text": "",
+        "x": 315.515625,
+        "y": 771,
+        "w": 41.484375,
+        "h": 44,
+        "right": 357
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "signup.html",
+    "errors": [],
+    "url": "/app/signup.html",
+    "gate": false,
+    "title": "JOIN THE COMMUNITY",
+    "burger": null,
+    "topbar": null,
+    "start": null,
+    "tabs": [],
+    "small": [
+      {
+        "text": "",
+        "x": 307,
+        "y": 483.078125,
+        "w": 36,
+        "h": 36,
+        "right": 343
+      },
+      {
+        "text": "",
+        "x": -9980,
+        "y": 728.453125,
+        "w": 4,
+        "h": 4,
+        "right": -9976
+      },
+      {
+        "text": "",
+        "x": 41,
+        "y": 826.28125,
+        "w": 13,
+        "h": 18,
+        "right": 54
+      },
+      {
+        "text": "",
+        "x": 41,
+        "y": 878.40625,
+        "w": 13,
+        "h": 18,
+        "right": 54
+      },
+      {
+        "text": "Sign in",
+        "x": 252.734375,
+        "y": 1109.875,
+        "w": 40.46875,
+        "h": 17,
+        "right": 293.203125
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "songbook.html",
+    "errors": [],
+    "url": "/app/songbook.html",
+    "gate": false,
+    "title": "ISOT SONGBOOK",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 16,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "Home\nSONGBOOK",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 69,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [],
+    "small": [
+      {
+        "text": "Home",
+        "x": 20,
+        "y": 16.828125,
+        "w": 74.875,
+        "h": 34.34375,
+        "right": 94.875
+      },
+      {
+        "text": "SONGBOOK",
+        "x": 162.953125,
+        "y": 24.34375,
+        "w": 108.765625,
+        "h": 19.3125,
+        "right": 271.71875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 16,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "Most sung",
+        "x": 18,
+        "y": 202.0625,
+        "w": 84.203125,
+        "h": 29,
+        "right": 102.203125
+      },
+      {
+        "text": "Most liked",
+        "x": 108.203125,
+        "y": 202.0625,
+        "w": 82.859375,
+        "h": 29,
+        "right": 191.0625
+      },
+      {
+        "text": "Most requested",
+        "x": 197.0625,
+        "y": 202.0625,
+        "w": 111.84375,
+        "h": 29,
+        "right": 308.90625
+      },
+      {
+        "text": "Latest",
+        "x": 18,
+        "y": 237.0625,
+        "w": 61.765625,
+        "h": 29,
+        "right": 79.765625
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "sports.html",
+    "errors": [],
+    "url": "/app/sports.html",
+    "gate": false,
+    "title": "FREE COURTS & PING PONG",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 17.296875,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "FREE SPORTS & COURTS\n0\nT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 71.625,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [
+      {
+        "text": "Home",
+        "active": false
+      },
+      {
+        "text": "Calendar",
+        "active": false
+      },
+      {
+        "text": "Map",
+        "active": true
+      },
+      {
+        "text": "Game",
+        "active": false
+      },
+      {
+        "text": "Run",
+        "active": false
+      }
+    ],
+    "small": [
+      {
+        "text": "FREE SPORTS & COURTS",
+        "x": 20,
+        "y": 16,
+        "w": 154.171875,
+        "h": 38.625,
+        "right": 174.171875
+      },
+      {
+        "text": "0",
+        "x": 190.171875,
+        "y": 24.0625,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 239.09375
+      },
+      {
+        "text": "",
+        "x": 251.09375,
+        "y": 17.046875,
+        "w": 28.703125,
+        "h": 36.515625,
+        "right": 279.796875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 17.296875,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "All Spots (11)",
+        "x": 18,
+        "y": 217.71875,
+        "w": 142.265625,
+        "h": 35,
+        "right": 160.265625
+      },
+      {
+        "text": "Basketball Courts (6)",
+        "x": 170.265625,
+        "y": 217.71875,
+        "w": 189.890625,
+        "h": 35,
+        "right": 360.15625
+      },
+      {
+        "text": "Ping Pong (5)",
+        "x": 370.15625,
+        "y": 217.71875,
+        "w": 145.421875,
+        "h": 35,
+        "right": 515.578125
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [
+      {
+        "text": "Ping Pong (5)",
+        "x": 370.15625,
+        "y": 217.71875,
+        "w": 145.421875,
+        "h": 35,
+        "right": 515.578125
+      },
+      {
+        "text": "",
+        "x": 387.15625,
+        "y": 228.5,
+        "w": 16.8125,
+        "h": 13.4375,
+        "right": 403.96875
+      }
+    ],
+    "brokenImages": [
+      "https://cartodb-basemaps-c.global.ssl.fastly.net/dark_all/12/2134/1471.png",
+      "https://cartodb-basemaps-a.global.ssl.fastly.net/dark_all/12/2135/1471.png",
+      "https://cartodb-basemaps-a.global.ssl.fastly.net/dark_all/12/2134/1472.png",
+      "https://cartodb-basemaps-b.global.ssl.fastly.net/dark_all/12/2135/1472.png"
+    ]
+  },
+  {
+    "file": "today.html",
+    "errors": [],
+    "url": "/app/today.html",
+    "gate": false,
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 16,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "TODAY\n0\nT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 69,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [
+      {
+        "text": "Home",
+        "active": true
+      },
+      {
+        "text": "Calendar",
+        "active": false
+      },
+      {
+        "text": "Map",
+        "active": false
+      },
+      {
+        "text": "Game",
+        "active": false
+      },
+      {
+        "text": "Run",
+        "active": false
+      }
+    ],
+    "small": [
+      {
+        "text": "TODAY",
+        "x": 20,
+        "y": 24.34375,
+        "w": 89.171875,
+        "h": 19.3125,
+        "right": 109.171875
+      },
+      {
+        "text": "0",
+        "x": 230.875,
+        "y": 22.75,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 279.796875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 16,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [
+      {
+        "text": "TUE\n13",
+        "x": 342.78125,
+        "y": 89,
+        "w": 56,
+        "h": 61.40625,
+        "right": 398.78125
+      }
+    ],
+    "brokenImages": []
+  },
+  {
+    "file": "tour.html",
+    "errors": [],
+    "url": "/app/tour.html",
+    "gate": false,
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 17.296875,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "ONE DAY IN TURIN\n0\nT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 71.625,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [
+      {
+        "text": "Home",
+        "active": false
+      },
+      {
+        "text": "Calendar",
+        "active": false
+      },
+      {
+        "text": "Map",
+        "active": true
+      },
+      {
+        "text": "Game",
+        "active": false
+      },
+      {
+        "text": "Run",
+        "active": false
+      }
+    ],
+    "small": [
+      {
+        "text": "ONE DAY IN TURIN",
+        "x": 20,
+        "y": 16,
+        "w": 154.171875,
+        "h": 38.625,
+        "right": 174.171875
+      },
+      {
+        "text": "0",
+        "x": 190.171875,
+        "y": 24.0625,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 239.09375
+      },
+      {
+        "text": "",
+        "x": 251.09375,
+        "y": 17.046875,
+        "w": 28.703125,
+        "h": 36.515625,
+        "right": 279.796875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 17.296875,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "turin-events.html",
+    "errors": [],
+    "url": "/app/turin-events.html",
+    "gate": false,
+    "title": "BIG IN TURIN",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 16,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "BIG IN TURIN\n0\nT",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 69,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [
+      {
+        "text": "Home",
+        "active": true
+      },
+      {
+        "text": "Calendar",
+        "active": false
+      },
+      {
+        "text": "Map",
+        "active": false
+      },
+      {
+        "text": "Game",
+        "active": false
+      },
+      {
+        "text": "Run",
+        "active": false
+      }
+    ],
+    "small": [
+      {
+        "text": "BIG IN TURIN",
+        "x": 20,
+        "y": 24.34375,
+        "w": 139.03125,
+        "h": 19.3125,
+        "right": 159.03125
+      },
+      {
+        "text": "0",
+        "x": 230.875,
+        "y": 22.75,
+        "w": 48.921875,
+        "h": 22.484375,
+        "right": 279.796875
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 16,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "Official site \u2197",
+        "x": 185.078125,
+        "y": 368.078125,
+        "w": 72.328125,
+        "h": 18.828125,
+        "right": 257.40625
+      },
+      {
+        "text": "Official site \u2197",
+        "x": 280.828125,
+        "y": 545.296875,
+        "w": 72.328125,
+        "h": 18.828125,
+        "right": 353.15625
+      },
+      {
+        "text": "Official site \u2197",
+        "x": 99,
+        "y": 702.90625,
+        "w": 72.328125,
+        "h": 18.828125,
+        "right": 171.328125
+      },
+      {
+        "text": "Official site \u2197",
+        "x": 99,
+        "y": 859,
+        "w": 72.328125,
+        "h": 18.828125,
+        "right": 171.328125
+      },
+      {
+        "text": "Official site \u2197",
+        "x": 99,
+        "y": 1033.1875,
+        "w": 72.328125,
+        "h": 18.828125,
+        "right": 171.328125
+      },
+      {
+        "text": "Official site \u2197",
+        "x": 99,
+        "y": 1229.625,
+        "w": 72.328125,
+        "h": 18.828125,
+        "right": 171.328125
+      },
+      {
+        "text": "Official site \u2197",
+        "x": 99,
+        "y": 1404.546875,
+        "w": 72.328125,
+        "h": 18.828125,
+        "right": 171.328125
+      },
+      {
+        "text": "Official site \u2197",
+        "x": 99,
+        "y": 1596.828125,
+        "w": 72.328125,
+        "h": 18.828125,
+        "right": 171.328125
+      },
+      {
+        "text": "Official site \u2197",
+        "x": 99,
+        "y": 1811.359375,
+        "w": 72.328125,
+        "h": 18.828125,
+        "right": 171.328125
+      },
+      {
+        "text": "Official site \u2197",
+        "x": 99,
+        "y": 1983.703125,
+        "w": 72.328125,
+        "h": 18.828125,
+        "right": 171.328125
+      },
+      {
+        "text": "Official site \u2197",
+        "x": 99,
+        "y": 2198.234375,
+        "w": 72.328125,
+        "h": 18.828125,
+        "right": 171.328125
+      },
+      {
+        "text": "Official site \u2197",
+        "x": 280.828125,
+        "y": 2569.640625,
+        "w": 72.328125,
+        "h": 18.828125,
+        "right": 353.15625
+      },
+      {
+        "text": "Official site \u2197",
+        "x": 99,
+        "y": 2767.59375,
+        "w": 72.328125,
+        "h": 18.828125,
+        "right": 171.328125
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  },
+  {
+    "file": "venue.html",
+    "errors": [],
+    "url": "/app/venue.html",
+    "gate": false,
+    "title": "YOUR BAR",
+    "burger": {
+      "text": "",
+      "x": 339.796875,
+      "y": 16,
+      "w": 30.203125,
+      "h": 36,
+      "right": 370
+    },
+    "topbar": {
+      "text": "Home\nISOT \u00b7 VENUE",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 69,
+      "right": 390
+    },
+    "start": null,
+    "tabs": [],
+    "small": [
+      {
+        "text": "Home",
+        "x": 20,
+        "y": 16.828125,
+        "w": 74.875,
+        "h": 34.34375,
+        "right": 94.875
+      },
+      {
+        "text": "ISOT \u00b7 VENUE",
+        "x": 161.53125,
+        "y": 24.34375,
+        "w": 111.609375,
+        "h": 19.3125,
+        "right": 273.140625
+      },
+      {
+        "text": "",
+        "x": 339.796875,
+        "y": 16,
+        "w": 30.203125,
+        "h": 36,
+        "right": 370
+      },
+      {
+        "text": "",
+        "x": 675.09375,
+        "y": 34,
+        "w": 26.40625,
+        "h": 34,
+        "right": 701.5
+      }
+    ],
+    "overflow": [],
+    "brokenImages": []
+  }
+]

@@ -1,0 +1,62 @@
+{
+  "networkXss": {
+    "handler": "openEventInvite('00000000-0000-4000-8000-000000000002', '');window.__auditXss=1;//')",
+    "executed": true
+  },
+  "songbookQuote": {
+    "handler": "toggleLike('Sweet Child O'mine', this)",
+    "error": "missing ) after argument list"
+  },
+  "consentsFailure": "Privacy consents updated!",
+  "fakeVote": {
+    "message": "Your vote (FAVOR) has been securely recorded in the assembly log.",
+    "calls": 0
+  },
+  "calendarDecember": true,
+  "calendarFailure": {
+    "visibleError": false,
+    "events": 0
+  },
+  "homeLongName": {
+    "x": 362.4375,
+    "right": 396.640625,
+    "width": 34.203125
+  },
+  "run3sec": [
+    {
+      "rpc": "log_run",
+      "args": {
+        "p_route_id": "valentino-loop",
+        "p_seconds": 3,
+        "p_gps_path": null,
+        "p_steps": null
+      }
+    }
+  ],
+  "pendingOwner": {
+    "routeId": "free-run",
+    "seconds": 30,
+    "path": [
+      [
+        45,
+        7,
+        123
+      ],
+      [
+        45.1,
+        7.1,
+        124
+      ]
+    ],
+    "at": 1
+  },
+  "drawerFocus": {
+    "focus": "burgerBtn",
+    "role": null,
+    "modal": null
+  },
+  "strikesFailure": {
+    "alert": false,
+    "html": "<i class=\"fa-solid fa-bus\"></i><span>GTT: no strikes announced for the next days</span>"
+  }
+}
