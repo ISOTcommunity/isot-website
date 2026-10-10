@@ -422,6 +422,23 @@
 
   </main>
 
+  <!-- A venue's menu (e.g. a happy-hour list), opened from its card -->
+  <div class="modal-backdrop" id="menuModal" onclick="closeMenuModal()">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div>
+          <div class="eyebrow"><i class="fa-solid fa-champagne-glasses text-pink"></i> Happy hour menu</div>
+          <h2 style="font-size:1.3rem;color:#FFF;margin-top:2px" id="menuModalTitle">Menu</h2>
+        </div>
+        <button type="button" onclick="closeMenuModal()" aria-label="Close menu"
+                style="background:transparent;border:none;color:var(--text-muted);font-size:1.4rem;cursor:pointer;min-width:44px;min-height:44px">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <img id="menuModalImg" alt="" style="width:100%;display:block;border-radius:14px" />
+    </div>
+  </div>
+
   <!-- Mobile Bottom Tab Bar -->
   <nav class="tabbar">
     <a href="home.html" class="tab-item">
@@ -625,10 +642,18 @@
       };
       const today = isotToday();
 
+      // The happy-hour columns arrive with migration 070. Until it is applied the wider
+      // select fails outright, so fall back to the columns that have always existed.
+      const VENUE_COLS = 'name, address, neighbourhood, lat, lng, member_discount, active';
+      const loadVenues = async () => {
+        const full = await db.from('venue_public')
+          .select(VENUE_COLS + ', happy_hour_start, happy_hour_end, happy_hour_note, menu_photo')
+          .eq('active', true);
+        return full.error ? db.from('venue_public').select(VENUE_COLS).eq('active', true) : full;
+      };
+
       const [{ data: venues, error }, cal] = await Promise.all([
-        db.from('venue_public')
-          .select('name, address, neighbourhood, lat, lng, member_discount, active')
-          .eq('active', true),
+        loadVenues(),
         db.rpc('calendar_between', { p_from: today, p_to: today }),
       ]);
 
@@ -696,7 +721,11 @@
                   (on.eventId ? ` <a href="event.html?e=${on.eventId}&d=${on.date}">details</a>` : '') +
                   '<br>' : '') +
             `${escapeHtml(v.address || v.neighbourhood || '')}` +
-            (v.member_discount ? `<br>${escapeHtml(v.member_discount)}` : '')
+            (v.member_discount ? `<br>${escapeHtml(v.member_discount)}` : '') +
+            (() => {
+              const hh = happyHour(v);
+              return hh ? `<br>Happy hour ${hh.from}–${hh.until}${hh.on ? ' · <b>on now</b>' : ''}` : '';
+            })()
           ));
       });
 
@@ -1474,6 +1503,29 @@
       host.hidden = !html;
     }
 
+    /* A venue's happy hour, judged in Turin time whatever the phone's clock says.
+       Returns null when the venue has none. Handles a window that crosses midnight. */
+    function happyHour(v) {
+      if (!v.happy_hour_start || !v.happy_hour_end) return null;
+      const from = String(v.happy_hour_start).slice(0, 5);
+      const until = String(v.happy_hour_end).slice(0, 5);
+      const now = new Date().toLocaleTimeString('en-GB',
+        { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+      const on = from <= until ? (now >= from && now < until) : (now >= from || now < until);
+      return { from, until, on };
+    }
+
+    function openMenuModal(src, name) {
+      document.getElementById('menuModalTitle').textContent = name || 'Menu';
+      const img = document.getElementById('menuModalImg');
+      img.src = src;
+      img.alt = (name ? name + ' ' : '') + 'happy hour menu';
+      document.getElementById('menuModal').classList.add('active');
+    }
+    function closeMenuModal() {
+      document.getElementById('menuModal').classList.remove('active');
+    }
+
     function renderVenueCards(venues, tonightByVenue, allEvents) {
       const host = document.getElementById('venueCards');
       if (!host) return;
@@ -1511,6 +1563,29 @@
                  <i class="fa-solid fa-ticket text-pink"></i> ${escapeHtml(v.member_discount)}
                </div>`
             : ''}
+
+          ${(() => {
+            const hh = happyHour(v);
+            if (!hh) return '';
+            return `
+              <div style="margin:0 0 10px;padding:12px 14px;border-radius:16px;
+                          background:rgba(255,184,31,0.10);border:1px solid rgba(255,184,31,0.32)">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <span style="font-size:0.9rem;font-weight:700;color:#FFF">
+                    <i class="fa-solid fa-champagne-glasses" style="color:var(--gold)" aria-hidden="true"></i>
+                    Happy hour ${hh.from}–${hh.until}
+                  </span>
+                  ${hh.on ? `<span class="badge" style="background:var(--green);color:#0E0F14;padding:3px 10px">On now · until ${hh.until}</span>` : ''}
+                </div>
+                ${v.happy_hour_note ? `<div style="font-size:0.84rem;color:var(--text-main);margin-top:6px;line-height:1.45">${escapeHtml(v.happy_hour_note)}</div>` : ''}
+                <div class="dim" style="font-size:0.78rem;margin-top:4px">Show your ISOT member card at the bar.</div>
+                ${v.menu_photo ? `
+                  <button type="button" class="btn btn-sm btn-outline" data-menu="${escapeHtml(v.menu_photo)}" data-menu-name="${escapeHtml(v.name)}"
+                          style="width:auto;padding:8px 16px;font-size:0.82rem;margin-top:10px;min-height:40px">
+                    <i class="fa-solid fa-utensils" aria-hidden="true"></i> See the menu
+                  </button>` : ''}
+              </div>`;
+          })()}
 
           ${nights.length ? `
             <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
@@ -1560,6 +1635,11 @@
           </div>
         </div>`;
       }).join('');
+
+      host.onclick = (e) => {
+        const b = e.target.closest('[data-menu]');
+        if (b) openMenuModal(b.dataset.menu, b.dataset.menuName);
+      };
     }
 
     /* Above the map as well as on it: someone opening this page at a bar should not
