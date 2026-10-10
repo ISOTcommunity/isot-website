@@ -21,3 +21,8 @@ node_modules/
 
 _preview/
 .claude/
+
+# Internal notes for people and coding agents (CLAUDE.md, README.md, briefs, reports).
+# No page fetches a Markdown file; they were being served publicly at /CLAUDE.md and
+# /app/README.md.
+*.md

@@ -446,7 +446,7 @@
 
         const nation = s.nationality || 'Turin Student';
         const uni = s.university || 'Turin Campus';
-        const langs = s.languages || 'English, Italian';
+        const langs = s.languages || '';   // no invented default
 
         return `
           <div class="student-card">
@@ -467,7 +467,9 @@
             </div>
 
             <div class="student-card-bottom">
-              <div class="dim" style="font-size:0.75rem"><i class="fa-solid fa-comments text-green"></i> ${escapeHtml(langs)}</div>
+              ${langs
+                ? `<div class="dim" style="font-size:0.75rem"><i class="fa-solid fa-comments text-green"></i> ${escapeHtml(langs)}</div>`
+                : '<span></span>'}
               ${btnHtml}
             </div>
           </div>

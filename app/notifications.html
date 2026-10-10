@@ -63,8 +63,11 @@
       </button>
     </div>
 
-    <!-- Web Push Permission Card -->
-    <div class="card card-glass" id="pushPermissionCard" style="margin-bottom: 20px; padding: 18px; border: 1px solid var(--border-glow); display: flex; align-items: center; justify-content: space-between; gap: 14px;">
+    <!-- Web Push Permission Card. Hidden: it promised alerts "even when the app is closed",
+         but nothing subscribes the device to push (no pushManager.subscribe, no stored
+         subscription, no sender), so granting permission changed nothing. Bring it back,
+         by removing `hidden` and restoring display:flex, once push is really wired. -->
+    <div class="card card-glass" id="pushPermissionCard" hidden style="margin-bottom: 20px; padding: 18px; border: 1px solid var(--border-glow); display: none; align-items: center; justify-content: space-between; gap: 14px;">
       <div style="flex: 1; min-width: 0;">
         <div style="font-weight: 700; color: #FFF; font-size: 0.98rem; display: flex; align-items: center; gap: 8px;">
           <i class="fa-solid fa-mobile-screen-button text-pink"></i> Lock Screen Alerts

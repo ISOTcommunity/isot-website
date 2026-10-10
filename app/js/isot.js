@@ -339,7 +339,7 @@ function renderMemberCardHtml(profile, isCurrentUser = false) {
   const name = escapeHtml(profile.full_name || 'Member');
   const nation = escapeHtml(profile.nationality || 'International Student');
   const uni = escapeHtml(profile.university || 'Turin Student');
-  const langs = escapeHtml(profile.languages || 'English, Italian');
+  const langs = profile.languages ? escapeHtml(profile.languages) : '';   // no invented default
   const tier = profile.tier === 'socio' ? 'badge-socio' : 'badge-participant';
   const tierText = TIER_LABEL[profile.tier] || 'Member';
 
@@ -361,9 +361,9 @@ function renderMemberCardHtml(profile, isCurrentUser = false) {
           <span class="meta-pill" style="font-size:0.73rem;padding:2px 8px;background:rgba(255,255,255,0.06);border-radius:12px;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;">
             <i class="fa-solid fa-graduation-cap text-gold"></i> ${uni}
           </span>
-          <span class="meta-pill" style="font-size:0.73rem;padding:2px 8px;background:rgba(255,255,255,0.06);border-radius:12px;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;">
+          ${langs ? `<span class="meta-pill" style="font-size:0.73rem;padding:2px 8px;background:rgba(255,255,255,0.06);border-radius:12px;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;">
             <i class="fa-solid fa-comments text-green"></i> ${langs}
-          </span>
+          </span>` : ''}
         </div>
       </div>
     </div>
