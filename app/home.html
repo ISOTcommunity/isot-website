@@ -259,7 +259,7 @@
       display: inline-flex; align-items: center; justify-content: center; font-size: 1.05rem;
     }
     .tit-wicon i, .tit-tip i, .tit-gtt i { display: inline-flex; align-items: center; justify-content: center; line-height: 1; margin: 0; padding: 0; }
-    .tit-temp { font-size: 1rem; font-weight: 700; color: #FFF; line-height: 1.1; font-variant-numeric: tabular-nums; }
+    .tit-temp { font-size: 1.35rem; font-weight: 800; color: #FFF; line-height: 1.1; font-variant-numeric: tabular-nums; }
     .tit-temp span { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-left: 4px; }
     .tit-meta { font-size: 0.74rem; color: var(--text-dim); margin-top: 3px; font-variant-numeric: tabular-nums; }
     .tit-tip {
@@ -355,6 +355,13 @@
     <!-- MEMBER / COMMUNITY ORDINARY HOME VIEW -->
     <div id="memberHomeView">
 
+      <!-- Today in Turin, first on the page: the weather, what to take with you, and whether
+           GTT is on strike. Hidden until something loads, so a failed forecast leaves no box. -->
+      <div id="todayTurin" class="tit-card" hidden>
+        <div id="titWeather"></div>
+        <a id="titGtt" class="tit-gtt" href="gtt.html" hidden></a>
+      </div>
+
       <!-- The next three nights. The first with its poster, the other two compact. -->
       <div id="featuredNight" hidden style="margin-bottom:18px"></div>
 
@@ -362,13 +369,6 @@
            quiet day does not leave an empty box on the home page. -->
       <a href="today.html" id="todayCard" hidden
          style="display:block;text-decoration:none;color:inherit;margin-bottom:18px"></a>
-
-      <!-- Today in Turin (a strip, below the nights: the next event is what people open the app for): the weather, what to take with you, and whether GTT is on
-           strike. Hidden until something loads, so a failed forecast leaves no box. -->
-      <div id="todayTurin" class="tit-card" hidden>
-        <div id="titWeather"></div>
-        <a id="titGtt" class="tit-gtt" href="gtt.html" hidden></a>
-      </div>
 
       <!-- 5 Categories Character Strip -->
       <div style="margin-bottom: 8px;">
@@ -764,8 +764,15 @@
             <div style="font-size:0.95rem;font-weight:600;color:var(--text-main)">
               ${escapeHtml(lead.time)} · ${escapeHtml(lead.venueName || '')}
             </div>
-            ${lead.goingCount ? `<div style="font-size:0.82rem;font-weight:700;color:var(--pink);margin-top:4px">
-              <i class="fa-solid fa-user-group" aria-hidden="true" style="font-size:0.72rem"></i> ${lead.goingCount} going</div>` : ''}
+            ${lead.goingCount ? `<button type="button" onclick="openAttendeesModal(null, '${lead.id}')"
+                style="display:inline-flex;align-items:center;gap:8px;min-height:40px;margin-top:8px;padding:6px 14px;
+                       border-radius:999px;border:1px solid var(--border-strong);background:rgba(255,255,255,0.07);
+                       color:var(--pink);font:inherit;font-size:0.84rem;font-weight:700;cursor:pointer">
+              <i class="fa-solid fa-user-group" aria-hidden="true" style="font-size:0.76rem"></i>
+              ${lead.goingCount} going
+              <span style="color:var(--text-main);font-weight:600">· See who</span>
+              <i class="fa-solid fa-chevron-right" aria-hidden="true" style="font-size:0.66rem;color:var(--text-main)"></i>
+            </button>` : ''}
             <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
               <button type="button" class="btn btn-sm ${userRsvps[lead.id] ? 'btn-outline' : 'btn-pink'}"
                       style="width:auto;padding:8px 16px;font-size:0.84rem"
@@ -856,8 +863,7 @@
         }
       }
 
-      // heroEventName is gone with the hero card; the caller always passes a title.
-      const title = eventTitle || 'Who\'s going';
+      const title = eventTitle || (occ && occ.title) || 'Who\'s going';
       document.getElementById('modalEventTitle').textContent = title;
       document.getElementById('attendeesListContainer').innerHTML = html;
       document.getElementById('attendeesModal').classList.add('active');
