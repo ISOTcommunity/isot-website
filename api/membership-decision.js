@@ -5,14 +5,18 @@
 //                                                    within 30 days, fee refunded in full
 //   { action: 'withdraw', application_id }          applicant withdrew before the decision
 //
-// Approval is not here: it is approve_application() in the database (073), called from
-// the admin page, because it needs no money to move.
+//   { action: 'approve', application_id }         Board admitted the applicant
+//
+// Approval runs approve_application() (073) AS THE CALLING BOARD MEMBER — their own token
+// is forwarded, so the database's is_board() check and decided_by stay theirs — and then
+// sends the welcome email.
 //
 // The refund has to go through Stripe with the secret key, which is why this is a
 // server function. A yearly plan's subscription is cancelled too, so it never charges
 // again. Cash and bank-transfer applications are refunded by hand: the response says so.
 
-const { stripe, db, userFromRequest } = require('./_lib/membership');
+const { SUPABASE_URL, ANON_KEY, stripe, db, userFromRequest } = require('./_lib/membership');
+const { sendEmail } = require('./_lib/email');
 
 async function refundStripe(app) {
   let ref = app.stripe_payment_intent;
@@ -48,7 +52,22 @@ module.exports = async function handler(req, res) {
 
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
     const action = body.action;
-    if (!['reject', 'withdraw'].includes(action)) return res.status(400).json({ error: 'action must be reject or withdraw' });
+    if (action === 'approve') {
+      const rpc = await fetch(`${SUPABASE_URL}/rest/v1/rpc/approve_application`, {
+        method: 'POST',
+        headers: { apikey: ANON_KEY, Authorization: req.headers.authorization, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ p_application: body.application_id }),
+      });
+      const out = await rpc.json().catch(() => null);
+      if (!rpc.ok) return res.status(409).json({ error: out?.message || 'could not admit' });
+      const [m] = await db('GET', `memberships?id=eq.${out}&select=valid_until`);
+      const [app] = await db('GET', `membership_applications?id=eq.${encodeURIComponent(body.application_id)}&select=*`);
+      let emailed = true;
+      try { await sendEmail('admitted', app.email, { ...app, valid_until: m.valid_until }); }
+      catch (err) { console.error('[membership-decision] email', err); emailed = false; }
+      return res.status(200).json({ ok: true, membership_id: out, emailed });
+    }
+    if (!['reject', 'withdraw'].includes(action)) return res.status(400).json({ error: 'action must be approve, reject or withdraw' });
     const reason = typeof body.reason === 'string' ? body.reason.trim().slice(0, 1000) : '';
     if (action === 'reject' && !reason) return res.status(400).json({ error: 'a rejection must give the reason (Statute Art. 6)' });
 
@@ -80,7 +99,17 @@ module.exports = async function handler(req, res) {
       refunded_at: refunded ? new Date().toISOString() : null,
     });
 
-    return res.status(200).json({ ok: true, refunded, manual_refund: manualRefund });
+    // Art. 6: the rejection and its reason are communicated in writing.
+    let emailed = true;
+    try {
+      await sendEmail(action === 'reject' ? 'rejected' : 'withdrawn', app.email,
+        { ...app, rejection_reason: reason, refunded });
+    } catch (err) {
+      console.error('[membership-decision] email', err);
+      emailed = false;
+    }
+
+    return res.status(200).json({ ok: true, refunded, manual_refund: manualRefund, emailed });
   } catch (err) {
     console.error('[membership-decision]', err);
     return res.status(500).json({ error: err.message || 'could not record the decision' });

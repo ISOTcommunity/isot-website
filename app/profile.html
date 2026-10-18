@@ -257,7 +257,8 @@
     // Under the card: what ISOT APS membership is, or where their application stands.
     async function showApsStatus(me, isSocio) {
       const card = document.getElementById('walletCard');
-      if (!card || isSocio) return;
+      if (!card) return;
+      if (isSocio) return showMembershipYear(me, card);
       const box = document.createElement('div');
       box.style.cssText = 'margin:14px auto 0;max-width:420px;font-size:0.84rem;line-height:1.5;color:var(--text-muted);text-align:center';
       let open = null;
@@ -274,6 +275,42 @@
         box.innerHTML = 'ISOT APS Members are the members of the General Assembly. <a href="apply.html">Apply to become one</a>.';
       }
       card.insertAdjacentElement('afterend', box);
+    }
+
+    // APS members: their membership year, and the renew / manage button when it applies
+    // (renewal opens 30 days before the anniversary; decided 18 Oct 2026).
+    async function showMembershipYear(me, card) {
+      let m = null;
+      try {
+        const { data } = await db.from('memberships').select('id,valid_until,auto_renew')
+          .eq('profile_id', me.id).eq('status', 'active').order('valid_until', { ascending: false }).limit(1);
+        m = data && data[0];
+      } catch (e) { return; }
+      if (!m) return;   // board founding members without a membership row
+      const box = document.createElement('div');
+      box.style.cssText = 'margin:14px auto 0;max-width:420px;font-size:0.84rem;line-height:1.5;color:var(--text-muted);text-align:center';
+      const until = new Date(m.valid_until + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+      const daysLeft = Math.ceil((new Date(m.valid_until + 'T00:00:00') - Date.now()) / 864e5);
+      let html = `Membership year until <b style="color:#FFF">${until}</b>${m.auto_renew ? ' · renews automatically' : ''}.`;
+      if (m.auto_renew) html += '<div style="margin-top:10px"><button type="button" class="btn btn-outline" id="apsBtn" style="width:auto">Manage automatic payment</button></div>';
+      else if (daysLeft <= 30) html += `<div style="margin-top:10px"><button type="button" class="btn btn-pink" id="apsBtn" style="width:auto">${daysLeft < 0 ? 'Renew now (overdue)' : 'Renew for €10'}</button></div>`;
+      box.innerHTML = html;
+      card.insertAdjacentElement('afterend', box);
+      const btn = document.getElementById('apsBtn');
+      if (!btn) return;
+      btn.addEventListener('click', async () => {
+        const done = busy(btn, 'Opening…');
+        const { data } = await db.auth.getSession();
+        const res = await fetch(m.auto_renew ? '/api/membership-portal' : '/api/membership-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${data?.session?.access_token || ''}` },
+          body: JSON.stringify({ kind: 'renewal', membership_id: m.id }),
+        });
+        const json = await res.json().catch(() => ({}));
+        if (res.ok && json.url) return location.assign(json.url);
+        done();
+        alert(json.error || 'Could not open the payment page.');
+      });
     }
 
     async function initProfile() {

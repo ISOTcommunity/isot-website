@@ -143,6 +143,8 @@ function readRawBody(req) {
 }
 
 module.exports = {
+  SUPABASE_URL,
+  ANON_KEY,
   SITE_URL,
   QUOTA_CENTS,
   PRODUCT_NAME,

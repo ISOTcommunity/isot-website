@@ -383,8 +383,15 @@
 
   async function approveApp(id) {
     if (!confirm('Record that the Board admitted this applicant? They become an ISOT APS Member and are entered in the register (libro soci).')) return;
-    const { error } = await db.rpc('approve_application', { p_application: id });
-    if (error) { alert('Could not record that: ' + error.message); return; }
+    const { data } = await db.auth.getSession();
+    const res = await fetch('/api/membership-decision', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${data?.session?.access_token || ''}` },
+      body: JSON.stringify({ application_id: id, action: 'approve' }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) { alert('Could not record that: ' + (json.error || res.status)); return; }
+    if (!json.emailed) alert('Admitted, but the welcome email did not send. Tell them yourself.');
     delete cache.apps; delete cache.members;
     render();
   }
@@ -404,6 +411,7 @@
     const json = await res.json().catch(() => ({}));
     if (!res.ok) { alert('Could not record that: ' + (json.error || res.status)); return; }
     if (json.manual_refund) alert('Recorded. This fee was paid in cash or by bank transfer: refund it by hand within 30 days.');
+    if (json.emailed === false) alert('Recorded, but the email to the applicant did not send. Write to them yourself: Art. 6 requires it in writing.');
     delete cache.apps;
     render();
   }

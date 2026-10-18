@@ -224,5 +224,11 @@
       "source": "/welcome",
       "destination": "/welcome.html"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/membership-reminders",
+      "schedule": "0 8 * * *"
+    }
   ]
 }
