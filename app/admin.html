@@ -92,6 +92,7 @@
     <nav class="nav">
       <button type="button" class="navbtn on" data-s="overview" onclick="go('overview')">Overview</button>
       <button type="button" class="navbtn" data-s="members"  onclick="go('members')">Members</button>
+      <button type="button" class="navbtn" data-s="applications" onclick="go('applications')">Applications</button>
       <button type="button" class="navbtn" data-s="activity" onclick="go('activity')">Activity</button>
       <button type="button" class="navbtn" data-s="proposals" onclick="go('proposals')">Proposals</button>
       <button type="button" class="navbtn" data-s="graphics" onclick="go('graphics')">Graphics</button>
@@ -115,7 +116,7 @@
   const cache = {};
 
   const TITLES = {
-    overview: 'Overview', members: 'Members',
+    overview: 'Overview', members: 'Members', applications: 'Applications',
     activity: 'Activity', proposals: 'Proposals', graphics: 'Graphics',
     events: 'Events', venues: 'Venues',
   };
@@ -161,7 +162,7 @@
     const el = document.getElementById('panel');
     el.innerHTML = '<div class="spinner" style="margin:36px auto"></div>';
     try {
-      await ({ overview: renderOverview, members: renderMembers, activity: renderActivity,
+      await ({ overview: renderOverview, members: renderMembers, applications: renderApplications, activity: renderActivity,
                proposals: renderProposals, graphics: renderGraphics,
                events: renderEvents, venues: renderVenues }[section])(el);
     } catch (e) {
@@ -255,7 +256,7 @@
             <b>${escapeHtml(p.full_name || 'Member')}</b>
             ${isBoard ? `<span class="tag pink">${escapeHtml(p.board_position || 'Board')}</span>` : ''}
             ${isVol ? '<span class="tag pink">KJ</span>' : ''}
-            ${isSocio ? '<span class="tag gold">Socio</span>' : ''}
+            ${isSocio ? '<span class="tag gold">APS Member</span>' : ''}
           </div>
           <div class="dim" style="font-size:0.76rem">${escapeHtml(p.member_code || '')} · ${escapeHtml(p.email || 'no email')}</div>
           ${p.university ? `<div class="dim" style="font-size:0.76rem">${escapeHtml(p.university)}</div>` : ''}
@@ -265,10 +266,8 @@
                       onclick="toggleVol('${p.id}', ${isVol ? 'false' : 'true'})">
                 ${isVol ? 'Remove KJ' : 'Make KJ'}
               </button>
-              <button type="button" class="btn btn-outline mini"
-                      onclick="toggleTier('${p.id}', '${isSocio ? 'participant' : 'socio'}')">
-                ${isSocio ? 'Mark unpaid' : 'Mark socio'}
-              </button>
+              <!-- ISOT APS membership is no longer toggled here: it comes only from an
+                   application the Board admits (Applications tab, Statute Art. 6). -->
             </div>`}
         </div>
       </div>`;
@@ -282,14 +281,212 @@
     render();
   }
 
-  async function toggleTier(id, tier) {
-    // A socio is a paying member with voting rights under the statute — this is a
-    // register change, not a display toggle, so it asks first.
-    const label = tier === 'socio' ? 'Mark as a paid socio (€10 received)?' : 'Remove socio status?';
-    if (!confirm(label)) return;
-    const { error } = await db.from('profiles').update({ tier }).eq('id', id);
-    if (error) { alert('Could not change that: ' + error.message); return; }
-    delete cache.members;
+  /* ── Applications (Statute Art. 5–6) ─────────────────────────────────── */
+  // The Board's side of membership. An application arrives online (form + signed PDF +
+  // Stripe) or on paper (scanned here). Only a paid application can be approved; approval
+  // creates the membership year and the register entry, and the card turns to
+  // ★ ISOT APS MEMBER. Rejection needs a reason and refunds the fee (api/membership-decision).
+  const APP_STATUS = {
+    paid:      ['gold', 'Paid · waiting for the Board'],
+    submitted: ['',     'Not paid yet'],
+    approved:  ['pink', 'Admitted'],
+    rejected:  ['',     'Rejected'],
+    withdrawn: ['',     'Withdrawn'],
+  };
+
+  async function renderApplications(el) {
+    if (!cache.apps) {
+      const [a, m] = await Promise.all([
+        db.from('membership_applications')
+          .select('id, channel, first_name, last_name, email, birth_date, birth_place, payment_plan, amount_eur, status, paid_at, created_at, decided_at, rejection_reason, refunded_at, pdf_path')
+          .order('created_at', { ascending: false }).limit(200),
+        db.from('memberships')
+          .select('id, member_name, valid_until, auto_renew, status')
+          .eq('status', 'active').order('valid_until', { ascending: true }),
+      ]);
+      if (a.error) { el.innerHTML = fail(a.error.message); return; }
+      cache.apps = a.data || [];
+      cache.activeMemberships = m.data || [];
+    }
+
+    const open = cache.apps.filter(x => x.status === 'paid');
+    const unpaid = cache.apps.filter(x => x.status === 'submitted');
+    const done = cache.apps.filter(x => !['paid', 'submitted'].includes(x.status)).slice(0, 30);
+    const today = new Date().toISOString().slice(0, 10);
+    const lapseDue = cache.activeMemberships.filter(m => !m.auto_renew &&
+      new Date(m.valid_until + 'T00:00:00') < new Date(Date.now() - 60 * 864e5));
+
+    el.innerHTML = `
+      <div class="prob ${open.length ? 'warning' : 'ok'}">
+        <i class="fa-solid fa-gavel" style="margin-top:3px"></i>
+        <div><b style="color:#FFF">${open.length} application${open.length === 1 ? '' : 's'} to decide</b>
+        <div class="dim" style="font-size:0.82rem">The Board decides at its first meeting after the application (Art. 6). Record the decision here after the meeting.</div></div>
+      </div>
+
+      <h3 style="margin:18px 0 6px">Waiting for the Board</h3>
+      ${open.length ? open.map(appRow).join('') : '<p class="dim" style="font-size:0.84rem">Nothing waiting.</p>'}
+
+      <h3 style="margin:22px 0 6px">Not paid yet</h3>
+      ${unpaid.length ? unpaid.map(appRow).join('') : '<p class="dim" style="font-size:0.84rem">None.</p>'}
+
+      <h3 style="margin:22px 0 6px">Membership lapsed (Art. 5)</h3>
+      ${lapseDue.length ? lapseDue.map(m => `
+        <div class="row"><div class="grow"><b>${escapeHtml(m.member_name)}</b>
+          <div class="dim" style="font-size:0.76rem">Anniversary ${escapeHtml(m.valid_until)} · unpaid for more than 60 days</div></div>
+          <button type="button" class="btn btn-outline mini" onclick="recordLapse('${m.id}')">Record lapse</button></div>`).join('')
+        : '<p class="dim" style="font-size:0.84rem">No one past the 60-day term.</p>'}
+
+      <h3 style="margin:22px 0 6px">Paper application</h3>
+      ${paperForm()}
+
+      <h3 style="margin:22px 0 6px">Recent decisions</h3>
+      ${done.length ? done.map(appRow).join('') : '<p class="dim" style="font-size:0.84rem">None yet.</p>'}
+      <p class="dim" style="font-size:0.74rem;margin-top:10px">Today ${today}. Every decision is kept with its date and the Board member who recorded it.</p>`;
+  }
+
+  function appRow(x) {
+    const [tone, label] = APP_STATUS[x.status] || ['', x.status];
+    const plan = { one_off: 'Stripe · once', yearly: 'Stripe · yearly', cash: 'Cash', bank_transfer: 'Bank transfer' }[x.payment_plan] || x.payment_plan;
+    const actions = x.status === 'paid' ? `
+        <button type="button" class="btn btn-pink mini" onclick="approveApp('${x.id}')">Admit</button>
+        <button type="button" class="btn btn-outline mini" onclick="decideApp('${x.id}', 'reject')">Reject</button>
+        <button type="button" class="btn btn-outline mini" onclick="decideApp('${x.id}', 'withdraw')">Withdrawn</button>`
+      : x.status === 'submitted' ? `
+        <button type="button" class="btn btn-outline mini" onclick="markPaid('${x.id}')">Fee received in cash / bank</button>
+        <button type="button" class="btn btn-outline mini" onclick="decideApp('${x.id}', 'withdraw')">Withdrawn</button>` : '';
+    return `
+      <div class="row" style="align-items:flex-start">
+        <div class="grow">
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            <b>${escapeHtml(x.first_name + ' ' + x.last_name)}</b>
+            <span class="tag ${tone}">${label}</span>
+            ${x.channel === 'paper' ? '<span class="tag">Paper</span>' : ''}
+          </div>
+          <div class="dim" style="font-size:0.76rem">${escapeHtml(x.email)} · born ${escapeHtml(x.birth_date || '')} in ${escapeHtml(x.birth_place || '')}</div>
+          <div class="dim" style="font-size:0.76rem">${escapeHtml(plan || '')}${x.paid_at ? ' · paid ' + ago(x.paid_at) : ''} · applied ${ago(x.created_at)}</div>
+          ${x.rejection_reason ? `<div class="dim" style="font-size:0.76rem">Reason: ${escapeHtml(x.rejection_reason)}</div>` : ''}
+          ${['rejected', 'withdrawn'].includes(x.status) && x.paid_at && !x.refunded_at ? '<div style="font-size:0.76rem;color:var(--gold)">Refund by hand (cash or bank transfer)</div>' : ''}
+          <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+            ${x.pdf_path ? `<button type="button" class="btn btn-outline mini" onclick="openAppPdf('${escapeHtml(x.pdf_path)}')"><i class="fa-solid fa-file-pdf"></i> Form</button>` : ''}
+            ${actions}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  async function openAppPdf(path) {
+    const w = window.open('', '_blank');
+    const { data, error } = await db.storage.from('admission-forms').createSignedUrl(path, 300);
+    if (error) { if (w) w.close(); alert('Could not open the form: ' + error.message); return; }
+    if (w) w.location = data.signedUrl; else location.assign(data.signedUrl);
+  }
+
+  async function approveApp(id) {
+    if (!confirm('Record that the Board admitted this applicant? They become an ISOT APS Member and are entered in the register (libro soci).')) return;
+    const { error } = await db.rpc('approve_application', { p_application: id });
+    if (error) { alert('Could not record that: ' + error.message); return; }
+    delete cache.apps; delete cache.members;
+    render();
+  }
+
+  async function decideApp(id, action) {
+    let reason = '';
+    if (action === 'reject') {
+      reason = prompt('Reason for the rejection (Statute Art. 6: it must be given in writing). It will be sent to the applicant.');
+      if (!reason || !reason.trim()) return;
+    } else if (!confirm('Record that the applicant withdrew? A Stripe payment is refunded in full.')) return;
+    const { data } = await db.auth.getSession();
+    const res = await fetch('/api/membership-decision', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${data?.session?.access_token || ''}` },
+      body: JSON.stringify({ application_id: id, action, reason }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) { alert('Could not record that: ' + (json.error || res.status)); return; }
+    if (json.manual_refund) alert('Recorded. This fee was paid in cash or by bank transfer: refund it by hand within 30 days.');
+    delete cache.apps;
+    render();
+  }
+
+  async function markPaid(id) {
+    const how = prompt('How was the €10 received? Type "cash" or "bank".', 'cash');
+    if (!how) return;
+    const plan = /bank|bonif/i.test(how) ? 'bank_transfer' : 'cash';
+    const { error } = await db.from('membership_applications')
+      .update({ status: 'paid', payment_plan: plan, paid_at: new Date().toISOString() })
+      .eq('id', id).eq('status', 'submitted');
+    if (error) { alert('Could not record that: ' + error.message); return; }
+    delete cache.apps;
+    render();
+  }
+
+  async function recordLapse(id) {
+    if (!confirm('Record that this membership lapsed (Art. 5)? The person goes back to ISOT Community. This needs the written reminder to have been sent at least 60 days ago.')) return;
+    const { error } = await db.rpc('record_lapse', { p_membership: id });
+    if (error) { alert(error.message); return; }
+    delete cache.apps; delete cache.members;
+    render();
+  }
+
+  function paperForm() {
+    return `
+      <form id="paperForm" class="card" onsubmit="savePaper(event)" style="padding:14px">
+        <p class="dim" style="font-size:0.8rem;margin-bottom:10px">For a form signed on paper. Scan or photograph it as a PDF first. <a href="/api/admission-form" target="_blank" rel="noopener">Print a blank form</a>.</p>
+        <div class="two">
+          <div class="field"><label>First name</label><input name="first_name" required /></div>
+          <div class="field"><label>Last name</label><input name="last_name" required /></div>
+          <div class="field"><label>Date of birth</label><input name="birth_date" type="date" required /></div>
+          <div class="field"><label>Place of birth</label><input name="birth_place" required /></div>
+        </div>
+        <div class="field"><label>Residential address</label><input name="residence_address" required /></div>
+        <div class="two">
+          <div class="field"><label>Email</label><input name="email" type="email" required /></div>
+          <div class="field"><label>Codice fiscale</label><input name="codice_fiscale" maxlength="16" /></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Fee</label>
+            <select name="payment"><option value="cash">Paid in cash</option><option value="bank_transfer">Paid by bank transfer</option><option value="">Not paid yet</option></select></div>
+          <div class="field"><label>Signed form (PDF)</label><input name="pdf" type="file" accept="application/pdf" required /></div>
+        </div>
+        <button type="submit" class="btn btn-pink mini" id="paperBtn">Save paper application</button>
+      </form>`;
+  }
+
+  async function savePaper(e) {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const file = f.get('pdf');
+    if (!file || file.type !== 'application/pdf') { alert('Attach the signed form as a PDF.'); return; }
+    const done = busy(document.getElementById('paperBtn'), 'Saving…');
+    const email = String(f.get('email')).trim().toLowerCase();
+    // Link to their app account when the email matches one, so the card updates on admission.
+    const { data: prof } = await db.from('profiles').select('id').ilike('email', email).maybeSingle();
+    const payment = f.get('payment');
+    const row = {
+      profile_id: prof?.id || null,
+      channel: 'paper',
+      first_name: String(f.get('first_name')).trim(),
+      last_name: String(f.get('last_name')).trim(),
+      birth_date: f.get('birth_date'),
+      birth_place: String(f.get('birth_place')).trim(),
+      residence_address: String(f.get('residence_address')).trim(),
+      email,
+      codice_fiscale: String(f.get('codice_fiscale') || '').trim().toUpperCase() || null,
+      accepts_statute: true,
+      privacy_ack: true,
+      privacy_version: 'paper-2026-10',
+      payment_plan: payment || 'cash',
+      status: payment ? 'paid' : 'submitted',
+      paid_at: payment ? new Date().toISOString() : null,
+    };
+    const { data: ins, error } = await db.from('membership_applications').insert(row).select('id').single();
+    if (error) { done(); alert('Could not save: ' + error.message); return; }
+    const path = `paper/${new Date().getFullYear()}/${ins.id}.pdf`;
+    const up = await db.storage.from('admission-forms').upload(path, file, { contentType: 'application/pdf' });
+    if (up.error) { done(); alert('Saved, but the PDF did not upload: ' + up.error.message); }
+    else await db.from('membership_applications').update({ pdf_path: path }).eq('id', ins.id);
+    done();
+    delete cache.apps;
     render();
   }
 

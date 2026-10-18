@@ -330,7 +330,7 @@ function renderGeoAvatar(memberCode, size = 44) {
 }
 
 /**
- * Renders a unified Apple-Grade Member Card HTML component
+ * Renders a unified Apple-Grade profile card HTML component
  * used consistently across Home, Events ("Who's Going"), Network, and Profile pages.
  */
 function renderMemberCardHtml(profile, isCurrentUser = false) {
@@ -341,7 +341,7 @@ function renderMemberCardHtml(profile, isCurrentUser = false) {
   const uni = escapeHtml(profile.university || 'Turin Student');
   const langs = profile.languages ? escapeHtml(profile.languages) : '';   // no invented default
   const tier = profile.tier === 'socio' ? 'badge-socio' : 'badge-participant';
-  const tierText = TIER_LABEL[profile.tier] || 'Member';
+  const tierText = TIER_LABEL[profile.tier] || TIER_LABEL.participant;
 
   return `
     <div class="card card-glass student-card" style="display:flex;align-items:center;gap:14px;padding:14px;margin-bottom:10px;">
@@ -832,7 +832,7 @@ function initBurgerMenu(profile) {
           ${escapeHtml(profile.email || '')}
         </div>
         <span class="badge ${profile.tier === 'socio' ? 'badge-socio' : 'badge-participant'}" style="margin-top:4px;display:inline-block">
-          ${TIER_LABEL[profile.tier] || 'Community'}
+          ${TIER_LABEL[profile.tier] || TIER_LABEL.participant}
         </span>
       </div>
     </div>
@@ -841,7 +841,7 @@ function initBurgerMenu(profile) {
       <div class="drawer-section-title">My Account Settings</div>
       <a href="profile.html" class="drawer-item">
         <i class="fa-solid fa-qrcode text-pink"></i>
-        <span>My Member Card &amp; QR</span>
+        <span>My ISOT Card &amp; QR</span>
       </a>
       <a href="account.html" class="drawer-item">
         <i class="fa-solid fa-user-gear text-pink"></i>
@@ -1047,7 +1047,9 @@ function passesBotCheck(form) {
   return city === 'turin' || city === 'torino';
 }
 
-const TIER_LABEL = { socio: 'ISOT Member', participant: 'Community' };
+// Statute Art. 5: two categories. Only a Board-admitted application makes a socio.
+const TIER_LABEL = { socio: 'ISOT APS Member', participant: 'ISOT Community' };
+const CARD_LABEL = { socio: 'APS Member Card', participant: 'Community Card' };
 const ROLE_LABEL = { board: 'Board', volunteer: 'Volunteer', partner: 'Venue partner' };
 
 /* ---------------------------------------------------------------

@@ -13,7 +13,7 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ISOT Member Card</title>
+  <title>ISOT Card</title>
   
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="../assets/favicon.png" sizes="48x48" type="image/png" />
@@ -130,7 +130,7 @@
 
   <!-- Top Bar -->
   <header class="topbar">
-    <a href="home.html" class="topbar-title">ISOT Member Card</a>
+    <a href="home.html" class="topbar-title" id="cardTitle">ISOT Card</a>
     <div style="display: flex; align-items: center; gap: 10px;">
       <div id="headerAvatar" style="cursor: pointer;" data-open-drawer></div>
       <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: #FFF; font-size: 1.3rem; cursor: pointer; padding: 6px;">
@@ -143,18 +143,18 @@
 
     <div id="alertBox"></div>
 
-    <!-- The Member Card (Physical Apple Wallet Object) -->
+    <!-- The ISOT card: ISOT COMMUNITY or ★ ISOT APS MEMBER (Physical Apple Wallet Object) -->
     <div class="wallet-card-wrap">
       <div class="wallet-card" id="walletCard">
         
-        <!-- Locked overlay for Free Community members -->
+        <!-- Locked overlay: unused since 054 (every account gets a working card); kept hidden -->
         <div class="card-locked-overlay" id="lockedOverlay" style="display: none;">
           <div style="font-size: 2.5rem; color: var(--gold); margin-bottom: 12px;"><i class="fa-solid fa-lock"></i></div>
           <h2 style="font-size: 1.3rem; margin-bottom: 8px; color: #FFF;">Community Access</h2>
           <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 20px; max-width: 320px;">
-            Upgrade to Official ISOT Member (€10/yr) to unlock your scannable discount card for ISOT partner bars!
+            Your ISOT card works at the door and at partner bars.
           </p>
-          <a href="../join.html" class="btn btn-pink" style="max-width: 240px;">Become a member · €10</a>
+          <a href="apply.html" class="btn btn-pink" style="max-width: 240px;">Become an ISOT APS Member</a>
         </div>
 
         <div class="wallet-header">
@@ -254,12 +254,34 @@
   <script>
     let qrcodeObj = null;
 
+    // Under the card: what ISOT APS membership is, or where their application stands.
+    async function showApsStatus(me, isSocio) {
+      const card = document.getElementById('walletCard');
+      if (!card || isSocio) return;
+      const box = document.createElement('div');
+      box.style.cssText = 'margin:14px auto 0;max-width:420px;font-size:0.84rem;line-height:1.5;color:var(--text-muted);text-align:center';
+      let open = null;
+      try {
+        const { data } = await db.from('membership_applications').select('status')
+          .eq('profile_id', me.id).in('status', ['submitted', 'paid']).limit(1);
+        open = data && data[0];
+      } catch (e) { /* the prompt below still makes sense */ }
+      if (open && open.status === 'paid') {
+        box.innerHTML = '<i class="fa-solid fa-hourglass-half text-gold"></i> Your ISOT APS membership application is under review by the Board.';
+      } else if (open) {
+        box.innerHTML = 'Your ISOT APS membership application is saved. <a href="apply.html">Pay the €10 fee to complete it</a>.';
+      } else {
+        box.innerHTML = 'ISOT APS Members are the members of the General Assembly. <a href="apply.html">Apply to become one</a>.';
+      }
+      card.insertAdjacentElement('afterend', box);
+    }
+
     async function initProfile() {
       const me = await requireAuth();
 
       // Render topbar avatar
       document.getElementById('headerAvatar').innerHTML = renderGeoAvatar(me.member_code, 36);
-      document.getElementById('memberName').textContent = me.full_name || 'Member';
+      document.getElementById('memberName').textContent = me.full_name || 'ISOT';
       document.getElementById('memberCode').textContent = me.member_code || 'ISOT-2026';
       
       document.getElementById('infoUni').textContent = me.university || 'Turin';
@@ -278,8 +300,14 @@
       statusEl.textContent = isSocio ? 'Active' : 'Active (app)';
       statusEl.style.color = 'var(--green)';
 
+      // Two categories only (Statute Art. 5): ISOT Community, and ISOT APS Member,
+      // which only a Board-admitted application makes. Never "member card" for both.
+      document.title = isSocio ? 'ISOT APS Member Card' : 'ISOT Community Card';
+      document.getElementById('cardTitle').textContent = document.title;
+      showApsStatus(me, isSocio);
+
       if (isSocio) {
-        document.getElementById('cardTierBadge').innerHTML = '<span class="badge badge-socio"><i class="fa-solid fa-star"></i> OFFICIAL MEMBER</span>';
+        document.getElementById('cardTierBadge').innerHTML = '<span class="badge badge-socio"><i class="fa-solid fa-star"></i> ISOT APS MEMBER</span>';
         document.getElementById('lockedOverlay').style.display = 'none';
         
         // The token comes from issue_qr_token() or it does not come at all.
@@ -314,7 +342,7 @@
          */
         // Since 054 the bar discount applies to every app account, so a non-paying user
         // carries the same working card — no upsell line, no "no discount" framing.
-        document.getElementById('cardTierBadge').innerHTML = '<span class="badge badge-participant">ISOT CARD</span>';
+        document.getElementById('cardTierBadge').innerHTML = '<span class="badge badge-participant">ISOT COMMUNITY</span>';
         document.getElementById('lockedOverlay').style.display = 'none';
 
         try {

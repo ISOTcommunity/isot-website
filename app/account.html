@@ -123,7 +123,7 @@
       <h2 style="font-size: 1.4rem; color: #FFF; margin-top: 8px; margin-bottom: 2px;" id="dispName">Member</h2>
       <div class="dim" style="font-size: 0.85rem;" id="dispEmail">email@example.com</div>
       <div style="margin-top: 8px;">
-        <span class="badge badge-socio" id="dispTier">ISOT Member</span>
+        <span class="badge badge-participant" id="dispTier">ISOT Community</span>
       </div>
     </div>
 
@@ -278,7 +278,7 @@
       // Header preview
       document.getElementById('dispName').textContent = currentProfile.full_name || 'Member';
       document.getElementById('dispEmail').textContent = currentProfile.email || '';
-      document.getElementById('dispTier').textContent = TIER_LABEL[currentProfile.tier] || 'Community';
+      document.getElementById('dispTier').textContent = TIER_LABEL[currentProfile.tier] || TIER_LABEL.participant;
       document.getElementById('dispTier').className = currentProfile.tier === 'socio' ? 'badge badge-socio' : 'badge badge-participant';
 
       renderAccountAvatarPreview();

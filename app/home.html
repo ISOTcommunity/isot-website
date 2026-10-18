@@ -299,7 +299,7 @@
       <div id="userGeoAvatar" style="cursor: pointer;" data-open-drawer></div>
       <div>
         <div id="welcomeUser" style="font-size: 0.95rem; font-weight: 700; color: #FFF;">Hello, Member</div>
-        <div id="userRoleBadge" style="font-size: 0.72rem; color: var(--text-dim);">Community Member</div>
+        <div id="userRoleBadge" style="font-size: 0.72rem; color: var(--text-dim);">ISOT Community</div>
       </div>
     </div>
     <div style="display: flex; align-items: center; gap: 12px;">
@@ -417,7 +417,7 @@
               <i class="fa-solid fa-qrcode" style="font-size: 1.2rem;"></i>
             </div>
             <div>
-              <div style="font-weight: 700; color: #FFF; font-size: 0.95rem;">Member Card</div>
+              <div id="cardTileLabel" style="font-weight: 700; color: #FFF; font-size: 0.95rem;">ISOT Card</div>
               <div class="dim">Discount QR token</div>
             </div>
           </div>
@@ -676,7 +676,9 @@
           document.getElementById('welcomeUser').textContent = `Hello, ${meProfile.full_name?.split(' ')[0] || 'Member'}`;
         }
         if (document.getElementById('userRoleBadge')) {
-          document.getElementById('userRoleBadge').textContent = ROLE_LABEL[meProfile.staff_role] || TIER_LABEL[meProfile.tier] || 'Community';
+          document.getElementById('userRoleBadge').textContent = ROLE_LABEL[meProfile.staff_role] || TIER_LABEL[meProfile.tier] || 'ISOT Community';
+          const tile = document.getElementById('cardTileLabel');
+          if (tile) tile.textContent = CARD_LABEL[meProfile.tier] || CARD_LABEL.participant;
         }
         if (document.getElementById('actionKaraokeIcon')) {
           document.getElementById('actionKaraokeIcon').innerHTML = getCategoryBadgeHtml('karaoke', 38);

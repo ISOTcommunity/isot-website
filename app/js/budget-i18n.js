@@ -110,7 +110,7 @@ const BUDGET_T = {
     t_cash: 'Cash disappears quietly. Write cash spending down for one week and you\'ll know the real number to put here.',
     t_unassigned: '{x} a month has no job yet. Money without a plan tends to disappear: move part of it to the emergency fund or a goal, and decide the rest before the month starts.',
     t_over: 'You\'re {x} a month over. Cut fun money first, then housing and food. Never cut the emergency fund to zero.',
-    t_card: 'Show your ISOT member card at partner bars for discounts, and more partners are coming. <a href="profile.html">My card</a>',
+    t_card: 'Show your ISOT card at partner bars for discounts, and more partners are coming. <a href="profile.html">My card</a>',
     t_fine: 'Looking good. Come back after your next payment.',
 
     reset: 'Start over',

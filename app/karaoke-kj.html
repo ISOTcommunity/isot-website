@@ -104,7 +104,7 @@
     <div class="scan-sheet">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
         <div style="font-weight:700;font-size:1.1rem;color:#FFF">
-          <i class="fa-solid fa-qrcode" style="color:var(--pink);margin-right:8px"></i>Scan member card
+          <i class="fa-solid fa-qrcode" style="color:var(--pink);margin-right:8px"></i>Scan ISOT card
         </div>
         <button type="button" onclick="closeScanModal()" style="background:transparent;border:none;color:var(--text-dim);font-size:1.3rem;cursor:pointer;padding:4px">
           <i class="fa-solid fa-xmark"></i>
@@ -580,14 +580,14 @@
     // ── Broadcast ──────────────────────────────────────────────────────────
     async function sendCheckinBroadcast() {
       const btn = document.getElementById('broadcastBtn');
-      if (!confirm('Send a notification to all members:\n\n"Show your member card to a volunteer to get checked in and earn 10 points!"\n\nSend to everyone?')) return;
+      if (!confirm('Send a notification to all members:\n\n"Show your ISOT card to a volunteer to get checked in and earn 10 points!"\n\nSend to everyone?')) return;
 
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
 
       const { data, error } = await db.rpc('board_broadcast', {
         p_title: '📲 Get your check-in points!',
-        p_message: 'Show your member card (Profile → QR code) to a volunteer at the door tonight to get checked in and earn 10 points.',
+        p_message: 'Show your ISOT card (Profile → QR code) to a volunteer at the door tonight to get checked in and earn 10 points.',
       });
 
       if (error) {
