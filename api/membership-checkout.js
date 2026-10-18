@@ -64,8 +64,8 @@ module.exports = async function handler(req, res) {
         subscription_data: yearly ? { metadata: meta } : undefined,
         payment_intent_data: yearly ? undefined : { metadata: meta },
         locale: 'auto',
-        success_url: `${SITE_URL}/join?paid=1`,
-        cancel_url: `${SITE_URL}/join?cancelled=1`,
+        success_url: `${SITE_URL}/app/apply.html?paid=1`,
+        cancel_url: `${SITE_URL}/app/apply.html?cancelled=1`,
       });
 
       await db('PATCH', `membership_applications?id=eq.${app.id}`,

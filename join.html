@@ -15,7 +15,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#000000" />
   <title>Join ISOT | Free Access & Official Membership</title>
-  <meta name="description" content="Join ISOT Community in Turin. Choose between Free Community Access or Official €10/year Membership with Intesa Sanpaolo bank transfer." />
+  <meta name="description" content="Join ISOT Community in Turin. Join the free ISOT Community, or apply to become an ISOT APS Member (€10/year, admitted by the Board)." />
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="/assets/favicon.png" sizes="48x48" type="image/png" />
   
@@ -235,8 +235,8 @@
         <div class="join-card">
           <div>
             <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">TRACK 01</div>
-            <h3 style="font-size: 2rem; font-weight: 700; color: #FFF; margin-top: 4px;">Free Community Access</h3>
-            <p style="color: var(--text-dim); font-size: 0.9rem;">Open to all international students and youth in Turin.</p>
+            <h3 style="font-size: 2rem; font-weight: 700; color: #FFF; margin-top: 4px;">ISOT Community</h3>
+            <p style="color: var(--text-dim); font-size: 0.9rem;">Everyone who uses ISOT’s digital platforms or comes to our events. Free, open to all.</p>
             <div style="font-family: var(--font-display); font-size: 4rem; font-weight: 700; color: #FFF; margin: 16px 0 24px;">€0 <span style="font-size: 1rem; color: var(--text-dark); font-family: var(--font-body);">/ forever</span></div>
 
             <ul style="list-style: none; margin-bottom: 30px; font-size: 0.95rem; color: var(--text-muted);">
@@ -275,61 +275,32 @@
           </div>
         </div>
 
-        <!-- Track 2: Official Member (€10/yr) -->
+        <!-- Track 2: ISOT APS Member — application, Board approval (Statute Art. 6) -->
         <div class="join-card featured">
-          <div style="position: absolute; top:-16px; right:30px; background: linear-gradient(135deg, var(--pink), var(--orange)); padding: 6px 18px; border-radius: var(--radius-full); font-size:0.75rem; font-weight:800; color:#FFF; text-transform:uppercase;">RECOMMENDED</div>
           <div>
             <div style="font-size: 0.8rem; font-weight: 700; color: var(--pink); text-transform: uppercase;">TRACK 02</div>
-            <h3 style="font-size: 2rem; font-weight: 700; color: #FFF; margin-top: 4px;">Official Member</h3>
-            <p style="color: var(--text-dim); font-size: 0.9rem;">VIP community rights, voting membership & partner perks.</p>
-            <div style="font-family: var(--font-display); font-size: 4rem; font-weight: 700; margin: 16px 0 24px;" class="text-gradient">€10 <span style="font-size: 1rem; color: var(--text-dark); font-family: var(--font-body);">/ per year</span></div>
+            <h3 style="font-size: 2rem; font-weight: 700; color: #FFF; margin-top: 4px;">ISOT APS Member</h3>
+            <p style="color: var(--text-dim); font-size: 0.9rem;">A member of the association, admitted by the Board. ISOT APS members are the members of the General Assembly.</p>
+            <div style="font-family: var(--font-display); font-size: 4rem; font-weight: 700; margin: 16px 0 24px;" class="text-gradient">€10 <span style="font-size: 1rem; color: var(--text-dark); font-family: var(--font-body);">/ year</span></div>
 
-            <ul style="list-style: none; margin-bottom: 30px; font-size: 0.95rem; color: var(--text-muted);">
-              <li style="margin-bottom: 10px;"><i class="fa-solid fa-star text-gold" style="margin-right: 8px;"></i> Everything in Free Access</li>
-              <li style="margin-bottom: 10px;"><i class="fa-solid fa-star text-gold" style="margin-right: 8px;"></i> Official Digital ISOT Member Card</li>
-              <li style="margin-bottom: 10px;"><i class="fa-solid fa-star text-gold" style="margin-right: 8px;"></i> Priority access to partner programs like SAS Career Lab & Startup Lab</li>
-              <li style="margin-bottom: 10px;"><i class="fa-solid fa-star text-gold" style="margin-right: 8px;"></i> Digital membership receipt issued</li>
+            <ul style="list-style: none; margin-bottom: 24px; font-size: 0.95rem; color: var(--text-muted);">
+              <li style="margin-bottom: 10px;"><i class="fa-solid fa-star text-gold" style="margin-right: 8px;"></i> Everything in ISOT Community</li>
+              <li style="margin-bottom: 10px;"><i class="fa-solid fa-star text-gold" style="margin-right: 8px;"></i> Member of the General Assembly: vote on the association’s decisions, elect and be elected to the Board</li>
+              <li style="margin-bottom: 10px;"><i class="fa-solid fa-star text-gold" style="margin-right: 8px;"></i> ISOT APS Member card in the app</li>
+              <li style="margin-bottom: 10px;"><i class="fa-solid fa-star text-gold" style="margin-right: 8px;"></i> Receipt for the annual fee</li>
             </ul>
+
+            <ol style="margin: 0 0 24px 18px; font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">
+              <li>Fill in and sign the admission form in the ISOT app</li>
+              <li>Pay the €10 annual fee, once or automatically each year</li>
+              <li>The Board decides at its next meeting. If not accepted, the fee is refunded in full</li>
+            </ol>
           </div>
 
-          <form id="memberForm" onsubmit="submitForm(event, 'member')">
-            <input type="text" name="website_url" class="hidden-field" tabindex="-1" autocomplete="off" />
-            <div class="form-group">
-              <label>Full Name</label>
-              <input type="text" id="memberName" required placeholder="Maria Silva" class="form-input" />
-            </div>
-            <div class="form-group">
-              <label>Email Address</label>
-              <input type="email" id="memberEmail" required placeholder="maria@example.com" class="form-input" />
-            </div>
-            <div class="form-group">
-              <label>University / School</label>
-              <input type="text" id="memberUni" required placeholder="Politecnico di Torino" class="form-input" />
-            </div>
-            <div class="form-group">
-              <label>Nationality</label>
-              <input type="text" id="memberNation" required placeholder="Spanish / Brazilian / Iranian" class="form-input" />
-            </div>
-            <div class="form-group">
-              <label>Verification Question: What city is ISOT based in?</label>
-              <input type="text" id="memberCity" required placeholder="Type city name" class="form-input" />
-            </div>
-            <button type="submit" id="memberBtn" class="btn btn-pink" style="width: 100%;">Become an Official Member →</button>
-            <p id="memberError" style="display:none; color: var(--pink); font-size: 0.85rem; margin-top: 10px; text-align: center;"></p>
-          </form>
-
-          <div id="memberSuccess" style="display:none; text-align:left; padding:24px; background: rgba(15,23,42,0.95); border-radius: var(--radius-md); border:1px solid var(--pink); margin-top:20px;">
-            <h4 style="color:#FFF; font-size:1.3rem; margin-bottom:8px;">Thank You for Registering! 🌟</h4>
-            <p style="color:var(--text-muted); font-size:0.85rem;">Please transfer your annual €10.00 membership fee via bank transfer:</p>
-            <div class="bank-box">
-              <div><strong>Beneficiary:</strong> ISOT Community</div>
-              <div><strong>Amount:</strong> €10.00</div>
-              <div><strong>IBAN:</strong> <span style="color:var(--gold); font-family:monospace;">IT96I0306909606100000413476</span></div>
-              <div><strong>Bank:</strong> Intesa Sanpaolo</div>
-              <div><strong>Reference (Causale):</strong> Quota associativa – <span id="refName">Member</span></div>
-            </div>
-            <p style="color:var(--text-dim); font-size:0.8rem; margin-top:12px;">Your membership receipt will be generated and emailed within 48h. Welcome to ISOT!</p>
-          </div>
+          <a href="/app/apply.html" class="btn btn-pink" style="width: 100%;">Apply in the app →</a>
+          <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 12px; text-align: center;">
+            Prefer paper? <a href="/api/admission-form" target="_blank" rel="noopener">Print the admission form</a> and hand it to a Board member at any ISOT event.
+          </p>
         </div>
 
       </div>
@@ -376,7 +347,7 @@
         </div>
       </div>
       <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 24px; text-align: center; color: var(--text-dark); font-size: 0.85rem;">
-        © 2026 ISOT Community • Turin, Italy (APS registration in progress)
+        © 2026 ISOT Community • Turin, Italy · ISOT APS, registered in RUNTS
       </div>
     </div>
   </footer>
@@ -400,32 +371,25 @@
       const honeypot = form.querySelector('input[name="website_url"]').value;
       if (honeypot) return;
 
-      const cityVal = (type === 'community' ? document.getElementById('commCity') : document.getElementById('memberCity')).value.trim().toLowerCase();
+      const cityVal = document.getElementById('commCity').value.trim().toLowerCase();
       if (cityVal !== 'turin' && cityVal !== 'torino') {
         alert('Please enter the city where ISOT is based (Turin or Torino).');
         return;
       }
 
-      const btn = document.getElementById(type === 'community' ? 'commBtn' : 'memberBtn');
-      const err = document.getElementById(type === 'community' ? 'commError' : 'memberError');
+      const btn = document.getElementById('commBtn');
+      const err = document.getElementById('commError');
       err.style.display = 'none';
       btn.disabled = true;
       const btnLabel = btn.textContent;
       btn.textContent = 'Sending…';
 
-      let name, email, message;
-      if (type === 'community') {
-        name = document.getElementById('commName').value.trim();
-        email = document.getElementById('commEmail').value.trim();
-        const uni = document.getElementById('commUni').value.trim();
-        message = `[JOIN — Free Community Access]\nUniversity: ${uni}`;
-      } else {
-        name = document.getElementById('memberName').value.trim();
-        email = document.getElementById('memberEmail').value.trim();
-        const uni = document.getElementById('memberUni').value.trim();
-        const nation = document.getElementById('memberNation').value.trim();
-        message = `[JOIN — €10/yr Official Member application]\nUniversity: ${uni}\nNationality: ${nation}\nAwaiting bank transfer confirmation before board creates the pending membership record.`;
-      }
+      // Membership applications no longer come through here: they go to /app/apply.html
+      // (admission form + fee + Board approval, Statute Art. 6).
+      const name = document.getElementById('commName').value.trim();
+      const email = document.getElementById('commEmail').value.trim();
+      const uni = document.getElementById('commUni').value.trim();
+      const message = `[JOIN — ISOT Community]\nUniversity: ${uni}`;
 
       const res = await sendEnquiry('contact', { name, email, message });
 
@@ -437,14 +401,8 @@
         return;
       }
 
-      if (type === 'community') {
-        document.getElementById('commForm').style.display = 'none';
-        document.getElementById('commSuccess').style.display = 'block';
-      } else {
-        document.getElementById('refName').innerText = name || 'Member';
-        document.getElementById('memberForm').style.display = 'none';
-        document.getElementById('memberSuccess').style.display = 'block';
-      }
+      document.getElementById('commForm').style.display = 'none';
+      document.getElementById('commSuccess').style.display = 'block';
     }
   
     function toggleMobileMenu() {

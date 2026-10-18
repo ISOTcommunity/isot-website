@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-N2S3FL84RT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-N2S3FL84RT');
+</script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apply to ISOT APS · ISOT App</title>
+
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="../assets/favicon.png" sizes="48x48" type="image/png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-title" content="ISOT" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0C1A4A" />
+  <script defer src="/_vercel/insights/script.js"></script>
+
+  <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .section-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .section-title { font-size: 1rem; font-weight: 700; color: #FFF; margin-bottom: 12px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+    @media (max-width: 420px) { .two-col { grid-template-columns: 1fr; } }
+    .check-row { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; }
+    .check-row input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; flex-shrink: 0; accent-color: var(--pink); }
+    .check-row label { font-size: 0.86rem; color: var(--text-muted); line-height: 1.45; cursor: pointer; }
+    .plan { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 10px; cursor: pointer; }
+    .plan input { margin-top: 3px; accent-color: var(--pink); }
+    .plan strong { color: #FFF; display: block; margin-bottom: 2px; }
+    .def { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+    .def strong { color: #FFF; }
+    .hint { font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; }
+  </style>
+</head>
+<body class="tone-violet">
+  <div id="gate"><div class="spinner"></div></div>
+
+  <header class="topbar">
+    <a href="home.html" class="topbar-title" style="display: flex; align-items: center; gap: 8px;">
+      <i class="fa-solid fa-file-signature text-pink"></i>
+      <span>Become an ISOT APS Member</span>
+    </a>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div id="headerAvatar" style="cursor: pointer;" data-open-drawer></div>
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: #FFF; font-size: 1.3rem; cursor: pointer; padding: 6px;">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="shell" style="max-width: 520px;">
+    <div id="alert" hidden></div>
+
+    <div class="section-card">
+      <div class="def"><strong>ISOT Community</strong>: everyone who uses ISOT's digital platforms or comes to our events. Free, open to all. That's you already.</div>
+      <div class="def" style="margin-top: 10px;"><strong>ISOT APS Member</strong>: a member of the association, admitted by the Board after an application and the €10 annual fee. ISOT APS members are the members of the General Assembly.</div>
+    </div>
+
+    <!-- State: already a member -->
+    <div id="stateMember" class="section-card" hidden>
+      <div class="section-title"><i class="fa-solid fa-star text-gold"></i> You're an ISOT APS Member</div>
+      <p class="def">Your membership card is on your <a href="profile.html">profile</a>.</p>
+    </div>
+
+    <!-- State: paid, waiting for the Board -->
+    <div id="stateReview" class="section-card" hidden>
+      <div class="section-title"><i class="fa-solid fa-hourglass-half text-gold"></i> Application under review</div>
+      <p class="def">We've received your application and the €10 fee. The Board decides at its next meeting and we'll email you the result. If the application isn't accepted, the fee is refunded in full.</p>
+      <p class="def" style="margin-top: 10px;">You can withdraw for a full refund until the Board decides: write to the Board from <a href="../contact">the contact page</a>.</p>
+      <button type="button" class="btn btn-outline" style="margin-top: 14px;" onclick="downloadCopy()"><i class="fa-solid fa-file-pdf"></i> Download your signed application</button>
+    </div>
+
+    <!-- State: submitted, choose payment -->
+    <form id="payForm" class="section-card" hidden>
+      <div class="section-title">Pay the annual fee to complete your application</div>
+      <label class="plan"><input type="radio" name="plan" value="one_off" checked />
+        <span><strong>€10, once</strong><span class="def">You renew yourself each year. We remind you from 30 days before your anniversary.</span></span></label>
+      <label class="plan"><input type="radio" name="plan" value="yearly" />
+        <span><strong>€10 / year, automatic</strong><span class="def">Charged each year on your admission anniversary. We email you 7 days before. Cancel anytime.</span></span></label>
+      <p class="hint">You can withdraw your application for a full refund until the Board decides. Once you're admitted, the annual fee is non-refundable; you can resign at any time by writing to the Board.</p>
+      <button type="submit" id="payBtn" class="btn btn-pink" style="margin-top: 12px;">Continue to payment</button>
+      <button type="button" class="btn btn-outline" style="margin-top: 10px;" onclick="downloadCopy()"><i class="fa-solid fa-file-pdf"></i> Download your signed application</button>
+    </form>
+
+    <!-- State: new application -->
+    <form id="applyForm" novalidate hidden>
+      <div class="section-card">
+        <div class="section-title">Admission form</div>
+        <p class="hint" style="margin-bottom: 14px;">Same form as the paper one (<a href="/api/admission-form" target="_blank" rel="noopener">print it</a>). Write your name as on your passport, in Latin letters.</p>
+        <div class="two-col">
+          <div class="field"><label for="first_name">First name</label><input id="first_name" required autocomplete="given-name" /></div>
+          <div class="field"><label for="last_name">Last name</label><input id="last_name" required autocomplete="family-name" /></div>
+          <div class="field"><label for="birth_date">Date of birth</label><input id="birth_date" type="date" required autocomplete="bday" /></div>
+          <div class="field"><label for="birth_place">Place of birth</label><input id="birth_place" required placeholder="City, country" /></div>
+        </div>
+        <div class="field"><label for="residence_address">Residential address</label><input id="residence_address" required autocomplete="street-address" placeholder="Street, number, postcode, city" /></div>
+        <div class="two-col">
+          <div class="field"><label for="codice_fiscale">Codice fiscale (if you have one)</label><input id="codice_fiscale" maxlength="16" style="text-transform: uppercase;" /></div>
+          <div class="field"><label for="phone">Phone</label><input id="phone" type="tel" autocomplete="tel" /></div>
+        </div>
+        <div class="field"><label>Email</label><input id="email" disabled /></div>
+        <div class="field" id="guardianField" hidden>
+          <label for="guardian_name">Parent or guardian (you're under 18)</label>
+          <input id="guardian_name" placeholder="Full name of the parent or guardian co-signing" />
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title">Declarations</div>
+        <p class="def" style="margin-bottom: 8px;">I apply to become a member of ISOT APS. I accept the Statute and the Regulations of the Association and will abide by the decisions of its bodies (Statute, art. 6), and I pay the annual membership fee of €10 with this application.</p>
+        <div class="check-row"><input type="checkbox" id="accepts_statute" /><label for="accepts_statute">I accept the <a href="/assets/docs/ISOT_APS_Statuto.pdf" target="_blank" rel="noopener">Statute</a> and the Regulations of ISOT APS.</label></div>
+        <div class="check-row"><input type="checkbox" id="privacy_ack" /><label for="privacy_ack">I have read the <a href="../privacy" target="_blank" rel="noopener">privacy notice</a> (GDPR art. 13).</label></div>
+        <div class="field" style="margin-top: 8px;">
+          <label for="signed_name">Sign by typing your full name</label>
+          <input id="signed_name" required placeholder="Your full name" />
+          <p class="hint">This is your electronic signature. We record the date, time and your IP address on the signed PDF.</p>
+        </div>
+        <button type="submit" id="applyBtn" class="btn btn-pink">Sign and continue</button>
+      </div>
+    </form>
+  </main>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/isot.js"></script>
+  <script>
+    let me = null;
+    let applicationId = null;
+
+    async function token() {
+      const { data } = await db.auth.getSession();
+      return data?.session?.access_token || '';
+    }
+
+    async function api(path, body) {
+      const res = await fetch(path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${await token()}` },
+        body: JSON.stringify(body),
+      });
+      const json = await res.json().catch(() => ({}));
+      return { ok: res.ok, status: res.status, json };
+    }
+
+    function show(id) {
+      ['stateMember', 'stateReview', 'payForm', 'applyForm'].forEach((s) => {
+        document.getElementById(s).hidden = s !== id;
+      });
+    }
+
+    async function downloadCopy() {
+      const res = await fetch(`/api/admission-form?application=${encodeURIComponent(applicationId)}`, {
+        headers: { Authorization: `Bearer ${await token()}` },
+      });
+      if (!res.ok) return setAlert(document.getElementById('alert'), 'Could not load your copy. Try again in a moment.');
+      const url = URL.createObjectURL(await res.blob());
+      const a = document.createElement('a');
+      a.href = url; a.download = 'ISOT_APS_Domanda_di_ammissione.pdf';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }
+
+    function ageFrom(iso) {
+      if (!iso) return null;
+      const b = new Date(iso + 'T00:00:00'); const t = new Date();
+      let a = t.getFullYear() - b.getFullYear();
+      if (t.getMonth() < b.getMonth() || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) a--;
+      return a;
+    }
+
+    async function init() {
+      me = await requireAuth();
+      document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(me, 36);
+
+      const params = new URLSearchParams(location.search);
+      if (params.get('cancelled')) setAlert(document.getElementById('alert'), 'Payment cancelled. Your application is saved; you can pay whenever you are ready.', 'info');
+      if (params.get('paid')) setAlert(document.getElementById('alert'), 'Payment received. Thank you!', 'success');
+
+      if (me.tier === 'socio') return show('stateMember');
+
+      const { data: apps } = await db.from('membership_applications')
+        .select('id,status,created_at').eq('profile_id', me.id)
+        .in('status', ['submitted', 'paid']).order('created_at', { ascending: false }).limit(1);
+      const open = apps && apps[0];
+
+      // Back from Stripe: the webhook may land a second after the redirect.
+      if (open && open.status === 'submitted' && params.get('paid')) {
+        applicationId = open.id;
+        show('stateReview');
+        return;
+      }
+      if (open) {
+        applicationId = open.id;
+        return show(open.status === 'paid' ? 'stateReview' : 'payForm');
+      }
+
+      const parts = (me.full_name || '').trim().split(/\s+/);
+      document.getElementById('first_name').value = parts.slice(0, -1).join(' ') || parts[0] || '';
+      document.getElementById('last_name').value = parts.length > 1 ? parts[parts.length - 1] : '';
+      document.getElementById('email').value = me.email || '';
+      if (me.date_of_birth) document.getElementById('birth_date').value = me.date_of_birth;
+      toggleGuardian();
+      show('applyForm');
+    }
+
+    function toggleGuardian() {
+      const a = ageFrom(document.getElementById('birth_date').value);
+      document.getElementById('guardianField').hidden = !(a !== null && a < 18);
+    }
+    document.getElementById('birth_date').addEventListener('change', toggleGuardian);
+
+    document.getElementById('applyForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const alertEl = document.getElementById('alert');
+      const v = (id) => document.getElementById(id).value.trim();
+      const body = {
+        first_name: v('first_name'), last_name: v('last_name'),
+        birth_date: v('birth_date'), birth_place: v('birth_place'),
+        residence_address: v('residence_address'),
+        codice_fiscale: v('codice_fiscale'), phone: v('phone'),
+        guardian_name: v('guardian_name'),
+        accepts_statute: document.getElementById('accepts_statute').checked,
+        privacy_ack: document.getElementById('privacy_ack').checked,
+        signed_name: v('signed_name'),
+      };
+      const btn = document.getElementById('applyBtn');
+      const done = busy(btn, 'Signing…');
+      const { ok, json } = await api('/api/membership-apply', body);
+      done();
+      if (!ok && json.application_id) { applicationId = json.application_id; return show(json.status === 'paid' ? 'stateReview' : 'payForm'); }
+      if (!ok) return setAlert(alertEl, json.error ? `Please check: ${json.error}.` : 'Something went wrong. Please try again.');
+      applicationId = json.application_id;
+      alertEl.hidden = true;
+      show('payForm');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    document.getElementById('payForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const plan = document.querySelector('input[name="plan"]:checked').value;
+      const done = busy(document.getElementById('payBtn'), 'Opening payment…');
+      const { ok, json } = await api('/api/membership-checkout', { kind: 'admission', application_id: applicationId, plan });
+      if (ok && json.url) return location.assign(json.url);
+      done();
+      setAlert(document.getElementById('alert'), json.error || 'Could not open the payment page.');
+    });
+
+    init();
+  </script>
+</body>
+</html>
