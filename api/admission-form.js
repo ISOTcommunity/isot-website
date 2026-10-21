@@ -1,7 +1,7 @@
 // ISOT — the admission form PDF
 //
 // GET /api/admission-form
-//   the blank form, to print for people applying in person. Same layout as the online one.
+//   the blank form, to print for people applying in person (redirects to the static PDF).
 // GET /api/admission-form?application=<id>   (Authorization: Bearer <token>)
 //   the applicant's own signed copy. The bucket is Board-only, so the copy is read here
 //   with the service role after checking the application belongs to the caller.
@@ -16,11 +16,13 @@ module.exports = async function handler(req, res) {
 
   const id = req.query?.application;
 
+  // The blank paper form is the designed bilingual PDF (English first, Italian alongside),
+  // made outside this repo and published as a static file. buildAdmissionPdf(null) is no
+  // longer used for paper; the online signed copy still comes from buildAdmissionPdf(data).
   if (!id) {
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'inline; filename="ISOT_APS_Domanda_di_ammissione.pdf"');
-    res.setHeader('Cache-Control', 'public, max-age=86400');
-    return res.status(200).send(buildAdmissionPdf(null));
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.setHeader('Location', '/assets/docs/ISOT_Membership_Application.pdf');
+    return res.status(302).end();
   }
 
   try {
