@@ -47,6 +47,17 @@
     .def { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
     .def strong { color: #FFF; }
     .hint { font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; }
+    .road { display: grid; gap: 0; margin: 4px 0 2px; }
+    .road .st { display: grid; grid-template-columns: 34px 1fr; gap: 10px; position: relative; padding-bottom: 14px; }
+    .road .st:not(:last-child)::before { content: ''; position: absolute; left: 16px; top: 32px; bottom: 0; width: 2px; background: rgba(255,255,255,0.14); }
+    .road .dot { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; color: #0E0F14; background: var(--c); }
+    .road .st.done .dot { background: var(--green); }
+    .road .st.now .dot { box-shadow: 0 0 0 4px rgba(255,255,255,0.18); }
+    .road b { display: block; color: #FFF; font-size: 0.92rem; }
+    .road span { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; }
+    .choice { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+    .choice label { display: flex; align-items: center; gap: 6px; padding: 8px 12px; border: 1px solid rgba(255,255,255,0.16); border-radius: 999px; font-size: 0.84rem; cursor: pointer; }
+    .choice input { accent-color: var(--pink); }
   </style>
 </head>
 <body class="tone-violet">
@@ -71,6 +82,16 @@
     <div class="section-card">
       <div class="def"><strong>ISOT Community</strong>: everyone who uses ISOT's digital platforms or comes to our events. Free, open to all. That's you already.</div>
       <div class="def" style="margin-top: 10px;"><strong>ISOT APS Member</strong>: a member of the association, admitted by the Board after an application and the €10 annual fee. ISOT APS members are the members of the General Assembly.</div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title"><i class="fa-solid fa-route" style="color: var(--pink)"></i> Your road to ISOT APS Member</div>
+      <div class="road" id="road">
+        <div class="st" data-step="1" style="--c: var(--blue)"><div class="dot">1</div><div><b>Fill in the form</b><span>Online, about 3 minutes. We make your signed PDF automatically.</span></div></div>
+        <div class="st" data-step="2" style="--c: var(--pink)"><div class="dot">2</div><div><b>Pay €10</b><span>Once, or yearly automatic, on Stripe's secure page.</span></div></div>
+        <div class="st" data-step="3" style="--c: var(--amber, #FFB81F)"><div class="dot">3</div><div><b>The Board decides</b><span>At its next meeting. Not admitted? Your €10 comes back in full.</span></div></div>
+        <div class="st" data-step="4" style="--c: var(--green)"><div class="dot">4</div><div><b>Welcome, member</b><span>Your card turns ★ ISOT APS Member and you vote in the General Assembly.</span></div></div>
+      </div>
     </div>
 
     <!-- State: already a member -->
@@ -103,19 +124,31 @@
     <form id="applyForm" novalidate hidden>
       <div class="section-card">
         <div class="section-title">Admission form</div>
-        <p class="hint" style="margin-bottom: 14px;">Prefer paper? <a href="/api/admission-form" target="_blank" rel="noopener">Print the form</a>. Write your name as on your passport, in Latin letters.</p>
+        <p class="hint" style="margin-bottom: 14px;">Write your name as on your passport, in Latin letters. When you sign, we make your application PDF and keep a copy for you.</p>
         <div class="two-col">
           <div class="field"><label for="first_name">First name</label><input id="first_name" required autocomplete="given-name" /></div>
           <div class="field"><label for="last_name">Last name</label><input id="last_name" required autocomplete="family-name" /></div>
           <div class="field"><label for="birth_date">Date of birth</label><input id="birth_date" type="date" required autocomplete="bday" /></div>
           <div class="field"><label for="birth_place">Place of birth</label><input id="birth_place" required placeholder="City, country" /></div>
         </div>
-        <div class="field"><label for="residence_address">Residential address</label><input id="residence_address" required autocomplete="street-address" placeholder="Street, number, postcode, city" /></div>
+        <div class="field"><label for="nationality">Nationality</label><input id="nationality" required autocomplete="country-name" /></div>
+        <div class="two-col">
+          <div class="field"><label for="residence_city">City you live in</label><input id="residence_city" required value="Torino" autocomplete="address-level2" /></div>
+          <div class="field"><label for="residence_address">Address and postcode</label><input id="residence_address" required autocomplete="street-address" placeholder="Street, number, postcode" /></div>
+        </div>
         <div class="two-col">
           <div class="field"><label for="codice_fiscale">Codice fiscale (if you have one)</label><input id="codice_fiscale" maxlength="16" style="text-transform: uppercase;" /></div>
           <div class="field"><label for="phone">Phone</label><input id="phone" type="tel" autocomplete="tel" /></div>
         </div>
         <div class="field"><label>Email</label><input id="email" disabled /></div>
+        <details style="margin-top: 6px;">
+          <summary class="hint" style="cursor: pointer;">ID document (optional)</summary>
+          <div class="field" style="margin-top: 10px;"><label for="id_document">Type and number</label><input id="id_document" placeholder="e.g. Passport AB1234567" /></div>
+          <div class="two-col">
+            <div class="field"><label for="id_issued_by">Issued by</label><input id="id_issued_by" /></div>
+            <div class="field"><label for="id_expiry">Expiry</label><input id="id_expiry" type="date" /></div>
+          </div>
+        </details>
         <div class="field" id="guardianField" hidden>
           <label for="guardian_name">Parent or guardian (you're under 18)</label>
           <input id="guardian_name" placeholder="Full name of the parent or guardian co-signing" />
@@ -123,10 +156,40 @@
       </div>
 
       <div class="section-card">
+        <div class="section-title">Your status</div>
+        <div class="choice" id="statusChoice">
+          <label><input type="radio" name="status_kind" value="student" /> Student</label>
+          <label><input type="radio" name="status_kind" value="graduate" /> Graduate</label>
+          <label><input type="radio" name="status_kind" value="researcher" /> Researcher, lecturer</label>
+          <label><input type="radio" name="status_kind" value="other" /> Working or other</label>
+        </div>
+        <div id="studyFields" hidden style="margin-top: 12px;">
+          <div class="field"><label for="institution" id="institutionLabel">University or school</label>
+            <input id="institution" list="institutions" placeholder="Start typing" />
+            <datalist id="institutions"><option value="Università degli Studi di Torino"><option value="Politecnico di Torino"><option value="ESCP Business School"><option value="SAA School of Management"><option value="IAAD"><option value="IED Torino"><option value="Accademia Albertina"><option value="Conservatorio G. Verdi"></datalist></div>
+          <div class="field" id="courseField"><label for="course">Degree course</label><input id="course" /></div>
+          <div class="two-col" id="levelRow">
+            <div class="field"><label for="study_level">Level</label>
+              <select id="study_level"><option value="">Choose</option><option value="bachelor">Bachelor (triennale)</option><option value="masters">Master's (magistrale)</option><option value="phd">PhD (dottorato)</option><option value="master">Master</option><option value="erasmus">Erasmus / exchange</option><option value="other">Other</option></select></div>
+            <div class="field" id="studentNoField"><label for="student_number">Student number (matricola)</label><input id="student_number" /></div>
+            <div class="field" id="gradYearField" hidden><label for="grad_year">Year of graduation</label><input id="grad_year" inputmode="numeric" maxlength="4" /></div>
+          </div>
+        </div>
+        <div class="field" id="occupationField" hidden style="margin-top: 12px;"><label for="occupation">What do you do?</label><input id="occupation" /></div>
+      </div>
+
+      <div class="section-card">
         <div class="section-title">Declarations</div>
         <p class="def" style="margin-bottom: 8px;">I apply to become a member of ISOT APS. I accept the Statute and the Regulations of the Association and will abide by the decisions of its bodies (Statute, art. 6), and I pay the annual membership fee of €10 with this application.</p>
         <div class="check-row"><input type="checkbox" id="accepts_statute" /><label for="accepts_statute">I accept the Statute (<a href="/assets/docs/ISOT_APS_Statuto.pdf" target="_blank" rel="noopener">Italian, binding</a> · <a href="/assets/docs/ISOT_APS_Statute_EN.pdf" target="_blank" rel="noopener">English translation</a>) and the Regulations of ISOT APS.</label></div>
+        <div class="check-row"><input type="checkbox" id="accepts_fee" /><label for="accepts_fee">I will pay the yearly membership fee (now €10). It's non-transferable and, once I'm admitted, non-refundable.</label></div>
+        <div class="check-row"><input type="checkbox" id="accepts_board" /><label for="accepts_board">I know the Board decides on admission (Statute, art. 6) and the fee is refunded if I'm not admitted.</label></div>
+        <div class="check-row"><input type="checkbox" id="truthful_ack" /><label for="truthful_ack">The information I gave is true, and I'll tell ISOT if it changes.</label></div>
         <div class="check-row"><input type="checkbox" id="privacy_ack" /><label for="privacy_ack">I have read the <a href="../privacy" target="_blank" rel="noopener">privacy notice</a> (GDPR art. 13).</label></div>
+        <div class="field" style="margin-top: 10px;"><label>Optional: photos and videos of activities on ISOT channels</label>
+          <div class="choice"><label><input type="radio" name="consent_media" value="yes" /> Yes</label><label><input type="radio" name="consent_media" value="no" /> No</label></div></div>
+        <div class="field"><label>Optional: event news by email and WhatsApp</label>
+          <div class="choice"><label><input type="radio" name="consent_news" value="yes" /> Yes</label><label><input type="radio" name="consent_news" value="no" /> No</label></div></div>
         <div class="field" style="margin-top: 8px;">
           <label for="signed_name">Sign by typing your full name</label>
           <input id="signed_name" required placeholder="Your full name" />
@@ -158,7 +221,18 @@
       return { ok: res.ok, status: res.status, json };
     }
 
+    // Light up the road: steps before `n` are done, `n` is where you are.
+    function roadAt(n) {
+      document.querySelectorAll('#road .st').forEach((el) => {
+        const s = Number(el.dataset.step);
+        el.classList.toggle('done', s < n);
+        el.classList.toggle('now', s === n);
+        if (s < n) el.querySelector('.dot').innerHTML = '<i class="fa-solid fa-check"></i>';
+      });
+    }
+
     function show(id) {
+      roadAt({ applyForm: 1, payForm: 2, stateReview: 3, stateMember: 5 }[id] || 1);
       ['stateMember', 'stateReview', 'payForm', 'applyForm'].forEach((s) => {
         document.getElementById(s).hidden = s !== id;
       });
@@ -171,7 +245,7 @@
       if (!res.ok) return setAlert(document.getElementById('alert'), 'Could not load your copy. Try again in a moment.');
       const url = URL.createObjectURL(await res.blob());
       const a = document.createElement('a');
-      a.href = url; a.download = 'ISOT_APS_Domanda_di_ammissione.pdf';
+      a.href = url; a.download = 'ISOT_APS_Membership_Application.pdf';
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 5000);
     }
@@ -215,6 +289,8 @@
       document.getElementById('last_name').value = parts.length > 1 ? parts[parts.length - 1] : '';
       document.getElementById('email').value = me.email || '';
       if (me.date_of_birth) document.getElementById('birth_date').value = me.date_of_birth;
+      if (me.nationality) document.getElementById('nationality').value = me.nationality;
+      if (me.university) document.getElementById('institution').value = me.university;
       toggleGuardian();
       show('applyForm');
     }
@@ -225,6 +301,19 @@
     }
     document.getElementById('birth_date').addEventListener('change', toggleGuardian);
 
+    function statusKind() { return document.querySelector('input[name="status_kind"]:checked')?.value || ''; }
+    document.getElementById('statusChoice').addEventListener('change', () => {
+      const k = statusKind();
+      document.getElementById('studyFields').hidden = !k || k === 'other';
+      document.getElementById('occupationField').hidden = k !== 'other';
+      document.getElementById('institutionLabel').textContent = k === 'researcher' ? 'Where you research or teach' : 'University or school';
+      document.getElementById('courseField').hidden = k === 'researcher';
+      document.getElementById('levelRow').hidden = k === 'researcher';
+      document.getElementById('studentNoField').hidden = k !== 'student';
+      document.getElementById('gradYearField').hidden = k !== 'graduate';
+    });
+    const yesNo = (name) => { const r = document.querySelector(`input[name="${name}"]:checked`); return r ? r.value === 'yes' : null; };
+
     document.getElementById('applyForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const alertEl = document.getElementById('alert');
@@ -232,7 +321,16 @@
       const body = {
         first_name: v('first_name'), last_name: v('last_name'),
         birth_date: v('birth_date'), birth_place: v('birth_place'),
-        residence_address: v('residence_address'),
+        residence_address: v('residence_address'), residence_city: v('residence_city'),
+        nationality: v('nationality'),
+        id_document: v('id_document'), id_issued_by: v('id_issued_by'), id_expiry: v('id_expiry'),
+        status_kind: statusKind(), institution: v('institution'), course: v('course'),
+        study_level: v('study_level'), student_number: v('student_number'), grad_year: v('grad_year'),
+        occupation: v('occupation'),
+        accepts_fee: document.getElementById('accepts_fee').checked,
+        accepts_board: document.getElementById('accepts_board').checked,
+        truthful_ack: document.getElementById('truthful_ack').checked,
+        consent_media: yesNo('consent_media'), consent_news: yesNo('consent_news'),
         codice_fiscale: v('codice_fiscale'), phone: v('phone'),
         guardian_name: v('guardian_name'),
         accepts_statute: document.getElementById('accepts_statute').checked,

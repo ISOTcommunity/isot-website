@@ -2,8 +2,10 @@
 //
 // POST, signed in (Authorization: Bearer <Supabase access token>), JSON body:
 //   first_name, last_name, birth_date (YYYY-MM-DD), birth_place, codice_fiscale?,
-//   residence_address, phone?, guardian_name? (required under 18),
-//   accepts_statute: true, privacy_ack: true, signed_name
+//   residence_address, residence_city, phone?, guardian_name? (required under 18),
+//   nationality, id_document?, id_issued_by?, id_expiry?, status_kind, institution, course,
+//   study_level, student_number, grad_year, occupation, consent_media, consent_news,
+//   accepts_statute, accepts_fee, accepts_board, truthful_ack, privacy_ack: true, signed_name
 // → { application_id }  — the app then calls api/membership-checkout to pay.
 //
 // What happens:
@@ -15,7 +17,9 @@
 //      Regolamento interno", so the Regolamento should name this online form.
 //   4. store it in the private 'admission-forms' bucket (Board-only) and keep the path
 //
-// No ID document, nationality or university is collected: not needed for the libro soci.
+// Since 076 (23 Oct 2026) the online form asks everything the paper form asks. The ID
+// document stays optional (data minimisation). If 076 has not been run yet, the extra
+// fields are dropped and the application is saved with the original ones.
 
 const { db, userFromRequest } = require('./_lib/membership');
 const { buildAdmissionPdf } = require('./_lib/admission-pdf');
@@ -74,9 +78,33 @@ module.exports = async function handler(req, res) {
       guardian_name: clean(b.guardian_name, 120) || null,
       signed_name: clean(b.signed_name, 160),
     };
+    const extra = {
+      nationality: clean(b.nationality, 80),
+      id_document: clean(b.id_document, 80) || null,
+      id_issued_by: clean(b.id_issued_by, 120) || null,
+      id_expiry: /^\d{4}-\d{2}-\d{2}$/.test(clean(b.id_expiry, 10)) ? clean(b.id_expiry, 10) : null,
+      residence_city: clean(b.residence_city, 80) || null,
+      status_kind: ['student', 'graduate', 'researcher', 'other'].includes(b.status_kind) ? b.status_kind : null,
+      institution: clean(b.institution, 160) || null,
+      course: clean(b.course, 160) || null,
+      study_level: ['bachelor', 'masters', 'phd', 'master', 'erasmus', 'other'].includes(b.study_level) ? b.study_level : null,
+      student_number: clean(b.student_number, 30) || null,
+      grad_year: /^(19|20)\d{2}$/.test(String(b.grad_year || '')) ? Number(b.grad_year) : null,
+      occupation: clean(b.occupation, 160) || null,
+      accepts_fee: b.accepts_fee === true,
+      accepts_board: b.accepts_board === true,
+      truthful_ack: b.truthful_ack === true,
+      consent_media: typeof b.consent_media === 'boolean' ? b.consent_media : null,
+      consent_news: typeof b.consent_news === 'boolean' ? b.consent_news : null,
+    };
 
     const missing = ['first_name', 'last_name', 'birth_date', 'birth_place', 'residence_address', 'signed_name']
       .filter((k) => !f[k]);
+    if (!extra.nationality) missing.push('nationality');
+    if (!extra.status_kind) missing.push('status_kind');
+    else if (extra.status_kind === 'other' ? !extra.occupation : !extra.institution) {
+      missing.push(extra.status_kind === 'other' ? 'occupation' : 'institution');
+    }
     if (missing.length) return res.status(400).json({ error: 'missing fields', fields: missing });
     if (!/^\d{4}-\d{2}-\d{2}$/.test(f.birth_date) || isNaN(Date.parse(f.birth_date))) {
       return res.status(400).json({ error: 'birth_date must be YYYY-MM-DD', fields: ['birth_date'] });
@@ -87,8 +115,8 @@ module.exports = async function handler(req, res) {
     if (f.codice_fiscale && !/^[A-Z0-9]{16}$/.test(f.codice_fiscale)) {
       return res.status(400).json({ error: 'codice fiscale has 16 letters and digits', fields: ['codice_fiscale'] });
     }
-    if (b.accepts_statute !== true || b.privacy_ack !== true) {
-      return res.status(400).json({ error: 'accept the Statute and read the privacy notice', fields: ['accepts_statute', 'privacy_ack'] });
+    if (b.accepts_statute !== true || b.privacy_ack !== true || !extra.accepts_fee || !extra.accepts_board || !extra.truthful_ack) {
+      return res.status(400).json({ error: 'tick all five declarations', fields: ['accepts_statute', 'accepts_fee', 'accepts_board', 'truthful_ack', 'privacy_ack'] });
     }
 
     // An application already waiting: send them on to pay it rather than duplicating.
@@ -102,7 +130,7 @@ module.exports = async function handler(req, res) {
     const now = new Date();
     const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || '';
 
-    const [app] = await db('POST', 'membership_applications', {
+    const base = {
       profile_id: user.id,
       channel: 'online',
       ...f,
@@ -113,11 +141,22 @@ module.exports = async function handler(req, res) {
       signed_at: now.toISOString(),
       signed_ip: ip,
       status: 'submitted',
-    }, 'return=representation');
+    };
+    let app;
+    try {
+      [app] = await db('POST', 'membership_applications', { ...base, ...extra }, 'return=representation');
+    } catch (err) {
+      // 076 not run yet: the new columns don't exist. Save what the table has; the PDF
+      // still shows every answer.
+      if (!/column|schema cache|PGRST204/i.test(String(err.message || err))) throw err;
+      [app] = await db('POST', 'membership_applications', base, 'return=representation');
+      app = { ...app, ...extra };
+    }
 
     const pdf = buildAdmissionPdf({
       ...app,
       birth_date: itDate(app.birth_date),
+      id_expiry: app.id_expiry ? itDate(String(app.id_expiry)) : '',
       signed_at_display: romeStamp(now),
     });
     const path = `${now.getUTCFullYear()}/${app.id}.pdf`;

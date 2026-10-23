@@ -1,21 +1,31 @@
-// ISOT — the admission form as a PDF (domanda di ammissione a socio)
+// ISOT — the online admission form as a PDF (domanda di ammissione a socio)
 //
-// ONE FORM, TWO WAYS IN
-// buildAdmissionPdf(null) is the blank form printed for people applying in person.
-// buildAdmissionPdf(data) is the same page filled from the online form, with the
-// electronic signature (typed name, time, IP) where the handwritten one would go.
-// Same layout either way, so the Board reviews one kind of document.
+// buildAdmissionPdf(data) draws the signed copy of an online application in the same
+// design as the paper form (assets/docs/ISOT_Membership_Application.pdf): Night Blue
+// header with the logo, the colour bar, four numbered sections, English first with the
+// Italian alongside, the Board box at the bottom. The electronic signature (typed name,
+// time, IP) sits where the handwritten one would go.
 //
 // WHY HAND-WRITTEN PDF
-// No build step and no dependencies on this site (see api/_lib/membership.js). One A4
-// page of text and lines is a few hundred bytes of PDF operators; a library is not
-// worth installing for it. Fonts are the standard Helvetica pair, WinAnsi encoded:
-// accented Latin names (é, ñ, ç, ü…) print correctly; other scripts are replaced
-// with '?', so the form asks for the name as written on the passport in Latin letters.
+// No build step and no dependencies on this site (see api/_lib/membership.js). Fonts are
+// the standard Helvetica family, WinAnsi encoded: accented Latin names (é, ñ, ç, ü…) print
+// correctly; other scripts become '?', so the form asks for names in Latin letters.
+// Images are JPEGs embedded as-is (api/_lib/admission-images.js).
+
+const IMG = require('./admission-images');
 
 const W = 595.28; // A4 in points
 const H = 841.89;
-const M = 48;     // margin
+const M = 40;     // side margin
+
+// ISOT Colour System v2.2
+const C = {
+  night: [12, 26, 74], blue: [61, 123, 255], violet: [127, 74, 255], magenta: [224, 60, 245],
+  coral: [255, 90, 60], amber: [255, 184, 31], green: [31, 212, 127], milk: [231, 220, 201],
+  white: [255, 255, 255], gray: [90, 100, 136], line: [138, 147, 179],
+  cream: [245, 241, 234], lavender: [243, 238, 255], soft: [238, 241, 250],
+};
+const rgb = (c) => c.map((v) => (v / 255).toFixed(3)).join(' ');
 
 // WinAnsi (cp1252) covers Latin-1 plus a few extras; everything else becomes '?'.
 const CP1252_EXTRA = { '€': 0x80, '‚': 0x82, '„': 0x84, '…': 0x85, '‘': 0x91, '’': 0x92, '“': 0x93, '”': 0x94, '–': 0x96, '—': 0x97, '·': 0xb7 };
@@ -28,7 +38,6 @@ function toWinAnsi(str) {
     else if (c >= 0xa0 && c <= 0xff) out.push(c);
     else out.push(0x3f);
   }
-  // PDF string escapes
   const bytes = [];
   for (const b of out) {
     if (b === 0x28 || b === 0x29 || b === 0x5c) bytes.push(0x5c);
@@ -37,143 +46,239 @@ function toWinAnsi(str) {
   return Buffer.from(bytes).toString('latin1');
 }
 
-// Helvetica average width is ~0.5em; good enough to wrap a paragraph inside the margins.
-function wrap(text, size, width) {
-  const max = Math.floor(width / (size * 0.5));
+// Rough Helvetica widths: enough to place text after a label and to wrap paragraphs.
+function tw(str, size, bold) {
+  let em = 0;
+  for (const ch of String(str)) {
+    if (ch === ' ') em += 0.278;
+    else if (/[il.,;:'|!]/.test(ch)) em += 0.25;
+    else if (/[A-Z]/.test(ch)) em += bold ? 0.72 : 0.67;
+    else if (/[mwMW]/.test(ch)) em += 0.83;
+    else if (/[0-9]/.test(ch)) em += 0.556;
+    else em += bold ? 0.58 : 0.52;
+  }
+  return em * size;
+}
+
+function wrap(text, size, width, bold) {
   const lines = [];
   let line = '';
   for (const word of String(text).split(/\s+/)) {
-    if ((line + ' ' + word).trim().length > max) { lines.push(line); line = word; }
-    else line = (line + ' ' + word).trim();
+    const next = (line + ' ' + word).trim();
+    if (tw(next, size, bold) > width && line) { lines.push(line); line = word; }
+    else line = next;
   }
   if (line) lines.push(line);
   return lines;
 }
 
-function page() {
+const FONT = { r: 'F1', b: 'F2', i: 'F3' };
+
+function canvas() {
   const ops = [];
-  let y = H - M;
-  const api = {
-    text(x, yy, size, str, bold = false, gray = 0) {
-      ops.push(`${gray} g BT /${bold ? 'F2' : 'F1'} ${size} Tf ${x.toFixed(2)} ${yy.toFixed(2)} Td (${toWinAnsi(str)}) Tj ET`);
-    },
-    line(x1, y1, x2, y2, width = 0.6) {
-      ops.push(`0.55 G ${width} w ${x1.toFixed(2)} ${y1.toFixed(2)} m ${x2.toFixed(2)} ${y2.toFixed(2)} l S`);
-    },
-    rect(x, yy, w, h) {
-      ops.push(`0.55 G 0.6 w ${x.toFixed(2)} ${yy.toFixed(2)} ${w.toFixed(2)} ${h.toFixed(2)} re S`);
-    },
-    fill(x, yy, w, h, gray) {
-      ops.push(`${gray} g ${x.toFixed(2)} ${yy.toFixed(2)} ${w.toFixed(2)} ${h.toFixed(2)} re f`);
-    },
-    para(str, size = 9, bold = false, gray = 0, indent = 0) {
-      for (const l of wrap(str, size, W - 2 * M - indent)) { api.text(M + indent, y, size, l, bold, gray); y -= size * 1.35; }
-    },
-    gap(n) { y -= n; },
-    get y() { return y; },
-    set y(v) { y = v; },
+  // all coordinates below are from the TOP of the page
+  const Y = (t) => (H - t).toFixed(2);
+  return {
     ops,
+    text(x, t, size, str, style = 'r', color = C.night) {
+      ops.push(`${rgb(color)} rg BT /${FONT[style]} ${size} Tf ${x.toFixed(2)} ${Y(t)} Td (${toWinAnsi(str)}) Tj ET`);
+      return x + tw(str, size, style === 'b');
+    },
+    box(x, t, w, h, fill, stroke, dash) {
+      if (fill) ops.push(`${rgb(fill)} rg ${x.toFixed(2)} ${Y(t + h)} ${w.toFixed(2)} ${h.toFixed(2)} re f`);
+      if (stroke) ops.push(`${dash ? '[3 2] 0 d ' : ''}${rgb(stroke)} RG 1 w ${x.toFixed(2)} ${Y(t + h)} ${w.toFixed(2)} ${h.toFixed(2)} re S [] 0 d`);
+    },
+    line(x1, t, x2, color = C.line, width = 0.7) {
+      ops.push(`${rgb(color)} RG ${width} w ${x1.toFixed(2)} ${Y(t)} m ${x2.toFixed(2)} ${Y(t)} l S`);
+    },
+    circle(cx, ct, r, color) {
+      const k = 0.5523 * r, cy = H - ct;
+      ops.push(`${rgb(color)} rg ${cx + r} ${cy} m ${cx + r} ${cy + k} ${cx + k} ${cy + r} ${cx} ${cy + r} c ` +
+        `${cx - k} ${cy + r} ${cx - r} ${cy + k} ${cx - r} ${cy} c ${cx - r} ${cy - k} ${cx - k} ${cy - r} ${cx} ${cy - r} c ` +
+        `${cx + k} ${cy - r} ${cx + r} ${cy - k} ${cx + r} ${cy} c f`);
+    },
+    // checkbox; ticked = filled violet with a white tick
+    check(x, t, on) {
+      if (on) {
+        ops.push(`${rgb(C.violet)} rg ${x} ${Y(t + 8)} 8 8 re f`);
+        ops.push(`1 1 1 RG 1.3 w ${x + 1.8} ${Y(t + 4.2)} m ${x + 3.4} ${Y(t + 6)} l ${x + 6.4} ${Y(t + 2)} l S`);
+      } else {
+        ops.push(`${rgb(C.night)} RG 0.9 w ${x} ${Y(t + 8)} 8 8 re S`);
+      }
+    },
+    image(name, x, t, w, h) { ops.push(`q ${w} 0 0 ${h} ${x} ${Y(t + h)} cm /${name} Do Q`); },
   };
-  return api;
 }
 
-const ORG = 'ISOT APS – International Students of Turin';
-const ORG_LINE = 'C.F. 97916340017 · Torino · Iscritta al RUNTS, sezione APS (DD n.1572/A2202C del 06/10/2026)';
+// data: an application row, plus birth_date / id_expiry as dd/mm/yyyy and signed_at_display
+function buildAdmissionPdf(data = {}) {
+  const p = canvas();
+  const v = (k) => (data && data[k] != null && data[k] !== '' ? String(data[k]) : '');
+  const R = W - M;
 
-// data: null for the blank form, or an application row (+ signed_* fields)
-function buildAdmissionPdf(data) {
-  const p = page();
-  const v = (k) => (data && data[k] ? String(data[k]) : '');
+  // ── header ────────────────────────────────────────────────────────────────────
+  p.box(0, 0, W, 100, C.night);
+  p.image('Im1', M - 6, 22, 62, 62);
+  p.text(116, 38, 22, 'Membership', 'b', C.white);
+  p.text(116, 62, 22, 'application', 'b', C.magenta);
+  p.text(116, 76, 9, 'Domanda di ammissione a socio/a · ISOT APS', 'i', C.milk);
+  p.text(116, 87, 6.4, 'ISOT APS – International Students of Turin · APS registered in RUNTS, DD n. 1572/A2202C, 06/10/2026', 'r', [184, 192, 221]);
+  p.text(116, 95, 6.4, 'Via Napione 33/A, 10124 Torino · C.F. 97916340017 · info@isotcommunity.com', 'r', [184, 192, 221]);
+  p.image('Im2', R - 62, 18, 62, 62);
+  const bar = [C.blue, C.violet, C.magenta, C.coral, C.amber, C.green];
+  bar.forEach((c, i) => p.box((W / 6) * i, 100, W / 6 + 0.5, 5, c));
 
-  // header band
-  p.fill(0, H - 86, W, 86, 0.03);
-  p.text(M, H - 44, 18, 'ISOT APS', true, 1);
-  p.text(M + 92, H - 44, 10, 'International Students of Turin', false, 0.85);
-  p.text(M, H - 64, 8, ORG_LINE, false, 0.75);
-  p.y = H - 118;
+  let t = 122;
+  let x = p.text(M, t, 8, 'To the Board of ISOT APS', 'b');
+  x = p.text(x + 3, t, 8, '/ Al Consiglio Direttivo di ISOT APS', 'i', C.gray);
+  p.text(x + 6, t, 8, `· Online application ${v('id').slice(0, 8)}`, 'r', C.gray);
 
-  p.text(M, p.y, 14, 'Domanda di ammissione a socio', true); p.gap(16);
-  p.text(M, p.y, 10, 'Membership application', false, 0.35); p.gap(18);
-  p.para('Al Consiglio Direttivo di ISOT APS  /  To the Board of ISOT APS', 9, true); p.gap(6);
-
-  // fields: two columns where they fit
-  const field = (x, w, label, value) => {
-    p.text(x, p.y, 7.5, label, false, 0.4);
-    if (value) p.text(x + 2, p.y - 14, 11, value);
-    p.line(x, p.y - 18, x + w, p.y - 18);
+  const section = (n, en, it, color) => {
+    t += 20;
+    p.circle(M + 8, t - 3, 8, color);
+    p.text(M + 5.3, t, 9, String(n), 'b', C.white);
+    const x1 = p.text(M + 22, t, 10, en, 'b');
+    const x2 = p.text(x1 + 6, t, 8, it, 'i', C.gray);
+    p.line(x2 + 6, t - 3, R, color, 1);
+    t += 8;
   };
-  const colW = (W - 2 * M - 20) / 2;
-  const row2 = (l1, k1, l2, k2) => { field(M, colW, l1, v(k1)); field(M + colW + 20, colW, l2, v(k2)); p.gap(34); };
-  const row1 = (l, k) => { field(M, W - 2 * M, l, v(k)); p.gap(34); };
 
-  row2('Nome / First name', 'first_name', 'Cognome / Last name', 'last_name');
-  row2('Data di nascita / Date of birth', 'birth_date', 'Luogo di nascita / Place of birth', 'birth_place');
-  row2('Codice fiscale (se disponibile / if available)', 'codice_fiscale', 'Telefono / Phone', 'phone');
-  row1('Indirizzo di residenza / Residential address', 'residence_address');
-  row1('Email', 'email');
-
-  p.gap(2);
-  p.para('Il/La sottoscritto/a chiede di essere ammesso/a come socio/a di ISOT APS. Dichiara di aver letto e di accettare lo Statuto e il Regolamento dell\'Associazione e di attenersi alle deliberazioni dei suoi organi (Statuto, art. 6), e versa contestualmente la quota associativa annuale di € 10,00.', 9);
-  p.gap(2);
-  p.para('I apply to become a member of ISOT APS. I declare that I have read and accept the Statute and the Regulations of the Association and will abide by the decisions of its bodies (Statute, art. 6), and I pay the annual membership fee of € 10.00 with this application.', 8.5, false, 0.35);
-  p.gap(8);
-
-  const box = (checked, it, en) => {
-    p.rect(M, p.y - 2, 9, 9);
-    if (checked) p.text(M + 1.6, p.y - 0.6, 9, 'X', true);
-    p.text(M + 16, p.y, 9, it);
-    p.text(M + 16, p.y - 11, 8, en, false, 0.35);
-    p.gap(26);
+  // a labelled value on an underline: bold English, Italian in grey, value in large type
+  const field = (x0, x1, en, it, value) => {
+    let x = p.text(x0, t + 7, 7.5, en, 'b');
+    if (it) x = p.text(x + 3, t + 7, 7.5, it, 'i', C.gray);
+    if (value) p.text(x0, t + 19, 10, value, 'r');
+    p.line(x0, t + 22, x1);
   };
-  box(data?.accepts_statute, 'Accetto lo Statuto e il Regolamento di ISOT APS.', 'I accept the Statute and the Regulations of ISOT APS.');
-  box(data?.privacy_ack, 'Ho letto l\'informativa privacy (GDPR art. 13): isotcommunity.com/privacy', 'I have read the privacy notice (GDPR art. 13): isotcommunity.com/privacy');
+  const row = (cols) => {          // cols: [[weight, en, it, value], …]
+    const total = cols.reduce((s, c) => s + c[0], 0);
+    const gap = 12;
+    const span = R - M - gap * (cols.length - 1);
+    let x0 = M;
+    for (const [wgt, en, it, value] of cols) {
+      const w = (span * wgt) / total;
+      field(x0, x0 + w, en, it, value);
+      x0 += w + gap;
+    }
+    t += 28;
+  };
 
-  p.para('L\'ammissione è deliberata dal Consiglio Direttivo alla prima riunione utile. In caso di rigetto la decisione è motivata e comunicata per iscritto entro 30 giorni e la quota è restituita integralmente.', 8.5);
-  p.para('Admission is decided by the Board at its next meeting. If the application is rejected, the reasons are given in writing within 30 days and the fee is refunded in full.', 8, false, 0.35);
-  p.gap(10);
+  // ── 1 personal details ────────────────────────────────────────────────────────
+  section(1, 'PERSONAL DETAILS', 'Dati anagrafici', C.blue);
+  row([[1, 'First name', 'Nome', v('first_name')], [1, 'Last name', 'Cognome', v('last_name')]]);
+  row([[1.2, 'Born in', 'Nato/a a', v('birth_place')], [0.6, 'on', 'il', v('birth_date')], [0.9, 'Nationality', 'Cittadinanza', v('nationality')]]);
+  row([[1, 'Codice fiscale', '(if assigned)', v('codice_fiscale')], [1, 'ID (type, no.)', 'Documento', v('id_document')]]);
+  row([[1.4, 'Issued by', 'Rilasciato da', v('id_issued_by')], [0.6, 'Expiry', 'Scadenza', v('id_expiry')]]);
+  row([[0.8, 'Living in', 'Residente a', v('residence_city')], [1.6, 'Address, postcode', 'Indirizzo, CAP', v('residence_address')]]);
+  row([[1, 'Phone', 'Telefono', v('phone')], [1.4, 'E-mail', '', v('email')]]);
+  if (v('guardian_name')) row([[1, 'Parent or guardian (under 18)', 'Genitore o tutore', v('guardian_name')]]);
 
-  // minors
-  p.text(M, p.y, 7.5, 'Se minorenne, genitore o tutore / If under 18, parent or guardian (nome e firma / name and signature)', false, 0.4);
-  if (v('guardian_name')) p.text(M + 2, p.y - 14, 11, v('guardian_name'));
-  p.line(M, p.y - 18, W - M, p.y - 18);
-  p.gap(36);
-
-  // signature
-  if (data && data.signed_at) {
-    p.fill(M, p.y - 30, W - 2 * M, 42, 0.95);
-    p.text(M + 8, p.y - 2, 8, 'Firmato elettronicamente / Signed electronically', true);
-    p.text(M + 8, p.y - 15, 10, `${v('signed_name')}  ·  ${v('signed_at_display')}`);
-    p.text(M + 8, p.y - 26, 7.5, `IP ${v('signed_ip')}  ·  domanda online / online application ${v('id')}`, false, 0.4);
-    p.gap(52);
+  // ── 2 status ──────────────────────────────────────────────────────────────────
+  section(2, 'STATUS', 'Posizione accademica / professionale', C.green);
+  t += 2;
+  [['student', 'Student', 'Studente/ssa'], ['graduate', 'Graduate', 'Laureato/a'],
+    ['researcher', 'Researcher, lecturer', 'Ricercatore/docente'], ['other', 'Working or other', 'Lavoratore/trice o altro']]
+    .forEach(([k, en, it], i) => {
+      const cx = M + (i % 2) * ((R - M) / 2), ct = t + Math.floor(i / 2) * 13;
+      p.check(cx, ct, v('status_kind') === k);
+      const xe = p.text(cx + 12, ct + 7, 8, en, 'b');
+      p.text(xe + 3, ct + 7, 7.5, it, 'i', C.gray);
+    });
+  t += 13;
+  t += 14;
+  const kind = v('status_kind');
+  const levels = { bachelor: 'Bachelor / Triennale', masters: "Master's / Magistrale", phd: 'PhD / Dottorato', master: 'Master', erasmus: 'Erasmus / exchange', other: 'Other / Altro' };
+  if (kind === 'other') {
+    row([[1, 'Occupation', 'Occupazione', v('occupation')]]);
   } else {
-    field(M, colW, 'Luogo e data / Place and date', '');
-    field(M + colW + 20, colW, 'Firma / Signature', '');
-    p.gap(40);
+    row([[1.1, kind === 'researcher' ? 'At' : 'University / institution', kind === 'researcher' ? 'Presso' : 'Ateneo / istituto', v('institution')],
+      [1, 'Degree course', 'Corso', v('course')]]);
+    if (kind === 'graduate') row([[1, 'Level', 'Livello', levels[v('study_level')] || ''], [0.6, 'Year of graduation', 'Anno', v('grad_year')]]);
+    else if (kind === 'student') row([[1, 'Level', 'Livello', levels[v('study_level')] || ''], [0.7, 'Student no.', 'Matricola', v('student_number')]]);
   }
 
-  // Board box
-  const top = p.y;
-  p.rect(M, top - 74, W - 2 * M, 84);
-  p.y = top - 4;
-  p.text(M + 8, p.y, 8, 'RISERVATO AL CONSIGLIO DIRETTIVO  /  FOR THE BOARD', true, 0.3); p.gap(18);
-  p.text(M + 8, p.y, 8.5, 'Quota ricevuta il / Fee received on ____________   mezzo / method:  Stripe  ·  contanti  ·  bonifico', false, 0.2); p.gap(18);
-  p.text(M + 8, p.y, 8.5, 'Delibera del Consiglio del / Board decision of ____________      ammesso/a   ·   non ammesso/a', false, 0.2); p.gap(18);
-  p.text(M + 8, p.y, 8.5, 'N. libro soci / Register no. ________      Firma del Presidente / President\'s signature ______________________', false, 0.2);
+  // ── 3 declarations ────────────────────────────────────────────────────────────
+  section(3, 'REQUEST AND DECLARATIONS', 'Richiesta e dichiarazioni', C.violet);
+  const decl = [
+    ['accepts_statute', 'I have read and accept the Statute and internal Regulations and share their aims;', "di aver letto e di accettare lo Statuto e il Regolamento interno e di condividerne le finalità;"],
+    ['accepts_fee', 'I will pay the yearly membership fee (now €10), non-transferable and non-refundable after admission;', "di versare la quota associativa annuale (oggi € 10,00), non trasmissibile e non rimborsabile dopo l'ammissione;"],
+    ['accepts_board', 'I know the Board decides on admission (Statute, art. 6) and the fee is refunded if I am not admitted;', "che l'ammissione è decisa dal Consiglio Direttivo (Statuto, art. 6) e che, se non ammesso/a, la quota sarà restituita;"],
+    ['truthful_ack', 'the information given is true and I will report any change;', 'che i dati forniti sono veritieri e di comunicare ogni variazione;'],
+    ['privacy_ack', "I have read the privacy notice (isotcommunity.com/privacy, EU Reg. 2016/679) and consent to the use of my data for membership and the members' register.", "di aver letto l'informativa privacy e di acconsentire al trattamento dei dati per il rapporto associativo e il libro soci."],
+  ];
+  const inner = R - M - 34;
+  const lines = decl.map(([, en, it]) => [wrap(en, 8, inner), wrap(it, 7.5, inner, false)]);
+  const boxH = 24 + lines.reduce((s, [a, b]) => s + (a.length + b.length) * 9.5 + 4, 0);
+  p.box(M, t, R - M, boxH, C.cream);
+  let x2 = p.text(M + 10, t + 13, 8, 'I apply', 'b');
+  x2 = p.text(x2 + 2, t + 13, 8, 'to become a member of ISOT APS and', 'r');
+  x2 = p.text(x2 + 2, t + 13, 8, 'declare:', 'b');
+  p.text(x2 + 4, t + 13, 7.5, 'Chiedo di essere ammesso/a come socio/a e dichiaro:', 'i', C.gray);
+  let tt = t + 22;
+  decl.forEach(([k], i) => {
+    p.check(M + 10, tt, data[k] === true);
+    const [en, it] = lines[i];
+    for (const l of en) { p.text(M + 24, tt + 7, 8, l, 'r'); tt += 9.5; }
+    for (const l of it) { p.text(M + 24, tt + 7, 7.5, l, 'i', C.gray); tt += 9.5; }
+    tt += 4;
+  });
+  t += boxH;
 
-  p.text(M, 26, 7, `${ORG}  ·  isotcommunity.com  ·  Modulo di ammissione v2026-10`, false, 0.5);
+  // ── 4 optional consents ───────────────────────────────────────────────────────
+  section(4, 'OPTIONAL CONSENTS', 'Consensi facoltativi', C.coral);
+  t += 2;
+  for (const [k, en, it] of [['consent_media', 'Photos and videos of activities on ISOT channels', 'Foto e video sui canali ISOT'],
+    ['consent_news', 'Event news by email, WhatsApp', 'Comunicazioni su eventi']]) {
+    let xx = p.text(M, t + 7, 8, en, 'b');
+    xx = p.text(xx + 3, t + 7, 7.5, it, 'i', C.gray);
+    const yes = data[k] === true, no = data[k] === false;
+    p.check(R - 90, t, yes); p.text(R - 78, t + 7, 8, 'Yes / Sì', 'b');
+    p.check(R - 30, t, no); p.text(R - 18, t + 7, 8, 'No', 'b');
+    t += 15;
+  }
+
+  // ── signature ─────────────────────────────────────────────────────────────────
+  t += 8;
+  p.box(M, t, R - M, 40, C.soft);
+  p.box(M, t, 4, 40, C.blue);
+  let xs = p.text(M + 12, t + 12, 8, 'Signed electronically', 'b');
+  p.text(xs + 4, t + 12, 7.5, 'Firmato elettronicamente (firma elettronica semplice)', 'i', C.gray);
+  p.text(M + 12, t + 25, 10.5, `${v('signed_name')}  ·  ${v('signed_at_display')}`, 'b');
+  p.text(M + 12, t + 35, 7, `IP ${v('signed_ip')}  ·  online application ${v('id')}`, 'r', C.gray);
+  t += 52;
+
+  // ── Board box ─────────────────────────────────────────────────────────────────
+  p.box(M, t, R - M, 74, C.lavender, C.violet, true);
+  let xb = p.text(M + 10, t + 13, 8.5, 'FOR THE BOARD ONLY', 'b', C.violet);
+  p.text(xb + 4, t + 13, 7.5, '· Riservato al Consiglio Direttivo', 'i', C.gray);
+  const bl = (y, parts) => { let xx = M + 10; for (const [s, st, gap] of parts) { xx = p.text(xx, y, 8, s, st, st === 'i' ? C.gray : C.night) + 3; if (gap) { p.line(xx, y + 2, xx + gap); xx += gap + 10; } } };
+  bl(t + 30, [['Fee €', 'b', 60], ['on', 'b'], ['il', 'i', 80], ['Method', 'b'], ['Stripe · cash · bank transfer', 'r', 0], ['Receipt no.', 'b', 60]]);
+  bl(t + 47, [['Board decision of', 'b'], ['Delibera CD del', 'i', 90], ['Admitted', 'b', 0], ['·  Not admitted', 'b'], ['(reason within 30 days)', 'i']]);
+  bl(t + 64, [['Register no.', 'b'], ['N. libro soci', 'i', 80], ["President's signature", 'b'], ['Firma del Presidente', 'i', 130]]);
+
+  // ── footer ────────────────────────────────────────────────────────────────────
+  p.box(0, H - 22, W, 22, C.night);
+  const xf = p.text(M, H - 8, 7, 'ISOT', 'b', C.amber);
+  p.text(xf + 3, H - 8, 7, '· Live globally, connect locally.', 'r', [205, 211, 234]);
+  p.text(R - 250, H - 8, 7, 'Online application, signed electronically · isotcommunity.com', 'r', [205, 211, 234]);
 
   return assemble(p.ops.join('\n'));
 }
 
 function assemble(content) {
+  const img = (i) => `<< /Type /XObject /Subtype /Image /Width ${i.w} /Height ${i.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${i.data.length} >>\nstream\n${i.data.toString('latin1')}\nendstream`;
   const objs = [
     '<< /Type /Catalog /Pages 2 0 R >>',
     '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
-    `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>`,
+    `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 4 0 R /F2 5 0 R /F3 9 0 R >> /XObject << /Im1 10 0 R /Im2 11 0 R >> >> /Contents 6 0 R >>`,
     '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
     '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>',
     `<< /Length ${Buffer.byteLength(content, 'latin1')} >>\nstream\n${content}\nendstream`,
-    `<< /Title (${toWinAnsi('ISOT APS – Domanda di ammissione')}) /Producer (isotcommunity.com) >>`,
+    `<< /Title (${toWinAnsi('ISOT APS – Membership application')}) /Producer (isotcommunity.com) >>`,
+    '<< >>',
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>',
+    img(IMG.logo),
+    img(IMG.character),
   ];
   let out = '%PDF-1.4\n%\xe2\xe3\xcf\xd3\n';
   const offsets = [];
