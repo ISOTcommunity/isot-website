@@ -1599,7 +1599,12 @@
     return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
   };
 
-  // 1. The hero badge — the very next thing happening.
+  // A ticketed special night in the next 7 days leads (same rule as the app's Home).
+  const weekOut = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+  const special = rows.find((e) => e.register_url && e.event_date <= weekOut);
+  if (special) rows = [special, ...rows.filter((e) => e !== special)];
+
+  // 1. The hero badge — the lead night.
   const n = rows[0];
   const badge = document.getElementById('heroNextEvent');
   if (badge) {
@@ -1619,7 +1624,11 @@
                 style="display:block;width:100%;height:auto;border-radius:12px" />
          </a>`
       : '';
-    host.innerHTML = art + rows.slice(0, 3).map((e) => `
+    const tickets = lead && lead.register_url
+      ? `<a href="${esc(lead.register_url)}" target="_blank" rel="noopener noreferrer" class="btn btn-pink"
+            style="display:inline-flex;margin:0 0 14px">${esc(lead.register_label || 'Get tickets')} →</a>`
+      : '';
+    host.innerHTML = art + tickets + rows.slice(0, 3).map((e) => `
       <a href="calendar.html" style="display:flex;gap:11px;align-items:baseline;
          padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.08);
          text-decoration:none;color:inherit">
@@ -1631,7 +1640,7 @@
         </span>
       </a>`).join('')
       + `<p style="font-size:0.75rem;color:var(--text-dim);margin:12px 0 14px">
-           Free entry. Bring your student card.
+           ${special ? 'Weekly nights: free entry.' : 'Free entry.'} Bring your student card.
          </p>`;
   }
 })();

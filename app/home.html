@@ -729,10 +729,15 @@
       if (!el) return;
 
       const today = isotToday();
-      const next = EVENTS_DATA
+      const upcoming = EVENTS_DATA
         .filter(e => e.date >= today)
-        .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time))
-        .slice(0, 3);
+        .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+      // A ticketed special night (it has a ticket link) in the next 7 days leads, even if a
+      // weekly night comes first: that is the one the Board is announcing (Turkish Night,
+      // 27 Oct 2026). The weekly nights stay right behind it.
+      const weekOut = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+      const special = upcoming.find(e => e.registerUrl && e.date <= weekOut);
+      const next = (special ? [special, ...upcoming.filter(e => e !== special)] : upcoming).slice(0, 3);
 
       if (!next.length) { el.hidden = true; return; }
 
