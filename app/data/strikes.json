@@ -33,6 +33,38 @@
       "scope": "national",
       "title": "General strike (USB): buses, metro, trains, flights, taxis",
       "note": "Friday 30 Oct. GTT buses, trams and metro may stop outside the guaranteed hours (usually 6:00–9:00 and 12:00–15:00, check gtt.to.it). Trains from 21:00 Thu 29 to 20:59 Fri 30. Flights and taxis all day."
+    },
+    {
+      "date": "2026-11-09",
+      "end": "2026-11-09",
+      "kind": "rail",
+      "scope": "national",
+      "title": "Italo trains (9:01–16:59)",
+      "note": "Italo high-speed trains may be cancelled 9:01–16:59. Trenitalia is not affected."
+    },
+    {
+      "date": "2026-11-20",
+      "end": "2026-11-20",
+      "kind": "general",
+      "scope": "national",
+      "title": "General strike (CGIL), public and private sectors",
+      "note": "Friday 20 Nov, all day. Transport may run reduced service: check gtt.to.it and your train before leaving."
+    },
+    {
+      "date": "2026-11-21",
+      "end": "2026-11-21",
+      "kind": "local",
+      "scope": "turin",
+      "title": "GTT and train strike (CUB / SGB)",
+      "note": "Saturday 21 Nov: GTT buses, trams and metro may stop all day outside the guaranteed hours (check gtt.to.it). Trains from 21:00 Fri 20 to 20:00 Sat 21."
+    },
+    {
+      "date": "2026-11-21",
+      "end": "2026-11-22",
+      "kind": "air",
+      "scope": "national",
+      "title": "Air traffic control (ENAV)",
+      "note": "Sat 21 Nov 13:00–17:00 across Italy, and all day Sun 22 Nov at Milano Malpensa. Check your flight with the airline."
     }
   ]
 }
