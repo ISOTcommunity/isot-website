@@ -194,6 +194,19 @@
 
     <div id="alertBox"></div>
 
+    <!-- The queue rules, always visible and bold: people should know them before the night (078) -->
+    <div class="card" id="queueRules" style="margin-bottom: 18px; border: 2px solid var(--gold, #FFB81F); background: rgba(255,184,31,0.08);">
+      <h3 style="margin-bottom: 10px; color: #FFF;"><i class="fa-solid fa-scroll text-gold" style="margin-right: 6px;"></i> How the queue works</h3>
+      <ol style="margin: 0 0 0 18px; padding: 0; color: #FFF; font-weight: 700; font-size: 0.92rem; line-height: 1.55;">
+        <li>The song list opens at <span class="text-gold">22:30</span>, then again at <span class="text-gold">23:00, 23:30 and 00:00</span>.</li>
+        <li>Each round takes about 30 minutes of songs. When it's full, wait for the next round.</li>
+        <li><span class="text-gold">One song per person per round</span>, and <span class="text-gold">max 3 songs a night</span>.</li>
+        <li>Here with friends? Pick the <span class="text-gold">same crew sticker</span>: your crew's songs stay at least 2 songs apart.</li>
+        <li><span class="text-gold">00:30 sing-along finale</span>: the 5 most voted songs, everyone sings together, no mic. Suggest and vote below (5 votes each).</li>
+        <li>The KJ can change the order live when needed.</li>
+      </ol>
+    </div>
+
     <!-- Closed Schedule Notice Card -->
     <div class="card card-glass" id="closedScheduleCard" style="display: none; text-align: center; padding: 28px; margin-bottom: 24px; border-color: var(--gold);">
       <i class="fa-solid fa-clock text-gold" style="font-size: 2.2rem; margin-bottom: 10px;"></i>
@@ -209,7 +222,6 @@
     <!-- Tonight's rounds: when the song list opens (078) -->
     <div class="card card-glass" id="roundsCard" style="margin-bottom: 18px;" hidden>
       <h3 style="margin-bottom: 2px;"><i class="fa-solid fa-clock text-gold" style="margin-right: 6px;"></i> Tonight's song rounds</h3>
-      <p class="dim" style="font-size: 0.8rem;">The list opens every 30 minutes. One song per person per round, up to 3 a night.</p>
       <div class="rounds" id="roundsBar"></div>
       <p id="roundsNote" style="font-size: 0.88rem; font-weight: 600; color: #FFF; margin-top: 8px;"></p>
     </div>
