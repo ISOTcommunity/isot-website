@@ -138,6 +138,7 @@
         <div>
           <div class="eyebrow" id="nightStatus">Not started</div>
           <div class="dim" style="font-size:0.8rem" id="nightPace">Pace: 5 min a song (estimated)</div>
+          <div style="font-size:0.8rem;color:#FFF;margin-top:2px" id="nightRound"></div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button type="button" id="btnOpenNight" class="btn btn-sm btn-outline" style="width:auto;padding:8px 16px;font-size:0.85rem" onclick="openNight()">
@@ -180,6 +181,18 @@
         <input type="text" id="walkupSong" placeholder="Song & Singer (e.g. Volare - Marco)" required style="flex: 1;" />
         <button type="submit" class="btn btn-sm btn-outline" style="width: auto; padding: 0 16px;">Add</button>
       </form>
+    </div>
+
+    <!-- Sing-along finale (078): top 5 voted songs, everyone sings, no mic -->
+    <div class="card card-glass" id="kjFinale" style="margin-bottom: 20px; border-color: rgba(255,184,31,0.45);" hidden>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">
+        <h3 style="font-size:1rem;margin:0"><i class="fa-solid fa-people-group text-gold" style="margin-right:6px"></i> Sing-along finale · <span id="kjFinaleTime">00:30</span></h3>
+        <span class="dim" style="font-size:0.78rem" id="kjFinaleCount"></span>
+      </div>
+      <div id="kjFinaleList" class="dim" style="font-size:0.85rem">No votes yet.</div>
+      <button type="button" id="kjFinaleBtn" class="btn btn-outline" style="margin-top:12px;border-color:rgba(255,184,31,0.6);color:#FFECBD" onclick="startFinale()">
+        <i class="fa-solid fa-flag-checkered"></i> Start the sing-along (top 5 to the front)
+      </button>
     </div>
 
     <!-- Up Next Queue Lineup -->
@@ -230,10 +243,14 @@
     async function fetchQueue() {
       if (!tonight?.open) return;
 
-      const [{ data, error }, ns] = await Promise.all([
+      const [{ data, error }, ns, ms, fb] = await Promise.all([
         db.rpc('karaoke_queue', { p_instance: tonight.instance_id }),
         db.rpc('karaoke_night_state', { p_instance: tonight.instance_id }),
+        db.rpc('my_karaoke_status', { p_instance: tonight.instance_id }),
+        db.rpc('finale_board', { p_instance: tonight.instance_id }),
       ]);
+      if (!ms.error && ms.data && ms.data.phase) renderRoundLine(ms.data);
+      if (!fb.error && !ms.error) renderKjFinale(fb.data || [], ms.data || {});
 
       if (error) {
         // Was an empty catch, so a broken queue looked identical to an empty one.
@@ -251,6 +268,45 @@
       }));
 
       renderKjUI();
+    }
+
+    const hm = (iso) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' });
+    const crewImg = (k) => k ? `<img src="assets/crews/${k}.jpg" alt="${k} crew" title="${k} crew" style="width:24px;height:24px;border-radius:6px;vertical-align:-7px;margin-right:6px" />` : '';
+
+    // Where the request rounds are (078): 22:30, then every 30 minutes; sing-along after.
+    function renderRoundLine(st) {
+      const el = document.getElementById('nightRound');
+      if (!el) return;
+      if (st.phase === 'before') el.textContent = `Song list opens at ${hm(st.opens_at)}`;
+      else if (st.phase === 'rounds') el.textContent = `Round ${st.round} of ${st.rounds} · ${st.round_taken}/${st.round_capacity} requests · next round ${hm(st.round_end)}`;
+      else el.textContent = st.finale_started ? 'Sing-along running' : `Song list closed · sing-along time (${hm(st.finale_at)})`;
+    }
+
+    function renderKjFinale(rows, st) {
+      const card = document.getElementById('kjFinale');
+      if (!card) return;
+      card.hidden = false;
+      if (st.finale_at) document.getElementById('kjFinaleTime').textContent = hm(st.finale_at);
+      document.getElementById('kjFinaleCount').textContent = rows.length ? `${rows.length} suggested` : '';
+      document.getElementById('kjFinaleList').innerHTML = rows.length
+        ? rows.slice(0, 8).map((r, i) => `<div style="padding:5px 0;${i < 5 ? 'color:#FFF;font-weight:700' : ''}">${i + 1}. ${escapeHtml(r.song_title)}${r.song_artist ? ' · ' + escapeHtml(r.song_artist) : ''} <span class="dim" style="font-weight:400">(${r.votes})</span></div>`).join('')
+        : 'No votes yet.';
+      const btn = document.getElementById('kjFinaleBtn');
+      btn.disabled = !!st.finale_started || !rows.length;
+      btn.innerHTML = st.finale_started
+        ? '<i class="fa-solid fa-circle-check"></i> Sing-along started'
+        : '<i class="fa-solid fa-flag-checkered"></i> Start the sing-along (top 5 to the front)';
+    }
+
+    async function startFinale() {
+      const regular = kjQueue.filter(s => s.status === 'pending' && !s.is_finale).length;
+      if (!confirm('Start the sing-along now? The 5 most voted songs go to the front of the queue and new requests close.' +
+        (regular ? `\n\n${regular} regular song(s) still waiting will stay after them: skip them if there's no time.` : ''))) return;
+      const { data, error } = await db.rpc('karaoke_start_finale', { p_instance: tonight.instance_id });
+      const box = document.getElementById('alertBox');
+      if (error) { setAlert(box, error.message, 'error'); return; }
+      setAlert(box, `Sing-along on: ${data.songs} songs at the front. Tap Next to start.`, 'success');
+      await fetchQueue();
     }
 
     function fmtEta(iso) {
@@ -393,9 +449,9 @@
       container.innerHTML = pendingSlots.map((item, idx) => `
         <div class="kj-song-card">
           <div style="flex:1;min-width:0">
-            <div style="font-size:0.75rem;color:var(--pink);font-weight:700">#${idx + 1} UP NEXT${item.eta_at ? ` · ${escapeHtml(fmtEta(item.eta_at))}` : ''}</div>
+            <div style="font-size:0.75rem;color:${item.is_finale ? 'var(--gold, #FFB81F)' : 'var(--pink)'};font-weight:700">#${idx + 1} ${item.is_finale ? 'SING-ALONG · NO MIC' : 'UP NEXT'}${item.eta_at ? ` · ${escapeHtml(fmtEta(item.eta_at))}` : ''}</div>
             <div style="font-weight:700;color:#FFF;font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(item.song_title)}</div>
-            <div class="dim" style="font-size:0.85rem">Artist: ${escapeHtml(item.artist_name || 'Original Artist')} • Performed by ${escapeHtml(item.singer_name || 'Member')}</div>
+            <div class="dim" style="font-size:0.85rem">${crewImg(item.crew)}Artist: ${escapeHtml(item.artist_name || 'Original Artist')} • Performed by ${escapeHtml(item.singer_name || 'Member')}</div>
           </div>
           <div style="display:flex;gap:6px">
             <button type="button" onclick="playNow('${item.id}')" class="btn btn-sm btn-outline" style="width:auto;padding:8px 12px;font-size:0.8rem;color:var(--green);border-color:rgba(31, 212, 127,0.4)">

@@ -119,6 +119,30 @@
       border-color: var(--pink);
       background: rgba(127, 74, 255, 0.12);
     }
+    /* Rounds timeline (078) */
+    .rounds { display: flex; gap: 6px; margin: 10px 0 4px; overflow-x: auto; }
+    .rounds .r { flex: 1; min-width: 58px; text-align: center; padding: 8px 4px; border-radius: 12px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); font-size: 0.78rem; color: var(--text-muted); }
+    .rounds .r b { display: block; color: #FFF; font-size: 0.92rem; }
+    .rounds .r.now { border-color: var(--pink); background: rgba(177,145,255,0.16); }
+    .rounds .r.past { opacity: 0.45; }
+    .rounds .r.fin { border-color: rgba(255,184,31,0.5); }
+    .rounds .r.fin b { color: var(--gold, #FFB81F); }
+    /* Crew stickers */
+    .crews { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 8px; margin-top: 8px; }
+    .crews button { padding: 0; border: 2px solid transparent; border-radius: 14px; background: none; cursor: pointer; aspect-ratio: 1; overflow: hidden; }
+    .crews button img { width: 100%; height: 100%; display: block; border-radius: 12px; }
+    .crews button.on { border-color: var(--pink); box-shadow: 0 0 0 3px rgba(177,145,255,0.3); }
+    .crews button.none { display: grid; place-items: center; color: var(--text-muted); font-size: 0.72rem; border: 1px dashed rgba(255,255,255,0.25); }
+    .crews button.none.on { border-style: solid; }
+    .crew-badge { width: 22px; height: 22px; border-radius: 6px; vertical-align: -6px; margin-right: 4px; }
+    .finale-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+    .finale-row .rank { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 0.8rem;
+      background: rgba(255,255,255,0.08); color: var(--text-muted); flex-shrink: 0; }
+    .finale-row.top .rank { background: var(--gold, #FFB81F); color: #0E0F14; }
+    .vote-btn { border: 1px solid rgba(255,255,255,0.18); background: none; color: #FFF; border-radius: 999px; padding: 6px 12px;
+      font: inherit; font-size: 0.8rem; font-weight: 700; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+    .vote-btn.on { background: var(--pink); border-color: var(--pink); color: #0E0F14; }
   </style>
 </head>
 <body class="tone-coral">
@@ -159,7 +183,7 @@
     <div class="position-hero-badge" id="heroBadge">
       <div class="eyebrow"><i class="fa-solid fa-music"></i> Live Stage Status</div>
       <h1 style="font-size: 2.1rem; color: #FFF; margin-top: 4px;" id="posText">Monday Karaoke @ Rough</h1>
-      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;" id="mySongSub">Queue opens every Monday at 21:00 (9 PM CET)!</p>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;" id="mySongSub">Song list opens every Monday at 22:30</p>
       <p class="now-on-stage" id="nowOnStage" hidden></p>
       <div id="scheduleOverrideNotice" style="margin-top: 10px; display: none;">
         <button type="button" class="btn btn-sm btn-outline" style="width: auto; padding: 4px 12px; font-size: 0.75rem; border-color: var(--gold); color: var(--gold);" onclick="toggleStaffOverride()">
@@ -173,13 +197,21 @@
     <!-- Closed Schedule Notice Card -->
     <div class="card card-glass" id="closedScheduleCard" style="display: none; text-align: center; padding: 28px; margin-bottom: 24px; border-color: var(--gold);">
       <i class="fa-solid fa-clock text-gold" style="font-size: 2.2rem; margin-bottom: 10px;"></i>
-      <h3 style="font-size: 1.1rem; color: #FFF; margin-bottom: 6px;">Karaoke Queue Opens Every Monday at 21:00</h3>
+      <h3 style="font-size: 1.1rem; color: #FFF; margin-bottom: 6px;">Karaoke every Monday · song list from 22:30</h3>
       <p class="dim" style="font-size: 0.85rem; margin-bottom: 14px;">
-        Join us live at Rough Bar (San Salvario) every Monday night from 21:00 (9 PM CET) to request your song on stage!
+        Join us live at Rough Bar (San Salvario) every Monday. The song list opens at 22:30, then every 30 minutes, and we finish with a sing-along at 00:30.
       </p>
       <a href="partner.html" class="btn btn-sm btn-outline" style="width: auto; display: inline-flex; padding: 6px 16px; font-size: 0.82rem;">
         <i class="fa-solid fa-location-dot text-pink"></i> View Venue &amp; Offer
       </a>
+    </div>
+
+    <!-- Tonight's rounds: when the song list opens (078) -->
+    <div class="card card-glass" id="roundsCard" style="margin-bottom: 18px;" hidden>
+      <h3 style="margin-bottom: 2px;"><i class="fa-solid fa-clock text-gold" style="margin-right: 6px;"></i> Tonight's song rounds</h3>
+      <p class="dim" style="font-size: 0.8rem;">The list opens every 30 minutes. One song per person per round, up to 3 a night.</p>
+      <div class="rounds" id="roundsBar"></div>
+      <p id="roundsNote" style="font-size: 0.88rem; font-weight: 600; color: #FFF; margin-top: 8px;"></p>
     </div>
 
     <!-- Song Request Form -->
@@ -205,6 +237,12 @@
         <div class="field">
           <label for="performerName">Your Name (Performer / Student) <span class="text-pink">*</span></label>
           <input type="text" id="performerName" required placeholder="Your Name" />
+        </div>
+
+        <div class="field">
+          <label>Your crew sticker <span class="dim" style="font-weight:400">(optional)</span></label>
+          <p class="dim" style="font-size: 0.78rem; margin: 2px 0 0;">Here with friends? All pick the same sticker. We keep your crew's songs at least 2 songs apart, so everyone gets a turn.</p>
+          <div class="crews" id="crewPicker"></div>
         </div>
 
         <p id="limitNote" class="dim" style="font-size:0.8rem;margin:-4px 0 12px" hidden></p>
@@ -235,6 +273,17 @@
       <div id="queueList">
         <div class="dim" style="text-align: center; padding: 20px;">Loading live queue...</div>
       </div>
+    </div>
+
+    <!-- Sing-along finale (078) -->
+    <div class="card card-glass" id="finaleCard" style="margin-top: 18px; border-color: rgba(255,184,31,0.4);" hidden>
+      <h3 style="margin-bottom: 2px;"><i class="fa-solid fa-people-group text-gold" style="margin-right: 6px;"></i> Sing-along finale · <span id="finaleTime">00:30</span></h3>
+      <p class="dim" style="font-size: 0.82rem;">The last 30 minutes: the <b>5 most voted songs</b>, everyone sings together, no mic. Suggest songs and vote (up to 5 votes each).</p>
+      <form id="finaleForm" style="display: flex; gap: 8px; margin: 12px 0 6px;" onsubmit="suggestFinale(event)">
+        <input type="text" id="finaleTitle" placeholder="Suggest a song everyone knows" autocomplete="off" style="flex: 1; min-width: 0;" />
+        <button type="submit" class="btn btn-sm btn-pink" style="width: auto; padding: 0 14px;">Suggest</button>
+      </form>
+      <div id="finaleList"><div class="dim" style="font-size: 0.85rem; padding: 8px 0;">No suggestions yet. Be the first!</div></div>
     </div>
 
   </main>
@@ -279,6 +328,32 @@
     // now: an empty queue shows an empty queue.
     let tonight = null;      // { open, instance_id, title, start_time, day }
 
+    // ISOT characters as crew stickers (078). Keys must match karaoke_slots_crew_check.
+    const CREWS = [
+      ['dj', 'DJs'], ['singer', 'Singers'], ['dancer', 'Dancers'], ['spritz', 'Spritz crew'],
+      ['octopus', 'Huggers'], ['circle', 'The circle'], ['runner', 'Runners'], ['hiker', 'Hikers'],
+      ['climber', 'Climbers'], ['traveller', 'Travellers'], ['book', 'Bookworms'], ['headset', 'Gamers'],
+      ['deal', 'Deal makers'], ['baller', 'Ballers'], ['boss', 'Bosses'], ['pasta', 'Pasta lovers'],
+    ];
+    const crewName = (k) => (CREWS.find((c) => c[0] === k) || [k, k])[1];
+    const crewImg = (k, cls = 'crew-badge') =>
+      k ? `<img class="${cls}" src="assets/crews/${k}.jpg" alt="${escapeHtml(crewName(k))} crew" title="${escapeHtml(crewName(k))} crew" />` : '';
+    let myCrew = '';
+    try { myCrew = localStorage.getItem('isot_karaoke_crew') || ''; } catch (e) {}
+
+    function renderCrewPicker() {
+      const host = document.getElementById('crewPicker');
+      if (!host) return;
+      host.innerHTML = `<button type="button" class="none ${myCrew ? '' : 'on'}" data-crew="">No crew</button>` +
+        CREWS.map(([k, n]) => `<button type="button" class="${myCrew === k ? 'on' : ''}" data-crew="${k}" aria-label="${n}" title="${n}">
+          <img src="assets/crews/${k}.jpg" alt="" /></button>`).join('');
+      host.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+        myCrew = b.dataset.crew;
+        try { localStorage.setItem('isot_karaoke_crew', myCrew); } catch (e) {}
+        renderCrewPicker();
+      }));
+    }
+
     async function initKaraoke() {
       me = await requireAuth();
 
@@ -313,6 +388,7 @@
         });
       })();
       document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(me, 36);
+      renderCrewPicker();
 
       if (document.getElementById('performerName')) {
         document.getElementById('performerName').value = me.full_name || 'Member';
@@ -354,12 +430,17 @@
     async function loadQueue() {
       if (!tonight?.open) return;
 
-      const [{ data, error }, ns, ms] = await Promise.all([
+      const [{ data, error }, ns, ms, fb] = await Promise.all([
         db.rpc('karaoke_queue', { p_instance: tonight.instance_id }),
         db.rpc('karaoke_night_state', { p_instance: tonight.instance_id }),
         db.rpc('my_karaoke_status', { p_instance: tonight.instance_id }),
+        db.rpc('finale_board', { p_instance: tonight.instance_id }),
       ]);
-      if (!ms.error) renderLimit(ms.data);
+      if (!ms.error) {
+        if (ms.data && ms.data.phase) renderRounds(ms.data);   // 078 is in
+        else renderLimit(ms.data);
+      }
+      if (!fb.error) renderFinale(fb.data || [], ms.data || {});
 
       if (error) {
         console.error('Could not load the queue:', error.message);
@@ -367,7 +448,8 @@
       }
       if (!ns.error) {
         night = ns.data;
-        renderQueueFull(night);
+        // Rounds (078) replace the "over an hour of songs" lock.
+        if (!(ms.data && ms.data.phase)) renderQueueFull(night);
       }
 
       renderQueueUI((data || []).map(r => ({
@@ -439,6 +521,93 @@
         : `Up to ${st.max} songs a night, ${st.gap_minutes} minutes apart.`;
       btn.disabled = false;
     }
+
+    /* Rounds (078): the song list opens at 22:30 and again every 30 minutes; the last
+       30 minutes are the sing-along. Everything here comes from my_karaoke_status, so a
+       phone with the wrong clock can't show the wrong round. */
+    const hm = (iso) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' });
+
+    function renderRounds(st) {
+      const card = document.getElementById('roundsCard');
+      const bar = document.getElementById('roundsBar');
+      const note = document.getElementById('limitNote');
+      const big = document.getElementById('roundsNote');
+      const btn = document.getElementById('addBtn');
+      if (!card || !st.opens_at) return;
+      card.hidden = false;
+
+      const open = new Date(st.opens_at).getTime();
+      const n = Number(st.rounds) || 4;
+      const cur = st.phase === 'rounds' ? Number(st.round) : (st.phase === 'finale' ? n + 1 : 0);
+      let cells = '';
+      for (let i = 1; i <= n; i++) {
+        const t = hm(new Date(open + (i - 1) * 30 * 60000).toISOString());
+        cells += `<div class="r ${i === cur ? 'now' : ''} ${i < cur ? 'past' : ''}"><b>${t}</b>Round ${i}</div>`;
+      }
+      cells += `<div class="r fin ${cur === n + 1 ? 'now' : ''}"><b>${hm(st.finale_at)}</b>Sing-along</div>`;
+      bar.innerHTML = cells;
+      document.getElementById('finaleTime').textContent = hm(st.finale_at);
+
+      const left = Math.max(0, (st.round_capacity || 0) - (st.round_taken || 0));
+      const msgs = {
+        before: `The song list opens at ${hm(st.opens_at)}.`,
+        finale: st.finale_started ? 'Sing-along time! Everyone sings, no mic.' : `Song list closed. Vote for the ${hm(st.finale_at)} sing-along below.`,
+        max: `That's your ${st.max} songs tonight. Vote for the sing-along below!`,
+        mine_this_round: `You have a song in this round. Next round opens at ${st.round_end ? hm(st.round_end) : ''}.`,
+        round_full: `Round ${st.round} is full. Next round opens at ${st.round_end ? hm(st.round_end) : ''}.`,
+        signed_out: 'Sign in to add a song.',
+      };
+      big.textContent = st.can_add
+        ? `Round ${st.round} is open until ${hm(st.round_end)}: ${left} ${left === 1 ? 'place' : 'places'} left.`
+        : (msgs[st.reason] || '');
+      big.style.color = st.can_add ? 'var(--green)' : '#FFF';
+
+      note.hidden = false;
+      note.textContent = st.used > 0 ? `${st.used} of ${st.max} songs tonight.` : `Up to ${st.max} songs a night, one per round.`;
+      btn.disabled = !st.can_add;
+    }
+
+    /* Sing-along finale: suggest = vote. Top 5 are highlighted. */
+    function renderFinale(rows, st) {
+      const card = document.getElementById('finaleCard');
+      const list = document.getElementById('finaleList');
+      const form = document.getElementById('finaleForm');
+      if (!card || !list) return;
+      card.hidden = false;
+      const closed = !!st.finale_started;
+      form.hidden = closed;
+      if (!rows.length) {
+        list.innerHTML = `<div class="dim" style="font-size:0.85rem;padding:8px 0">${closed ? 'No songs were voted.' : 'No suggestions yet. Be the first!'}</div>`;
+        return;
+      }
+      list.innerHTML = rows.map((r, i) => `
+        <div class="finale-row ${i < 5 ? 'top' : ''}">
+          <span class="rank">${i + 1}</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;color:#FFF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(r.song_title)}</div>
+            <div class="dim" style="font-size:0.76rem">${r.song_artist ? escapeHtml(r.song_artist) + ' · ' : ''}${r.votes} ${Number(r.votes) === 1 ? 'vote' : 'votes'}${i < 5 ? ' · in the finale' : ''}</div>
+          </div>
+          ${closed ? '' : `<button type="button" class="vote-btn ${r.voted_by_me ? 'on' : ''}" data-title="${escapeHtml(r.song_title)}" onclick="voteFinale(this)">
+            <i class="fa-solid fa-thumbs-up"></i> ${r.voted_by_me ? 'Voted' : 'Vote'}</button>`}
+        </div>`).join('');
+    }
+
+    async function sendFinaleVote(title, artist) {
+      const { error } = await db.rpc('finale_vote', { p_instance: tonight.instance_id, p_title: title, p_artist: artist || null });
+      if (error) setAlert(document.getElementById('alertBox'), error.message.replace(/^.*?:\s*/, ''), 'error');
+      await loadQueue();
+    }
+    window.voteFinale = (b) => { b.disabled = true; sendFinaleVote(b.dataset.title); };
+    window.suggestFinale = async (e) => {
+      e.preventDefault();
+      const box = document.getElementById('finaleTitle');
+      const t = box.value.trim();
+      if (!t) return;
+      // Fill the artist from the songbook when the title matches a song sung here.
+      const hit = (songbookCache || []).find((r) => (r.title || '').toLowerCase() === t.toLowerCase());
+      box.value = '';
+      await sendFinaleVote(hit ? hit.title : t, hit ? hit.artist : null);
+    };
 
     /* Locks the submit form when the projected wait exceeds one hour.
      * Uses data already fetched by karaoke_night_state — no extra round trip.
@@ -646,7 +815,9 @@
               <div style="flex:1;min-width:0;">
                 <div style="font-weight:700;color:#FFF;font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(s.song_title)}</div>
                 <div class="dim" style="font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                  <i class="fa-solid fa-music text-pink"></i> ${escapeHtml(s.artist_name || 'Artist')} • <i class="fa-solid fa-user text-gold"></i> ${escapeHtml(s.singer_name || 'Member')} ${isMine ? '(You)' : ''}
+                  ${s.is_finale
+                    ? `<i class="fa-solid fa-people-group text-gold"></i> Sing-along · everyone, no mic`
+                    : `${crewImg(s.crew)}<i class="fa-solid fa-music text-pink"></i> ${escapeHtml(s.artist_name || 'Artist')} • <i class="fa-solid fa-user text-gold"></i> ${escapeHtml(s.singer_name || 'Member')} ${isMine ? '(You)' : ''}`}
                 </div>
               </div>
             </div>
@@ -728,12 +899,19 @@
       // tapping at the same moment cannot land on the same number. It also enforces
       // one live request each. Previously the insert used columns that do not exist and
       // silently pushed into an in-memory array that vanished on refresh.
-      const { data, error } = await db.rpc('join_karaoke_queue', {
+      const args = {
         p_instance: tonight.instance_id,
         p_song: songVal,
         p_artist: artistVal || null,
         p_singer: performerVal || null,
-      });
+        p_crew: myCrew || null,
+      };
+      let { data, error } = await db.rpc('join_karaoke_queue', args);
+      // Before migration 078 the function has no p_crew: send the song without it.
+      if (error && (error.code === 'PGRST202' || /Could not find the function/i.test(error.message || ''))) {
+        delete args.p_crew;
+        ({ data, error } = await db.rpc('join_karaoke_queue', args));
+      }
 
       restore();
 
