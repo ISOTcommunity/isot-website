@@ -367,7 +367,7 @@
           ${x.rejection_reason ? `<div class="dim" style="font-size:0.76rem">Reason: ${escapeHtml(x.rejection_reason)}</div>` : ''}
           ${['rejected', 'withdrawn'].includes(x.status) && x.paid_at && !x.refunded_at ? '<div style="font-size:0.76rem;color:var(--gold)">Refund by hand (cash or bank transfer)</div>' : ''}
           <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
-            ${x.pdf_path ? `<button type="button" class="btn btn-outline mini" onclick="openAppPdf('${escapeHtml(x.pdf_path)}')"><i class="fa-solid fa-file-pdf"></i> Form</button>` : ''}
+            ${x.pdf_path ? `<button type="button" class="btn btn-outline mini" onclick="openAppPdf(${jsArg(x.pdf_path)})"><i class="fa-solid fa-file-pdf"></i> Form</button>` : ''}
             ${actions}
           </div>
         </div>
@@ -1000,7 +1000,7 @@ Motto: "Live globally, connect locally."
           </div>
           <button type="button" class="btn btn-outline mini" onclick="editEvent('${e.event_id}')">Edit</button>
           <button type="button" class="btn btn-outline mini"
-                  onclick="cancelNight('${e.event_id}', '${e.event_date}', '${escapeHtml(e.title).replace(/'/g, "&#39;")}')">
+                  onclick="cancelNight(${jsArg(e.event_id)}, ${jsArg(e.event_date)}, ${jsArg(e.title)})">
             Cancel
           </button>
         </div>`;
@@ -1320,7 +1320,7 @@ Motto: "Live globally, connect locally."
           <div class="dim" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px">Poster check-in QR</div>
           <div class="code">https://isotcommunity.com/checkin?v=${escapeHtml(v.self_checkin_token)}</div>
           <button type="button" class="btn btn-outline mini" style="margin-top:8px"
-                  onclick="copyPoster('${escapeHtml(v.self_checkin_token)}', this)">Copy link</button>
+                  onclick="copyPoster(${jsArg(v.self_checkin_token)}, this)">Copy link</button>
         </div>
       </div>`).join('') + `
       <p class="dim" style="font-size:0.76rem">

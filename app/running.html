@@ -1470,7 +1470,8 @@
         meters: totalDistanceMeters,
         steps: motionEvents > 0 ? stepCount : null,
         path: gpsTrailCoords.length >= 2 ? gpsTrailCoords.slice() : null,
-        at: Date.now()
+        at: Date.now(),
+        owner: currentUser ? currentUser.id : null
       };
       storePendingRun(pending);
       await saveRun(pending);
@@ -1478,7 +1479,8 @@
 
     // ── Saving: a failed save never throws the run away ──────────────────────
     // Runs often end where signal is weakest. The run is kept in this browser until
-    // the server confirms it, and the timer card offers Retry until then.
+    // the server confirms it, and the timer card offers Retry until then. Each run carries
+    // its owner: on a shared phone, another account never sees or retries someone else's run.
     const PENDING_KEY = 'isot_pending_run';
 
     function storePendingRun(run) {
@@ -1490,7 +1492,8 @@
     function readPendingRun() {
       try {
         const run = JSON.parse(localStorage.getItem(PENDING_KEY) || 'null');
-        return run && run.routeId && run.seconds ? run : null;
+        if (!run || !run.routeId || !run.seconds) return null;
+        return currentUser && run.owner === currentUser.id ? run : null;
       } catch (_) { return null; }
     }
 

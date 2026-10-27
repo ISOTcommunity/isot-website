@@ -157,7 +157,7 @@
         </div>
         <button type="button" class="like ${s.liked_by_me ? 'on' : ''}"
                 id="like_${escapeHtml(s.song_key).replace(/[^a-z0-9]/gi, '_')}"
-                onclick="toggleLike('${escapeHtml(s.song_key).replace(/'/g, "&#39;")}', this)">
+                onclick="toggleLike(${jsArg(s.song_key)}, this)">
           <i class="fa-${s.liked_by_me ? 'solid' : 'regular'} fa-heart"></i> ${s.likes}
         </button>
       </div>`;

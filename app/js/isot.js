@@ -1026,6 +1026,12 @@ function escapeHtml(s) {
   ));
 }
 
+// A value passed as an argument inside an inline handler: onclick="fn(${jsArg(x)})".
+// JSON makes it a valid JS string literal; escapeHtml protects the attribute. No surrounding quotes.
+function jsArg(v) {
+  return escapeHtml(JSON.stringify(String(v ?? '')));
+}
+
 function setAlert(el, message, type = 'error') {
   if (!el) return;
   if (!message) { el.hidden = true; return; }

@@ -561,12 +561,16 @@
           { purpose: 'newsletter', granted: document.getElementById('cNews').checked },
         ].map(r => ({ ...r, profile_id: currentProfile.id, policy_version: '2026-08' }));
 
-        await db.from('consents').upsert(rows);
+        const { error } = await db.from('consents').insert(rows);
         restore();
-        setAlert(alertEl, 'Privacy consents updated!', 'success');
+        if (error) {
+          setAlert(alertEl, `Your privacy choices were not saved (${error.message}). Please try again.`, 'error');
+        } else {
+          setAlert(alertEl, 'Privacy consents updated!', 'success');
+        }
       } catch (e) {
         restore();
-        setAlert(alertEl, 'Consents updated!', 'success');
+        setAlert(alertEl, 'Your privacy choices were not saved: could not reach the server. Please try again.', 'error');
       }
     }
 

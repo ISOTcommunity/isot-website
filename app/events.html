@@ -699,7 +699,7 @@
                   <div class="dim" style="font-size:0.75rem">${escapeHtml(f.nationality || 'Turin Student')} • ${escapeHtml(f.university || 'UniTo')}</div>
                 </div>
               </div>
-              <button type="button" id="btnInvite_${key}" class="btn btn-sm ${isAlreadyInvited ? 'btn-outline' : 'btn-pink'}" style="width:auto;padding:6px 14px;font-size:0.78rem;" onclick="sendSingleFriendInvite('${f.id}', '${escapeHtml(f.full_name)}', '${escapeHtml(eventTitle)}', '${eventId}', '${key}', '${eventDate}')">
+              <button type="button" id="btnInvite_${key}" class="btn btn-sm ${isAlreadyInvited ? 'btn-outline' : 'btn-pink'}" style="width:auto;padding:6px 14px;font-size:0.78rem;" onclick="sendSingleFriendInvite(${jsArg(f.id)}, ${jsArg(f.full_name)}, ${jsArg(eventTitle)}, ${jsArg(eventId)}, ${jsArg(key)}, ${jsArg(eventDate)})">
                 ${isAlreadyInvited ? '<i class="fa-solid fa-check text-green"></i> Invited' : '<i class="fa-solid fa-envelope"></i> Invite 💌'}
               </button>
             </div>
@@ -1077,7 +1077,7 @@
                     <i class="fa-solid fa-arrow-up-right-from-square"></i>
                     ${escapeHtml(item.registerLabel || 'Register')}
                   </a>` : ''}
-                <button type="button" class="btn btn-sm btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex" onclick="openInviteModal('${escapeHtml(item.title)}', '${item.eventId}', '${item.date}')">
+                <button type="button" class="btn btn-sm btn-outline" style="width:auto;padding:5px 12px;font-size:0.78rem;display:inline-flex" onclick="openInviteModal(${jsArg(item.title)}, ${jsArg(item.eventId)}, ${jsArg(item.date)})">
                   <i class="fa-solid fa-paper-plane text-pink"></i> Invite Friends
                 </button>
               </div>
@@ -1086,11 +1086,11 @@
           </div>
 
           <div class="rsvp-row">
-            <div class="avatar-stack-wrapper" onclick="openAttendeesModal('${escapeHtml(item.title)}', '${item.id}')">
+            <div class="avatar-stack-wrapper" onclick="openAttendeesModal(${jsArg(item.title)}, ${jsArg(item.id)})">
               ${isGoing ? `<div class="avatar-stack">${stackHtml}</div><span class="avatar-stack-count"><strong>1 Going</strong> • You <i class="fa-solid fa-chevron-right text-pink" style="font-size:0.7rem;margin-left:4px"></i></span>` : `<span class="avatar-stack-count">Be the first to RSVP <i class="fa-solid fa-chevron-right text-pink" style="font-size:0.7rem;margin-left:4px"></i></span>`}
             </div>
 
-            <button type="button" onclick="event.stopPropagation(); toggleRsvp('${item.id}')" class="btn-rsvp ${isGoing ? 'going' : ''}">
+            <button type="button" onclick="event.stopPropagation(); toggleRsvp(${jsArg(item.id)})" class="btn-rsvp ${isGoing ? 'going' : ''}">
               <i class="${isGoing ? 'fa-solid fa-circle-check' : 'fa-regular fa-calendar-plus'}"></i>
               <span>${isGoing ? "I'm Going!" : "I'm Going"}</span>
             </button>

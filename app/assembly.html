@@ -33,7 +33,7 @@
       <i class="fa-solid fa-check-to-slot text-pink"></i>
       <span>General Assembly</span>
     </a>
-    <span class="badge badge-socio">MEMBER VOTING</span>
+    <span class="badge badge-socio">MEMBERS</span>
   </header>
 
   <main class="shell">
@@ -42,24 +42,15 @@
       <h1 style="font-size: 1.8rem; margin-top: 4px;">General Assembly Motions</h1>
     </div>
 
-    <!-- Active Motion Voting Card -->
-    <div class="card card-glow" style="margin-bottom: 20px;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-        <span class="badge badge-live">ACTIVE MOTION #04</span>
-        <span class="dim">Voting closes 23:59</span>
-      </div>
-      <h2 style="font-size: 1.3rem; margin-bottom: 8px;">Approval of 2026 Student Integration Budget</h2>
-      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
-        Motion to allocate €1,200 towards student emergency welcome kits and EDISU housing guide translation.
+    <!-- Online voting is not live yet: no motion is open and no vote is recorded here. -->
+    <div class="card" style="margin-bottom: 20px;">
+      <span class="badge">COMING SOON</span>
+      <h2 style="font-size: 1.3rem; margin: 8px 0;">Online voting is not open yet</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">
+        Motions are voted in person at the General Assembly for now. Members are invited by email
+        with the date, the agenda and the motions. When online voting opens, it will appear here.
       </p>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <button onclick="vote('favor')" class="btn btn-pink" style="background: var(--green);"><i class="fa-solid fa-thumbs-up"></i> In Favor</button>
-        <button onclick="vote('against')" class="btn btn-outline" style="color: var(--red); border-color: rgba(255, 90, 60,0.4);"><i class="fa-solid fa-thumbs-down"></i> Against</button>
-      </div>
     </div>
-
-    <div id="voteAlert"></div>
 
   </main>
 
@@ -70,9 +61,6 @@
       await requireAuth({ socio: true });
     });
 
-    function vote(type) {
-      setAlert(document.getElementById('voteAlert'), `Your vote (${type.toUpperCase()}) has been securely recorded in the assembly log.`, 'success');
-    }
   </script>
 </body>
 </html>

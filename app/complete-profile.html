@@ -173,15 +173,18 @@
     // Recorded on BOTH paths now. Photo consent is required to finish, so it has to be
     // written whether they filled in the optional details or pressed Skip — otherwise
     // there is no record of the agreement that was just required of them.
+    // Returns an error message, or null once the server has the choices. Consents are an
+    // append-only log (latest row wins), so a retry simply records the choice again.
     async function saveConsents() {
       try {
         const rows = [
           { purpose: 'photos',     granted: document.getElementById('cPhotos').checked },
           { purpose: 'newsletter', granted: document.getElementById('cNews').checked },
         ].map(r => ({ ...r, profile_id: me.id, policy_version: '2026-08' }));
-        await db.from('consents').insert(rows);
+        const { error } = await db.from('consents').insert(rows);
+        return error ? error.message : null;
       } catch (e) {
-        console.warn('consent save skipped');
+        return 'Could not reach the server.';
       }
     }
 
@@ -227,6 +230,14 @@
         }
       }
 
+      // Consents first: the profile is only marked complete once they are on record.
+      const consentError = await saveConsents();
+      if (consentError) {
+        restore();
+        setAlert(alertEl, `Your privacy choices could not be saved (${consentError}). Please try again.`);
+        return;
+      }
+
       const patch = { profile_completed_at: new Date().toISOString() };
       if (withDetails) {
         patch.full_name   = form.full_name.value.trim() || me.full_name;
@@ -243,7 +254,6 @@
 
       if (error) { restore(); setAlert(alertEl, error.message); return; }
 
-      await saveConsents();
       location.replace('home.html');
     }
 

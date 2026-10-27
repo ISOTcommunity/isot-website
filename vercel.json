@@ -101,6 +101,15 @@
           "value": "cross-origin"
         }
       ]
+    },
+    {
+      "source": "/app/(scan|karaoke-kj)(.html)?",
+      "headers": [
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(self), microphone=(), geolocation=(self), payment=(), usb=()"
+        }
+      ]
     }
   ],
   "rewrites": [

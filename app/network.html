@@ -427,7 +427,7 @@
           // on every student in the directory is a spam vector.
           btnHtml = `
             <div style="display:flex;gap:6px">
-              <button type="button" class="btn-connect" onclick="openEventInvite('${s.id}', '${escapeHtml(s.full_name || 'Member').replace(/'/g, "&#39;")}')"><i class="fa-solid fa-paper-plane"></i> Invite</button>
+              <button type="button" class="btn-connect" onclick="openEventInvite(${jsArg(s.id)}, ${jsArg(s.full_name || 'Member')})"><i class="fa-solid fa-paper-plane"></i> Invite</button>
               <button type="button" class="btn-connect connected" onclick="toggleFriendship('${s.id}')"><i class="fa-solid fa-user-check"></i> Friends</button>
             </div>`;
         } else if (status === 'sent') {
@@ -540,7 +540,7 @@
             <div style="display:flex;gap:8px;flex-wrap:wrap">
               <button type="button" id="invRsvp_${i}" class="btn btn-sm ${n.going ? 'btn-outline' : 'btn-pink'}"
                       style="width:auto;padding:6px 14px;font-size:0.8rem"
-                      onclick="rsvpFromInvite(${i}, '${n.event_id}', '${n.event_date}')">
+                      onclick="rsvpFromInvite(${i}, ${jsArg(n.event_id)}, ${jsArg(n.event_date)})">
                 <i class="fa-solid ${n.going ? 'fa-circle-check text-green' : 'fa-calendar-plus'}"></i>
                 ${n.going ? "You're going" : "I'm going"}
               </button>
@@ -631,7 +631,7 @@
         return `
           <button type="button" id="invEvt_${i}" class="btn btn-outline"
                   style="width:100%;justify-content:flex-start;text-align:left;padding:10px 12px;font-size:0.84rem"
-                  onclick="sendEventInvite(${i}, '${e.event_id}', '${e.event_date}', '${escapeHtml(e.title).replace(/'/g, "&#39;")}', '${escapeHtml(when)}', '${escapeHtml(e.venue_name || '')}')">
+                  onclick="sendEventInvite(${i}, ${jsArg(e.event_id)}, ${jsArg(e.event_date)}, ${jsArg(e.title)}, ${jsArg(when)}, ${jsArg(e.venue_name || '')})">
             <span style="display:flex;flex-direction:column;gap:2px">
               <span style="color:#FFF;font-weight:600">${escapeHtml(e.title)}</span>
               <span class="dim" style="font-size:0.76rem">${escapeHtml(when)} · ${escapeHtml((e.start_time || '').slice(0,5))} · ${escapeHtml(e.venue_name || '')}</span>
