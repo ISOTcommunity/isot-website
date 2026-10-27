@@ -173,7 +173,7 @@ async function handler(req, res) {
   try {
     const r = await fetch(REGISTER_URL, {
       headers: { 'User-Agent': 'ISOT Community app (isotcommunity.com)', 'Accept': 'text/html' },
-      signal: AbortSignal.timeout(8000)
+      signal: AbortSignal.timeout(15000)
     });
     if (!r.ok) throw new Error('register ' + r.status);
     const strikes = parseRegister(await r.text(), today);
