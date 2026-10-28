@@ -124,7 +124,15 @@
     const me = await requireAuth();
 
     // Already done — do not make them see this twice.
-    if (me.profile_completed_at) { location.replace('home.html'); return; }
+    // Where they were going before signing up (set by signup.html), else Home.
+    function afterProfile() {
+      let next = null;
+      try { next = localStorage.getItem('isot_next'); localStorage.removeItem('isot_next'); } catch (_) {}
+      location.replace(next && /^[a-z0-9-]{1,40}$/i.test(next) ? next + '.html' : 'home.html');
+    }
+
+    // Already done — do not make them see this twice.
+    if (me.profile_completed_at) { afterProfile(); return; }
 
     const form    = document.getElementById('form');
     const alertEl = document.getElementById('alert');
@@ -254,7 +262,7 @@
 
       if (error) { restore(); setAlert(alertEl, error.message); return; }
 
-      location.replace('home.html');
+      afterProfile();
     }
 
     form.addEventListener('submit', (e) => { e.preventDefault(); finish(true); });

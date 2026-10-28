@@ -57,7 +57,7 @@
       <div id="googleSlot"></div>
 
       <div style="text-align: center; margin-top: 20px; font-size: 0.88rem;" class="dim">
-        Don't have an account? <a href="signup.html" style="color: var(--pink); font-weight: 700;">Join ISOT Free</a>
+        Don't have an account? <a id="signupLink" href="signup.html" style="color: var(--pink); font-weight: 700;">Join ISOT Free</a>
       </div>
     </div>
 
@@ -144,5 +144,13 @@
       });
     })();
   </script>
+<script>
+  // A new person sent here from "Start your application" has no account yet: keep where
+  // they were going when they tap "Join ISOT Free" (signup.html checks it again).
+  (function () {
+    const next = new URLSearchParams(location.search).get('next');
+    if (next) document.getElementById('signupLink').href = 'signup.html?next=' + encodeURIComponent(next);
+  })();
+</script>
 </body>
 </html>

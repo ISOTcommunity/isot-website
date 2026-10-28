@@ -121,7 +121,14 @@
   }
 
   const { data: { session } } = await db.auth.getSession();
-  if (session) { location.replace('home.html'); return; }
+  // Where to go once the account and profile exist (e.g. next=apply from /join).
+  // Only a bare page name is kept, never a URL. complete-profile.html reads and clears it.
+  const nextPage = (new URLSearchParams(location.search).get('next') || '').replace(/\.html$/i, '');
+  if (/^[a-z0-9-]{1,40}$/i.test(nextPage)) {
+    try { localStorage.setItem('isot_next', nextPage); } catch (_) {}
+  }
+
+  if (session) { location.replace(/^[a-z0-9-]{1,40}$/i.test(nextPage) ? nextPage + '.html' : 'home.html'); return; }
 
       document.getElementById('googleSlot').innerHTML = googleButtonHtml('Sign up with Google');
       document.getElementById('googleBtn').addEventListener('click', async (ev) => {
