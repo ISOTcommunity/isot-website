@@ -843,6 +843,10 @@ function initBurgerMenu(profile) {
         <i class="fa-solid fa-qrcode text-pink"></i>
         <span>My ISOT Card &amp; QR</span>
       </a>
+      <a href="apply.html" class="drawer-item">
+        <i class="fa-solid fa-star text-pink"></i>
+        <span>ISOT APS Membership</span>
+      </a>
       <a href="account.html" class="drawer-item">
         <i class="fa-solid fa-user-gear text-pink"></i>
         <span>Account &amp; Profile Settings</span>

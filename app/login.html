@@ -150,6 +150,15 @@
   (function () {
     const next = new URLSearchParams(location.search).get('next');
     if (next) document.getElementById('signupLink').href = 'signup.html?next=' + encodeURIComponent(next);
+    if (next === 'apply') {
+      // Coming from "Start your application": most have no account yet, so lead with that.
+      const url = 'signup.html?next=apply';
+      document.querySelector('h1').textContent = 'Create your free account first';
+      const sub = document.querySelector('h1 + p');
+      sub.textContent = 'You need an ISOT account to apply. Your application comes right after.';
+      sub.insertAdjacentHTML('afterend', '<a class="btn btn-pink" href="' + url + '" style="margin-top:16px">Create my free account</a>'
+        + '<div class="dim" style="margin-top:14px;font-size:0.85rem">Already have an account? Sign in below.</div>');
+    }
   })();
 </script>
 </body>

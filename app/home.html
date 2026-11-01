@@ -364,6 +364,10 @@
 
       <!-- The next three nights. The first with its poster, the other two compact. -->
       <div id="featuredNight" hidden style="margin-bottom:18px"></div>
+      <a href="apply.html" id="apsPrompt" class="card" hidden style="display:block;margin-bottom:18px;text-decoration:none">
+        <div style="font-weight:700;color:#FFF;font-size:0.95rem"><i class="fa-solid fa-star text-gold"></i> <span id="apsPromptTitle">Become an ISOT APS Member</span></div>
+        <div class="dim" id="apsPromptText" style="font-size:0.82rem;margin-top:4px">€10 a year. Vote in the General Assembly and get the ★ card.</div>
+      </a>
 
       <!-- Today's member-proposed activity. Hidden until there is something to say, so a
            quiet day does not leave an empty box on the home page. -->
@@ -665,6 +669,25 @@
         .catch(() => {});
     }
 
+    // Only for people who aren't members and have nothing under review.
+    async function showApsPrompt(me) {
+      if (me.tier === 'socio' || me.staff_role === 'board') return;
+      const el = document.getElementById('apsPrompt');
+      if (!el) return;
+      let open = null;
+      try {
+        const { data } = await db.from('membership_applications').select('status')
+          .eq('profile_id', me.id).in('status', ['submitted', 'paid']).limit(1);
+        open = data && data[0];
+      } catch (e) { return; }
+      if (open && open.status === 'paid') return;
+      if (open) {
+        document.getElementById('apsPromptTitle').textContent = 'Finish your ISOT APS application';
+        document.getElementById('apsPromptText').textContent = 'It is saved. Pay the €10 fee to complete it.';
+      }
+      el.hidden = false;
+    }
+
     async function initHome() {
       try {
         meProfile = await requireAuth();
@@ -683,6 +706,8 @@
         if (document.getElementById('actionKaraokeIcon')) {
           document.getElementById('actionKaraokeIcon').innerHTML = getCategoryBadgeHtml('karaoke', 38);
         }
+
+        showApsPrompt(meProfile);
 
         await loadUpcoming();
 
