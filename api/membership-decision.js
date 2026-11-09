@@ -38,6 +38,13 @@ async function refundStripe(app) {
   throw new Error('no Stripe payment found to refund');
 }
 
+// The bell in the app, next to the email. Never fails the decision itself.
+async function notifyInApp(userId, actorId, title, message) {
+  try {
+    await db('POST', 'notifications', { user_id: userId, actor_id: actorId, type: 'system', title, message });
+  } catch (err) { console.error('[membership-decision] notification', err); }
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -65,6 +72,9 @@ module.exports = async function handler(req, res) {
       let emailed = true;
       try { await sendEmail('admitted', app.email, { ...app, valid_until: m.valid_until }); }
       catch (err) { console.error('[membership-decision] email', err); emailed = false; }
+      if (app.profile_id) await notifyInApp(app.profile_id, user.id,
+        'Welcome, ISOT APS Member ★',
+        `The Board admitted you as a member of ISOT APS. Your ★ card is ready, and you can vote in the General Assembly.`);
       return res.status(200).json({ ok: true, membership_id: out, emailed });
     }
     if (!['reject', 'withdraw'].includes(action)) return res.status(400).json({ error: 'action must be approve, reject or withdraw' });
@@ -109,6 +119,9 @@ module.exports = async function handler(req, res) {
       emailed = false;
     }
 
+    if (app.profile_id && action === 'reject') await notifyInApp(app.profile_id, user.id,
+      'Your ISOT APS application',
+      'The Board could not admit you this time. We emailed you the reason, and your €10 is refunded.');
     return res.status(200).json({ ok: true, refunded, manual_refund: manualRefund, emailed });
   } catch (err) {
     console.error('[membership-decision]', err);
