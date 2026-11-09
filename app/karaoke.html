@@ -232,7 +232,13 @@
 
       <form id="songForm" onsubmit="submitSong(event)">
         <div class="field">
-          <label for="songTitle">Song Title <span class="text-pink">*</span></label>
+          <label>1. Pick your crew sticker <span class="dim" style="font-weight:400">(optional)</span></label>
+          <p class="dim" style="font-size: 0.78rem; margin: 2px 0 0;">Here with friends? All pick the same sticker. We keep your crew's songs at least 2 songs apart, so everyone gets a turn.</p>
+          <div class="crews" id="crewPicker"></div>
+        </div>
+
+        <div class="field">
+          <label for="songTitle">2. Song Title <span class="text-pink">*</span></label>
           <input type="text" id="songTitle" required autocomplete="off"
                  placeholder="e.g. Despacito, Bohemian Rhapsody, Volare" />
           <!-- Suggestions from songs already sung here. "As it was" and "As it was
@@ -249,12 +255,6 @@
         <div class="field">
           <label for="performerName">Your Name (Performer / Student) <span class="text-pink">*</span></label>
           <input type="text" id="performerName" required placeholder="Your Name" />
-        </div>
-
-        <div class="field">
-          <label>Your crew sticker <span class="dim" style="font-weight:400">(optional)</span></label>
-          <p class="dim" style="font-size: 0.78rem; margin: 2px 0 0;">Here with friends? All pick the same sticker. We keep your crew's songs at least 2 songs apart, so everyone gets a turn.</p>
-          <div class="crews" id="crewPicker"></div>
         </div>
 
         <p id="limitNote" class="dim" style="font-size:0.8rem;margin:-4px 0 12px" hidden></p>
