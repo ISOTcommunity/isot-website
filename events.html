@@ -15,7 +15,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#000000" />
   <title>Events Calendar | ISOT Community Turin</title>
-  <meta name="description" content="Weekly social events schedule for international students in Turin: Monday Karaoke @ Rough, Thursday Social Hub @ Capodoglio, Saturday Pre-Party." />
+  <meta name="description" content="Weekly social events schedule for international students in Turin: Monday Karaoke @ Rough, Saturday Pre-Party." />
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="/assets/favicon.png" sizes="48x48" type="image/png" />
   
@@ -544,35 +544,6 @@
           </div>
         </div>
 
-        <!-- Event 2 -->
-        <div class="event-card">
-          <div class="event-header-img">
-            <img src="/assets/wgm opening 2d watsapp@2x.png" alt="International Social Hub & WGM Opening Party 17 September" />
-            <div class="event-day-badge">EVERY THURSDAY • 21:00</div>
-          </div>
-          <div class="event-card-body">
-            <div>
-              <h3 style="font-size: 1.4rem; font-weight: 700; color: #FFF; margin-bottom: 6px;">International Social Hub</h3>
-              <div style="font-size: 0.85rem; color: var(--pink); font-weight: 600; margin-bottom: 12px;"><i class="fa-solid fa-location-dot"></i> Capodoglio Murazzi</div>
-
-              <!-- This-week special banner — remove after 17 Sep -->
-              <div style="background: rgba(212,90,232,0.12); border: 1px solid rgba(212,90,232,0.35); border-radius: 10px; padding: 11px 14px; margin-bottom: 14px;">
-                <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--pink); margin-bottom: 5px;">🔥 This Thursday · 17 September</div>
-                <div style="font-weight: 700; color: #FFF; font-size: 0.95rem; margin-bottom: 4px;">Social Hub + WGM Opening Party</div>
-                <div style="font-size: 0.82rem; color: var(--text-dim); line-height: 1.5;">
-                  Social games &amp; friendly gathering from <strong style="color:#FFF">21:00</strong> — then DJ set by <strong style="color:#FFF">Beaddie &amp; Chiuraz</strong> from <strong style="color:#FFF">22:00</strong>.<br>
-                  Free entry — no registration needed. You can stay for the party after 23:30 without registering.
-                  Only if you arrive <em>after</em> 23:30, registration is required.
-                </div>
-              </div>
-
-              <p style="color: var(--text-dim); font-size: 0.95rem; margin-bottom: 14px;">The flagship gathering! Social games, friendly icebreakers, drinks and riverfront vibes at Murazzi.</p>
-            </div>
-            <a href="https://xceed.me/torino/event/wgm-opening-party-1709-capodoglio-how-we-do/243098" target="_blank" rel="noopener" class="btn" style="width:100%;text-align:center;margin-bottom:8px;background:var(--pink);color:#FFF;border:none;">Register for the Party (after 23:30) →</a>
-            <a href="https://www.instagram.com/isot.community/" target="_blank" rel="noopener" class="btn btn-outline" style="width: 100%; text-align: center;">View Instagram Updates →</a>
-          </div>
-        </div>
-
         <!-- Event 3 -->
         <div class="event-card">
           <div class="event-header-img">
@@ -819,11 +790,6 @@
             events.push({
               id: `w_${dateStr}`, date: dateStr, year: 2026, monthIdx: m, dayNum: d, dayName: 'WED',
               title: 'SAS Startup Lab (From Problem to Pitch)', venue: 'SAA School of Management • Via Ventimiglia 115', time: '17:30', cat: 'career', goingCount: 30
-            });
-          } else if (dayOfWeek === 4) { // Thursday
-            events.push({
-              id: `t_${dateStr}`, date: dateStr, year: 2026, monthIdx: m, dayNum: d, dayName: 'THU',
-              title: 'International Social Hub', venue: 'Capodoglio • Murazzi del Po, Turin', time: '21:00', cat: 'social', goingCount: 85
             });
           } else if (dayOfWeek === 6) { // Saturday
             events.push({
