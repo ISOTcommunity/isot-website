@@ -156,6 +156,16 @@ const TEMPLATES = {
   }),
 };
 
+// Notice of meeting for the General Assembly, written by the Board on the Assembly page.
+// d: { subject, text } — plain text; blank lines make paragraphs.
+TEMPLATES.assembly_notice = (d) => ({
+  subject: d.subject,
+  html: layout(d.subject,
+    String(d.text).split(/\n\s*\n/).map((par) => p(esc(par.trim()).replace(/\n/g, '<br>'))).join('') +
+    button(`${SITE}/app/assembly.html`, 'Open Assembly & Voting') +
+    small('You receive this because you are a member of ISOT APS. This is the written notice of meeting under the Statute.')),
+});
+
 async function sendEmail(kind, to, data) {
   const key = process.env.RESEND_API_KEY;
   if (!key) throw new Error('RESEND_API_KEY is not set');

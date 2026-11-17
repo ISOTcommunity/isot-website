@@ -109,6 +109,48 @@
         <button type="submit" class="btn btn-pink" id="saveBtn" style="margin-top: 14px;">Create the vote</button>
       </form>
     </div>
+
+    <!-- Board only: the written notice of meeting -->
+    <div class="card card-glass no-print" id="noticeCard" hidden style="border-color: var(--gold, #FFB81F); margin-top: 18px;">
+      <h3 style="margin-bottom: 4px;"><i class="fa-solid fa-envelope text-gold" style="margin-right: 6px;"></i> Board: send the notice of meeting</h3>
+      <p class="meta" style="margin-top: 0;">Goes by e-mail, plus an app notification, to every member who can vote. The Statute asks for <b>15 days</b> before the Assembly (5 only for a reasoned urgency). Fill in every part in [brackets]; send a test to yourself first.</p>
+      <div class="field"><label for="nSubject">Subject</label>
+        <input type="text" id="nSubject" maxlength="160" value="ISOT APS – Notice of the General Assembly, Thursday 3 December 2026" /></div>
+      <div class="field"><label for="nText">Text</label>
+        <textarea id="nText" rows="22">Dear member,
+
+You are invited to the ordinary General Assembly of ISOT APS.
+
+FIRST CALL: Thursday 3 December 2026 at [time]
+SECOND CALL: Thursday 3 December 2026 at [time, e.g. 30 minutes later]
+WHERE: [address], and online at [link]
+
+AGENDA
+1. Report of the President on the year's activities
+2. Annual membership fee (€10) and the membership year, renewal and lapse rules
+3. Internal Regulations: online membership applications
+4. Number of Board members, and election of the Board
+5. Any other business
+
+HOW TO VOTE
+Voting is in the ISOT app: Menu → General Assembly & Voting. You can vote there whether you attend in person, online, or cannot attend. Voting opens on [date and time] and closes on [date and time]. Your vote is secret and counted once.
+
+CANDIDATES FOR THE BOARD
+Every member can stand. Put yourself forward in the app, on the same page, by [date and time].
+
+WHO CAN VOTE
+Members whose annual fee is paid. You may also give a written proxy to another member (each member can hold up to 3 proxies).
+
+The first call is valid with more than half of the members; the second call is valid whatever the number present.
+
+Amirhossein Shokouhipour
+President, ISOT APS</textarea></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <button type="button" class="btn btn-outline" style="width:auto" onclick="sendNotice(true, this)">Send a test to me</button>
+        <button type="button" class="btn btn-pink" style="width:auto" onclick="sendNotice(false, this)">Send to all members</button>
+      </div>
+      <div id="noticeResult" class="meta"></div>
+    </div>
   </main>
 
   <script src="vendor/supabase.js"></script>
@@ -133,6 +175,7 @@
             ? '<i class="fa-solid fa-triangle-exclamation text-gold"></i> Your annual fee is not recorded as paid, so you cannot vote yet. Write to the Board if this is a mistake.'
             : 'Voting is for ISOT APS members. <a href="apply.html" style="color:var(--pink)">Apply to become one</a>.');
       document.getElementById('boardCard').hidden = !data.is_board;
+      document.getElementById('noticeCard').hidden = !data.is_board;
       render();
     }
 
@@ -297,6 +340,28 @@
         <b>Did not vote:</b><br>${data.roll.filter((n) => !voted.has(n)).map(escapeHtml).join(', ') || 'none'}<br>
         <span class="dim">Who voted is recorded; how each member voted is not, by design.</span><br>
         <button class="btn btn-sm btn-outline no-print" style="width:auto;margin-top:10px" onclick="window.print()">Print this page for the minutes</button></div>`;
+    };
+
+    window.sendNotice = async (test, btn) => {
+      const subject = document.getElementById('nSubject').value.trim();
+      const text = document.getElementById('nText').value.trim();
+      if (/\[[^\]]*\]/.test(text)) return setAlert(alertEl(), 'Fill in every part in [brackets] before sending.', 'error');
+      if (!test && !confirm(`Send this notice of meeting by e-mail to all ${state.members} members who can vote?\n\nThis cannot be unsent.`)) return;
+      const restore = busy(btn, 'Sending…');
+      const { data: s } = await db.auth.getSession();
+      const res = await fetch('/api/assembly-notice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (s?.session?.access_token || '') },
+        body: JSON.stringify({ subject, text, test }),
+      });
+      const out = await res.json().catch(() => ({}));
+      restore();
+      if (!res.ok) return setAlert(alertEl(), out.error || 'Could not send the notice.', 'error');
+      document.getElementById('noticeResult').innerHTML = test
+        ? 'Test sent to your e-mail. Check it (and spam), then send to all.'
+        : `<b>Sent ${when(out.sent_at)} to ${out.sent.length}:</b> ${out.sent.map(escapeHtml).join(', ')}` +
+          (out.failed.length ? `<br><b style="color:var(--coral,#FF5A3C)">Failed (${out.failed.length}):</b> ${out.failed.map(escapeHtml).join(', ')}. Send these by hand.` : '') +
+          '<br>Take a screenshot of this line for the minutes.';
     };
 
     (async function init() {
