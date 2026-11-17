@@ -12,55 +12,298 @@
 </script>
 
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-  <title>ISOT General Assembly & Voting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assembly & Voting · ISOT App</title>
 
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="../assets/favicon.png" sizes="48x48" type="image/png" />
-  
-  
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-title" content="ISOT" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0C1A4A" />
+  <script defer src="/_vercel/insights/script.js"></script>
+
   <link rel="preload" href="fonts/moderna.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-
   <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .vote-card { margin-bottom: 18px; }
+    .chip { display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,0.1); color: var(--text-muted); }
+    .chip.open { background: rgba(31,212,127,0.18); color: var(--green); }
+    .chip.closed { background: rgba(255,184,31,0.16); color: var(--gold, #FFB81F); }
+    .opt { display: flex; gap: 10px; align-items: flex-start; padding: 11px 12px; border: 1px solid var(--border-light);
+      border-radius: 12px; margin-top: 8px; cursor: pointer; }
+    .opt input { margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; }
+    .opt b { color: #FFF; }
+    .opt small { display: block; color: var(--text-muted); font-size: 0.8rem; margin-top: 2px; }
+    .bar { height: 8px; border-radius: 6px; background: rgba(255,255,255,0.08); margin-top: 6px; overflow: hidden; }
+    .bar i { display: block; height: 100%; background: var(--pink); border-radius: 6px; }
+    .res { padding: 10px 0; border-bottom: 1px solid var(--border-light); }
+    .res.win b { color: var(--gold, #FFB81F); }
+    .meta { font-size: 0.82rem; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+    .field label { display: block; font-size: 0.82rem; font-weight: 600; margin: 10px 0 4px; }
+    .field input, .field select, .field textarea { width: 100%; }
+    @media print { header, #boardCard, .no-print, #gate { display: none !important; } body { background: #FFF; color: #000; } }
+  </style>
 </head>
 <body class="tone-violet">
-
   <div id="gate"><div class="spinner"></div></div>
 
   <header class="topbar">
     <a href="home.html" class="topbar-title" style="display: flex; align-items: center; gap: 8px;">
       <i class="fa-solid fa-check-to-slot text-pink"></i>
-      <span>General Assembly</span>
+      <span>Assembly &amp; Voting</span>
     </a>
-    <span class="badge badge-socio">MEMBERS</span>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div id="headerAvatar" style="cursor: pointer;" data-open-drawer></div>
+      <button type="button" id="burgerBtn" aria-label="Account menu" style="background: transparent; border: none; color: #FFF; font-size: 1.3rem; cursor: pointer; padding: 6px;">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
   </header>
 
-  <main class="shell">
+  <main class="shell" style="max-width: 560px;">
+    <div id="alert" hidden></div>
 
-    <div style="margin-bottom: 24px;">
-      <h1 style="font-size: 1.8rem; margin-top: 4px;">General Assembly Motions</h1>
+    <div class="card card-glass" style="margin-bottom: 18px;">
+      <h3 style="margin-bottom: 6px;"><i class="fa-solid fa-scale-balanced text-gold" style="margin-right: 6px;"></i> How voting works</h3>
+      <ul style="margin: 0 0 0 18px; padding: 0; font-size: 0.88rem; line-height: 1.6; color: #FFF;">
+        <li><b>Who votes:</b> ISOT APS members with a paid annual fee. One member, one vote.</li>
+        <li><b>Secret:</b> ISOT records <i>that</i> you voted, never <i>how</i> you voted.</li>
+        <li><b>Final:</b> once sent, a vote can't be changed.</li>
+        <li><b>Results:</b> shown to everyone only after voting closes. Nobody sees them before, the Board included.</li>
+      </ul>
+      <p class="meta" id="myStatus"></p>
     </div>
 
-    <!-- Online voting is not live yet: no motion is open and no vote is recorded here. -->
-    <div class="card" style="margin-bottom: 20px;">
-      <span class="badge">COMING SOON</span>
-      <h2 style="font-size: 1.3rem; margin: 8px 0;">Online voting is not open yet</h2>
-      <p style="color: var(--text-muted); font-size: 0.9rem;">
-        Motions are voted in person at the General Assembly for now. Members are invited by email
-        with the date, the agenda and the motions. When online voting opens, it will appear here.
-      </p>
-    </div>
+    <div id="votes"></div>
 
+    <!-- Board only -->
+    <div class="card card-glass" id="boardCard" hidden style="border-color: var(--gold, #FFB81F);">
+      <h3 style="margin-bottom: 4px;"><i class="fa-solid fa-gavel text-gold" style="margin-right: 6px;"></i> Board: set up a vote</h3>
+      <p class="meta" style="margin-top: 0;">Every member who can vote gets a notification. A vote can be edited or deleted only until the first ballot is cast.</p>
+      <form id="voteForm" onsubmit="saveVote(event)">
+        <div class="field"><label for="fKind">Type</label>
+          <select id="fKind" onchange="kindChanged()">
+            <option value="election">Election (members stand as candidates)</option>
+            <option value="motion">Motion (In favour / Against / Abstain)</option>
+          </select></div>
+        <div class="field"><label for="fTitle">Title</label>
+          <input type="text" id="fTitle" required maxlength="140" placeholder="Election of the Board 2026–2029" /></div>
+        <div class="field"><label for="fDesc">Text shown to members (optional)</label>
+          <textarea id="fDesc" rows="3" maxlength="2000" placeholder="What is being decided, in plain words."></textarea></div>
+        <div id="electionFields">
+          <div class="field"><label for="fSeats">Seats to elect</label>
+            <input type="number" id="fSeats" min="1" max="9" value="7" /></div>
+          <div class="field"><label for="fMax">Candidates one member can tick</label>
+            <input type="number" id="fMax" min="1" max="9" value="7" /></div>
+          <div class="field"><label for="fCand">Candidacies close (Italian time)</label>
+            <input type="datetime-local" id="fCand" /></div>
+        </div>
+        <div class="field"><label for="fOpen">Voting opens (Italian time)</label>
+          <input type="datetime-local" id="fOpen" required /></div>
+        <div class="field"><label for="fClose">Voting closes (Italian time)</label>
+          <input type="datetime-local" id="fClose" required /></div>
+        <button type="submit" class="btn btn-pink" id="saveBtn" style="margin-top: 14px;">Create the vote</button>
+      </form>
+    </div>
   </main>
 
   <script src="vendor/supabase.js"></script>
   <script src="js/isot.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      await requireAuth({ socio: true });
-    });
+    let me = null, state = null;
+    const alertEl = () => document.getElementById('alert');
+    const when = (iso) => new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' });
+    const fail = (error) => setAlert(alertEl(), (error.message || 'Something went wrong').replace(/^.*?:\s*/, ''), 'error');
 
+    async function load() {
+      const { data, error } = await db.rpc('assembly_votes_list');
+      if (error) {
+        document.getElementById('votes').innerHTML = '<div class="card card-glass dim">Voting is not set up yet.</div>';
+        return;
+      }
+      state = data;
+      const st = document.getElementById('myStatus');
+      st.innerHTML = data.eligible
+        ? `<i class="fa-solid fa-circle-check" style="color:var(--green)"></i> You can vote. ${data.members} members can vote today.`
+        : (data.is_member
+            ? '<i class="fa-solid fa-triangle-exclamation text-gold"></i> Your annual fee is not recorded as paid, so you cannot vote yet. Write to the Board if this is a mistake.'
+            : 'Voting is for ISOT APS members. <a href="apply.html" style="color:var(--pink)">Apply to become one</a>.');
+      document.getElementById('boardCard').hidden = !data.is_board;
+      render();
+    }
+
+    function render() {
+      const host = document.getElementById('votes');
+      if (!state.votes.length) {
+        host.innerHTML = `<div class="card card-glass dim" style="margin-bottom:18px">${state.is_member || state.is_board ? 'No votes yet. When the Board opens one, you get a notification.' : ''}</div>`;
+        return;
+      }
+      host.innerHTML = state.votes.map(voteHtml).join('');
+    }
+
+    function voteHtml(v) {
+      const chip = v.state === 'open' ? '<span class="chip open">Voting open</span>'
+                 : v.state === 'closed' ? '<span class="chip closed">Closed</span>'
+                 : '<span class="chip">Opens ' + when(v.opens_at) + '</span>';
+      let body = '';
+      if (v.state === 'closed') body = resultsHtml(v);
+      else if (v.state === 'open') body = v.i_voted
+        ? '<p style="margin-top:12px;font-weight:700;color:var(--green)"><i class="fa-solid fa-circle-check"></i> Your vote is recorded. It is secret and final.</p>'
+        : (state.eligible ? ballotHtml(v) : '<p class="meta">Voting is open for members with a paid annual fee.</p>');
+      else body = upcomingHtml(v);
+
+      const board = !state.is_board ? '' : `<div class="no-print" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+          ${v.state === 'open' ? `<button class="btn btn-sm btn-outline" style="width:auto" onclick="closeVote('${v.id}')">Close voting now</button>` : ''}
+          <button class="btn btn-sm btn-outline" style="width:auto" onclick="showRecord('${v.id}')">Record for the minutes</button>
+          ${Number(v.voted) === 0 ? `<button class="btn btn-sm btn-outline" style="width:auto" onclick="deleteVote('${v.id}')">Delete</button>` : ''}
+        </div><div id="rec-${v.id}"></div>`;
+
+      return `<div class="card card-glass vote-card" id="v-${v.id}">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+          <h3 style="margin:0">${escapeHtml(v.title)}</h3>${chip}
+        </div>
+        ${v.description ? `<p style="font-size:0.9rem;margin-top:8px;white-space:pre-line">${escapeHtml(v.description)}</p>` : ''}
+        <p class="meta">${v.kind === 'election' ? `${v.seats} ${v.seats === 1 ? 'seat' : 'seats'} · tick up to ${v.max_choices} · ` : ''}Voting ${when(v.opens_at)} → ${when(v.closes_at)} (Italian time)<br>
+          ${v.voted} of ${state.members} members have voted.</p>
+        ${body}${board}
+      </div>`;
+    }
+
+    function upcomingHtml(v) {
+      if (v.kind !== 'election') return '';
+      const mine = v.options.find((o) => o.mine);
+      const list = v.options.length
+        ? v.options.map((o) => `<div class="res"><b style="color:#FFF">${escapeHtml(o.label)}</b>${o.statement ? `<div class="meta" style="margin-top:2px">${escapeHtml(o.statement)}</div>` : ''}</div>`).join('')
+        : '<p class="meta">No candidates yet.</p>';
+      let form = '';
+      if (v.candidacy_open && state.eligible) {
+        form = `<div style="margin-top:14px">
+          <div class="field"><label for="st-${v.id}">${mine ? 'Your candidacy: edit your few words' : 'Stand as a candidate: a few words about you (optional)'}</label>
+            <textarea id="st-${v.id}" rows="3" maxlength="600" placeholder="Why you, and what you want to do for ISOT.">${mine && mine.statement ? escapeHtml(mine.statement) : ''}</textarea></div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-pink" onclick="stand('${v.id}', this)">${mine ? 'Update my candidacy' : 'Stand as a candidate'}</button>
+            ${mine ? `<button class="btn btn-outline" style="width:auto" onclick="withdraw('${v.id}')">Withdraw</button>` : ''}
+          </div></div>`;
+      }
+      return `<h4 style="margin:14px 0 2px;font-size:0.95rem">Candidates <span class="dim" style="font-weight:400">· until ${when(v.candidacy_closes_at)}</span></h4>${list}${form}`;
+    }
+
+    function ballotHtml(v) {
+      const type = v.max_choices > 1 ? 'checkbox' : 'radio';
+      const opts = v.options.map((o) => `<label class="opt"><input type="${type}" name="b-${v.id}" value="${o.id}" onchange="limit('${v.id}', ${v.max_choices}, this)" />
+        <span><b>${escapeHtml(o.label)}</b>${o.statement ? `<small>${escapeHtml(o.statement)}</small>` : ''}</span></label>`).join('');
+      if (!v.options.length) return '<p class="meta">There is nothing to vote on yet.</p>';
+      return `${opts}
+        <p class="meta">${v.max_choices > 1 ? `Tick up to ${v.max_choices}. ` : ''}Ticking nothing sends a blank ballot.</p>
+        <button class="btn btn-pink" style="margin-top:10px" onclick="cast('${v.id}', this)"><i class="fa-solid fa-check-to-slot"></i> Cast my vote</button>`;
+    }
+
+    function resultsHtml(v) {
+      const rows = [...v.options].sort((a, b) => b.votes - a.votes);
+      const top = Math.max(1, ...rows.map((r) => Number(r.votes)));
+      const seats = v.kind === 'election' ? Number(v.seats) : 0;
+      // A tie on the last seat is the Assembly's to settle, so nobody on the tied line is marked.
+      const cut = seats && rows.length > seats && rows[seats - 1].votes === rows[seats].votes ? rows[seats].votes : -1;
+      const html = rows.map((r, i) => {
+        const win = seats && i < seats && Number(r.votes) > 0 && Number(r.votes) !== Number(cut);
+        return `<div class="res ${win ? 'win' : ''}"><div style="display:flex;justify-content:space-between"><b>${escapeHtml(r.label)}${win ? ' · elected' : ''}</b><span>${r.votes}</span></div>
+          <div class="bar"><i style="width:${Math.round(100 * r.votes / top)}%"></i></div></div>`;
+      }).join('');
+      return `<h4 style="margin:14px 0 2px;font-size:0.95rem">Result</h4>${html}
+        <p class="meta">${v.voted} ballots · ${v.blank} blank.${cut >= 0 ? ' <b style="color:var(--gold,#FFB81F)">Tie on the last seat: the Assembly decides.</b>' : ''}</p>`;
+    }
+
+    window.limit = (id, max, box) => {
+      if (box.type !== 'checkbox') return;
+      const n = document.querySelectorAll(`input[name="b-${id}"]:checked`).length;
+      if (n > max) { box.checked = false; setAlert(alertEl(), `You can tick at most ${max}.`, 'info'); }
+    };
+
+    window.cast = async (id, btn) => {
+      const v = state.votes.find((x) => x.id === id);
+      const picked = [...document.querySelectorAll(`input[name="b-${id}"]:checked`)].map((b) => b.value);
+      const names = picked.map((p) => v.options.find((o) => o.id === p).label);
+      const msg = (picked.length ? 'You are voting for:\n\n' + names.join('\n') : 'You are sending a BLANK ballot.') +
+        '\n\nYour vote is secret and cannot be changed. Send it?';
+      if (!confirm(msg)) return;
+      const restore = busy(btn, 'Sending…');
+      const { error } = await db.rpc('assembly_cast', { p_vote: id, p_options: picked });
+      restore();
+      if (error) return fail(error);
+      setAlert(alertEl(), 'Your vote is recorded. Thank you!', 'success');
+      load();
+    };
+
+    window.stand = async (id, btn) => {
+      const restore = busy(btn, 'Saving…');
+      const { error } = await db.rpc('assembly_stand', { p_vote: id, p_statement: document.getElementById('st-' + id).value });
+      restore();
+      if (error) return fail(error);
+      setAlert(alertEl(), 'You are a candidate. Good luck!', 'success');
+      load();
+    };
+    window.withdraw = async (id) => {
+      if (!confirm('Withdraw your candidacy?')) return;
+      const { error } = await db.rpc('assembly_withdraw', { p_vote: id });
+      if (error) return fail(error);
+      load();
+    };
+
+    /* Board */
+    window.kindChanged = () => {
+      document.getElementById('electionFields').hidden = document.getElementById('fKind').value !== 'election';
+    };
+    const iso = (id) => { const v = document.getElementById(id).value; return v ? new Date(v).toISOString() : null; };
+    window.saveVote = async (e) => {
+      e.preventDefault();
+      const kind = document.getElementById('fKind').value;
+      const restore = busy(document.getElementById('saveBtn'), 'Creating…');
+      const { error } = await db.rpc('assembly_vote_save', {
+        p_id: null, p_title: document.getElementById('fTitle').value, p_description: document.getElementById('fDesc').value,
+        p_kind: kind, p_seats: kind === 'election' ? Number(document.getElementById('fSeats').value) : null,
+        p_max_choices: kind === 'election' ? Number(document.getElementById('fMax').value) : 1,
+        p_candidacy_closes_at: kind === 'election' ? iso('fCand') : null,
+        p_opens_at: iso('fOpen'), p_closes_at: iso('fClose'),
+      });
+      restore();
+      if (error) return fail(error);
+      document.getElementById('voteForm').reset(); kindChanged();
+      setAlert(alertEl(), 'Vote created. Members have been notified.', 'success');
+      load();
+    };
+    window.closeVote = async (id) => {
+      if (!confirm('Close voting now? Nobody can vote after this, and the result is shown to all members.')) return;
+      const { error } = await db.rpc('assembly_vote_close', { p_vote: id });
+      if (error) return fail(error);
+      load();
+    };
+    window.deleteVote = async (id) => {
+      if (!confirm('Delete this vote? This cannot be undone.')) return;
+      const { error } = await db.rpc('assembly_vote_delete', { p_vote: id });
+      if (error) return fail(error);
+      load();
+    };
+    window.showRecord = async (id) => {
+      const { data, error } = await db.rpc('assembly_vote_record', { p_vote: id });
+      if (error) return fail(error);
+      const voted = new Set(data.voters.map((w) => w.name));
+      document.getElementById('rec-' + id).innerHTML = `<div style="margin-top:14px;font-size:0.85rem;line-height:1.6">
+        <b>Members entitled to vote today (${data.roll.length}):</b><br>${data.roll.map(escapeHtml).join(', ') || 'none'}<br><br>
+        <b>Voted (${data.voters.length}):</b><br>${data.voters.map((w) => escapeHtml(w.name) + ' · ' + when(w.at)).join('<br>') || 'nobody yet'}<br><br>
+        <b>Did not vote:</b><br>${data.roll.filter((n) => !voted.has(n)).map(escapeHtml).join(', ') || 'none'}<br>
+        <span class="dim">Who voted is recorded; how each member voted is not, by design.</span><br>
+        <button class="btn btn-sm btn-outline no-print" style="width:auto;margin-top:10px" onclick="window.print()">Print this page for the minutes</button></div>`;
+    };
+
+    (async function init() {
+      me = await requireAuth();
+      document.getElementById('headerAvatar').innerHTML = renderUserAvatarHtml(me, 36);
+      await load();
+    })();
   </script>
 </body>
 </html>
