@@ -183,7 +183,7 @@
     <div class="position-hero-badge" id="heroBadge">
       <div class="eyebrow"><i class="fa-solid fa-music"></i> Live Stage Status</div>
       <h1 style="font-size: 2.1rem; color: #FFF; margin-top: 4px;" id="posText">Monday Karaoke @ Rough</h1>
-      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;" id="mySongSub">Song list opens every Monday at 22:30</p>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;" id="mySongSub">Song list open every Monday 19:30 to 00:30</p>
       <p class="now-on-stage" id="nowOnStage" hidden></p>
       <div id="scheduleOverrideNotice" style="margin-top: 10px; display: none;">
         <button type="button" class="btn btn-sm btn-outline" style="width: auto; padding: 4px 12px; font-size: 0.75rem; border-color: var(--gold); color: var(--gold);" onclick="toggleStaffOverride()">
@@ -198,11 +198,11 @@
     <div class="card" id="queueRules" style="margin-bottom: 18px; border: 2px solid var(--gold, #FFB81F); background: rgba(255,184,31,0.08);">
       <h3 style="margin-bottom: 10px; color: #FFF;"><i class="fa-solid fa-scroll text-gold" style="margin-right: 6px;"></i> How the queue works</h3>
       <ol style="margin: 0 0 0 18px; padding: 0; color: #FFF; font-weight: 700; font-size: 0.92rem; line-height: 1.55;">
-        <li>The song list opens at <span class="text-gold">22:30</span>, then again at <span class="text-gold">23:00, 23:30 and 00:00</span>.</li>
-        <li>Each round has <span class="text-gold">8 songs</span> and stays open until they're taken. When it's full, wait for the next round.</li>
-        <li><span class="text-gold">One song per person per round</span>, and <span class="text-gold">max 3 songs a night</span>.</li>
+        <li>The song list is open from <span class="text-gold">19:30</span> until the <span class="text-gold">00:30</span> sing-along.</li>
+        <li>Up to <span class="text-gold">10 songs waiting</span> at a time. When the list is full, <span class="text-gold">a spot opens every time a singer starts</span>: keep the page open and try again.</li>
+        <li><span class="text-gold">One song waiting per person</span>: add your next one after you sing. <span class="text-gold">Max 3 songs a night.</span></li>
         <li>Here with friends? Pick the <span class="text-gold">same crew sticker</span>: your crew's songs stay at least 2 songs apart.</li>
-        <li><span class="text-gold">00:30 sing-along finale</span>: the 5 most voted songs, everyone sings together, no mic. Suggest and vote below (5 votes each).</li>
+        <li><span class="text-gold">00:30 sing-along finale</span>: the 5 most voted songs, everyone sings together, no mic. List full? <span class="text-gold">Suggest and vote</span> for the finale meanwhile.</li>
         <li>The KJ can change the order live when needed.</li>
       </ol>
     </div>
@@ -210,9 +210,9 @@
     <!-- Closed Schedule Notice Card -->
     <div class="card card-glass" id="closedScheduleCard" style="display: none; text-align: center; padding: 28px; margin-bottom: 24px; border-color: var(--gold);">
       <i class="fa-solid fa-clock text-gold" style="font-size: 2.2rem; margin-bottom: 10px;"></i>
-      <h3 style="font-size: 1.1rem; color: #FFF; margin-bottom: 6px;">Karaoke every Monday · song list from 22:30</h3>
+      <h3 style="font-size: 1.1rem; color: #FFF; margin-bottom: 6px;">Karaoke every Monday · song list from 19:30</h3>
       <p class="dim" style="font-size: 0.85rem; margin-bottom: 14px;">
-        Join us live at Rough Bar (San Salvario) every Monday. The song list opens at 22:30, then every 30 minutes, and we finish with a sing-along at 00:30.
+        Join us live at Rough Bar (San Salvario) every Monday. The song list is open from 19:30, up to 10 songs waiting at a time, and we finish with a sing-along at 00:30.
       </p>
       <a href="partner.html" class="btn btn-sm btn-outline" style="width: auto; display: inline-flex; padding: 6px 16px; font-size: 0.82rem;">
         <i class="fa-solid fa-location-dot text-pink"></i> View Venue &amp; Offer
@@ -221,7 +221,7 @@
 
     <!-- Tonight's rounds: when the song list opens (078) -->
     <div class="card card-glass" id="roundsCard" style="margin-bottom: 18px;" hidden>
-      <h3 style="margin-bottom: 2px;"><i class="fa-solid fa-clock text-gold" style="margin-right: 6px;"></i> Tonight's song rounds</h3>
+      <h3 style="margin-bottom: 2px;"><i class="fa-solid fa-clock text-gold" style="margin-right: 6px;"></i> Tonight's song list</h3>
       <div class="rounds" id="roundsBar"></div>
       <p id="roundsNote" style="font-size: 0.88rem; font-weight: 600; color: #FFF; margin-top: 8px;"></p>
     </div>
@@ -548,6 +548,7 @@
       if (!card || !st.opens_at) return;
       card.hidden = false;
 
+      if (st.mode === 'waitlist') return renderWaitlist(st, card, bar, note, big, btn);
       const open = new Date(st.opens_at).getTime();
       const n = Number(st.rounds) || 4;
       const cur = st.phase === 'rounds' ? Number(st.round) : (st.phase === 'finale' ? n + 1 : 0);
@@ -579,6 +580,36 @@
       btn.disabled = !st.can_add;
     }
 
+    /* Waiting-list mode (083): open 19:30 to 00:30, at most 10 songs waiting, one waiting
+       song per person. Full list or used up: send people to the sing-along suggestions. */
+    function renderWaitlist(st, card, bar, note, big, btn) {
+      const cap = Number(st.queue_cap) || 10;
+      const waiting = Number(st.queue_waiting) || 0;
+      const cur = st.phase === 'finale' ? 2 : (st.phase === 'before' ? 0 : 1);
+      bar.innerHTML =
+        `<div class="r ${cur === 1 ? 'now' : ''} ${cur > 1 ? 'past' : ''}"><b>${hm(st.opens_at)}</b>Song list opens</div>` +
+        `<div class="r" style="flex:2"><b>${Math.min(waiting, cap)} / ${cap}</b>songs waiting</div>` +
+        `<div class="r fin ${cur === 2 ? 'now' : ''}"><b>${hm(st.finale_at)}</b>Sing-along</div>`;
+      document.getElementById('finaleTime').textContent = hm(st.finale_at);
+      const toFinale = ' <a href="#finaleCard" style="color:var(--gold,#FFB81F);text-decoration:underline">Suggest a sing-along song ↓</a>';
+      const msgs = {
+        before: `The song list opens at ${hm(st.opens_at)}.`,
+        finale: st.finale_started ? 'Sing-along time! Everyone sings, no mic.' : `Song list closed. Vote for the ${hm(st.finale_at)} sing-along below.`,
+        max: `That's your ${st.max} songs tonight.` + toFinale,
+        mine_waiting: 'Your song is waiting. Add your next one after you sing.' + toFinale,
+        queue_full: `The list is full (${cap} waiting). A spot opens each time a singer starts: try again in a few minutes.` + toFinale,
+        signed_out: 'Sign in to add a song.',
+      };
+      const free = cap - waiting;
+      big.innerHTML = st.can_add
+        ? `Song list open: ${free} ${free === 1 ? 'spot' : 'spots'} free.`
+        : (msgs[st.reason] || '');
+      big.style.color = st.can_add ? 'var(--green)' : '#FFF';
+      note.hidden = false;
+      note.textContent = st.used > 0 ? `${st.used} of ${st.max} songs tonight.` : `Up to ${st.max} songs a night, one waiting at a time.`;
+      btn.disabled = !st.can_add;
+    }
+
     /* Sing-along finale: suggest = vote. Top 5 are highlighted. */
     function renderFinale(rows, st) {
       const card = document.getElementById('finaleCard');
@@ -586,6 +617,11 @@
       const form = document.getElementById('finaleForm');
       if (!card || !list) return;
       card.hidden = false;
+      // From midnight, or when someone can't add a song, the sing-along goes above the form.
+      const romeHour = Number(new Date().toLocaleString('en-GB', { hour: '2-digit', hour12: false, timeZone: 'Europe/Rome' }));
+      const lift = (romeHour >= 0 && romeHour < 6) || ['queue_full', 'max', 'mine_waiting', 'finale'].includes(st.reason);
+      const req = document.getElementById('requestCard');
+      if (req && lift && card.nextElementSibling !== req) { card.style.margin = '0 0 18px'; req.parentNode.insertBefore(card, req); }
       const closed = !!st.finale_started;
       form.hidden = closed;
       if (!rows.length) {
