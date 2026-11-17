@@ -199,8 +199,8 @@
       <h3 style="margin-bottom: 10px; color: #FFF;"><i class="fa-solid fa-scroll text-gold" style="margin-right: 6px;"></i> How the queue works</h3>
       <ol style="margin: 0 0 0 18px; padding: 0; color: #FFF; font-weight: 700; font-size: 0.92rem; line-height: 1.55;">
         <li>The song list is open from <span class="text-gold">19:30</span> until the <span class="text-gold">00:30</span> sing-along.</li>
-        <li>Up to <span class="text-gold">10 songs waiting</span> at a time. When the list is full, <span class="text-gold">a spot opens every time a singer starts</span>: keep the page open and try again.</li>
-        <li><span class="text-gold">One song waiting per person</span>: add your next one after you sing. <span class="text-gold">Max 3 songs a night.</span></li>
+        <li>Up to <span class="text-gold">10 songs waiting</span> at a time. List full? <span class="text-gold">Send your song anyway: it goes on standby</span> and joins the list by itself, first come first served, as soon as a spot opens.</li>
+        <li><span class="text-gold">One song waiting per person</span> (standby counts): add your next one after you sing. <span class="text-gold">Max 3 songs a night.</span></li>
         <li>Here with friends? Pick the <span class="text-gold">same crew sticker</span>: your crew's songs stay at least 2 songs apart.</li>
         <li><span class="text-gold">00:30 sing-along finale</span>: the 5 most voted songs, everyone sings together, no mic. List full? <span class="text-gold">Suggest and vote</span> for the finale meanwhile.</li>
         <li>The KJ can change the order live when needed.</li>
@@ -588,7 +588,7 @@
       const cur = st.phase === 'finale' ? 2 : (st.phase === 'before' ? 0 : 1);
       bar.innerHTML =
         `<div class="r ${cur === 1 ? 'now' : ''} ${cur > 1 ? 'past' : ''}"><b>${hm(st.opens_at)}</b>Song list opens</div>` +
-        `<div class="r" style="flex:2"><b>${Math.min(waiting, cap)} / ${cap}</b>songs waiting</div>` +
+        `<div class="r" style="flex:2"><b>${Math.min(waiting, cap)} / ${cap}</b>songs waiting${Number(st.standby_count) ? ` · ${st.standby_count} on standby` : ''}</div>` +
         `<div class="r fin ${cur === 2 ? 'now' : ''}"><b>${hm(st.finale_at)}</b>Sing-along</div>`;
       document.getElementById('finaleTime').textContent = hm(st.finale_at);
       const toFinale = ' <a href="#finaleCard" style="color:var(--gold,#FFB81F);text-decoration:underline">Suggest a sing-along song ↓</a>';
@@ -597,12 +597,14 @@
         finale: st.finale_started ? 'Sing-along time! Everyone sings, no mic.' : `Song list closed. Vote for the ${hm(st.finale_at)} sing-along below.`,
         max: `That's your ${st.max} songs tonight.` + toFinale,
         mine_waiting: 'Your song is waiting. Add your next one after you sing.' + toFinale,
+        mine_standby: `Your song is on standby (#${st.standby_position || 1}). It joins the list by itself when a spot opens. <a href="#" onclick="leaveStandby(event)" style="color:var(--text-muted);text-decoration:underline">Cancel</a>` + toFinale,
         queue_full: `The list is full (${cap} waiting). A spot opens each time a singer starts: try again in a few minutes.` + toFinale,
         signed_out: 'Sign in to add a song.',
       };
       const free = cap - waiting;
       big.innerHTML = st.can_add
-        ? `Song list open: ${free} ${free === 1 ? 'spot' : 'spots'} free.`
+        ? (free > 0 ? `Song list open: ${free} ${free === 1 ? 'spot' : 'spots'} free.`
+                    : `The list is full: send your song and it goes on standby. It joins by itself when a spot opens.`)
         : (msgs[st.reason] || '');
       big.style.color = st.can_add ? 'var(--green)' : '#FFF';
       note.hidden = false;
@@ -970,10 +972,19 @@
 
       document.getElementById('songTitle').value = '';
       document.getElementById('artistName').value = '';
-      setAlert(alertEl, `You're number ${data.position} in the queue.`, 'success');
+      setAlert(alertEl, data.standby
+        ? `The list is full, so your song is on standby (#${data.position}). It joins the list by itself when a spot opens. No need to ask the KJ!`
+        : `You're number ${data.position} in the queue.`, 'success');
       await loadQueue();
     }
 
+
+    window.leaveStandby = async (e) => {
+      e.preventDefault();
+      if (!confirm('Take your song off standby?')) return;
+      await db.rpc('leave_karaoke_standby', { p_instance: tonight.instance_id });
+      await loadQueue();
+    };
 
     async function cancelMySong() {
       if (!myActiveSlot) return;
