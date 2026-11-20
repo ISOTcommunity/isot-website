@@ -826,6 +826,7 @@
                   All events
                 </a>`}
             </div>
+            <div class="home-extra" data-occ="${lead.id}"></div>
           </div>
         </div>
 
@@ -846,6 +847,7 @@
               ${userRsvps[e.id] ? '<i class="fa-solid fa-check" aria-hidden="true"></i> Going' : 'Count me in'}
             </button>
           </div>
+          <div class="home-extra" data-occ="${e.id}" style="padding:0 16px 14px"></div>
         </div>`).join('')}
 
         ${rest.length ? `
@@ -879,6 +881,41 @@
       // The last row's divider has nothing under it.
       const rows = el.querySelectorAll('div[style*="border-bottom"]');
       if (rows.length) rows[rows.length - 1].style.borderBottom = 'none';
+      loadHomeExtras();
+    }
+
+    // The night's optional extra (Lasagna & Karaoke, 23 Nov: "Lasagna + drink · €10", max 30),
+    // right under "Count me in" so nobody has to open the event to reserve it.
+    async function loadHomeExtras() {
+      for (const slot of document.querySelectorAll('.home-extra')) {
+        const [eventId, date] = slot.dataset.occ.split('|');
+        const { data, error } = await db.rpc('event_extra_state', { p_event_id: eventId, p_date: date });
+        if (error || !data || !data.label) { slot.innerHTML = ''; continue; }
+        const left = data.cap ? Math.max(0, data.cap - data.count) : null;
+        const soldOut = left === 0 && !data.mine;
+        slot.innerHTML = `
+          <button type="button" ${soldOut ? 'disabled' : ''} onclick="toggleHomeExtra('${slot.dataset.occ}', ${!data.mine})"
+                  style="margin-top:12px;width:100%;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;
+                         border:1px solid ${data.mine ? 'var(--green, #22c55e)' : 'var(--border-strong)'};
+                         background:rgba(255,255,255,0.06);color:#FFF;font:inherit;text-align:left;cursor:${soldOut ? 'default' : 'pointer'}">
+            <i class="fa-${data.mine ? 'solid fa-square-check text-green' : 'regular fa-square'}" style="font-size:1.3rem"></i>
+            <span style="flex:1">
+              <b>${escapeHtml(data.label)}</b>
+              <span class="dim" style="display:block;font-size:0.78rem">${data.mine ? "You're on the list. Pay at the bar." : soldOut ? 'Sold out' : 'Tap to reserve yours'}</span>
+            </span>
+            ${left === null ? '' : `<span style="text-align:center"><b style="color:${left ? '#FFF' : 'var(--pink)'}">${left}</b><span class="dim" style="display:block;font-size:0.62rem">of ${data.cap} left</span></span>`}
+          </button>`;
+      }
+    }
+
+    async function toggleHomeExtra(occId, on) {
+      const [eventId, date] = occId.split('|');
+      const { data, error } = await db.rpc('set_rsvp_extra', { p_event_id: eventId, p_date: date, p_on: on });
+      if (error) { alert(error.message); loadHomeExtras(); return; }
+      userRsvps[occId] = true;
+      const occ = EVENTS_DATA.find(e => e.id === occId);
+      if (occ) { occ.goingCount = data.going_count; occ.instanceId = data.instance_id; }
+      renderFeaturedNight();
     }
 
     /* RSVP from any of the three cards on the home screen. */
