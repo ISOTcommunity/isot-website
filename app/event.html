@@ -146,16 +146,19 @@
     const { data, error } = await db.rpc('event_extra_state', { p_event_id: ev.event_id, p_date: ev.event_date });
     if (error || !data || !data.label) { box.innerHTML = ''; return; }
     const isBoard = me && me.staff_role === 'board';
+    const left = data.cap ? Math.max(0, data.cap - data.count) : null;
+    const soldOut = left === 0 && !data.mine;
     box.innerHTML = `
       <div class="card card-glass" style="margin-top:12px">
         <label style="display:flex;align-items:center;gap:12px;cursor:pointer">
-          <input type="checkbox" id="extraTick" ${data.mine ? 'checked' : ''} onchange="setExtra(this.checked)"
+          <input type="checkbox" id="extraTick" ${data.mine ? 'checked' : ''} ${soldOut ? 'disabled' : ''} onchange="setExtra(this.checked)"
                  style="width:22px;height:22px;accent-color:var(--pink)" />
           <div style="flex:1">
             <div style="color:#FFF;font-weight:600">${escapeHtml(data.label)}</div>
-            <div class="dim" style="font-size:0.8rem">${data.mine ? "You're on the list — pay at the bar." : 'Tick to reserve yours. It also marks you going.'}</div>
+            <div class="dim" style="font-size:0.8rem">${data.mine ? "You're on the list — pay at the bar." : soldOut ? 'Sold out — all portions are reserved.' : 'Tick to reserve yours. It also marks you going.'}</div>
           </div>
-          <div style="text-align:center"><b style="color:#FFF">${data.count}</b><div class="dim" style="font-size:0.65rem">so far</div></div>
+          <div style="text-align:center">${left === null ? `<b style="color:#FFF">${data.count}</b><div class="dim" style="font-size:0.65rem">so far</div>`
+            : `<b style="color:${left ? '#FFF' : 'var(--pink)'}">${left}</b><div class="dim" style="font-size:0.65rem">of ${data.cap} left</div>`}</div>
         </label>
         ${isBoard ? `<button type="button" class="btn btn-sm btn-outline" style="width:auto;margin-top:12px;padding:6px 14px;font-size:0.8rem" onclick="showExtraList()">Board: see names</button><div id="extraList"></div>` : ''}
       </div>`;
