@@ -1,6 +1,6 @@
 {
   "_readme": "ISOT's own strike list. Edit on GitHub and commit: the app reads it on every open. The official register (via /api/strikes) is merged in automatically; add an entry here only to correct its wording or to add something it misses. kind: local | general | rail | air. scope: turin | region | national. date and end: YYYY-MM-DD. Past entries disappear on their own.",
-  "updated": "2026-10-27",
+  "updated": "2026-11-20",
   "strikes": [
     {
       "date": "2026-10-02",
@@ -59,12 +59,28 @@
       "note": "Saturday 21 Nov: GTT buses, trams and metro may stop all day outside the guaranteed hours (check gtt.to.it). Trains from 21:00 Fri 20 to 20:00 Sat 21."
     },
     {
-      "date": "2026-11-21",
+      "date": "2026-11-22",
       "end": "2026-11-22",
       "kind": "air",
+      "scope": "region",
+      "title": "Air traffic control at Milano Malpensa (ENAV)",
+      "note": "Sunday 22 Nov, 13:00–17:00, Malpensa only. Flights there may be delayed or cancelled: check with your airline."
+    },
+    {
+      "date": "2026-12-04",
+      "end": "2026-12-04",
+      "kind": "general",
       "scope": "national",
-      "title": "Air traffic control (ENAV)",
-      "note": "Sat 21 Nov 13:00–17:00 across Italy, and all day Sun 22 Nov at Milano Malpensa. Check your flight with the airline."
+      "title": "General strike (CUB, SGB, SI-Cobas and others)",
+      "note": "Friday 4 Dec. Trains from 21:00 Thu 3 Dec to 21:00 Fri 4 Dec. GTT buses, trams and metro may stop outside the guaranteed hours (usually 6:00–9:00 and 12:00–15:00): times still to be announced, check gtt.to.it. Flights: times not announced yet."
+    },
+    {
+      "date": "2026-12-15",
+      "end": "2026-12-15",
+      "kind": "local",
+      "scope": "national",
+      "title": "Taxi strike",
+      "note": "Tuesday 15 Dec, 8:00–22:00, across Italy. Plan another way to get around."
     }
   ]
 }
