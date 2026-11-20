@@ -127,12 +127,54 @@
         </div>
       </div>
 
+      <div id="extraBox"></div>
+
       <div class="card card-glass" style="margin-top:12px">
         <div class="eyebrow" style="margin-bottom:10px">Who's going</div>
         <div id="attendees"><div class="spinner" style="margin:16px auto"></div></div>
       </div>`;
 
     loadAttendees();
+    loadExtra();
+  }
+
+  // Optional extra for this night (e.g. "Lasagna + drink · €10"). Ticking it also marks
+  // you going, so the bar gets one honest count of portions.
+  async function loadExtra() {
+    const box = document.getElementById('extraBox');
+    if (!box) return;
+    const { data, error } = await db.rpc('event_extra_state', { p_event_id: ev.event_id, p_date: ev.event_date });
+    if (error || !data || !data.label) { box.innerHTML = ''; return; }
+    const isBoard = me && me.staff_role === 'board';
+    box.innerHTML = `
+      <div class="card card-glass" style="margin-top:12px">
+        <label style="display:flex;align-items:center;gap:12px;cursor:pointer">
+          <input type="checkbox" id="extraTick" ${data.mine ? 'checked' : ''} onchange="setExtra(this.checked)"
+                 style="width:22px;height:22px;accent-color:var(--pink)" />
+          <div style="flex:1">
+            <div style="color:#FFF;font-weight:600">${escapeHtml(data.label)}</div>
+            <div class="dim" style="font-size:0.8rem">${data.mine ? "You're on the list — pay at the bar." : 'Tick to reserve yours. It also marks you going.'}</div>
+          </div>
+          <div style="text-align:center"><b style="color:#FFF">${data.count}</b><div class="dim" style="font-size:0.65rem">so far</div></div>
+        </label>
+        ${isBoard ? `<button type="button" class="btn btn-sm btn-outline" style="width:auto;margin-top:12px;padding:6px 14px;font-size:0.8rem" onclick="showExtraList()">Board: see names</button><div id="extraList"></div>` : ''}
+      </div>`;
+  }
+
+  async function setExtra(on) {
+    const { data, error } = await db.rpc('set_rsvp_extra', { p_event_id: ev.event_id, p_date: ev.event_date, p_on: on });
+    if (error) { alert('Could not save: ' + error.message); loadExtra(); return; }
+    ev.going_count = data.going_count;
+    ev.instance_id = data.instance_id;
+    render();
+  }
+
+  async function showExtraList() {
+    const el = document.getElementById('extraList');
+    const { data, error } = await db.rpc('event_extra_list', { p_event_id: ev.event_id, p_date: ev.event_date });
+    if (error) { el.innerHTML = `<p class="dim">${escapeHtml(error.message)}</p>`; return; }
+    el.innerHTML = `<ol style="margin:10px 0 0 18px;color:#FFF;font-size:0.86rem">${(data || []).map(r =>
+      `<li>${escapeHtml(r.full_name || '?')} <span class="dim">${escapeHtml(r.member_code || '')}</span></li>`).join('') || '<li class="dim">Nobody yet</li>'}</ol>`;
   }
 
   async function myRsvpState() {
